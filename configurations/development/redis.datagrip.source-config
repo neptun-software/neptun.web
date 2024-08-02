@@ -1,0 +1,5 @@
+#DataSourceSettings#
+#LocalDataSource: neptun.dev.redis@localhost
+#BEGIN#
+<data-source source="LOCAL" name="neptun.dev.redis@localhost" uuid="99b0bab4-55e0-4aa0-9655-a4df552b70a0"><database-info product="Redis Standalone" version="6.3.4" jdbc-version="4.2" driver-name="Redis JDBC Driver" driver-version="1.5" dbms="REDIS" exact-version="6.3.4" exact-driver-version="1.5"><jdbc-catalog-is-schema>true</jdbc-catalog-is-schema></database-info><case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed"/><driver-ref>redis</driver-ref><synchronize>true</synchronize><jdbc-driver>jdbc.RedisDriver</jdbc-driver><jdbc-url>jdbc:redis://localhost:6379/0</jdbc-url><secret-storage>master_key</secret-storage><auth-provider>no-auth</auth-provider><user-name>redis</user-name><schema-mapping/><working-dir>$ProjectFileDir$</working-dir></data-source>
+#END#
