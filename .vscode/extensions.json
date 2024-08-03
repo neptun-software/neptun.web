@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "streetsidesoftware.code-spell-checker",
+    "Selemondev.shadcn-vue",
+    "heybourn.headwind",
+    "esbenp.prettier-vscode",
+    "christian-kohler.path-intellisense",
+    "nuxtr.nuxt-vscode-extentions",
+    "christian-kohler.npm-intellisense",
+    "zignd.html-css-class-completion",
+    "qufiwefefwoyn.inline-sql-syntax",
+    "moalamri.inline-fold",
+    "ecmel.vscode-html-css"
+  ]
+}

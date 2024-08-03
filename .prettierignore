@@ -1,0 +1,8 @@
+node_modules
+public
+.nuxt
+.vercel
+components/ui/**
+server/.generated/**
+server/database/migrations/**
+pnpm-lock.yaml

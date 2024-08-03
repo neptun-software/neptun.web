@@ -1,0 +1,43 @@
+<script lang="ts" setup>
+type possibleDashboardTabs = 'chat' | 'chats';
+const selectedDashboardTab = ref<possibleDashboardTabs>('chat');
+const selectedDashboardTabFromLocalStorage =
+  useLocalStorage<possibleDashboardTabs>(
+    localStorageTopicKey('selected-dashboard-tab'),
+    'chat'
+  );
+
+watch(selectedDashboardTab, () => {
+  selectedDashboardTabFromLocalStorage.value = selectedDashboardTab.value;
+});
+
+onMounted(() => {
+  selectedDashboardTab.value = selectedDashboardTabFromLocalStorage.value;
+});
+</script>
+
+<template>
+  <div>
+    <ShadcnTabs
+      v-model="selectedDashboardTab"
+      default-value="chat"
+      class="h-screen max-h-[calc(100%-3rem)] pr-2"
+    >
+      <ShadcnTabsList class="flex justify-start w-full bg-muted/50">
+        <ShadcnTabsTrigger value="chats"> All Chats </ShadcnTabsTrigger>
+        <ShadcnTabsTrigger value="chat">
+          Active Chat Information
+        </ShadcnTabsTrigger>
+      </ShadcnTabsList>
+      <ShadcnTabsContent value="chats" class="h-full">
+        <AiChats />
+      </ShadcnTabsContent>
+      <ShadcnTabsContent value="chat" class="h-full">
+        <AiChatInformation />
+        <!-- FILES OF CHAT -->
+      </ShadcnTabsContent>
+    </ShadcnTabs>
+  </div>
+</template>
+
+<style scoped></style>
