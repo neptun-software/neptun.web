@@ -1,5 +1,12 @@
 <script setup lang="ts">
 // Thanks to https://codepen.io/Mamboleoo/pen/obWGYr ♥
+const colorMode = useColorMode();
+const colors = computed(() => {
+  return colorMode.preference === 'dark'
+    ? ['#00FFFF', '#1E90FF', '#00BFFF', '#00CED1', '#00B2FF']
+    : ['#0e7490', '#083344', '#042f2e', '#082f49', '#60a5fa'];
+});
+
 const { x, y } = useMouse();
 const mouse = ref<Mouse>({ x: 0, y: 0 });
 const radius = ref<number>(1);
@@ -61,7 +68,7 @@ class Particle {
     const b = this.y - mouse.y;
     const distance = Math.sqrt(a * a + b * b);
 
-    const multiplier = 30;
+    const multiplier = 15;
     if (distance < radius * multiplier) {
       // multiplier for the interaction radius
       const force = (radius * multiplier - distance) / (radius * multiplier); // force calculation
@@ -76,7 +83,6 @@ class Particle {
 const canvas = ref<HTMLCanvasElement | null>(null);
 
 const particles: Particle[] = [];
-const colors = ['#0e7490', '#083344', '#042f2e', '#082f49', '#60a5fa'];
 const staticText = 'Neptun';
 
 const initScene = () => {
@@ -102,7 +108,7 @@ const initScene = () => {
   for (let i = 0; i < ww; i += Math.round(ww / 150)) {
     for (let j = 0; j < wh; j += Math.round(ww / 150)) {
       if (data[(i + j * ww) * 4 + 3] > 150) {
-        particles.push(new Particle(i, j, colors));
+        particles.push(new Particle(i, j, colors.value));
       }
     }
   }
@@ -145,6 +151,15 @@ onUnmounted(() => {
   window.removeEventListener('touchend', onTouchEnd);
 });
 
+const headerNavigationStore = useHeaderNavigationStore();
+const { headerNavigationElement } = storeToRefs(headerNavigationStore);
+
+const headerNavigationHeight = ref(81);
+watch(headerNavigationElement, (newHeaderNavigationElement) => {
+  const { height } = useElementSize(newHeaderNavigationElement);
+  headerNavigationHeight.value = height.value;
+});
+
 definePageMeta({
   name: 'Home',
   alias: ['/root'],
@@ -153,9 +168,52 @@ definePageMeta({
 
 <template>
   <div class="overflow-hidden">
-    <canvas ref="canvas" id="scene"></canvas>
-    <div class="mt-[2rem] text-center relative z-10">
-      <ShadcnButton class="rounded-3xl" as-child>
+    <canvas ref="canvas" id="scene" class="z-10 bg-primary"></canvas>
+    <div
+      class="absolute left-0 z-50 w-full bg-accent"
+      :style="{ top: headerNavigationHeight + 'px' }"
+    >
+      <div>
+        <svg
+          class="waves"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          viewBox="0 24 150 28"
+          preserveAspectRatio="none"
+          shape-rendering="auto"
+        >
+          <defs>
+            <path
+              id="gentle-wave"
+              d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"
+            />
+          </defs>
+          <g class="parallax">
+            <use
+              xlink:href="#gentle-wave"
+              x="48"
+              y="0"
+              class="fill-primary/70"
+            />
+            <use
+              xlink:href="#gentle-wave"
+              x="48"
+              y="3"
+              class="fill-primary/50"
+            />
+            <use
+              xlink:href="#gentle-wave"
+              x="48"
+              y="5"
+              class="fill-primary/30"
+            />
+            <use xlink:href="#gentle-wave" x="48" y="7" class="fill-primary" />
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="mt-[2rem] relative z-10 text-center">
+      <ShadcnButton class="rounded-3xl" variant="outline" as-child>
         <NuxtLink to="/sign-up"> Sign Up Now </NuxtLink>
       </ShadcnButton>
     </div>
@@ -172,5 +230,52 @@ canvas {
   width: 100dvw;
   height: 100vh;
   height: 100dvh;
+}
+
+.waves {
+  position: relative;
+  width: 100%;
+  height: 15vh;
+  margin-bottom: -7px; /* fix for safari gap */
+  min-height: 100px;
+  max-height: 150px;
+}
+
+/* Animation */
+
+.parallax > use {
+  animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+}
+.parallax > use:nth-child(1) {
+  animation-delay: -2s;
+  animation-duration: 7s;
+}
+.parallax > use:nth-child(2) {
+  animation-delay: -3s;
+  animation-duration: 10s;
+}
+.parallax > use:nth-child(3) {
+  animation-delay: -4s;
+  animation-duration: 13s;
+}
+.parallax > use:nth-child(4) {
+  animation-delay: -5s;
+  animation-duration: 20s;
+}
+@keyframes move-forever {
+  0% {
+    transform: translate3d(-90px, 0, 0);
+  }
+  100% {
+    transform: translate3d(85px, 0, 0);
+  }
+}
+
+/*Shrinking for mobile*/
+@media (max-width: 768px) {
+  .waves {
+    height: 40px;
+    min-height: 40px;
+  }
 }
 </style>
