@@ -172,10 +172,10 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="overflow-hidden">
-    <canvas ref="canvas" id="scene" class="z-10 bg-slate-950"></canvas>
+  <div class="h-full overflow-hidden bg-slate-950">
+    <canvas ref="canvas" id="scene" class="z-10"></canvas>
     <div
-      class="absolute left-0 z-50 w-full bg-cyan-600"
+      class="absolute left-0 w-full bg-cyan-600"
       :style="{ top: headerNavigationHeight + 'px' }"
     >
       <div>
