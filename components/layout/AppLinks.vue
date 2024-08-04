@@ -11,7 +11,11 @@ const routes = router.options.routes;
 
 const hiddenRoutes = ['/new-password'];
 const hiddenRoutesIfLoggedIn = hiddenRoutes.concat(['/log-in', '/sign-up']);
-const hiddenRoutesIfLoggedOut = hiddenRoutes.concat(['/', '/account']);
+const hiddenRoutesIfLoggedOut = hiddenRoutes.concat([
+  '/',
+  '/account',
+  '/guide',
+]);
 
 const visibleRoutes = computed(() => {
   if (loggedIn.value) {
