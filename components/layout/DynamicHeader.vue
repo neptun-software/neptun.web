@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
+import { navigateTo } from '#imports';
 
 const props = defineProps<{
   class?: HTMLAttributes['class'];
