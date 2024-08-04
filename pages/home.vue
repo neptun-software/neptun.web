@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { loggedIn } = useUserSession();
 // Thanks to https://codepen.io/Mamboleoo/pen/obWGYr ♥
 const colorMode = useColorMode();
 const colors = computed(() => {
@@ -10,6 +11,10 @@ const colors = computed(() => {
 const { x, y } = useMouse();
 const mouse = ref<Mouse>({ x: 0, y: 0 });
 const radius = ref<number>(1);
+
+watch(colors, () => {
+  initScene();
+});
 
 watch(x, (newX) => {
   mouse.value.x = newX;
@@ -154,7 +159,7 @@ onUnmounted(() => {
 const headerNavigationStore = useHeaderNavigationStore();
 const { headerNavigationElement } = storeToRefs(headerNavigationStore);
 
-const headerNavigationHeight = ref(81);
+const headerNavigationHeight = ref(loggedIn.value ? 81 : 77);
 watch(headerNavigationElement, (newHeaderNavigationElement) => {
   const { height } = useElementSize(newHeaderNavigationElement);
   headerNavigationHeight.value = height.value;
@@ -168,9 +173,9 @@ definePageMeta({
 
 <template>
   <div class="overflow-hidden">
-    <canvas ref="canvas" id="scene" class="z-10 bg-primary"></canvas>
+    <canvas ref="canvas" id="scene" class="z-10 bg-slate-950"></canvas>
     <div
-      class="absolute left-0 z-50 w-full bg-accent"
+      class="absolute left-0 z-50 w-full bg-cyan-600"
       :style="{ top: headerNavigationHeight + 'px' }"
     >
       <div>
@@ -193,29 +198,29 @@ definePageMeta({
               xlink:href="#gentle-wave"
               x="48"
               y="0"
-              class="fill-primary/70"
+              class="fill-slate-950/70"
             />
             <use
               xlink:href="#gentle-wave"
               x="48"
               y="3"
-              class="fill-primary/50"
+              class="fill-slate-950/50"
             />
             <use
               xlink:href="#gentle-wave"
               x="48"
               y="5"
-              class="fill-primary/30"
+              class="fill-slate-950/30"
             />
-            <use xlink:href="#gentle-wave" x="48" y="7" class="fill-primary" />
+            <use
+              xlink:href="#gentle-wave"
+              x="48"
+              y="7"
+              class="fill-slate-950"
+            />
           </g>
         </svg>
       </div>
-    </div>
-    <div class="mt-[2rem] relative z-10 text-center">
-      <ShadcnButton class="rounded-3xl" variant="outline" as-child>
-        <NuxtLink to="/sign-up"> Sign Up Now </NuxtLink>
-      </ShadcnButton>
     </div>
   </div>
 </template>
