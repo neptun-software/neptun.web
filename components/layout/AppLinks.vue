@@ -73,6 +73,7 @@ const sortedRoutes = computed(() => {
         >
           <ShadcnAvatar>
             <ShadcnAvatarImage src="/favicon.png" alt="Neptun Logo" />
+            <ShadcnAvatarFallback>Home</ShadcnAvatarFallback>
           </ShadcnAvatar>
         </NuxtLink>
         <NuxtLink v-else :to="route.path" activeClass="active-link">

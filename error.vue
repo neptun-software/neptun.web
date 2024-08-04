@@ -10,14 +10,16 @@ const handleError = () => clearError({ redirect: '/home' });
 
 <template #error="{ error }">
   <NuxtLayout>
-    <h1 class="font-bold text-9xl text-primary-foreground">
-      {{ error?.statusCode }}
-    </h1>
-    <p class="text-4xl font-medium text-primary-foreground">
-      {{ error?.message }}
-    </p>
-    <ShadcnButton class="mt-4" variant="secondary" @click="handleError">
-      Home
-    </ShadcnButton>
+    <div class="flex flex-col items-center justify-center h-full">
+      <h1 class="font-bold text-9xl">
+        {{ error?.statusCode }}
+      </h1>
+      <p class="text-4xl font-medium">
+        {{ error?.message }}
+      </p>
+      <ShadcnButton class="mt-4" variant="secondary" @click="handleError">
+        Home
+      </ShadcnButton>
+    </div>
   </NuxtLayout>
 </template>
