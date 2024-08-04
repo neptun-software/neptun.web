@@ -162,7 +162,7 @@ let filteredChats = computed(() => {
 </script>
 
 <template>
-  <div class="relative h-[calc(100%-2.25rem)] p-2 border rounded-md">
+  <div class="relative h-[calc(100%-2.75rem-0.5rem)] p-2 border rounded-md">
     <div class="pb-2 bg-background">
       <div class="flex flex-wrap items-center w-full gap-1">
         <div class="relative w-full">

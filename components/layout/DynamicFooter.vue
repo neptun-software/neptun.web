@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <footer class="border-t">
+  <footer class="z-10 border-t bg-background">
     <AppLinks />
   </footer>
 </template>

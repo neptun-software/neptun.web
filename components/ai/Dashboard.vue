@@ -6,7 +6,7 @@ const { width } = useWindowSize();
 </script>
 
 <template>
-  <div>
+  <div class="h-full">
     <ShadcnResizablePanelGroup
       v-if="width >= 1024"
       id="handle-group-1"
