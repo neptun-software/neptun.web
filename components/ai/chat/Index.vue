@@ -13,6 +13,7 @@ import {
 } from 'lucide-vue-next';
 import { useChat, type Message } from '@ai-sdk/vue'; // NOTE: can only be called in setup scripts ("Could not get current instance, check to make sure that `useSwrv` is declared in the top level of the setup function.")
 import { toast } from 'vue-sonner';
+import { generateUUID } from '~/lib/utils';
 const { console } = useLogger();
 
 const { loadFiles } = useFetchFiles();
@@ -79,6 +80,7 @@ const waitForValidRef = (condition: Ref<boolean | undefined>) => {
   return promise;
 };
 
+const chatMessagesKey = ref<string>(generateUUID());
 watch(
   () => chatMessages.value.length,
   async (newLength, oldLength) => {
@@ -96,6 +98,7 @@ watch(
     }
 
     await aiIsDoneResponding;
+    chatMessagesKey.value = generateUUID();
     if (selectedAiChat.value.id !== -1) {
       await loadFiles(user.value?.id ?? -1, selectedAiChat.value.id);
     }
@@ -301,9 +304,14 @@ async function reloadLast() {
 }
 
 async function deleteLast() {
-  await $fetch(`/api/users/2/chats/214/messages/last`, {
-    method: 'DELETE',
-  })
+  await $fetch(
+    `/api/users/${user.value?.id ?? -1}/chats/${
+      selectedAiChat.value.id
+    }/messages/last`,
+    {
+      method: 'DELETE',
+    }
+  )
     .then(async () => {
       toast.success('Chat message deleted!');
     })
@@ -371,7 +379,7 @@ async function deleteLast() {
         </DevOnly>
         -->
 
-        <AiChatMessages :messages="chatMessages" />
+        <AiChatMessages :messages="chatMessages" :key="chatMessagesKey" />
 
         <template v-if="isLoading">
           <MessagesSkeleton />
