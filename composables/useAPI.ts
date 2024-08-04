@@ -122,17 +122,21 @@ export const useAPI = () => {
     const codeBlocks = await getCodeBlocksFromMarkdown(markdown);
 
     if (codeBlocks.length > 0) {
-      const persistedCodeBlocks = await $fetch(
-        `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
-        {
-          method: 'POST',
-          body: {
-            files: codeBlocks,
-          },
-        }
-      );
+      try {
+        const persistedCodeBlocks = await $fetch(
+          `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
+          {
+            method: 'POST',
+            body: {
+              files: codeBlocks,
+            },
+          }
+        );
 
-      return persistedCodeBlocks;
+        return persistedCodeBlocks;
+      } catch {
+        console.error("Failed to persist code blocks!");
+      }
     }
 
     return null;
@@ -316,10 +320,14 @@ export function useFetchFiles() {
         return;
       }
 
-      const data = await $fetch(`/api/users/${user_id}/chats/${chat_id}/files`);
-      if (data.chatFiles && data.chatFiles.length > 0) {
-        const chatFiles = data.chatFiles;
-        fetchedFiles.value = (chatFiles as ReadChatConversationFile[]) ?? [];
+      try {
+        const data = await $fetch(`/api/users/${user_id}/chats/${chat_id}/files`);
+        if (data.chatFiles && data.chatFiles.length > 0) {
+          const chatFiles = data.chatFiles;
+          fetchedFiles.value = (chatFiles as ReadChatConversationFile[]) ?? [];
+        }
+      } catch {
+        console.error("Failed to fetch files!");
       }
     }
   }

@@ -188,22 +188,26 @@ async function loadChatMessages(user_id: number, chat_id: number) {
       return;
     }
 
-    const data = await $fetch(
-      `/api/users/${user_id}/chats/${chat_id}/messages`
-    );
-
-    if (data?.chatMessages && data.chatMessages.length > 0) {
-      const chatMessages = data.chatMessages;
-      const messages = chatMessages.map(
-        ({ id, message, actor }) =>
-          ({
-            id: `${String(id)}-${String(Date.now())}`,
-            content: message,
-            role: actor,
-          } as Message)
+    try {
+      const data = await $fetch(
+        `/api/users/${user_id}/chats/${chat_id}/messages`
       );
 
-      setChatMessages(messages);
+      if (data?.chatMessages && data.chatMessages.length > 0) {
+        const chatMessages = data.chatMessages;
+        const messages = chatMessages.map(
+          ({ id, message, actor }) =>
+            ({
+              id: `${String(id)}-${String(Date.now())}`,
+              content: message,
+              role: actor,
+            } as Message)
+        );
+
+        setChatMessages(messages);
+      }
+    } catch {
+      console.error('Failed to load chat messages!');
     }
   }
 }

@@ -29,28 +29,32 @@ async function persistCodeBlocks(
     if (LOG_BACKEND)
       console.log(`persisting ${codeBlocks.length} code block(s)...`);
 
-    const persistedCodeBlocks = await event.$fetch(
-      `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
-      {
-        // .event.$fetch used because it contains the current session
-        method: 'POST',
-        body: {
-          files: codeBlocks,
-        },
-      }
-    );
-
-    if (LOG_BACKEND) {
-      console.info(
-        'persistCodeBlocks:',
-        persistedCodeBlocks,
-        user_id,
-        chat_id,
-        message_id
+    try {
+      const persistedCodeBlocks = await event.$fetch(
+        `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
+        {
+          // .event.$fetch used because it contains the current session
+          method: 'POST',
+          body: {
+            files: codeBlocks,
+          },
+        }
       );
-    }
 
-    return persistedCodeBlocks;
+      if (LOG_BACKEND) {
+        console.info(
+          'persistCodeBlocks:',
+          persistedCodeBlocks,
+          user_id,
+          chat_id,
+          message_id
+        );
+      }
+
+      return persistedCodeBlocks;
+    } catch (error) {
+      if (LOG_BACKEND) console.error('Persisting code blocks errored:', error);
+    }
   }
 
   return null;
@@ -64,34 +68,38 @@ async function persistChatMessage(
   event: H3Event<EventHandlerRequest>
 ) {
   if (chat_id >= 1) {
-    const persistedChatMessage = await event.$fetch(
-      `/api/users/${user_id}/chats/${chat_id}/messages`,
-      {
-        // .event.$fetch used because it contains the current session
-        method: 'POST',
-        body: {
-          message: messageText,
-          actor,
-        },
-      }
-    );
-
-    if (LOG_BACKEND)
-      console.info(
-        'persistChatMessage:',
-        persistedChatMessage,
-        user_id,
-        chat_id,
-        messageText
+    try {
+      const persistedChatMessage = await event.$fetch(
+        `/api/users/${user_id}/chats/${chat_id}/messages`,
+        {
+          // .event.$fetch used because it contains the current session
+          method: 'POST',
+          body: {
+            message: messageText,
+            actor,
+          },
+        }
       );
 
-    const chatMessage =
-      persistedChatMessage && 'chatMessage' in persistedChatMessage
-        ? persistedChatMessage.chatMessage
-          ? persistedChatMessage.chatMessage[0]
-          : null
-        : null;
-    return chatMessage;
+      if (LOG_BACKEND)
+        console.info(
+          'persistChatMessage:',
+          persistedChatMessage,
+          user_id,
+          chat_id,
+          messageText
+        );
+
+      const chatMessage =
+        persistedChatMessage && 'chatMessage' in persistedChatMessage
+          ? persistedChatMessage.chatMessage
+            ? persistedChatMessage.chatMessage[0]
+            : null
+          : null;
+      return chatMessage;
+    } catch (error) {
+      if (LOG_BACKEND) console.error('Persisting chat message errored:', error);
+    }
   }
 
   return null;
