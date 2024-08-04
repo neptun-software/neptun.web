@@ -7,6 +7,9 @@ import {
   Loader2,
   Filter,
   FilterX,
+  CalendarArrowUp,
+  CalendarClock,
+  Bot,
 } from 'lucide-vue-next';
 import type { AllowedAiModels } from '~/lib/types/ai.models';
 import type { MinimalChat, FullyFeaturedChat } from '~/lib/types/chat';
@@ -294,7 +297,7 @@ let filteredChats = computed(() => {
         <p class="flex-grow">Loading chats<LoadingDots /></p>
       </div>
       <ShadcnScrollArea
-        class="h-full"
+        class="h-[calc(100%-2.25rem)]"
         :class="{ 'h-40': useSmall }"
         v-if="
           filteredChats &&
@@ -383,29 +386,46 @@ let filteredChats = computed(() => {
               </ShadcnAlertDialog>
             </div>
 
-            <div>
-              <span class="truncate text-muted-foreground">{{
-                chat?.model
-              }}</span
-              ><br />
-              <NuxtTime
-                class="text-muted-foreground"
-                :datetime="chat?.created_at ?? new Date()"
-                day="numeric"
-                month="numeric"
-                year="numeric"
-                hour="numeric"
-                minute="numeric"
-              /><br />
-              <NuxtTime
-                class="text-muted-foreground"
-                :datetime="chat?.updated_at ?? new Date()"
-                day="numeric"
-                month="numeric"
-                year="numeric"
-                hour="numeric"
-                minute="numeric"
-              />
+            <div
+              class="flex-[1] min-w-fit flex flex-col justify-between min-h-full"
+            >
+              <div
+                class="flex h-full gap-1 p-1 border border-b-0 rounded-md rounded-b-none text-muted-foreground"
+              >
+                <Bot />
+                <span class="truncate">
+                  {{ chat?.model }}
+                </span>
+              </div>
+              <div
+                class="flex flex-wrap gap-2 p-1 border border-t-0 rounded-md rounded-t-none"
+              >
+                <div class="flex items-center gap-2">
+                  <CalendarArrowUp class="w-5 h-5 text-muted-foreground" />
+                  <NuxtTime
+                    class="text-muted-foreground"
+                    :datetime="chat?.created_at ?? new Date()"
+                    day="numeric"
+                    month="numeric"
+                    year="numeric"
+                    hour="numeric"
+                    minute="numeric"
+                  />
+                </div>
+                <br />
+                <div class="flex items-center gap-2">
+                  <CalendarClock class="w-5 h-5 text-muted-foreground" />
+                  <NuxtTime
+                    class="text-muted-foreground"
+                    :datetime="chat?.updated_at ?? new Date()"
+                    day="numeric"
+                    month="numeric"
+                    year="numeric"
+                    hour="numeric"
+                    minute="numeric"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
