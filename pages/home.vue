@@ -1,5 +1,149 @@
 <script setup lang="ts">
-import Button from '~/components/ui/button/Button.vue';
+// Thanks to https://codepen.io/Mamboleoo/pen/obWGYr ♥
+const { x, y } = useMouse();
+const mouse = ref<Mouse>({ x: 0, y: 0 });
+const radius = ref<number>(1);
+
+watch(x, (newX) => {
+  mouse.value.x = newX;
+});
+
+watch(y, (newY) => {
+  mouse.value.y = newY;
+});
+
+interface Mouse {
+  x: number;
+  y: number;
+}
+
+class Particle {
+  x: number;
+  y: number;
+  dest: { x: number; y: number };
+  r: number;
+  vx: number;
+  vy: number;
+  accX: number;
+  accY: number;
+  friction: number;
+  color: string;
+
+  constructor(x: number, y: number, colors: string[]) {
+    this.x = Math.random() * window.innerWidth;
+    this.y = Math.random() * window.innerHeight;
+    this.dest = { x, y };
+    this.r = Math.random() * 5 + 2;
+    this.vx = (Math.random() - 0.5) * 20;
+    this.vy = (Math.random() - 0.5) * 20;
+    this.accX = 0;
+    this.accY = 0;
+    this.friction = Math.random() * 0.05 + 0.94;
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  render(ctx: CanvasRenderingContext2D, mouse: Mouse, radius: number) {
+    this.accX = (this.dest.x - this.x) / 500;
+    this.accY = (this.dest.y - this.y) / 500;
+    this.vx += this.accX;
+    this.vy += this.accY;
+    this.vx *= this.friction;
+    this.vy *= this.friction;
+    this.x += this.vx;
+    this.y += this.vy;
+
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    const a = this.x - mouse.x;
+    const b = this.y - mouse.y;
+    const distance = Math.sqrt(a * a + b * b);
+
+    const multiplier = 30;
+    if (distance < radius * multiplier) {
+      // multiplier for the interaction radius
+      const force = (radius * multiplier - distance) / (radius * multiplier); // force calculation
+      this.accX = ((this.x - mouse.x) * force) / 10; // divisor for impact strength
+      this.accY = ((this.y - mouse.y) * force) / 10; // divisor for impact strength
+      this.vx += this.accX;
+      this.vy += this.accY;
+    }
+  }
+}
+
+const canvas = ref<HTMLCanvasElement | null>(null);
+
+const particles: Particle[] = [];
+const colors = ['#0e7490', '#083344', '#042f2e', '#082f49', '#60a5fa'];
+const staticText = 'Neptun';
+
+const initScene = () => {
+  if (!canvas.value) return;
+
+  const ctx = canvas.value.getContext('2d');
+  if (!ctx) return;
+
+  const ww = (canvas.value.width = window.innerWidth);
+  const wh = (canvas.value.height = window.innerHeight);
+
+  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
+  ctx.font = `bold ${ww / 4}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle'; // Align text vertically in the middle
+  ctx.fillText(staticText, ww / 2, wh / 2);
+
+  const data = ctx.getImageData(0, 0, ww, wh).data;
+  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
+  ctx.globalCompositeOperation = 'screen';
+
+  particles.length = 0;
+  for (let i = 0; i < ww; i += Math.round(ww / 150)) {
+    for (let j = 0; j < wh; j += Math.round(ww / 150)) {
+      if (data[(i + j * ww) * 4 + 3] > 150) {
+        particles.push(new Particle(i, j, colors));
+      }
+    }
+  }
+};
+
+const render = () => {
+  if (!canvas.value) return;
+
+  const ctx = canvas.value.getContext('2d');
+  if (!ctx) return;
+
+  requestAnimationFrame(render);
+  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
+  particles.forEach((particle) =>
+    particle.render(ctx, mouse.value, radius.value)
+  );
+};
+
+const onTouchEnd = (event: TouchEvent) => {
+  const touch = event.changedTouches[0];
+  mouse.value.x = touch.clientX;
+  mouse.value.y = touch.clientY;
+};
+
+const onMouseClick = () => {
+  radius.value = radius.value === 5 ? 1 : radius.value + 1;
+};
+
+onMounted(() => {
+  window.addEventListener('resize', initScene);
+  window.addEventListener('click', onMouseClick);
+  window.addEventListener('touchend', onTouchEnd);
+  initScene();
+  requestAnimationFrame(render);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', initScene);
+  window.removeEventListener('click', onMouseClick);
+  window.removeEventListener('touchend', onTouchEnd);
+});
 
 definePageMeta({
   name: 'Home',
@@ -8,35 +152,25 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="px-4 pt-32 mx-auto text-center max-w-7xl">
-    <h1
-      class="max-w-4xl mx-auto text-3xl font-medium tracking-tight font-display sm:text-7xl"
-    >
-      Chat
-      <span class="relative text-blue-600 whitespace-nowrap">
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 418 42"
-          class="absolute left-0 top-2/3 h-[0.58em] w-full fill-blue-300/70"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M203.371.916c-26.013-2.078-76.686 1.963-124.73 9.946L67.3 12.749C35.421 18.062 18.2 21.766 6.004 25.934 1.244 27.561.828 27.778.874 28.61c.07 1.214.828 1.121 9.595-1.176 9.072-2.377 17.15-3.92 39.246-7.496C123.565 7.986 157.869 4.492 195.942 5.046c7.461.108 19.25 1.696 19.17 2.582-.107 1.183-7.874 4.31-25.75 10.366-21.992 7.45-35.43 12.534-36.701 13.884-2.173 2.308-.202 4.407 4.442 4.734 2.654.187 3.263.157 15.593-.78 35.401-2.686 57.944-3.488 88.365-3.143 46.327.526 75.721 2.23 130.788 7.584 19.787 1.924 20.814 1.98 24.557 1.332l.066-.011c1.201-.203 1.53-1.825.399-2.335-2.911-1.31-4.893-1.604-22.048-3.261-57.509-5.556-87.871-7.36-132.059-7.842-23.239-.254-33.617-.116-50.627.674-11.629.54-42.371 2.494-46.696 2.967-2.359.259 8.133-3.625 26.504-9.81 23.239-7.825 27.934-10.149 28.304-14.005.417-4.348-3.529-6-16.878-7.066Z"
-          ></path>
-        </svg>
-        <span class="relative">for absolutely free</span>
-      </span>
-    </h1>
-    <blockquote
-      class="max-w-2xl mx-auto mt-6 text-lg tracking-tight sm:mt-12 text-slate-600"
-    >
-      You have to sign up to use the service, so that it doesn't get abused.
-      Your password and email will be encrypted.
-    </blockquote>
-    <Button class="mt-4 rounded-3xl" as-child>
-      <NuxtLink to="/sign-up"> Sign Up Now </NuxtLink>
-    </Button>
+  <div class="overflow-hidden">
+    <canvas ref="canvas" id="scene"></canvas>
+    <div class="mt-[2rem] text-center relative z-10">
+      <ShadcnButton class="rounded-3xl" as-child>
+        <NuxtLink to="/sign-up"> Sign Up Now </NuxtLink>
+      </ShadcnButton>
+    </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+canvas {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  width: 100dvw;
+  height: 100vh;
+  height: 100dvh;
+}
+</style>
