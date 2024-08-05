@@ -54,9 +54,7 @@ onMounted(() => {
 
 <template>
   <div class="text-slider">
-    <p
-      class="inline my-8 ml-4 text-5xl font-extrabold text-center text-slate-800"
-    >
+    <p class="inline my-8 text-5xl font-extrabold text-center text-slate-800">
       {{ text }}
       <span class="dynamic-text" ref="dynamicText">{{ currentText }}</span>
     </p>

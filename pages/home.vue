@@ -34,7 +34,9 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
       </div>
     </SecondarySection>
 
-    <SecondarySection :isLast="true"> What? </SecondarySection>
+    <SecondarySection :isLast="true">
+      <Preview />
+    </SecondarySection>
     <Cursor />
   </section>
 </template>
@@ -62,7 +64,6 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
 
 .content {
   position: relative;
-  margin-left: 2rem;
 }
 
 .headline {
