@@ -30,7 +30,7 @@ const { headerNavigationElement } = storeToRefs(uiStore); // don't bind using :r
           @click="clear().finally(async () => await navigateTo('/home'))"
         >
           Sign Out
-          <span class="hidden lg:block"
+          <span class="hidden ml-1 lg:block"
             >{{ user?.primary_email.substring(0, 15)
             }}{{
               user?.primary_email && user?.primary_email.length > 15

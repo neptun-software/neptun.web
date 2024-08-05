@@ -36,6 +36,8 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
 
     <SecondarySection :isLast="true">
       <Preview />
+      <Benefits />
+      <Features />
     </SecondarySection>
     <Cursor />
   </section>
