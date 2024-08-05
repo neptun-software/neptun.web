@@ -96,3 +96,34 @@ pre.shiki {
   border-radius: 0.25rem;
   /* overflow-x: auto; */
 }
+
+/* WITHOUT THIS, THE CUSTOM CURSOR WON'T WORK. DO NOT TOUCH ME!!! */
+body {
+  @apply bg-background;
+}
+
+/* Somehow also needs to be global, which is weird to me */
+.cursor {
+  z-index: 999999999;
+  position: fixed;
+  display: block;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  border-radius: 0;
+  transform-origin: center center;
+  mix-blend-mode: difference;
+  filter: url('#cursor-mask');
+}
+
+.cursor span {
+  z-index: 999999999;
+  position: absolute;
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 20px;
+  background-color: #fff;
+  transform-origin: center center;
+  transform: translate(-50%, -50%);
+}

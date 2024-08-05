@@ -6,11 +6,12 @@ definePageMeta({
 </script>
 
 <template>
-  <section class="flex items-center justify-center h-full">
+  <section id="home" class="flex items-center justify-center h-full">
     <div class="content">
       <h2>Neptun</h2>
       <h2>Neptun</h2>
     </div>
+    <Cursor />
   </section>
 </template>
 
