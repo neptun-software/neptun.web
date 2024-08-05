@@ -13,12 +13,13 @@ const colors = computed(() => {
 });
 
 const { x, y } = useMouse();
-const { pressed } = useMousePressed(); // touch an click
+const { pressed } = useMousePressed(); // touch and click
 const { width, height } = useWindowSize();
 const mouse = ref<Mouse>({ x: 0, y: 0 });
 const radius = ref<number>(1);
 const canvas = ref<HTMLCanvasElement | null>(null);
 const particles: Particle[] = [];
+const isLoaded = ref(false);
 
 watch(colors, () => {
   initScene();
@@ -93,12 +94,16 @@ class Particle {
     const b = this.y - mouse.y;
     const distance = Math.sqrt(a * a + b * b);
 
+    // multiplier for the interaction radius
     const multiplier = 15;
     if (distance < radius * multiplier) {
-      // multiplier for the interaction radius
-      const force = (radius * multiplier - distance) / (radius * multiplier); // force calculation
-      this.accX = ((this.x - mouse.x) * force) / 10; // divisor for impact strength
-      this.accY = ((this.y - mouse.y) * force) / 10; // divisor for impact strength
+      // force calculation
+      const force = (radius * multiplier - distance) / (radius * multiplier);
+
+      // divisor for impact strength
+      this.accX = ((this.x - mouse.x) * force) / 10;
+      this.accY = ((this.y - mouse.y) * force) / 10;
+
       this.vx += this.accX;
       this.vy += this.accY;
     }
@@ -108,7 +113,7 @@ class Particle {
 const initScene = () => {
   if (!canvas.value) return;
 
-  const ctx = canvas.value.getContext('2d');
+  const ctx = canvas.value.getContext('2d', { willReadFrequently: true });
   if (!ctx) return;
 
   const ww = (canvas.value.width = window.innerWidth);
@@ -117,7 +122,7 @@ const initScene = () => {
   ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
   ctx.font = `bold ${ww / 4}px sans-serif`;
   ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle'; // Align text vertically in the middle
+  ctx.textBaseline = 'middle'; // align text vertically in the middle
   ctx.fillText(props.text || 'Neptun', ww / 2, wh / 2);
 
   const data = ctx.getImageData(0, 0, ww, wh).data;
@@ -145,12 +150,18 @@ const render = () => {
   particles.forEach((particle) =>
     particle.render(ctx, mouse.value, radius.value)
   );
+
+  isLoaded.value = true;
 };
 
 onMounted(() => {
-  initScene();
-  requestAnimationFrame(render);
+  if (isDesktop.value) {
+    initScene();
+    requestAnimationFrame(render);
+  }
 });
+
+const isDesktop = useMediaQuery('(min-width: 1024px)');
 </script>
 
 <template>
@@ -200,6 +211,11 @@ onMounted(() => {
           </g>
         </svg>
       </div>
+    </div>
+    <div
+      class="absolute top-0 left-0 flex items-center justify-center w-full h-full text-slate-200"
+    >
+      <slot v-if="!isLoaded"></slot>
     </div>
   </div>
 </template>
