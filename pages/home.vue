@@ -6,35 +6,40 @@ definePageMeta({
 </script>
 
 <template>
-  <section id="home" class="flex items-center justify-center h-full">
+  <section id="home" class="relative flex items-center justify-center h-full">
     <div class="content">
-      <h2>Neptun</h2>
-      <h2>Neptun</h2>
+      <div class="headline">
+        <h2
+          class="headline-text text-[6rem] sm:text-[10rem] md:text-[12rem] lg:text-[14rem] xl:text-[18rem] 2xl:text-[22rem]"
+        >
+          Neptun
+        </h2>
+        <h2
+          class="headline-animation text-[6rem] sm:text-[10rem] md:text-[12rem] lg:text-[14rem] xl:text-[18rem] 2xl:text-[22rem]"
+        >
+          Neptun
+        </h2>
+      </div>
     </div>
     <Cursor />
   </section>
 </template>
 
 <style lang="postcss" scoped>
-.content {
+.headline {
   position: relative;
 }
 
-.content h2 {
-  font-size: 16em;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.content h2:nth-child(1) {
+.headline-text {
   color: transparent;
   @apply stroke-primary;
   -webkit-text-stroke: 2px hsl(var(--primary));
 }
 
-.content h2:nth-child(2) {
+.headline-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
   @apply text-primary;
   animation: animate 4s ease-in-out infinite;
 }
