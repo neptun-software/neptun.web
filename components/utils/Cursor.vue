@@ -6,6 +6,9 @@ const amount = 20;
 const sineDots = Math.floor(amount * 0.3);
 const idleTimeout = 150;
 
+const scrollElement = ref(null);
+const isScrolling = ref(false);
+const { x: scrollX, y: scrollY } = useWindowScroll(); // needed, so that the bubbles are set to the right position, when the user scrolls
 const { x: mouseX, y: mouseY } = useMouse();
 const cursor = ref(null);
 let lastFrame = 0;
@@ -71,13 +74,15 @@ function buildDots() {
 }
 
 function positionCursor(delta) {
-  let x = mouseX.value - width / 2;
-  let y = mouseY.value - width / 2;
+  let x = mouseX.value - width / 2 - scrollX.value;
+  let y = mouseY.value - width / 2 - scrollY.value;
+
   dots.forEach((dot, index) => {
     let nextDot = dots[index + 1] || dots[0];
     dot.x = x;
     dot.y = y;
     dot.draw(delta);
+
     if (!idle || index <= sineDots) {
       const dx = (nextDot.x - dot.x) * 0.35;
       const dy = (nextDot.y - dot.y) * 0.35;
@@ -100,6 +105,21 @@ onMounted(() => {
   requestAnimationFrame(render);
 
   document.getElementById('home').style.cursor = 'none';
+
+  scrollElement.value = window;
+  if (scrollElement.value) {
+    const { isScrolling: scrollStatus } = useScroll(scrollElement.value);
+
+    watch(scrollStatus, (scrolling) => {
+      isScrolling.value = scrolling;
+
+      if (scrolling) {
+        console.log('Scrolling detected');
+      } else {
+        console.log('Scrolling stopped');
+      }
+    });
+  }
 });
 
 onUnmounted(() => {
@@ -127,6 +147,13 @@ watch([mouseX, mouseY], resetIdleTimer);
     </svg>
 
     <div ref="cursor" class="cursor"></div>
+    <DevOnly>
+      <div class="fixed top-0 left-0 z-50">
+        {{ mouseX }}, {{ mouseY }} VS {{ scrollX }}, {{ scrollY }} ({{
+          isScrolling
+        }})
+      </div>
+    </DevOnly>
   </div>
 </template>
 

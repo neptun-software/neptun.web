@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-export const useHeaderNavigationStore = defineStore('header-navigation', () => {
+export const useUiStore = defineStore('ui-store', () => {
   const headerNavigationElement = ref<HTMLElement | null>(null);
 
   return {
