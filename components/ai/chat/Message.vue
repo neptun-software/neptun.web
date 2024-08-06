@@ -25,6 +25,11 @@ defineProps<{
           class="overflow-x-auto break-words whitespace-pre-wrap"
           :value="message.content"
         />
+        <template #fallback>
+          <div class="overflow-x-auto break-words whitespace-pre-wrap">
+            {{ message.content }}
+          </div>
+        </template>
       </ClientOnly>
       <ShadcnSeparator class="my-4" label="Controls" />
       <AiChatMessageControls
@@ -41,6 +46,11 @@ defineProps<{
     >
       <ClientOnly>
         <MDC :value="message.content" />
+        <template #fallback>
+          <div class="overflow-x-auto break-words whitespace-pre-wrap">
+            {{ message.content }}
+          </div>
+        </template>
       </ClientOnly>
     </div>
   </div>

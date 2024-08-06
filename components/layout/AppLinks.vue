@@ -62,7 +62,7 @@ const sortedRoutes = computed(() => {
     </div>
 
     <ul
-      class="flex gap-2"
+      class="flex items-center gap-2"
       v-bind:class="{
         navigation: layout === 'navigation',
         default: layout !== 'navigation',
@@ -72,7 +72,7 @@ const sortedRoutes = computed(() => {
       <li v-for="route in sortedRoutes" :key="useSsrSaveId">
         <NuxtLink
           class="font-bold"
-          v-if="loggedIn && layout === 'navigation' && route.path === '/home'"
+          v-if="layout === 'navigation' && route.path === '/home'"
           :to="route.path"
         >
           <ShadcnAvatar>

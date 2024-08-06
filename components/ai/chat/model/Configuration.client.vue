@@ -85,11 +85,12 @@ watch(
             placeholder="Name of the chat... (optional)"
             @keydown.enter.prevent="
               async () => {
-                selectedAiChat.id = await persistChatConversation(
-                  user?.id ?? -1,
-                  selectedAiChat.name,
-                  selectedAiChat.model
-                );
+                selectedAiChat.id =
+                  (await persistChatConversation(
+                    user?.id ?? -1,
+                    selectedAiChat.name,
+                    selectedAiChat.model
+                  )) || -1;
               }
             "
           />
@@ -99,11 +100,12 @@ watch(
             variant="secondary"
             @click="
               async () => {
-                selectedAiChat.id = await persistChatConversation(
-                  user?.id ?? -1,
-                  selectedAiChat.name,
-                  selectedAiChat.model
-                );
+                selectedAiChat.id =
+                  (await persistChatConversation(
+                    user?.id ?? -1,
+                    selectedAiChat.name,
+                    selectedAiChat.model
+                  )) || -1;
               }
             "
             >Persist Chat History</ShadcnButton

@@ -371,18 +371,6 @@ async function deleteLast() {
 
     <div class="flex flex-col flex-grow max-w-full min-h-0 pt-10 pb-6">
       <ShadcnScrollArea ref="$scrollArea">
-        <!--
-        <DevOnly>
-          <ClientOnly>
-            SELECTED: {{ selectedAiChat }} | {{ selectedAiChatKey }}<br />
-            messages: {{ JSON.stringify(chatMessages) }}<br />
-            <hr />
-            PLAYGROUND: {{ selectedAiChatIsPlayground }} |
-            {{ JSON.stringify(currentAiChatPlaygroundMessagesBackup) }}<br />
-          </ClientOnly>
-        </DevOnly>
-        -->
-
         <AiChatMessages :messages="chatMessages" :key="chatMessagesKey" />
 
         <template v-if="isLoading">

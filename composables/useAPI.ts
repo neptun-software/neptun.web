@@ -29,7 +29,10 @@ export const useAPI = () => {
       await useFetch(url, {
         ...options,
         onResponse({ response }: any) {
-          resolve(response._data);
+          // THIS IS CALLED EVERY TIME, ALSO IF RESPONSE IS NOT OK!
+          if (response.ok) {
+            resolve(response._data);
+          }
         },
         onResponseError({ response }: any) {
           reject(response._data);
@@ -93,24 +96,30 @@ export const useAPI = () => {
       pick: ['chat'] as any,
     };
 
+    console.log({ model, name })
+
     const toastMessages = {
       loading: 'Persisting chat history...',
       success: (data: any) => 'Chat history persisted!',
       error: (data: any) => 'Failed to persist chat history!',
     };
 
-    const response = await handleFetch<{ chat: FullyFeaturedChat }>(
-      url,
-      options,
-      toastMessages
-    );
+    try {
+      const response = await handleFetch<{ chat: FullyFeaturedChat }>(
+        url,
+        options,
+        toastMessages
+      );
 
-    await persistChatConversationMessagesOfPlayground(
-      user_id,
-      response.chat.id
-    );
+      await persistChatConversationMessagesOfPlayground(
+        user_id,
+        response.chat.id
+      );
 
-    return response.chat.id;
+      return response.chat.id;
+    } catch {
+      console.error("Failed to persist chat history!");
+    }
   };
 
   async function persistCodeBlocks(
@@ -119,24 +128,28 @@ export const useAPI = () => {
     message_id: number,
     markdown: string
   ) {
-    const codeBlocks = await getCodeBlocksFromMarkdown(markdown);
+    try {
+      const codeBlocks = await getCodeBlocksFromMarkdown(markdown);
 
-    if (codeBlocks.length > 0) {
-      try {
-        const persistedCodeBlocks = await $fetch(
-          `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
-          {
-            method: 'POST',
-            body: {
-              files: codeBlocks,
-            },
-          }
-        );
+      if (codeBlocks.length > 0) {
+        try {
+          const persistedCodeBlocks = await $fetch(
+            `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
+            {
+              method: 'POST',
+              body: {
+                files: codeBlocks,
+              },
+            }
+          );
 
-        return persistedCodeBlocks;
-      } catch {
-        console.error("Failed to persist code blocks!");
+          return persistedCodeBlocks;
+        } catch {
+          console.error("Failed to persist code blocks!");
+        }
       }
+    } catch {
+      console.error("Failed to parse code blocks!");
     }
 
     return null;
@@ -170,18 +183,27 @@ export const useAPI = () => {
 
       console.info('Persisting messages...', messages);
 
-      const messagesPersisted = await handleFetch<{
-        chatMessages: ReadChatConversationMessage[];
-      }>(url, options, toastMessages);
-      for (const message of messagesPersisted.chatMessages) {
-        if (message.actor === 'assistant') {
-          await persistCodeBlocks(
-            message.chat_user_id,
-            message.chat_conversation_id,
-            message.id,
-            message.message
-          );
+      try {
+        const messagesPersisted = await handleFetch<{
+          chatMessages: ReadChatConversationMessage[];
+        }>(url, options, toastMessages);
+
+        for (const message of messagesPersisted.chatMessages) {
+          if (message.actor === 'assistant') {
+            try {
+              await persistCodeBlocks(
+                message.chat_user_id,
+                message.chat_conversation_id,
+                message.id,
+                message.message
+              );
+            } catch {
+              console.error("Failed to persist code blocks!");
+            }
+          }
         }
+      } catch {
+        console.error("Failed to persist chat messages!");
       }
 
       messagesRef.value = [];
@@ -206,11 +228,15 @@ export const useAPI = () => {
       error: (data: any) => 'Failed to rename chat!',
     };
 
-    return await handleFetch<{ chat: FullyFeaturedChat }>(
-      url,
-      options,
-      toastMessages
-    );
+    try {
+      return await handleFetch<{ chat: FullyFeaturedChat }>(
+        url,
+        options,
+        toastMessages
+      );
+    } catch {
+      console.error("Failed to rename chat!");
+    }
   };
 
   const persistChatConversationDelete = async (
@@ -230,7 +256,12 @@ export const useAPI = () => {
         error: (data: any) => 'Failed to delete chat!',
       };
 
-      await handleFetch<void>(url, options, toastMessages);
+      try {
+        await handleFetch<void>(url, options, toastMessages);
+      } catch {
+        console.error("Failed to delete chat!");
+      }
+
       return;
     }
 
@@ -247,7 +278,11 @@ export const useAPI = () => {
       error: (data: any) => 'Failed to delete chats!',
     };
 
-    await handleFetch<void>(url, options, toastMessages);
+    try {
+      await handleFetch<void>(url, options, toastMessages);
+    } catch {
+      console.error("Failed to delete chats!");
+    }
   };
 
   return {

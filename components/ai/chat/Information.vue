@@ -131,8 +131,13 @@ const colorMode = useColorMode();
               </p>
             </template>
             <template v-else>
-              <ClientOnly>
+              <ClientOnly fallback-tag="div">
                 <MDC :value="selectedFileVersionMarkdown" />
+                <template #fallback>
+                  <ShadcnSkeleton
+                    class="absolute top-0 left-0 w-full h-full bg-slate-400"
+                  />
+                </template>
               </ClientOnly>
               <span class="absolute flex items-center top-2 right-2">
                 <ShadcnDialog v-if="versionsForSelectedFileType.length > 1">
