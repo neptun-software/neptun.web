@@ -8,9 +8,23 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
 </script>
 
 <template>
-  <section id="home" class="relative">
-    <SecondarySection :isFirst="true">
+  <section id="home" class="relative overflow-x-hidden">
+    <!-- hm... -->
+    <!-- <PlanetSystem
+      :imagePaths="[
+        '/assets/icons/docker-icon.svg',
+        '/assets/icons/github-actions.svg',
+        '/assets/icons/github-icon.svg',
+        '/assets/icons/hugging-face-icon.svg',
+        '/assets/icons/mistral-ai-icon.svg',
+      ]"
+      :imageSizeMin="100"
+    /> -->
+
+    <SecondarySection :isFirst="true" class="overflow-hidden">
       <div class="flex flex-col items-center min-h-screen content">
+        <Bubbles />
+
         <div class="relative headline">
           <h2
             class="headline-text text-[6rem] sm:text-[8rem] md:text-[10rem] lg:text-[12rem] xl:text-[14rem] 2xl:text-[16rem]"
@@ -65,6 +79,7 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
 }
 
 .content {
+  z-index: 2;
   position: relative;
 }
 

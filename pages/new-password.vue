@@ -7,7 +7,10 @@ definePageMeta({
 
 <template>
   <!-- TODO: needs email verification -->
-  <div>Reset Password</div>
+  <div>
+    <!-- Reset Password -->
+    Coming Soon...
+  </div>
 </template>
 
 <style scoped></style>

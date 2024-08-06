@@ -15,15 +15,27 @@ const colorMode = useColorMode();
           class="absolute top-2 lg:-top-8 left-1/2 transform -translate-x-1/2 w-[90%] mx-auto h-24 lg:h-80 bg-blue-950/50 rounded-full blur-3xl opacity-70"
         ></div>
 
-        <NuxtImg
-          class="w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
-          :src="
-            colorMode.preference == 'light'
-              ? '/assets/preview-light.jpg'
-              : '/assets/preview-dark.jpg'
-          "
-          alt="app preview image"
-        />
+        <ClientOnly fallback-tag="div">
+          <NuxtImg
+            v-if="colorMode.preference === 'light'"
+            class="w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+            src="/assets/preview-light.jpg"
+            alt="app preview image light"
+          />
+          <NuxtImg
+            v-else
+            class="w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+            src="/assets/preview-dark.jpg"
+            alt="app preview image dark"
+          />
+          <template #fallback>
+            <NuxtImg
+              class="w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+              src="/assets/preview-light.jpg"
+              alt="app preview image light"
+            />
+          </template>
+        </ClientOnly>
 
         <!-- gradient effect img -->
         <div
