@@ -1,5 +1,32 @@
 <script setup lang="ts">
+import gsap from 'gsap';
+
 const colorMode = useColorMode();
+const floatingImage = ref<HTMLElement | null>(null);
+
+const initializeAnimation = () => {
+  gsap.to('.floating-image', {
+    y: -10,
+    duration: 2,
+    ease: 'power1.inOut',
+    yoyo: true,
+    repeat: -1,
+  });
+};
+
+watch(floatingImage, (newValue) => {
+  if (newValue) {
+    initializeAnimation();
+  }
+});
+
+onMounted(() => {
+  setTimeout(() => {
+    if (floatingImage.value) {
+      initializeAnimation();
+    }
+  }, 100);
+});
 </script>
 
 <template>
@@ -18,19 +45,22 @@ const colorMode = useColorMode();
         <ClientOnly fallback-tag="div">
           <NuxtImg
             v-if="colorMode.preference === 'light'"
-            class="w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+            ref="floatingImage"
+            class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
             src="/assets/preview-light.jpg"
             alt="app preview image light"
           />
           <NuxtImg
             v-else
-            class="w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+            ref="floatingImage"
+            class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
             src="/assets/preview-dark.jpg"
             alt="app preview image dark"
           />
           <template #fallback>
             <NuxtImg
-              class="w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+              ref="floatingImage"
+              class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
               src="/assets/preview-light.jpg"
               alt="app preview image light"
             />
