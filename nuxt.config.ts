@@ -175,7 +175,8 @@ export default defineNuxtConfig({
     'nuxt-time',
     'nuxt-security',
     '@nuxtjs/robots',
-    "nuxt-monaco-editor"
+    "nuxt-monaco-editor",
+    '@formkit/auto-animate/nuxt'
   ],
 
   mdc: {

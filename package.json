@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@ai-sdk/vue": "^0.0.28",
+    "@formkit/auto-animate": "^0.8.2",
     "@huggingface/inference": "^2.7.0",
     "@neondatabase/serverless": "^0.9.4",
     "@nuxt/eslint": "^0.4.0",

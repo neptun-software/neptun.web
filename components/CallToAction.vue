@@ -2,7 +2,8 @@
 import { gsap } from 'gsap';
 
 defineProps<{
-  text: string;
+  text?: string;
+  href?: string;
 }>();
 
 const { x: scrollX, y: scrollY } = useWindowScroll(); // needed, so that the button doesn't have a fucking seizure, when you scroll
@@ -53,9 +54,14 @@ onMounted(() => {
 
 <template>
   <button ref="magneticButton">
-    <NuxtLink class="cta-button bg-slate-900 text-slate-200" to="/sign-in">
-      {{ text }}
-    </NuxtLink>
+    <template v-if="href">
+      <NuxtLink class="cta-button" :to="href">
+        {{ text }} <slot></slot>
+      </NuxtLink>
+    </template>
+    <template v-else>
+      <div class="cta-button">{{ text }} <slot></slot></div>
+    </template>
   </button>
 </template>
 
@@ -63,15 +69,11 @@ onMounted(() => {
 .cta-button {
   font-weight: 900;
   font-size: 1.6rem;
-  font-family: 'Syne', sans-serif;
   cursor: pointer;
   outline: none;
   border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 10rem;
-  height: 10rem;
-  border-radius: 100%;
 }
 </style>

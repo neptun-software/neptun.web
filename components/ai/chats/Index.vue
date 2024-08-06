@@ -305,7 +305,7 @@ let filteredChats = computed(() => {
           filteredChats?.length !== 0
         "
       >
-        <div class="flex flex-col h-full gap-1">
+        <div class="flex flex-col h-full gap-1" v-auto-animate>
           <div
             nuxt-client
             class="flex flex-wrap justify-between flex-grow w-full gap-3 p-4 border rounded-sm border-border bg-background"

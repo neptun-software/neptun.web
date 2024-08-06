@@ -44,7 +44,22 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
           :duration="1.5"
         />
 
-        <CallToAction :text="'Chat Now'" />
+        <TypeText
+          :typeData="[
+            'Hey!\n generate me every file I need to implement CICD.',
+            'docker-compose-files',
+          ]"
+        >
+          <CallToAction>
+            <NuxtLink class="cta-button" to="/sign-up">
+              <ShadcnButton
+                class="bg-slate-950 text-slate-200 hover:bg-slate-950 hover:text-slate-200"
+                variant="outline"
+                >send</ShadcnButton
+              >
+            </NuxtLink>
+          </CallToAction>
+        </TypeText>
       </div>
     </SecondarySection>
 

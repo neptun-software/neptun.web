@@ -11,6 +11,9 @@ importers:
       '@ai-sdk/vue':
         specifier: ^0.0.28
         version: 0.0.28(vue@3.4.35(typescript@5.5.4))(zod@3.23.8)
+      '@formkit/auto-animate':
+        specifier: ^0.8.2
+        version: 0.8.2
       '@huggingface/inference':
         specifier: ^2.7.0
         version: 2.8.0
@@ -1185,6 +1188,9 @@ packages:
 
   '@floating-ui/vue@1.1.2':
     resolution: {integrity: sha512-7pq8HfhVhxOpV6iIMKSslI51fwFYy8G0BF0GjhlhpmUhVwL8jCByvcjzTwEtRWFVRrGD/I9kLp6eUHKumiUTjw==}
+
+  '@formkit/auto-animate@0.8.2':
+    resolution: {integrity: sha512-SwPWfeRa5veb1hOIBMdzI+73te5puUBHmqqaF1Bu7FjvxlYSz/kJcZKSa9Cg60zL0uRNeJL2SbRxV6Jp6Q1nFQ==}
 
   '@huggingface/inference@2.8.0':
     resolution: {integrity: sha512-Ti681P1qckcCAqgzmL53jBnluPuZGelmMIuXNjgAwC5+RIjF4S0SDQu6oy44ZTwekwNp2ETaZ2sXsOk+45aC4w==}
@@ -6832,6 +6838,8 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
+
+  '@formkit/auto-animate@0.8.2': {}
 
   '@huggingface/inference@2.8.0':
     dependencies:
