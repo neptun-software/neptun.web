@@ -68,7 +68,8 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
       <Benefits />
       <Features />
     </SecondarySection>
-    <Cursor />
+    <!-- <Cursor /> -->
+    <!-- <SimpleCursor /> -->
   </section>
 </template>
 

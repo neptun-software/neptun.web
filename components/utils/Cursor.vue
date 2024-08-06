@@ -74,6 +74,8 @@ function buildDots() {
 }
 
 function positionCursor(delta) {
+  if (isScrolling.value) return; // skip animation while scrolling
+
   let x = mouseX.value - width / 2 - scrollX.value;
   let y = mouseY.value - width / 2 - scrollY.value;
 
@@ -112,11 +114,10 @@ onMounted(() => {
 
     watch(scrollStatus, (scrolling) => {
       isScrolling.value = scrolling;
-
       if (scrolling) {
-        console.log('Scrolling detected');
+        idle = true; // lock animations while scrolling
       } else {
-        console.log('Scrolling stopped');
+        resetIdleTimer(); // resume animations after scrolling stops
       }
     });
   }
@@ -126,7 +127,7 @@ onUnmounted(() => {
   clearTimeout(timeoutID);
 });
 
-watch([mouseX, mouseY], resetIdleTimer);
+watch([mouseX, mouseY, scrollX, scrollY], resetIdleTimer);
 </script>
 
 <template>
