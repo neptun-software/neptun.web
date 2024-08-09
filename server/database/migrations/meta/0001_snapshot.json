@@ -1,0 +1,562 @@
+{
+  "id": "721bc304-7952-4c8a-b018-265735f14c90",
+  "prevId": "91faf3cd-118d-4293-a3ea-0a5505a4e84f",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.chat_conversation": {
+      "name": "chat_conversation",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "ai_model_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "chat_user_id": {
+          "name": "chat_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chat_conversation_chat_user_id_chat_user_id_fk": {
+          "name": "chat_conversation_chat_user_id_chat_user_id_fk",
+          "tableFrom": "chat_conversation",
+          "tableTo": "chat_user",
+          "columnsFrom": [
+            "chat_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.chat_conversation_file": {
+      "name": "chat_conversation_file",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'text'"
+        },
+        "file_extension": {
+          "name": "file_extension",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'txt'"
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "chat_user_id": {
+          "name": "chat_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "chat_conversation_id": {
+          "name": "chat_conversation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "chat_conversation_message_id": {
+          "name": "chat_conversation_message_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chat_conversation_file_chat_user_id_chat_user_id_fk": {
+          "name": "chat_conversation_file_chat_user_id_chat_user_id_fk",
+          "tableFrom": "chat_conversation_file",
+          "tableTo": "chat_user",
+          "columnsFrom": [
+            "chat_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "chat_conversation_file_chat_conversation_id_chat_conversation_id_fk": {
+          "name": "chat_conversation_file_chat_conversation_id_chat_conversation_id_fk",
+          "tableFrom": "chat_conversation_file",
+          "tableTo": "chat_conversation",
+          "columnsFrom": [
+            "chat_conversation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "chat_conversation_file_chat_conversation_message_id_chat_conversation_message_id_fk": {
+          "name": "chat_conversation_file_chat_conversation_message_id_chat_conversation_message_id_fk",
+          "tableFrom": "chat_conversation_file",
+          "tableTo": "chat_conversation_message",
+          "columnsFrom": [
+            "chat_conversation_message_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.chat_conversation_message": {
+      "name": "chat_conversation_message",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor": {
+          "name": "actor",
+          "type": "chat_conversation_message_actor_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'user'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "chat_user_id": {
+          "name": "chat_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "chat_conversation_id": {
+          "name": "chat_conversation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chat_conversation_message_chat_user_id_chat_user_id_fk": {
+          "name": "chat_conversation_message_chat_user_id_chat_user_id_fk",
+          "tableFrom": "chat_conversation_message",
+          "tableTo": "chat_user",
+          "columnsFrom": [
+            "chat_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "chat_conversation_message_chat_conversation_id_chat_conversation_id_fk": {
+          "name": "chat_conversation_message_chat_conversation_id_chat_conversation_id_fk",
+          "tableFrom": "chat_conversation_message",
+          "tableTo": "chat_conversation",
+          "columnsFrom": [
+            "chat_conversation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.chat_github_app_installation": {
+      "name": "chat_github_app_installation",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "github_account_type": {
+          "name": "github_account_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "github_account_avatar_url": {
+          "name": "github_account_avatar_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "github_account_id": {
+          "name": "github_account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "github_account_name": {
+          "name": "github_account_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "chat_user_id": {
+          "name": "chat_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chat_github_app_installation_chat_user_id_chat_user_id_fk": {
+          "name": "chat_github_app_installation_chat_user_id_chat_user_id_fk",
+          "tableFrom": "chat_github_app_installation",
+          "tableTo": "chat_user",
+          "columnsFrom": [
+            "chat_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.chat_github_app_installation_repositories": {
+      "name": "chat_github_app_installation_repositories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "github_repository_id": {
+          "name": "github_repository_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "github_repository_name": {
+          "name": "github_repository_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "github_repository_is_private": {
+          "name": "github_repository_is_private",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "chat_github_app_installation_id": {
+          "name": "chat_github_app_installation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chat_github_app_installation_repositories_chat_github_app_installation_id_chat_github_app_installation_id_fk": {
+          "name": "chat_github_app_installation_repositories_chat_github_app_installation_id_chat_github_app_installation_id_fk",
+          "tableFrom": "chat_github_app_installation_repositories",
+          "tableTo": "chat_github_app_installation",
+          "columnsFrom": [
+            "chat_github_app_installation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.chat_user": {
+      "name": "chat_user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "primary_email": {
+          "name": "primary_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hashed_password": {
+          "name": "hashed_password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "chat_user_primary_email_unique": {
+          "name": "chat_user_primary_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "primary_email"
+          ]
+        }
+      }
+    },
+    "public.chat_user_oauth_account": {
+      "name": "chat_user_oauth_account",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "oauth_provider_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "oauth_user_id": {
+          "name": "oauth_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "oauth_email": {
+          "name": "oauth_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "chat_user_id": {
+          "name": "chat_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chat_user_oauth_account_chat_user_id_chat_user_id_fk": {
+          "name": "chat_user_oauth_account_chat_user_id_chat_user_id_fk",
+          "tableFrom": "chat_user_oauth_account",
+          "tableTo": "chat_user",
+          "columnsFrom": [
+            "chat_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {
+    "public.ai_model_enum": {
+      "name": "ai_model_enum",
+      "schema": "public",
+      "values": [
+        "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
+        "mistralai/Mistral-7B-Instruct-v0.1"
+      ]
+    },
+    "public.chat_conversation_message_actor_enum": {
+      "name": "chat_conversation_message_actor_enum",
+      "schema": "public",
+      "values": [
+        "user",
+        "assistant"
+      ]
+    },
+    "public.oauth_provider_enum": {
+      "name": "oauth_provider_enum",
+      "schema": "public",
+      "values": [
+        "github",
+        "google"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

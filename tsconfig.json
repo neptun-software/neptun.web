@@ -2,7 +2,7 @@
   // https://nuxt.com/docs/guide/concepts/typescript
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
-    "typeRoots": ["./lib/types"],
+    "typeRoots": ["./lib/types", "./node_modules/@types"],
     "types": ["vue-dndrop"]
   }
 }

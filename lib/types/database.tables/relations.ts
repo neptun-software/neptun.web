@@ -5,6 +5,8 @@ import {
   chat_conversation,
   chat_user_oauth_account,
   chat_conversation_file,
+  chat_github_app_installation,
+  chat_github_app_installation_repository,
 } from './schema';
 
 export const chat_conversation_fileRelations = relations(
@@ -65,6 +67,29 @@ export const chat_user_oauth_accountRelations = relations(
     chat_user: one(chat_user, {
       fields: [chat_user_oauth_account.chat_user_id],
       references: [chat_user.id],
+    }),
+  })
+);
+
+export const chat_github_app_installationRelations = relations(
+  chat_github_app_installation,
+  ({ one, many }) => ({
+    chat_user: one(chat_user, {
+      fields: [chat_github_app_installation.chat_user_id],
+      references: [chat_user.id],
+    }),
+    chat_github_app_installation_repositories: many(
+      chat_github_app_installation_repository
+    ),
+  })
+);
+
+export const chat_github_app_installation_repositoryRelations = relations(
+  chat_github_app_installation_repository,
+  ({ one }) => ({
+    chat_github_app_installation: one(chat_github_app_installation, {
+      fields: [chat_github_app_installation_repository.chat_github_app_installation_id],
+      references: [chat_github_app_installation.id],
     }),
   })
 );

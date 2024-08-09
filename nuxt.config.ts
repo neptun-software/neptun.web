@@ -122,6 +122,15 @@ export default defineNuxtConfig({
         clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
       },
     },
+    github: {
+      app: {
+        webhookSecret: process.env.NEPTUN_GITHUB_APP_WEBHOOK_SECRET,
+        appId: process.env.NEPTUN_GITHUB_APP_ID,
+        clientId: process.env.NEPTUN_GITHUB_APP_GITHUB_CLIENT_ID,
+        clientSecret: process.env.NEPTUN_GITHUB_APP_GITHUB_CLIENT_SECRET,
+        privateKey: process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY
+      }
+    },
     session: {
       /* session persists for 7 days */ name: 'neptun-session',
       password: process.env.NUXT_SESSION_PASSWORD,

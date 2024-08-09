@@ -1,6 +1,8 @@
 import { generateUUID } from '~/lib/utils';
 import {
   chat_user,
+  chat_user_oauth_account,
+  type ReadOauthAccount,
   type GetUser,
   type ReadUser,
   type UserToCreate,
@@ -109,6 +111,29 @@ export const readUserUsingPrimaryEmail = async (
 
   return fetchedUser[0]; // [][0] => undefined :)
 };
+
+export const readUserUsingGithubOauthId = async (
+  github_oauth_id: ReadOauthAccount['oauth_user_id']
+) => {
+  const fetchedUser = await db.query.chat_user_oauth_account.findFirst({
+    columns: {},
+    where: and(
+      eq(decryptColumn(chat_user_oauth_account.oauth_user_id), github_oauth_id),
+      eq(chat_user_oauth_account.provider, 'github')
+    ),
+    with: {
+      chat_user: {
+        columns: {
+          id: true
+        }
+      }
+    },
+  })
+
+  if (!fetchedUser) return null;
+
+  return fetchedUser.chat_user;
+}
 
 export const updateUser = async (
   id: ReadUser['id'],

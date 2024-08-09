@@ -4,6 +4,7 @@ import { AllowedAiModelsEnum, allowedModelsConst } from '../ai.models';
 import type { Message } from 'ai';
 import { z } from 'zod';
 import {
+  boolean,
   integer,
   pgEnum,
   pgTable,
@@ -264,3 +265,75 @@ export const InsertFileUniversalSchema = z
   .object({ files: z.array(InsertFileSchema) })
   .or(InsertFileSchema); // files: [] could be shortened to []
 export const SelectFileSchema = createSelectSchema(chat_conversation_file);
+
+/* GITHUB APP INSTALLATION */
+
+export const chat_github_app_installation = pgTable('chat_github_app_installation', {
+  id: serial('id').primaryKey(),
+  github_account_type: text('github_account_type').notNull(), // Organization or User (do not make me an enum, because it might break, if github changes their naming, which they do regularly without calling it a breaking change)
+  github_account_avatar_url: text('github_account_avatar_url').notNull(), // should be encrypted in the future (includes id)
+  github_account_id: integer('github_account_id').notNull(), // should be encrypted in the future
+  github_account_name: text('github_account_name'),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+
+  chat_user_id: integer('chat_user_id')
+    .notNull()
+    .references(() => chat_user.id, { onDelete: 'cascade' }),
+});
+
+export const SelectGithubAppInstallationSchema = createSelectSchema(chat_github_app_installation);
+const InsertGithubAppInstallationSchemaBase = createInsertSchema(chat_github_app_installation);
+export const InsertGithubAppInstallationSchema = InsertGithubAppInstallationSchemaBase.pick({
+  github_account_type: true,
+  github_account_avatar_url: true,
+  github_account_id: true,
+  github_account_name: true,
+  chat_user_id: true,
+})
+export type NewGithubAppInstallation = z.infer<typeof InsertGithubAppInstallationSchema>;
+
+/* GITHUB APP INSTALLATION - SELECTED REPOSITORIES */
+
+export const chat_github_app_installation_repository = pgTable('chat_github_app_installation_repository', {
+  id: serial('id').primaryKey(),
+  github_repository_id: integer('github_repository_id').notNull(),
+  github_repository_name: text('github_repository_name').notNull(),
+  github_repository_description: text('github_repository_description'),
+  github_repository_size: integer('github_repository_size'),
+  github_repository_language: text('github_repository_language'),
+  github_repository_license: text('github_repository_license'),
+  github_repository_url: text('github_repository_url').notNull(),
+  github_repository_website_url: text('github_repository_website_url'),
+  github_repository_default_branch: text('github_repository_default_branch'),
+  github_repository_is_private: boolean('github_repository_is_private').notNull(),
+  github_repository_is_fork: boolean('github_repository_is_fork'),
+  github_repository_is_template: boolean('github_repository_is_template'),
+  github_repository_is_archived: boolean('github_repository_is_archived').notNull(),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+
+  chat_github_app_installation_id: integer('chat_github_app_installation_id')
+    .notNull()
+    .references(() => chat_github_app_installation.id, { onDelete: 'cascade' }),
+});
+
+export const SelectGithubAppInstallationRepositorySchema = createSelectSchema(chat_github_app_installation_repository);
+const InsertGithubAppInstallationRepositorySchemaBase = createInsertSchema(chat_github_app_installation_repository);
+export const InsertGithubAppInstallationRepositorySchema = InsertGithubAppInstallationRepositorySchemaBase.pick({
+  github_repository_id: true,
+  github_repository_name: true,
+  github_repository_description: true,
+  github_repository_size: true,
+  github_repository_language: true,
+  github_repository_license: true,
+  github_repository_url: true,
+  github_repository_website_url: true,
+  github_repository_default_branch: true,
+  github_repository_is_private: true,
+  github_repository_is_fork: true,
+  github_repository_is_template: true,
+  github_repository_is_archived: true,
+  chat_github_app_installation_id: true,
+})
+export type NewGithubAppInstallationRepository = z.infer<typeof InsertGithubAppInstallationRepositorySchema>;
