@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import {
-  RefreshCcw,
   Pen,
   Trash2,
   Search,
@@ -162,6 +161,8 @@ let filteredChats = computed(() => {
     chat.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
+
+const refreshAnimationIsActive = ref(false);
 </script>
 
 <template>
@@ -255,11 +256,18 @@ let filteredChats = computed(() => {
         <ShadcnButton
           :disabled="fetchedChatsStatus === 'pending'"
           variant="outline"
-          @click="async () => await fetchedChatsRefresh()"
-          class="[&>*]:hover:animate-spin"
+          @click="
+            async () => {
+              refreshAnimationIsActive = true;
+              await fetchedChatsRefresh().then(() => {
+                refreshAnimationIsActive = false;
+              });
+            }
+          "
         >
+          <!-- class="[&>*]:hover:animate-spin" -->
           Reload
-          <RefreshCcw class="w-4 h-4 ml-1" />
+          <RefreshIcon :animation-is-active="refreshAnimationIsActive" />
         </ShadcnButton>
       </div>
 
