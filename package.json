@@ -27,6 +27,7 @@
     "@nuxt/image": "^1.7.0",
     "@nuxtjs/mdc": "^0.8.3",
     "@nuxtjs/robots": "^4.0.2",
+    "@octokit/plugin-paginate-rest": "^11.3.3",
     "@pinia/nuxt": "^0.5.1",
     "@radix-icons/vue": "^1.0.0",
     "@vee-validate/zod": "^4.13.2",

@@ -2,7 +2,7 @@ import { App } from 'octokit';
 import { createGithubAppInstallation } from '~/server/database/repositories/githubAppInstallations';
 import { createGithubAppInstallationRepositories } from '~/server/database/repositories/githubAppInstallationsRepositories';
 import { readUserUsingGithubOauthId } from '~/server/database/repositories/users';
-// import { type GetResponseTypeFromEndpointMethod } from "@octokit/types";
+import { type GetResponseTypeFromEndpointMethod } from "@octokit/types";
 
 export default defineEventHandler(async (event) => {
     const runtimeConfig = useRuntimeConfig(event);
@@ -100,7 +100,6 @@ export default defineEventHandler(async (event) => {
                 };
 
                 // console.log('User ID:', installation.account?.id);
-                // console.dir(repositoryList, { depth: 1 });
 
                 // create github app installation
                 const createdGithubAppInstallation = await createGithubAppInstallation(githubAppInstallationToCreate);
@@ -120,35 +119,80 @@ export default defineEventHandler(async (event) => {
 
                 // create associated repositories
                 try {
-                    // TODO: add pagination to get all repositories and not only the first 100
-                    const repositories = await octokit.rest.apps.listReposAccessibleToInstallation({
-                        installation_id: Number(installation_id),
+                    const filteredRepositories = await octokit.paginate(octokit.rest.apps.listReposAccessibleToInstallation, {
+                        installation_id: installationId,
                         per_page: 100
-                    });
+                    },
+                        (response) => {
+                            type Repository = GetResponseTypeFromEndpointMethod<typeof octokit.rest.apps.listReposAccessibleToInstallation>["data"]["repositories"][0];
+                            type Repositories = {
+                                [key: number]: Repository
+                                repository_selection: string;
+                                total_count: number;
+                            };
 
-                    const { repositories: repositoryList } = repositories.data;
-                    const filteredRepositories = repositoryList.map(repo => {
-                        return {
-                            github_repository_id: repo.id,
-                            github_repository_name: repo.name,
-                            github_repository_description: repo.description,
-                            github_repository_size: repo.size,
-                            github_repository_language: repo.language,
-                            github_repository_license: repo.license?.name ?? null,
-                            github_repository_url: repo.html_url,
-                            github_repository_website_url: repo.homepage,
-                            github_repository_default_branch: repo.default_branch,
-                            github_repository_is_private: repo.private,
-                            github_repository_is_fork: repo.fork,
-                            github_repository_is_template: repo.is_template ?? false,
-                            github_repository_is_archived: repo.archived,
-                            chat_github_app_installation_id: githubAppInstallationId
-                        };
-                    });
+                            /**
+                             * Contains valid type.
+                             * 
+                             * ```
+                             * // invalid
+                             * (parameter) response: NormalizeResponse<OctokitResponse<{
+                             *      total_count: number;
+                             *      repositories: components["schemas"]["repository"][];
+                             *      repository_selection?: string;
+                             *  }, 200>>
+                             * ```
+                             * 
+                             * should be typed as
+                             * 
+                             * ```
+                             * // valid
+                             *  type Repositories = {
+                             *      [key: number]: Repository[0]
+                             *      repository_selection: string;
+                             *      total_count: number;
+                             *  };
+                             * ```
+                             * 
+                             */
+                            const repositories = response.data as Repositories;
+
+                            // removes repository_selection and total_count
+                            const filteredRepositories = Object.keys(repositories).filter(key => !isNaN(Number(key))).map(key => {
+                                return repositories[Number(key)];
+                            });
+
+                            if (LOG_BACKEND) console.log("PAGE: ", repositories["repository_selection"], repositories["total_count"], filteredRepositories.map((repository) => repository.name));
+
+                            // should be response.data.repositories, but is response.data[number][]
+                            return filteredRepositories.map((repository) => {
+                                return {
+                                    github_repository_id: repository.id,
+                                    github_repository_name: repository.name,
+                                    github_repository_description: repository.description,
+                                    github_repository_size: repository.size,
+                                    github_repository_language: repository.language,
+                                    github_repository_license: repository.license?.name ?? null,
+                                    github_repository_url: repository.html_url,
+                                    github_repository_website_url: repository.homepage,
+                                    github_repository_default_branch: repository.default_branch,
+                                    github_repository_is_private: repository.private,
+                                    github_repository_is_fork: repository.fork,
+                                    github_repository_is_template: repository.is_template ?? false,
+                                    github_repository_is_archived: repository.archived,
+                                    chat_github_app_installation_id: githubAppInstallationId
+                                };
+                            });
+                        }
+                    );
+
+                    if (LOG_BACKEND) console.log("PAGES: filteredRepositories", filteredRepositories.length, filteredRepositories.map((repository) => repository.github_repository_name));
+                    // console.dir(repositories, { depth: 1 });
 
                     try {
                         const createdGithubAppInstallationRepositories = await createGithubAppInstallationRepositories(filteredRepositories);
                         if (!createdGithubAppInstallationRepositories) {
+                            if (LOG_BACKEND) console.error(3, "Could not create github app installation repositories in database.");
                             if (LOG_BACKEND) console.info("Failed to create github app installation repositories in database.");
                             return sendError(
                                 event,
@@ -165,7 +209,7 @@ export default defineEventHandler(async (event) => {
                             `/home`
                         )
                     } catch (error) {
-                        console.error(error);
+                        if (LOG_BACKEND) console.error(2, error);
                         if (LOG_BACKEND) console.info("Failed to create github app installation repositories in database.");
                         return sendError(
                             event,
@@ -176,7 +220,8 @@ export default defineEventHandler(async (event) => {
                             })
                         )
                     }
-                } catch {
+                } catch (error) {
+                    if (LOG_BACKEND) console.error(1, error);
                     if (LOG_BACKEND) console.info("Failed to create github app installation repositories in database.");
                     return sendError(
                         event,
