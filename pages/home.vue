@@ -67,6 +67,15 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
       <Preview />
       <Benefits />
       <Features />
+      <!-- WIP, needed for displaying different UI previews -->
+      <!-- <SlidingTabs :tabs="['All_Chats', 'Active_Chat']">
+        <template v-slot:All_Chats>
+          <p>All Chats Preview.</p>
+        </template>
+        <template v-slot:Active_Chat>
+          <p>Active Chat Information Preview.</p>
+        </template>
+      </SlidingTabs> -->
     </SecondarySection>
     <!-- <Cursor /> -->
     <!-- <SimpleCursor /> -->
