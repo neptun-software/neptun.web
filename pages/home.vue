@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Timer, Lightbulb } from 'lucide-vue-next';
+
 definePageMeta({
   name: 'Home',
   alias: ['/root'],
@@ -66,6 +68,22 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
     <SecondarySection :isLast="true">
       <Preview />
       <Benefits />
+      <!-- <SpotlightCards
+        :cards="[
+          {
+            title: 'More time for the actual project!',
+            description:
+              'The more time you spend on the actual project, the better. Am I right?',
+            icon: Timer,
+          },
+          {
+            title: 'Easy entry!',
+            description:
+              'Neptun is a very good starting point, for you to learn how to dockerize your applications.',
+            icon: Lightbulb,
+          },
+        ]"
+      /> -->
       <Features />
       <!-- WIP, needed for displaying different UI previews -->
       <!-- <SlidingTabs :tabs="['All_Chats', 'Active_Chat']">

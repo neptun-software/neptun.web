@@ -38,6 +38,7 @@ const benefitList: BenefitsProps[] = [
         </p>
       </div>
 
+      <!-- type: prop for simple/spotlight -->
       <div class="grid w-full gap-4 lg:grid-cols-2">
         <Card
           v-for="({ icon, title, description }, index) in benefitList"
