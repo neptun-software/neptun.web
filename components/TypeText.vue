@@ -82,9 +82,7 @@ onMounted(() => {
 <template>
   <div class="flex flex-col items-center w-full">
     <div>
-      <p
-        class="px-4 py-2 mb-1 rounded-md bg-slate-950 w-96 min-h-24 text-slate-200"
-      >
+      <p class="px-4 py-2 mb-1 rounded-md bg-secondary w-96 min-h-24">
         <a href="" class="typewrite">
           <span class="wrap"></span>
         </a>

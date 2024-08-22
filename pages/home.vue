@@ -54,11 +54,7 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
         >
           <CallToAction>
             <NuxtLink class="cta-button" to="/sign-up">
-              <ShadcnButton
-                class="bg-slate-950 text-slate-200 hover:bg-slate-950 hover:text-slate-200"
-                variant="outline"
-                >send</ShadcnButton
-              >
+              <ShadcnButton variant="outline">send</ShadcnButton>
             </NuxtLink>
           </CallToAction>
         </TypeText>
@@ -133,15 +129,19 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
 }
 
 .headline-text {
-  @apply stroke-slate-800 stroke-[5px] text-slate-200;
-  -webkit-text-stroke: 5px #1e293b;
+  @apply stroke-slate-900 dark:stroke-[#5799c5] stroke-[5px] text-primary-foreground dark:text-primary;
+  -webkit-text-stroke: 5px #0f172a;
+}
+
+.dark .headline-text {
+  -webkit-text-stroke: 5px #5799c5;
 }
 
 .headline-animation {
   position: absolute;
   top: 0;
   left: 0;
-  @apply text-slate-950;
+  @apply text-slate-900 dark:text-[#5799c5];
   animation: animate 4s ease-in-out infinite;
 }
 

@@ -37,7 +37,7 @@ const featureList: FeaturesProps[] = [
         :key="title"
       >
         <Card
-          class="h-full border-0 shadow-none bg-background w-fit max-w-[65ch]"
+          class="h-full border-0 shadow-none bg-secondary w-fit max-w-[65ch]"
         >
           <CardHeader class="flex items-center justify-center">
             <div

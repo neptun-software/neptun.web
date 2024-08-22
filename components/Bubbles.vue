@@ -97,26 +97,32 @@
 <style lang="scss" scoped>
 @use 'sass:math';
 
-$bubble-color-base-1: hsl(200, 100%, 80%);
-$bubble-color-base-2: hsl(200, 100%, 70%);
-$bubble-color-base-3: hsl(200, 100%, 60%);
-
-$bubble-stroke-opacity: 0.7;
-$bubble-fill-opacity: 0.3;
-
-$bubble-stroke-color-1: hsla(200, 100%, 80%, $bubble-stroke-opacity);
-$bubble-stroke-color-2: hsla(200, 100%, 70%, $bubble-stroke-opacity);
-$bubble-stroke-color-3: hsla(200, 100%, 60%, $bubble-stroke-opacity);
-
-$bubble-fill-color-1: hsla(200, 100%, 80%, $bubble-fill-opacity);
-$bubble-fill-color-2: hsla(200, 100%, 70%, $bubble-fill-opacity);
-$bubble-fill-color-3: hsla(200, 100%, 60%, $bubble-fill-opacity);
-
 $stroke-width-large: 2px;
 $stroke-width-small: 1px;
 
 $total-bubbles-large: 3;
 $total-bubbles-small: 7;
+
+/* NOTE: :root cannot be used, because vue compiles css selectors with data-ids */
+.container {
+  --bubble-stroke-color-1: hsla(200, 100%, 80%, 0.7);
+  --bubble-stroke-color-2: hsla(200, 100%, 70%, 0.7);
+  --bubble-stroke-color-3: hsla(200, 100%, 60%, 0.7);
+
+  --bubble-fill-color-1: hsla(200, 100%, 80%, 0.3);
+  --bubble-fill-color-2: hsla(200, 100%, 70%, 0.3);
+  --bubble-fill-color-3: hsla(200, 100%, 60%, 0.3);
+}
+
+.dark .container {
+  --bubble-stroke-color-1: hsla(210, 50%, 30%, 0.7);
+  --bubble-stroke-color-2: hsla(210, 50%, 20%, 0.7);
+  --bubble-stroke-color-3: hsla(210, 50%, 10%, 0.7);
+
+  --bubble-fill-color-1: hsla(210, 50%, 30%, 0.3);
+  --bubble-fill-color-2: hsla(210, 50%, 20%, 0.3);
+  --bubble-fill-color-3: hsla(210, 50%, 10%, 0.3);
+}
 
 @keyframes wobble {
   33% {
@@ -178,18 +184,18 @@ $total-bubbles-small: 7;
 }
 
 .bubbles circle {
-  fill: $bubble-fill-color-3;
-  stroke: $bubble-stroke-color-3;
+  fill: var(--bubble-fill-color-3);
+  stroke: var(--bubble-stroke-color-3);
 }
 
 .bubbles > g > g:nth-of-type(3n) circle {
-  stroke: $bubble-stroke-color-2;
-  fill: $bubble-fill-color-2;
+  stroke: var(--bubble-stroke-color-2);
+  fill: var(--bubble-fill-color-2);
 }
 
 .bubbles > g > g:nth-of-type(4n) circle {
-  stroke: $bubble-stroke-color-1;
-  fill: $bubble-fill-color-1;
+  stroke: var(--bubble-stroke-color-1);
+  fill: var(--bubble-fill-color-1);
 }
 
 .bubbles-large {
