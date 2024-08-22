@@ -35,7 +35,7 @@ export async function readAllChatConversationsOfUser(
   let query = db
     .select()
     .from(chat_conversation)
-    .where(eq(chat_conversation.chat_user_id, user_id))
+    .where(eq(chat_conversation.neptun_user_id, user_id))
     .$dynamic();
 
   if (order_by) {
@@ -69,7 +69,7 @@ export async function updateChatConversation(
   fields: Partial<
     Omit<
       ReadChatConversation,
-      'id' | 'model' | 'created_at' | 'updated_at' | 'chat_user_id'
+      'id' | 'model' | 'created_at' | 'updated_at' | 'neptun_user_id'
     >
   >
 ) {

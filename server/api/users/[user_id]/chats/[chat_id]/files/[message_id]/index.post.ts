@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
       title: title,
       language: language,
       extension: extension,
-      chat_user_id: user_id,
+      neptun_user_id: user_id,
       chat_conversation_id: chat_id,
       chat_conversation_message_id: message_id,
     } as ChatConversationFileToCreate;
@@ -71,7 +71,7 @@ export default defineEventHandler(async (event) => {
         title,
         language,
         extension,
-        chat_user_id: user_id,
+        neptun_user_id: user_id,
         chat_conversation_id: chat_id,
         chat_conversation_message_id: message_id,
       })

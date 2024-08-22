@@ -10,7 +10,7 @@ export type MinimalChat = {
 export interface FullyFeaturedChat extends MinimalChat {
   created_at: ReadChatConversation['created_at'];
   updated_at: ReadChatConversation['updated_at'];
-  chat_user_id: ReadChatConversation['chat_user_id'];
+  neptun_user_id: ReadChatConversation['neptun_user_id'];
 }
 
 export type ChatConversationKeys = keyof ReadChatConversation;

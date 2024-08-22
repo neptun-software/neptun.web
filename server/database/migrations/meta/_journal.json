@@ -29,6 +29,27 @@
       "when": 1723155288856,
       "tag": "0003_complete_bruce_banner",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1724357746705,
+      "tag": "0004_black_eddie_brock",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1724358130661,
+      "tag": "0005_far_cerise",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1724358175185,
+      "tag": "0006_glorious_loa",
+      "breakpoints": true
     }
   ]
 }

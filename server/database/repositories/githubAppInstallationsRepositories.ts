@@ -1,9 +1,9 @@
-import { chat_github_app_installation_repository, type NewGithubAppInstallationRepository } from "~/lib/types/database.tables/schema"
+import { github_app_installation_repository, type NewGithubAppInstallationRepository } from "~/lib/types/database.tables/schema"
 import { eq } from "drizzle-orm";
 
 export const createGithubAppInstallationRepositories = async (installationRepositoriesToCreate: NewGithubAppInstallationRepository[]) => {
     const createdGithubAppInstallationRepositories = await db
-        .insert(chat_github_app_installation_repository)
+        .insert(github_app_installation_repository)
         .values(installationRepositoriesToCreate)
         .returning()
         .catch((err) => {
@@ -23,8 +23,8 @@ export const createGithubAppInstallationRepositories = async (installationReposi
 export const readAllGithubAppInstallationRepositoriesOfInstallation = async (installationId: number) => {
     const fetchedGithubAppInstallationRepositories = await db
         .select()
-        .from(chat_github_app_installation_repository)
-        .where(eq(chat_github_app_installation_repository.chat_github_app_installation_id, installationId))
+        .from(github_app_installation_repository)
+        .where(eq(github_app_installation_repository.github_app_installation_id, installationId))
         .catch((err) => {
             if (LOG_BACKEND)
                 console.error(

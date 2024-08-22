@@ -192,7 +192,7 @@ export const useAPI = () => {
           if (message.actor === 'assistant') {
             try {
               await persistCodeBlocks(
-                message.chat_user_id,
+                message.neptun_user_id,
                 message.chat_conversation_id,
                 message.id,
                 message.message

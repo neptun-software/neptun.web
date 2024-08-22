@@ -96,7 +96,7 @@ export default defineEventHandler(async (event) => {
                     github_account_name: githubUserName ?? "",
                     github_account_avatar_url: githubUserAvatarUrl,
                     github_account_type: githubUserAccountType,
-                    chat_user_id: userId
+                    neptun_user_id: userId
                 };
 
                 // console.log('User ID:', installation.account?.id);
@@ -180,7 +180,7 @@ export default defineEventHandler(async (event) => {
                                     github_repository_is_fork: repository.fork,
                                     github_repository_is_template: repository.is_template ?? false,
                                     github_repository_is_archived: repository.archived,
-                                    chat_github_app_installation_id: githubAppInstallationId
+                                    github_app_installation_id: githubAppInstallationId
                                 };
                             });
                         }

@@ -1,7 +1,7 @@
 import { generateUUID } from '~/lib/utils';
 import {
-  chat_user,
-  chat_user_oauth_account,
+  neptun_user,
+  neptun_user_oauth_account,
   type ReadOauthAccount,
   type GetUser,
   type ReadUser,
@@ -16,16 +16,16 @@ export const validateUserCredentials = async (
   /* TODO: allow more than one email */
   const fetchedUser = await db
     .select({
-      id: chat_user.id,
-      primary_email: decryptColumn(chat_user.primary_email),
+      id: neptun_user.id,
+      primary_email: decryptColumn(neptun_user.primary_email),
     })
-    .from(chat_user)
+    .from(neptun_user)
     .where(
       and(
-        like(chat_user.primary_email, encryptColumn(email)), // SELECT decrypt('\x2866794d48ffaaef22d27652555382a77dfce3e6b71b8fcb3c18ee1a5e6a466a'::bytea, 'secret', 'aes') LIKE 'e.mail@example.com' AS decrypted_primary_email; --check (\x<hex>)
+        like(neptun_user.primary_email, encryptColumn(email)), // SELECT decrypt('\x2866794d48ffaaef22d27652555382a77dfce3e6b71b8fcb3c18ee1a5e6a466a'::bytea, 'secret', 'aes') LIKE 'e.mail@example.com' AS decrypted_primary_email; --check (\x<hex>)
         like(
-          chat_user.hashed_password,
-          compareWithSecret(password, chat_user.hashed_password)
+          neptun_user.hashed_password,
+          compareWithSecret(password, neptun_user.hashed_password)
         ) // SELECT crypt('password', '$2a$12$rUibDTAV38yIModD5ufgmOnlpy89Syof3sU0QitE9J.aKdKtwH3IC') LIKE '$2a$12$rUibDTAV38yIModD5ufgmOnlpy89Syof3sU0QitE9J.aKdKtwH3IC' AS password_is_correct; --check
       )
     )
@@ -44,17 +44,17 @@ export const validateUserCredentials = async (
 export const createUser = async (user: UserToCreate) => {
   /* TODO: only allow, if email is verified via email code => needs extended login flow */
   const createdUser = await db
-    .insert(chat_user)
+    .insert(neptun_user)
     .values({
       primary_email: encryptColumn(user.primary_email), // SELECT encode(encrypt('e.mail@example.com', 'secret', 'aes'), 'hex') AS encrypted_primary_email; --encrypt
       hashed_password: encryptSecret(user.password), // SELECT crypt('password', gen_salt('bf', 12)) AS hashed_password; --encrypt
     })
     // @ts-ignore (is allowed, just not properly typed)
     .returning({
-      id: chat_user.id,
+      id: neptun_user.id,
       primary_email: decryptColumn(
-        chat_user.primary_email
-      ) /* decode(${chat_user.primary_email}, 'hex') instead of ('\x' || ${chat_user.primary_email}) instead of concat('\x', ${chat_user.primary_email}) */,
+        neptun_user.primary_email
+      ) /* decode(${neptun_user.primary_email}, 'hex') instead of ('\x' || ${neptun_user.primary_email}) instead of concat('\x', ${neptun_user.primary_email}) */,
     })
     .catch((err) => {
       if (LOG_BACKEND)
@@ -69,7 +69,7 @@ export const createUser = async (user: UserToCreate) => {
 // Needed for Oauth, if no user exists yet.
 export const createEmptyUser = async () => {
   const createdUser = await db
-    .insert(chat_user)
+    .insert(neptun_user)
     .values({
       primary_email: encryptColumn(
         `${generateUUID()}@account.oAuth`
@@ -78,8 +78,8 @@ export const createEmptyUser = async () => {
     })
     // @ts-ignore (is allowed, just not properly typed)
     .returning({
-      id: chat_user.id,
-      primary_email: decryptColumn(chat_user.primary_email),
+      id: neptun_user.id,
+      primary_email: decryptColumn(neptun_user.primary_email),
     })
     .catch((err) => {
       if (LOG_BACKEND)
@@ -97,11 +97,11 @@ export const readUserUsingPrimaryEmail = async (
   /* TODO: Improve, so that other emails are checked too */
   const fetchedUser = await db
     .select({
-      id: chat_user.id,
-      primary_email: decryptColumn(chat_user.primary_email),
+      id: neptun_user.id,
+      primary_email: decryptColumn(neptun_user.primary_email),
     })
-    .from(chat_user)
-    .where(like(chat_user.primary_email, encryptColumn(email)))
+    .from(neptun_user)
+    .where(like(neptun_user.primary_email, encryptColumn(email)))
     .catch((err) => {
       if (LOG_BACKEND) console.error('Failed to fetch user from database', err);
       return null;
@@ -115,14 +115,14 @@ export const readUserUsingPrimaryEmail = async (
 export const readUserUsingGithubOauthId = async (
   github_oauth_id: ReadOauthAccount['oauth_user_id']
 ) => {
-  const fetchedUser = await db.query.chat_user_oauth_account.findFirst({
+  const fetchedUser = await db.query.neptun_user_oauth_account.findFirst({
     columns: {},
     where: and(
-      eq(decryptColumn(chat_user_oauth_account.oauth_user_id), github_oauth_id),
-      eq(chat_user_oauth_account.provider, 'github')
+      eq(decryptColumn(neptun_user_oauth_account.oauth_user_id), github_oauth_id),
+      eq(neptun_user_oauth_account.provider, 'github')
     ),
     with: {
-      chat_user: {
+      neptun_user: {
         columns: {
           id: true
         }
@@ -132,7 +132,7 @@ export const readUserUsingGithubOauthId = async (
 
   if (!fetchedUser) return null;
 
-  return fetchedUser.chat_user;
+  return fetchedUser.neptun_user;
 }
 
 export const updateUser = async (
@@ -164,13 +164,13 @@ export const updateUser = async (
   };
 
   const updatedUser = await db
-    .update(chat_user)
+    .update(neptun_user)
     .set(updatedUserInformation)
-    .where(eq(chat_user.id, id))
+    .where(eq(neptun_user.id, id))
     // @ts-ignore (is allowed, just not properly typed)
     .returning({
-      id: chat_user.id,
-      primary_email: decryptColumn(chat_user.primary_email),
+      id: neptun_user.id,
+      primary_email: decryptColumn(neptun_user.primary_email),
     })
     .catch((err) => {
       if (LOG_BACKEND) console.error('Failed to update user in database', err);
@@ -184,8 +184,8 @@ export const updateUser = async (
 
 export const deleteUser = async (id: ReadUser['id']) => {
   return await db
-    .delete(chat_user)
-    .where(eq(chat_user.id, id))
+    .delete(neptun_user)
+    .where(eq(neptun_user.id, id))
     .then(() => true)
     .catch((err) => {
       if (LOG_BACKEND)

@@ -121,13 +121,13 @@ async function persistAiChatMessage(
 
   if (!persistedChatMessage) return persistedChatMessage;
   const {
-    chat_user_id,
+    neptun_user_id,
     chat_conversation_id,
     id: message_id,
     message,
   } = persistedChatMessage;
   const persistedCodeBlocks = await persistCodeBlocks(
-    chat_user_id,
+    neptun_user_id,
     chat_conversation_id,
     message_id,
     message,

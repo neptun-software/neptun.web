@@ -34,9 +34,9 @@ export default oauthGitHubEventHandler({
 
     await setUserSession(event, {
       user: {
-        id: createdOrFetchedUserAndConnectedOauthAccount.userData.chat_user.id,
+        id: createdOrFetchedUserAndConnectedOauthAccount.userData.neptun_user.id,
         primary_email:
-          createdOrFetchedUserAndConnectedOauthAccount.userData.chat_user
+          createdOrFetchedUserAndConnectedOauthAccount.userData.neptun_user
             .primary_email,
         oauth: {
           github: {

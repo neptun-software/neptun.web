@@ -21,7 +21,7 @@ export const primaryIdSchema = z.number().positive().int();
 
 /* USERS */
 
-export const chat_user = pgTable('chat_user', {
+export const neptun_user = pgTable('neptun_user', {
   id: serial('id').primaryKey(),
   primary_email: text('primary_email')
     .notNull()
@@ -34,21 +34,21 @@ export const chat_user = pgTable('chat_user', {
     .$onUpdate(() => new Date()),
 });
 
-type NewUser = typeof chat_user.$inferInsert;
-export type GetUser = typeof chat_user.$inferSelect;
+type NewUser = typeof neptun_user.$inferInsert;
+export type GetUser = typeof neptun_user.$inferSelect;
 
 export type UserToCreate = Omit<NewUser, 'id' | 'hashed_password'> & {
   password: string;
 };
 export type ReadUser = Omit<GetUser, 'hashed_password'>;
 
-const InsertUserSchemaBase = createInsertSchema(chat_user);
+const InsertUserSchemaBase = createInsertSchema(neptun_user);
 export const InsertUserSchema = InsertUserSchemaBase.pick({
   primary_email: true,
   created_at: true,
   updated_at: true,
 })
-const SelectUserSchemaBase = createSelectSchema(chat_user);
+const SelectUserSchemaBase = createSelectSchema(neptun_user);
 export const SelectUserSchema = SelectUserSchemaBase.pick({
   id: true,
   primary_email: true,
@@ -62,7 +62,7 @@ export const POSSIBLE_OAUTH_PROVIDERS = pgEnum('oauth_provider_enum', [
   'github',
   'google',
 ]);
-export const chat_user_oauth_account = pgTable('chat_user_oauth_account', {
+export const neptun_user_oauth_account = pgTable('neptun_user_oauth_account', {
   id: serial('id').primaryKey(),
   provider: POSSIBLE_OAUTH_PROVIDERS('provider').notNull(),
   oauth_user_id: text('oauth_user_id').notNull(),
@@ -72,37 +72,37 @@ export const chat_user_oauth_account = pgTable('chat_user_oauth_account', {
     .defaultNow()
     .$onUpdate(() => new Date()),
 
-  chat_user_id: integer('chat_user_id')
+  neptun_user_id: integer('neptun_user_id')
     .notNull()
-    .references(() => chat_user.id, { onDelete: 'cascade' }),
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
 });
 
-type NewOauthAccount = typeof chat_user_oauth_account.$inferInsert;
-type GetOauthAccount = typeof chat_user_oauth_account.$inferSelect;
+type NewOauthAccount = typeof neptun_user_oauth_account.$inferInsert;
+type GetOauthAccount = typeof neptun_user_oauth_account.$inferSelect;
 
 export type OauthAccountToCreate = Omit<
   NewOauthAccount,
-  'id' | 'chat_user_id' | 'created_at' | 'updated_at'
+  'id' | 'neptun_user_id' | 'created_at' | 'updated_at'
 > & {
-  chat_user_id?: number /* so that a oauth account can be linked to an existing user */;
+  neptun_user_id?: number /* so that a oauth account can be linked to an existing user */;
 }
 export type ReadOauthAccount = Omit<
   GetOauthAccount,
   'created_at' | 'updated_at'
 >;
 
-const InsertOauthAccountSchemaBase = createInsertSchema(chat_user_oauth_account);
+const InsertOauthAccountSchemaBase = createInsertSchema(neptun_user_oauth_account);
 export const InsertOauthAccountSchema = InsertOauthAccountSchemaBase.pick({
   oauth_user_id: true,
   oauth_email: true,
   provider: true,
 })
 const SelectOauthAccountSchemaBase = createSelectSchema(
-  chat_user_oauth_account
+  neptun_user_oauth_account
 );
 export const SelectOauthAccountSchema = SelectOauthAccountSchemaBase.pick({
   id: true,
-  chat_user_id: true,
+  neptun_user_id: true,
   oauth_user_id: true,
   oauth_email: true,
   provider: true,
@@ -120,9 +120,9 @@ export const chat_conversation = pgTable('chat_conversation', {
     .defaultNow()
     .$onUpdate(() => new Date()),
 
-  chat_user_id: integer('chat_user_id')
+  neptun_user_id: integer('neptun_user_id')
     .notNull()
-    .references(() => chat_user.id, { onDelete: 'cascade' }),
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
 });
 
 type NewChatConversation = typeof chat_conversation.$inferInsert;
@@ -135,7 +135,7 @@ const InsertChatConversationSchemaBase = createInsertSchema(chat_conversation);
 export const InsertChatConversationSchema = InsertChatConversationSchemaBase.pick({
   name: true,
   model: true,
-}) /* chat_user_id: true */
+}) /* neptun_user_id: true */
 export const ChatConversationToCreateSchema = z.object({
   model: z.nativeEnum(AllowedAiModelsEnum),
   name: z.string().min(3),
@@ -174,9 +174,9 @@ export const chat_conversation_message = pgTable('chat_conversation_message', {
     .defaultNow()
     .$onUpdate(() => new Date()),
 
-  chat_user_id: integer('chat_user_id')
+  neptun_user_id: integer('neptun_user_id')
     .notNull()
-    .references(() => chat_user.id, { onDelete: 'cascade' }),
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
   chat_conversation_id: integer('chat_conversation_id')
     .notNull()
     .references(() => chat_conversation.id, { onDelete: 'cascade' }),
@@ -199,7 +199,7 @@ const InsertChatConversationMessageSchemaBase = createInsertSchema(
 export const InsertChatConversationMessageSchema = InsertChatConversationMessageSchemaBase.pick({
   message: true,
   actor: true,
-}) /* chat_conversation_id: true, chat_user_id: true */
+}) /* chat_conversation_id: true, neptun_user_id: true */
 export const ChatConversationMessagesToCreateSchema = z.object({
   messages: z.array(
     z.object({
@@ -235,9 +235,9 @@ export const chat_conversation_file = pgTable('chat_conversation_file', {
     .defaultNow()
     .$onUpdate(() => new Date()),
 
-  chat_user_id: integer('chat_user_id')
+  neptun_user_id: integer('neptun_user_id')
     .notNull()
-    .references(() => chat_user.id, { onDelete: 'cascade' }),
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
   chat_conversation_id: integer('chat_conversation_id')
     .notNull()
     .references(() => chat_conversation.id, { onDelete: 'cascade' }),
@@ -260,7 +260,7 @@ export const InsertFileSchema = InsertFileSchemaBase.pick({
   language: true,
   extension: true,
   text: true,
-}); // chat_user_id: true, chat_conversation_id: true, chat_conversation_message_id: true
+}); // neptun_user_id: true, chat_conversation_id: true, chat_conversation_message_id: true
 export const InsertFileUniversalSchema = z
   .object({ files: z.array(InsertFileSchema) })
   .or(InsertFileSchema); // files: [] could be shortened to []
@@ -268,7 +268,7 @@ export const SelectFileSchema = createSelectSchema(chat_conversation_file);
 
 /* GITHUB APP INSTALLATION */
 
-export const chat_github_app_installation = pgTable('chat_github_app_installation', {
+export const github_app_installation = pgTable('github_app_installation', {
   id: serial('id').primaryKey(),
   github_account_type: text('github_account_type').notNull(), // Organization or User (do not make me an enum, because it might break, if github changes their naming, which they do regularly without calling it a breaking change)
   github_account_avatar_url: text('github_account_avatar_url').notNull(), // should be encrypted in the future (includes id)
@@ -277,25 +277,25 @@ export const chat_github_app_installation = pgTable('chat_github_app_installatio
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
 
-  chat_user_id: integer('chat_user_id')
+  neptun_user_id: integer('neptun_user_id')
     .notNull()
-    .references(() => chat_user.id, { onDelete: 'cascade' }),
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
 });
 
-export const SelectGithubAppInstallationSchema = createSelectSchema(chat_github_app_installation);
-const InsertGithubAppInstallationSchemaBase = createInsertSchema(chat_github_app_installation);
+export const SelectGithubAppInstallationSchema = createSelectSchema(github_app_installation);
+const InsertGithubAppInstallationSchemaBase = createInsertSchema(github_app_installation);
 export const InsertGithubAppInstallationSchema = InsertGithubAppInstallationSchemaBase.pick({
   github_account_type: true,
   github_account_avatar_url: true,
   github_account_id: true,
   github_account_name: true,
-  chat_user_id: true,
+  neptun_user_id: true,
 })
 export type NewGithubAppInstallation = z.infer<typeof InsertGithubAppInstallationSchema>;
 
 /* GITHUB APP INSTALLATION - SELECTED REPOSITORIES */
 
-export const chat_github_app_installation_repository = pgTable('chat_github_app_installation_repository', {
+export const github_app_installation_repository = pgTable('github_app_installation_repository', {
   id: serial('id').primaryKey(),
   github_repository_id: integer('github_repository_id').notNull(),
   github_repository_name: text('github_repository_name').notNull(),
@@ -313,13 +313,13 @@ export const chat_github_app_installation_repository = pgTable('chat_github_app_
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
 
-  chat_github_app_installation_id: integer('chat_github_app_installation_id')
+  github_app_installation_id: integer('github_app_installation_id')
     .notNull()
-    .references(() => chat_github_app_installation.id, { onDelete: 'cascade' }),
+    .references(() => github_app_installation.id, { onDelete: 'cascade' }),
 });
 
-export const SelectGithubAppInstallationRepositorySchema = createSelectSchema(chat_github_app_installation_repository);
-const InsertGithubAppInstallationRepositorySchemaBase = createInsertSchema(chat_github_app_installation_repository);
+export const SelectGithubAppInstallationRepositorySchema = createSelectSchema(github_app_installation_repository);
+const InsertGithubAppInstallationRepositorySchemaBase = createInsertSchema(github_app_installation_repository);
 export const InsertGithubAppInstallationRepositorySchema = InsertGithubAppInstallationRepositorySchemaBase.pick({
   github_repository_id: true,
   github_repository_name: true,
@@ -334,6 +334,6 @@ export const InsertGithubAppInstallationRepositorySchema = InsertGithubAppInstal
   github_repository_is_fork: true,
   github_repository_is_template: true,
   github_repository_is_archived: true,
-  chat_github_app_installation_id: true,
+  github_app_installation_id: true,
 })
 export type NewGithubAppInstallationRepository = z.infer<typeof InsertGithubAppInstallationRepositorySchema>;

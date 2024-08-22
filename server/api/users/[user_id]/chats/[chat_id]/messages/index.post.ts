@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
     const conversationMessageToCreate = {
       message: message,
       actor: actor,
-      chat_user_id: user_id,
+      neptun_user_id: user_id,
       chat_conversation_id: chat_id,
     };
 
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
     const messages = validatedBody.messages.map(({ content, role }) => ({
       message: content,
       actor: role,
-      chat_user_id: user_id,
+      neptun_user_id: user_id,
       chat_conversation_id: chat_id,
     }));
 

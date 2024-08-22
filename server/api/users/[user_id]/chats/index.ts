@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     if (LOG_BACKEND) console.info(`creating new chat (${validatedBody})...`);
 
     const chatToCreate: ChatConversationToCreate = {
-      chat_user_id: user_id,
+      neptun_user_id: user_id,
       model,
       name,
     };
