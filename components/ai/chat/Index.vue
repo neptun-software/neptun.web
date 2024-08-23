@@ -9,6 +9,7 @@ import {
   Delete,
   Loader2,
   Mouse,
+  Download,
   Settings2,
 } from 'lucide-vue-next';
 import { useChat, type Message } from '@ai-sdk/vue'; // NOTE: can only be called in setup scripts ("Could not get current instance, check to make sure that `useSwrv` is declared in the top level of the setup function.")
@@ -324,6 +325,22 @@ async function deleteLast() {
     });
 }
 
+async function downloadChatMessages(event = null, type: 'json' = 'json') {
+  const blob = new Blob([JSON.stringify(chatMessages.value)], {
+    type: `application/${type}`,
+  });
+
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = `chat-messages.${type}`;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+}
+
 // const isDesktop = useMediaQuery('(min-width: 768px)');
 </script>
 
@@ -355,7 +372,16 @@ async function deleteLast() {
         type="button"
         size="icon"
         variant="ghost"
-        :disabled="chatResponseIsLoading"
+        :disabled="chatMessages.length === 0"
+        @click="downloadChatMessages"
+      >
+        <Download class="size-6" />
+      </ShadcnButton>
+      <ShadcnButton
+        type="button"
+        size="icon"
+        variant="ghost"
+        :disabled="chatMessages.length === 0 || chatResponseIsLoading"
         @click="scrollToBottom"
       >
         <Mouse class="size-6" />
