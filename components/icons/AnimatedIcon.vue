@@ -21,7 +21,7 @@ watch(
 </script>
 
 <template>
-  <div class="w-5 h-5 ml-1">
+  <div class="w-5 h-5 ml-1 animated-icon">
     <ClientOnly>
       <Vue3Lottie
         :key="animationKey"
@@ -39,4 +39,13 @@ watch(
   </div>
 </template>
 
-<style scoped></style>
+<!-- NOTE: scoped is not enough -->
+<style lang="postcss">
+.animated-icon svg path {
+  fill: none !important;
+  stroke-width: 2 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  @apply stroke-foreground;
+}
+</style>
