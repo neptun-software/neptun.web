@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Share, Import } from 'lucide-vue-next';
+import { Import } from 'lucide-vue-next';
 import { useUiStore } from '~/stores/useUiStore';
 
 definePageMeta({
@@ -37,17 +37,9 @@ watch(headerNavigationElement, (newHeaderNavigationElement) => {
             class="ml-auto gap-1.5 text-sm truncate"
             disabled
           >
-            <Import class="size-3.5" />
+            Import Github Repository
+            <Import class="size-4" />
             <!-- Import Code Repository To Analyze -->
-          </ShadcnButton>
-          <ShadcnButton
-            variant="outline"
-            size="sm"
-            class="ml-auto gap-1.5 text-sm truncate"
-            disabled
-          >
-            <Share class="size-3.5" />
-            <!-- Share -->
           </ShadcnButton>
         </div>
       </header>

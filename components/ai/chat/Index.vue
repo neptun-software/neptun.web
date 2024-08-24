@@ -368,24 +368,27 @@ async function downloadChatMessages(event = null, type: 'json' = 'json') {
           <AiChats :useSmall="true" />
         </ShadcnDrawerContent>
       </ShadcnDrawer>
-      <ShadcnButton
-        type="button"
-        size="icon"
-        variant="ghost"
-        :disabled="chatMessages.length === 0"
-        @click="downloadChatMessages"
-      >
-        <Download class="size-6" />
-      </ShadcnButton>
-      <ShadcnButton
-        type="button"
-        size="icon"
-        variant="ghost"
-        :disabled="chatMessages.length === 0 || chatResponseIsLoading"
-        @click="scrollToBottom"
-      >
-        <Mouse class="size-6" />
-      </ShadcnButton>
+      <div class="flex gap-1">
+        <ShadcnButton
+          type="button"
+          size="icon"
+          variant="ghost"
+          :disabled="chatMessages.length === 0"
+          @click="downloadChatMessages"
+        >
+          <Download class="size-6" />
+        </ShadcnButton>
+        <AiChatShareDialog />
+        <ShadcnButton
+          type="button"
+          size="icon"
+          variant="ghost"
+          :disabled="chatMessages.length === 0 || chatResponseIsLoading"
+          @click="scrollToBottom"
+        >
+          <Mouse class="size-6" />
+        </ShadcnButton>
+      </div>
     </div>
 
     <ShadcnBadge

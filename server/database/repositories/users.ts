@@ -7,7 +7,7 @@ import {
   type ReadUser,
   type UserToCreate,
 } from '../../../lib/types/database.tables/schema';
-import { and, eq, like } from 'drizzle-orm';
+import { and, eq, like, sql } from 'drizzle-orm';
 
 export const validateUserCredentials = async (
   email: ReadUser['primary_email'],
@@ -111,6 +111,47 @@ export const readUserUsingPrimaryEmail = async (
 
   return fetchedUser[0]; // [][0] => undefined :)
 };
+
+export const readUserIdsOfPrimaryEmails = async (
+  emails: ReadUser['primary_email'][]
+) => {
+  /* const encryptedEmails = emails.map(email => sql.join([sql`(SELECT `, encryptColumn(email), sql` AS TEXT)`]));
+  const fetchedUsers = await db.execute<ReadChatConversationShare>(sql`SELECT "id" FROM "neptun_user" WHERE "neptun_user"."primary_email" IN (${sql.join(encryptedEmails, sql`, `)})`); 
+    return (fetchedUsers as ReadChatConversationShare[]).map(({ id }) => {
+    return {
+      id
+    }
+  }); */
+
+  /* const encryptedEmails = emails.map(email => sql.join([sql`neptun_user.primary_email = `, encryptColumn(email)]));
+
+  const fetchedUsers = await db
+    .select({
+      id: neptun_user.id,
+    })
+    .from(neptun_user)
+    .where(sql`${sql.join(encryptedEmails, sql` or `)}`)
+    .catch((err) => {
+      if (LOG_BACKEND) console.error('Failed to fetch users from database', err);
+      return null;
+    }) */
+
+  const encryptedEmails = emails.map(email => encryptColumn(email));
+  const fetchedUsers = await db
+    .select({
+      id: neptun_user.id,
+    })
+    .from(neptun_user)
+    .where(sql`neptun_user.primary_email IN (${sql.join(encryptedEmails, sql`, `)})`) // because inArray is not typed correctly
+    .catch((err) => {
+      if (LOG_BACKEND) console.error('Failed to fetch users from database', err);
+      return null;
+    })
+
+  if (!fetchedUsers) return null;
+
+  return fetchedUsers;
+}
 
 export const readUserUsingGithubOauthId = async (
   github_oauth_id: ReadOauthAccount['oauth_user_id']

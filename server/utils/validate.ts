@@ -301,6 +301,70 @@ export async function validateParamChatId(
   );
 }
 
+/* VALIDATE ROUTE PARAMS(user_id, chat_id, share_id) */
+export async function validateParamShareId(
+  event: H3Event<EventHandlerRequest>
+): Promise<ValidationResult<ShareIdType>> {
+  return validateParams<ShareIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-ignore
+        const user_id = Number(params?.user_id); // => NaN if not a number, not present
+        // @ts-ignore
+        const chat_id = Number(params?.chat_id);
+        // @ts-ignore
+        const share_id = Number(params?.share_id);
+        event.context.validated.params['user_id'] = user_id;
+        event.context.validated.params['chat_id'] = chat_id;
+        event.context.validated.params['share_id'] = share_id;
+
+        return ShareIdSchema.safeParse({ user_id, chat_id, share_id });
+      });
+      if (result.success) {
+        return {
+          success: true,
+          data: { user_id: result.data.user_id, chat_id: result.data.chat_id, share_id: result.data.share_id },
+        };
+      } else {
+        return result;
+      }
+    },
+    'Successfully validated routeParams(user_id, chat_id, share_id).',
+    `Invalid routeParams(user_id, chat_id, share_id). You (user_id=${event.context.validated.params['user_id']}) do not have access to view the user information of routeParams(user_id=${event.context.validated.params['user_id']}, chat_id=${event.context.validated.params['chat_id']}, share_id=${event.context.validated.params['share_id']}).`,
+    'queryParams(user_id, chat_id, share_id):',
+    (user, data) => user.id !== data.user_id // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
+  );
+}
+
+export async function validateParamUuid(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ChatUuidType>> {
+  return validateParams<ChatUuidType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(
+        event,
+        ChatUuidSchema.safeParse
+      );
+
+      event.context.validated.params['uuid'] = result?.data?.uuid || null;
+
+      if (result.success) {
+        return {
+          success: true,
+          data: { uuid: result.data.uuid },
+        };
+      } else {
+        return result;
+      }
+    },
+    'Successfully validated routeParams(uuid).',
+    `Invalid routeParams(uuid). The resource with uuid=${event.context.validated.params['uuid']} does not exist or you do not have access to it.`,
+    'queryParams(uuid):',
+  );
+}
+
 /* VALIDATE ROUTE PARAMS(user_id, chat_id, message_id) */
 export async function validateParamMessageId(
   event: H3Event<EventHandlerRequest>
@@ -393,6 +457,20 @@ export const ChatIdSchema = z.object({
 });
 
 type ChatIdType = z.infer<typeof ChatIdSchema>;
+
+export const ShareIdSchema = z.object({
+  user_id: primaryIdSchema,
+  chat_id: primaryIdSchema,
+  share_id: primaryIdSchema,
+});
+
+type ShareIdType = z.infer<typeof ShareIdSchema>;
+
+export const ChatUuidSchema = z.object({
+  uuid: z.string().uuid(),
+});
+
+type ChatUuidType = z.infer<typeof ChatUuidSchema>;
 
 export const ChatMessageIdSchema = z.object({
   user_id: primaryIdSchema,

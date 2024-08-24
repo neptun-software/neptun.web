@@ -1,0 +1,1 @@
+ALTER TABLE "chat_conversation_share" ALTER COLUMN "is_shared" SET DEFAULT true;

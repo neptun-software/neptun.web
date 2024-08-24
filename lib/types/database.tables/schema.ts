@@ -11,6 +11,7 @@ import {
   serial,
   text,
   timestamp,
+  uuid,
 } from 'drizzle-orm/pg-core';
 
 // Types used, and not interfaces, because you do not get full intellisense on interfaces and we do not need any features that interfaces provide...
@@ -150,6 +151,63 @@ export const SelectChatConversationSchema = createSelectSchema(
   chat_conversation
 );
 
+/* SHARES */
+
+export const chat_conversation_share = pgTable('chat_conversation_share', {
+  id: serial('id').primaryKey(),
+  is_shared: boolean('is_shared').default(true).notNull(),
+  share_uuid: uuid('share_id').defaultRandom().notNull().unique(),
+  is_protected: boolean('is_protected').default(false).notNull(),
+  hashed_password: text('hashed_password'),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+
+  chat_conversation_id: integer('chat_conversation_id')
+    .notNull()
+    .unique()
+    .references(() => chat_conversation.id, { onDelete: 'cascade' }),
+});
+
+type NewChatConversationShare = typeof chat_conversation_share.$inferInsert;
+type GetChatConversationShare = typeof chat_conversation_share.$inferSelect;
+
+export type ChatConversationShareToCreate = Omit<NewChatConversationShare, 'id' | 'share_uuid' | 'created_at' | 'updated_at'>;
+export type ReadChatConversationShare = GetChatConversationShare;
+
+const InsertChatConversationShareSchemaBase = createInsertSchema(chat_conversation_share);
+export const InsertChatConversationShareSchema = InsertChatConversationShareSchemaBase.pick({
+  is_shared: true,
+  is_protected: true,
+  hashed_password: true,
+})
+
+/* SHARES - WHITELIST */
+
+export const chat_conversation_share_whitelist_entry = pgTable('chat_conversation_share_whitelist_entry', {
+  id: serial('id').primaryKey(),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+
+  whitelisted_neptun_user_id: integer('whitelisted_neptun_user_id')
+    .notNull()
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
+  chat_conversation_share_id: integer('chat_conversation_share_id')
+    .notNull()
+    .references(() => chat_conversation_share.id, { onDelete: 'cascade' }),
+});
+
+type NewChatConversationShareWhitelist = typeof chat_conversation_share_whitelist_entry.$inferInsert;
+type GetChatConversationShareWhitelist = typeof chat_conversation_share_whitelist_entry.$inferSelect;
+
+export type ChatConversationShareWhitelistToCreate = Omit<NewChatConversationShareWhitelist, 'id' | 'created_at' | 'updated_at'>;
+export type ReadChatConversationShareWhitelist = GetChatConversationShareWhitelist;
+
+const InsertChatConversationShareWhitelistSchemaBase = createInsertSchema(chat_conversation_share_whitelist_entry);
+export const InsertChatConversationShareWhitelistSchema = InsertChatConversationShareWhitelistSchemaBase.pick({
+  whitelisted_neptun_user_id: true,
+})
+export const EmailListToCreateSchema = z.array(z.string().min(5).email()).min(1);
+
 /* MESSAGES */
 
 /**
@@ -235,6 +293,7 @@ export const chat_conversation_file = pgTable('chat_conversation_file', {
     .defaultNow()
     .$onUpdate(() => new Date()),
 
+  /* NOTE: stores user_id, chat_id and message_id for quicker retrieval (get in file browser, in chat info and in connected message) */
   neptun_user_id: integer('neptun_user_id')
     .notNull()
     .references(() => neptun_user.id, { onDelete: 'cascade' }),
