@@ -64,8 +64,8 @@ async function validateParams<S, E = S>(
     data,
     success,
   } = secondValidationStep
-      ? secondValidationStep(maybeValidatedParams.data!)
-      : { success: true, data: null, validationErrorMessage: '' };
+    ? secondValidationStep(maybeValidatedParams.data!)
+    : { success: true, data: null, validationErrorMessage: '' };
   if (secondValidationStep) {
     if (!success || !data) {
       return {
@@ -144,6 +144,7 @@ export async function validateQueryChatId(
   );
 }
 
+/* VALIDATE QUERY PARAMS(order_by) */
 export async function validateQueryOrderBy(
   event: H3Event<EventHandlerRequest>
 ): Promise<ValidationResult<OrderByQueryType>> {
@@ -324,7 +325,11 @@ export async function validateParamShareId(
       if (result.success) {
         return {
           success: true,
-          data: { user_id: result.data.user_id, chat_id: result.data.chat_id, share_id: result.data.share_id },
+          data: {
+            user_id: result.data.user_id,
+            chat_id: result.data.chat_id,
+            share_id: result.data.share_id,
+          },
         };
       } else {
         return result;
@@ -334,34 +339,6 @@ export async function validateParamShareId(
     `Invalid routeParams(user_id, chat_id, share_id). You (user_id=${event.context.validated.params['user_id']}) do not have access to view the user information of routeParams(user_id=${event.context.validated.params['user_id']}, chat_id=${event.context.validated.params['chat_id']}, share_id=${event.context.validated.params['share_id']}).`,
     'queryParams(user_id, chat_id, share_id):',
     (user, data) => user.id !== data.user_id // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
-  );
-}
-
-export async function validateParamUuid(
-  event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<ChatUuidType>> {
-  return validateParams<ChatUuidType>(
-    event,
-    async () => {
-      const result = await getValidatedRouterParams(
-        event,
-        ChatUuidSchema.safeParse
-      );
-
-      event.context.validated.params['uuid'] = result?.data?.uuid || null;
-
-      if (result.success) {
-        return {
-          success: true,
-          data: { uuid: result.data.uuid },
-        };
-      } else {
-        return result;
-      }
-    },
-    'Successfully validated routeParams(uuid).',
-    `Invalid routeParams(uuid). The resource with uuid=${event.context.validated.params['uuid']} does not exist or you do not have access to it.`,
-    'queryParams(uuid):',
   );
 }
 
@@ -443,6 +420,34 @@ export async function validateParamAiModelName(
   );
 }
 
+export async function validateParamUuid(
+  event: H3Event<EventHandlerRequest>
+): Promise<ValidationResult<ChatUuidType>> {
+  return validateParams<ChatUuidType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(
+        event,
+        ChatUuidSchema.safeParse
+      );
+
+      event.context.validated.params['uuid'] = result?.data?.uuid || null;
+
+      if (result.success) {
+        return {
+          success: true,
+          data: { uuid: result.data.uuid },
+        };
+      } else {
+        return result;
+      }
+    },
+    'Successfully validated routeParams(uuid).',
+    `Invalid routeParams(uuid). The resource with uuid=${event.context.validated.params['uuid']} does not exist or you do not have access to it.`,
+    'queryParams(uuid):'
+  );
+}
+
 /* ROUTE PARAMETER SCHEMAs */
 
 export const UserIdSchema = z.object({
@@ -465,12 +470,6 @@ export const ShareIdSchema = z.object({
 });
 
 type ShareIdType = z.infer<typeof ShareIdSchema>;
-
-export const ChatUuidSchema = z.object({
-  uuid: z.string().uuid(),
-});
-
-type ChatUuidType = z.infer<typeof ChatUuidSchema>;
 
 export const ChatMessageIdSchema = z.object({
   user_id: primaryIdSchema,
@@ -531,6 +530,12 @@ const OrderByQuerySchema = z.object({
 });
 
 type OrderByQueryType = z.infer<typeof OrderByQuerySchema>;
+
+export const ChatUuidSchema = z.object({
+  uuid: z.string().uuid(),
+});
+
+type ChatUuidType = z.infer<typeof ChatUuidSchema>;
 
 /* BODY SCHEMAs */
 

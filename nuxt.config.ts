@@ -128,8 +128,8 @@ export default defineNuxtConfig({
         appId: process.env.NEPTUN_GITHUB_APP_ID,
         clientId: process.env.NEPTUN_GITHUB_APP_GITHUB_CLIENT_ID,
         clientSecret: process.env.NEPTUN_GITHUB_APP_GITHUB_CLIENT_SECRET,
-        privateKey: process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY
-      }
+        privateKey: process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY,
+      },
     },
     session: {
       /* session persists for 7 days */ name: 'neptun-session',
@@ -184,8 +184,8 @@ export default defineNuxtConfig({
     'nuxt-time',
     'nuxt-security',
     '@nuxtjs/robots',
-    "nuxt-monaco-editor",
-    '@formkit/auto-animate/nuxt'
+    'nuxt-monaco-editor',
+    '@formkit/auto-animate/nuxt',
   ],
 
   mdc: {

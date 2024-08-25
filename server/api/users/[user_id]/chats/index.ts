@@ -5,7 +5,10 @@ import {
   deleteChatConversations,
   readAllChatConversationsOfUser,
 } from '~/server/database/repositories/chatConversations';
-import { ChatConversationToCreateSchema, ChatConversationsToDelete } from '~/lib/types/database.tables/schema';
+import {
+  ChatConversationToCreateSchema,
+  ChatConversationsToDelete,
+} from '~/lib/types/database.tables/schema';
 
 export default defineEventHandler(async (event) => {
   /* 0. VALIDATE METHOD */

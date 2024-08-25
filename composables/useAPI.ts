@@ -96,7 +96,7 @@ export const useAPI = () => {
       pick: ['chat'] as any,
     };
 
-    console.log({ model, name })
+    console.log({ model, name });
 
     const toastMessages = {
       loading: 'Persisting chat history...',
@@ -118,7 +118,7 @@ export const useAPI = () => {
 
       return response.chat.id;
     } catch {
-      console.error("Failed to persist chat history!");
+      console.error('Failed to persist chat history!');
     }
   };
 
@@ -145,11 +145,11 @@ export const useAPI = () => {
 
           return persistedCodeBlocks;
         } catch {
-          console.error("Failed to persist code blocks!");
+          console.error('Failed to persist code blocks!');
         }
       }
     } catch {
-      console.error("Failed to parse code blocks!");
+      console.error('Failed to parse code blocks!');
     }
 
     return null;
@@ -198,12 +198,12 @@ export const useAPI = () => {
                 message.message
               );
             } catch {
-              console.error("Failed to persist code blocks!");
+              console.error('Failed to persist code blocks!');
             }
           }
         }
       } catch {
-        console.error("Failed to persist chat messages!");
+        console.error('Failed to persist chat messages!');
       }
 
       messagesRef.value = [];
@@ -235,7 +235,7 @@ export const useAPI = () => {
         toastMessages
       );
     } catch {
-      console.error("Failed to rename chat!");
+      console.error('Failed to rename chat!');
     }
   };
 
@@ -259,7 +259,7 @@ export const useAPI = () => {
       try {
         await handleFetch<void>(url, options, toastMessages);
       } catch {
-        console.error("Failed to delete chat!");
+        console.error('Failed to delete chat!');
       }
 
       return;
@@ -281,7 +281,7 @@ export const useAPI = () => {
     try {
       await handleFetch<void>(url, options, toastMessages);
     } catch {
-      console.error("Failed to delete chats!");
+      console.error('Failed to delete chats!');
     }
   };
 
@@ -356,13 +356,15 @@ export function useFetchFiles() {
       }
 
       try {
-        const data = await $fetch(`/api/users/${user_id}/chats/${chat_id}/files`);
+        const data = await $fetch(
+          `/api/users/${user_id}/chats/${chat_id}/files`
+        );
         if (data.chatFiles && data.chatFiles.length > 0) {
           const chatFiles = data.chatFiles;
           fetchedFiles.value = (chatFiles as ReadChatConversationFile[]) ?? [];
         }
       } catch {
-        console.error("Failed to fetch files!");
+        console.error('Failed to fetch files!');
       }
     }
   }

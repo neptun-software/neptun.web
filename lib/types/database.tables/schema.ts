@@ -48,14 +48,14 @@ export const InsertUserSchema = InsertUserSchemaBase.pick({
   primary_email: true,
   created_at: true,
   updated_at: true,
-})
+});
 const SelectUserSchemaBase = createSelectSchema(neptun_user);
 export const SelectUserSchema = SelectUserSchemaBase.pick({
   id: true,
   primary_email: true,
   created_at: true,
   updated_at: true,
-})
+});
 
 /* OAuth ACCOUNTS */
 
@@ -86,18 +86,20 @@ export type OauthAccountToCreate = Omit<
   'id' | 'neptun_user_id' | 'created_at' | 'updated_at'
 > & {
   neptun_user_id?: number /* so that a oauth account can be linked to an existing user */;
-}
+};
 export type ReadOauthAccount = Omit<
   GetOauthAccount,
   'created_at' | 'updated_at'
 >;
 
-const InsertOauthAccountSchemaBase = createInsertSchema(neptun_user_oauth_account);
+const InsertOauthAccountSchemaBase = createInsertSchema(
+  neptun_user_oauth_account
+);
 export const InsertOauthAccountSchema = InsertOauthAccountSchemaBase.pick({
   oauth_user_id: true,
   oauth_email: true,
   provider: true,
-})
+});
 const SelectOauthAccountSchemaBase = createSelectSchema(
   neptun_user_oauth_account
 );
@@ -107,7 +109,7 @@ export const SelectOauthAccountSchema = SelectOauthAccountSchemaBase.pick({
   oauth_user_id: true,
   oauth_email: true,
   provider: true,
-})
+});
 
 /* CHATS */
 
@@ -129,14 +131,18 @@ export const chat_conversation = pgTable('chat_conversation', {
 type NewChatConversation = typeof chat_conversation.$inferInsert;
 type GetChatConversation = typeof chat_conversation.$inferSelect;
 
-export type ChatConversationToCreate = Omit<NewChatConversation, 'id' | 'created_at' | 'updated_at'>
+export type ChatConversationToCreate = Omit<
+  NewChatConversation,
+  'id' | 'created_at' | 'updated_at'
+>;
 export type ReadChatConversation = GetChatConversation;
 
 const InsertChatConversationSchemaBase = createInsertSchema(chat_conversation);
-export const InsertChatConversationSchema = InsertChatConversationSchemaBase.pick({
-  name: true,
-  model: true,
-}) /* neptun_user_id: true */
+export const InsertChatConversationSchema =
+  InsertChatConversationSchemaBase.pick({
+    name: true,
+    model: true,
+  }); /* neptun_user_id: true */
 export const ChatConversationToCreateSchema = z.object({
   model: z.nativeEnum(AllowedAiModelsEnum),
   name: z.string().min(3),
@@ -147,9 +153,8 @@ export const ChatConversationsToDelete = z.object({
 export const ChatConversationAttributesToUpdateSchema = z.object({
   name: z.string().min(3),
 });
-export const SelectChatConversationSchema = createSelectSchema(
-  chat_conversation
-);
+export const SelectChatConversationSchema =
+  createSelectSchema(chat_conversation);
 
 /* SHARES */
 
@@ -160,7 +165,9 @@ export const chat_conversation_share = pgTable('chat_conversation_share', {
   is_protected: boolean('is_protected').default(false).notNull(),
   hashed_password: text('hashed_password'),
   created_at: timestamp('created_at').defaultNow(),
-  updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+  updated_at: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 
   chat_conversation_id: integer('chat_conversation_id')
     .notNull()
@@ -171,42 +178,64 @@ export const chat_conversation_share = pgTable('chat_conversation_share', {
 type NewChatConversationShare = typeof chat_conversation_share.$inferInsert;
 type GetChatConversationShare = typeof chat_conversation_share.$inferSelect;
 
-export type ChatConversationShareToCreate = Omit<NewChatConversationShare, 'id' | 'share_uuid' | 'created_at' | 'updated_at'>;
+export type ChatConversationShareToCreate = Omit<
+  NewChatConversationShare,
+  'id' | 'share_uuid' | 'created_at' | 'updated_at'
+>;
 export type ReadChatConversationShare = GetChatConversationShare;
 
-const InsertChatConversationShareSchemaBase = createInsertSchema(chat_conversation_share);
-export const InsertChatConversationShareSchema = InsertChatConversationShareSchemaBase.pick({
-  is_shared: true,
-  is_protected: true,
-  hashed_password: true,
-})
+const InsertChatConversationShareSchemaBase = createInsertSchema(
+  chat_conversation_share
+);
+export const InsertChatConversationShareSchema =
+  InsertChatConversationShareSchemaBase.pick({
+    is_shared: true,
+    is_protected: true,
+    hashed_password: true,
+  });
 
 /* SHARES - WHITELIST */
 
-export const chat_conversation_share_whitelist_entry = pgTable('chat_conversation_share_whitelist_entry', {
-  id: serial('id').primaryKey(),
-  created_at: timestamp('created_at').defaultNow(),
-  updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+export const chat_conversation_share_whitelist_entry = pgTable(
+  'chat_conversation_share_whitelist_entry',
+  {
+    id: serial('id').primaryKey(),
+    created_at: timestamp('created_at').defaultNow(),
+    updated_at: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date()),
 
-  whitelisted_neptun_user_id: integer('whitelisted_neptun_user_id')
-    .notNull()
-    .references(() => neptun_user.id, { onDelete: 'cascade' }),
-  chat_conversation_share_id: integer('chat_conversation_share_id')
-    .notNull()
-    .references(() => chat_conversation_share.id, { onDelete: 'cascade' }),
-});
+    whitelisted_neptun_user_id: integer('whitelisted_neptun_user_id')
+      .notNull()
+      .references(() => neptun_user.id, { onDelete: 'cascade' }),
+    chat_conversation_share_id: integer('chat_conversation_share_id')
+      .notNull()
+      .references(() => chat_conversation_share.id, { onDelete: 'cascade' }),
+  }
+);
 
-type NewChatConversationShareWhitelist = typeof chat_conversation_share_whitelist_entry.$inferInsert;
-type GetChatConversationShareWhitelist = typeof chat_conversation_share_whitelist_entry.$inferSelect;
+type NewChatConversationShareWhitelist =
+  typeof chat_conversation_share_whitelist_entry.$inferInsert;
+type GetChatConversationShareWhitelist =
+  typeof chat_conversation_share_whitelist_entry.$inferSelect;
 
-export type ChatConversationShareWhitelistToCreate = Omit<NewChatConversationShareWhitelist, 'id' | 'created_at' | 'updated_at'>;
-export type ReadChatConversationShareWhitelist = GetChatConversationShareWhitelist;
+export type ChatConversationShareWhitelistToCreate = Omit<
+  NewChatConversationShareWhitelist,
+  'id' | 'created_at' | 'updated_at'
+>;
+export type ReadChatConversationShareWhitelist =
+  GetChatConversationShareWhitelist;
 
-const InsertChatConversationShareWhitelistSchemaBase = createInsertSchema(chat_conversation_share_whitelist_entry);
-export const InsertChatConversationShareWhitelistSchema = InsertChatConversationShareWhitelistSchemaBase.pick({
-  whitelisted_neptun_user_id: true,
-})
-export const EmailListToCreateSchema = z.array(z.string().min(5).email()).min(1);
+const InsertChatConversationShareWhitelistSchemaBase = createInsertSchema(
+  chat_conversation_share_whitelist_entry
+);
+export const InsertChatConversationShareWhitelistSchema =
+  InsertChatConversationShareWhitelistSchemaBase.pick({
+    whitelisted_neptun_user_id: true,
+  });
+export const EmailListToCreateSchema = z
+  .array(z.string().min(5).email())
+  .min(1);
 
 /* MESSAGES */
 
@@ -217,16 +246,18 @@ export enum Actor {
   'user' = 'user',
   'assistant' = 'assistant',
 }
-const Actors = [
-  'user',
-  'assistant',
-] as const;
+const Actors = ['user', 'assistant'] as const;
 const typedActors: readonly Message['role'][] = Actors;
-export const POSSIBLE_CHAT_CONVERSATION_MESSAGE_ACTORS = pgEnum('chat_conversation_message_actor_enum', typedActors as [string, ...string[]]);
+export const POSSIBLE_CHAT_CONVERSATION_MESSAGE_ACTORS = pgEnum(
+  'chat_conversation_message_actor_enum',
+  typedActors as [string, ...string[]]
+);
 export const chat_conversation_message = pgTable('chat_conversation_message', {
   id: serial('id').primaryKey(),
   message: text('message').notNull(),
-  actor: POSSIBLE_CHAT_CONVERSATION_MESSAGE_ACTORS('actor').notNull().default('user'),
+  actor: POSSIBLE_CHAT_CONVERSATION_MESSAGE_ACTORS('actor')
+    .notNull()
+    .default('user'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at')
     .defaultNow()
@@ -240,24 +271,23 @@ export const chat_conversation_message = pgTable('chat_conversation_message', {
     .references(() => chat_conversation.id, { onDelete: 'cascade' }),
 });
 
-type NewChatConversationMessage =
-  typeof chat_conversation_message.$inferInsert;
-type GetChatConversationMessage =
-  typeof chat_conversation_message.$inferSelect;
+type NewChatConversationMessage = typeof chat_conversation_message.$inferInsert;
+type GetChatConversationMessage = typeof chat_conversation_message.$inferSelect;
 
 export type ChatConversationMessageToCreate = Omit<
   NewChatConversationMessage,
   'id' | 'created_at' | 'updated_at'
->
+>;
 export type ReadChatConversationMessage = GetChatConversationMessage;
 
 const InsertChatConversationMessageSchemaBase = createInsertSchema(
   chat_conversation_message
 );
-export const InsertChatConversationMessageSchema = InsertChatConversationMessageSchemaBase.pick({
-  message: true,
-  actor: true,
-}) /* chat_conversation_id: true, neptun_user_id: true */
+export const InsertChatConversationMessageSchema =
+  InsertChatConversationMessageSchemaBase.pick({
+    message: true,
+    actor: true,
+  }); /* chat_conversation_id: true, neptun_user_id: true */
 export const ChatConversationMessagesToCreateSchema = z.object({
   messages: z.array(
     z.object({
@@ -305,12 +335,13 @@ export const chat_conversation_file = pgTable('chat_conversation_file', {
     .references(() => chat_conversation_message.id, { onDelete: 'cascade' }),
 });
 
-type NewChatConversationFile =
-  typeof chat_conversation_file.$inferInsert;
-type GetChatConversationFile =
-  typeof chat_conversation_file.$inferSelect;
+type NewChatConversationFile = typeof chat_conversation_file.$inferInsert;
+type GetChatConversationFile = typeof chat_conversation_file.$inferSelect;
 
-export type ChatConversationFileToCreate = Omit<NewChatConversationFile, 'id' | 'created_at' | 'updated_at'>
+export type ChatConversationFileToCreate = Omit<
+  NewChatConversationFile,
+  'id' | 'created_at' | 'updated_at'
+>;
 export type ReadChatConversationFile = GetChatConversationFile;
 
 const InsertFileSchemaBase = createInsertSchema(chat_conversation_file);
@@ -334,65 +365,90 @@ export const github_app_installation = pgTable('github_app_installation', {
   github_account_id: integer('github_account_id').notNull(), // should be encrypted in the future
   github_account_name: text('github_account_name'),
   created_at: timestamp('created_at').defaultNow(),
-  updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+  updated_at: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 
   neptun_user_id: integer('neptun_user_id')
     .notNull()
     .references(() => neptun_user.id, { onDelete: 'cascade' }),
 });
 
-export const SelectGithubAppInstallationSchema = createSelectSchema(github_app_installation);
-const InsertGithubAppInstallationSchemaBase = createInsertSchema(github_app_installation);
-export const InsertGithubAppInstallationSchema = InsertGithubAppInstallationSchemaBase.pick({
-  github_account_type: true,
-  github_account_avatar_url: true,
-  github_account_id: true,
-  github_account_name: true,
-  neptun_user_id: true,
-})
-export type NewGithubAppInstallation = z.infer<typeof InsertGithubAppInstallationSchema>;
+export const SelectGithubAppInstallationSchema = createSelectSchema(
+  github_app_installation
+);
+const InsertGithubAppInstallationSchemaBase = createInsertSchema(
+  github_app_installation
+);
+export const InsertGithubAppInstallationSchema =
+  InsertGithubAppInstallationSchemaBase.pick({
+    github_account_type: true,
+    github_account_avatar_url: true,
+    github_account_id: true,
+    github_account_name: true,
+    neptun_user_id: true,
+  });
+export type NewGithubAppInstallation = z.infer<
+  typeof InsertGithubAppInstallationSchema
+>;
 
 /* GITHUB APP INSTALLATION - SELECTED REPOSITORIES */
 
-export const github_app_installation_repository = pgTable('github_app_installation_repository', {
-  id: serial('id').primaryKey(),
-  github_repository_id: integer('github_repository_id').notNull(),
-  github_repository_name: text('github_repository_name').notNull(),
-  github_repository_description: text('github_repository_description'),
-  github_repository_size: integer('github_repository_size'),
-  github_repository_language: text('github_repository_language'),
-  github_repository_license: text('github_repository_license'),
-  github_repository_url: text('github_repository_url').notNull(),
-  github_repository_website_url: text('github_repository_website_url'),
-  github_repository_default_branch: text('github_repository_default_branch'),
-  github_repository_is_private: boolean('github_repository_is_private').notNull(),
-  github_repository_is_fork: boolean('github_repository_is_fork'),
-  github_repository_is_template: boolean('github_repository_is_template'),
-  github_repository_is_archived: boolean('github_repository_is_archived').notNull(),
-  created_at: timestamp('created_at').defaultNow(),
-  updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+export const github_app_installation_repository = pgTable(
+  'github_app_installation_repository',
+  {
+    id: serial('id').primaryKey(),
+    github_repository_id: integer('github_repository_id').notNull(),
+    github_repository_name: text('github_repository_name').notNull(),
+    github_repository_description: text('github_repository_description'),
+    github_repository_size: integer('github_repository_size'),
+    github_repository_language: text('github_repository_language'),
+    github_repository_license: text('github_repository_license'),
+    github_repository_url: text('github_repository_url').notNull(),
+    github_repository_website_url: text('github_repository_website_url'),
+    github_repository_default_branch: text('github_repository_default_branch'),
+    github_repository_is_private: boolean(
+      'github_repository_is_private'
+    ).notNull(),
+    github_repository_is_fork: boolean('github_repository_is_fork'),
+    github_repository_is_template: boolean('github_repository_is_template'),
+    github_repository_is_archived: boolean(
+      'github_repository_is_archived'
+    ).notNull(),
+    created_at: timestamp('created_at').defaultNow(),
+    updated_at: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date()),
 
-  github_app_installation_id: integer('github_app_installation_id')
-    .notNull()
-    .references(() => github_app_installation.id, { onDelete: 'cascade' }),
-});
+    github_app_installation_id: integer('github_app_installation_id')
+      .notNull()
+      .references(() => github_app_installation.id, { onDelete: 'cascade' }),
+  }
+);
 
-export const SelectGithubAppInstallationRepositorySchema = createSelectSchema(github_app_installation_repository);
-const InsertGithubAppInstallationRepositorySchemaBase = createInsertSchema(github_app_installation_repository);
-export const InsertGithubAppInstallationRepositorySchema = InsertGithubAppInstallationRepositorySchemaBase.pick({
-  github_repository_id: true,
-  github_repository_name: true,
-  github_repository_description: true,
-  github_repository_size: true,
-  github_repository_language: true,
-  github_repository_license: true,
-  github_repository_url: true,
-  github_repository_website_url: true,
-  github_repository_default_branch: true,
-  github_repository_is_private: true,
-  github_repository_is_fork: true,
-  github_repository_is_template: true,
-  github_repository_is_archived: true,
-  github_app_installation_id: true,
-})
-export type NewGithubAppInstallationRepository = z.infer<typeof InsertGithubAppInstallationRepositorySchema>;
+export const SelectGithubAppInstallationRepositorySchema = createSelectSchema(
+  github_app_installation_repository
+);
+const InsertGithubAppInstallationRepositorySchemaBase = createInsertSchema(
+  github_app_installation_repository
+);
+export const InsertGithubAppInstallationRepositorySchema =
+  InsertGithubAppInstallationRepositorySchemaBase.pick({
+    github_repository_id: true,
+    github_repository_name: true,
+    github_repository_description: true,
+    github_repository_size: true,
+    github_repository_language: true,
+    github_repository_license: true,
+    github_repository_url: true,
+    github_repository_website_url: true,
+    github_repository_default_branch: true,
+    github_repository_is_private: true,
+    github_repository_is_fork: true,
+    github_repository_is_template: true,
+    github_repository_is_archived: true,
+    github_app_installation_id: true,
+  });
+export type NewGithubAppInstallationRepository = z.infer<
+  typeof InsertGithubAppInstallationRepositorySchema
+>;

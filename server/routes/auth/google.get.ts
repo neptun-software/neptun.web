@@ -35,7 +35,8 @@ export default oauthGoogleEventHandler({
 
     await setUserSession(event, {
       user: {
-        id: createdOrFetchedUserAndConnectedOauthAccount.userData.neptun_user.id,
+        id: createdOrFetchedUserAndConnectedOauthAccount.userData.neptun_user
+          .id,
         primary_email:
           createdOrFetchedUserAndConnectedOauthAccount.userData.neptun_user
             .primary_email,

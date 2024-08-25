@@ -1,5 +1,8 @@
-import { takeRightWhile, without, /* dropRight */ } from "es-toolkit";
-import { deleteChatConversationMessage, readChatConversationMessages } from "~/server/database/repositories/chatConversationMessages";
+import { takeRightWhile, without /* dropRight */ } from 'es-toolkit';
+import {
+  deleteChatConversationMessage,
+  readChatConversationMessages,
+} from '~/server/database/repositories/chatConversationMessages';
 
 // Delete last chat message of chat conversation
 export default defineEventHandler(async (event) => {
@@ -30,15 +33,20 @@ export default defineEventHandler(async (event) => {
   }
 
   // messages, that should not be there
-  const userMessagesToDelete = takeRightWhile(fetchedChatMessages, (message) => message.actor === 'user');
+  const userMessagesToDelete = takeRightWhile(
+    fetchedChatMessages,
+    (message) => message.actor === 'user'
+  );
   const messagesDeletedSuccessfully: number[] = [];
   const messagesFailedToDelete: number[] = [];
   for (const message of userMessagesToDelete) {
-    await deleteChatConversationMessage(message.id).then(async () => {
-      messagesDeletedSuccessfully.push(message.id);
-    }).catch(() => {
-      messagesFailedToDelete.push(message.id);
-    });
+    await deleteChatConversationMessage(message.id)
+      .then(async () => {
+        messagesDeletedSuccessfully.push(message.id);
+      })
+      .catch(() => {
+        messagesFailedToDelete.push(message.id);
+      });
   }
 
   const messagesLeft = without(fetchedChatMessages, ...userMessagesToDelete);
@@ -47,7 +55,7 @@ export default defineEventHandler(async (event) => {
   if (messagesLeft.length < 2) {
     return {
       deletedSuccessfully: messagesDeletedSuccessfully,
-      failedToDelete: messagesFailedToDelete
+      failedToDelete: messagesFailedToDelete,
     };
   }
 

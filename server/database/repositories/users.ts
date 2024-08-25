@@ -136,22 +136,25 @@ export const readUserIdsOfPrimaryEmails = async (
       return null;
     }) */
 
-  const encryptedEmails = emails.map(email => encryptColumn(email));
+  const encryptedEmails = emails.map((email) => encryptColumn(email));
   const fetchedUsers = await db
     .select({
       id: neptun_user.id,
     })
     .from(neptun_user)
-    .where(sql`neptun_user.primary_email IN (${sql.join(encryptedEmails, sql`, `)})`) // because inArray is not typed correctly
+    .where(
+      sql`neptun_user.primary_email IN (${sql.join(encryptedEmails, sql`, `)})`
+    ) // because inArray is not typed correctly
     .catch((err) => {
-      if (LOG_BACKEND) console.error('Failed to fetch users from database', err);
+      if (LOG_BACKEND)
+        console.error('Failed to fetch users from database', err);
       return null;
-    })
+    });
 
   if (!fetchedUsers) return null;
 
   return fetchedUsers;
-}
+};
 
 export const readUserUsingGithubOauthId = async (
   github_oauth_id: ReadOauthAccount['oauth_user_id']
@@ -159,22 +162,25 @@ export const readUserUsingGithubOauthId = async (
   const fetchedUser = await db.query.neptun_user_oauth_account.findFirst({
     columns: {},
     where: and(
-      eq(decryptColumn(neptun_user_oauth_account.oauth_user_id), github_oauth_id),
+      eq(
+        decryptColumn(neptun_user_oauth_account.oauth_user_id),
+        github_oauth_id
+      ),
       eq(neptun_user_oauth_account.provider, 'github')
     ),
     with: {
       neptun_user: {
         columns: {
-          id: true
-        }
-      }
+          id: true,
+        },
+      },
     },
-  })
+  });
 
   if (!fetchedUser) return null;
 
   return fetchedUser.neptun_user;
-}
+};
 
 export const updateUser = async (
   id: ReadUser['id'],

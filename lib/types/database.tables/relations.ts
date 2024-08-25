@@ -15,7 +15,9 @@ export const neptun_userRelations = relations(neptun_user, ({ many }) => ({
   neptun_user_oauth_accounts: many(neptun_user_oauth_account),
   github_app_installations: many(github_app_installation),
   chat_conversations: many(chat_conversation),
-  chat_conversation_share_whitelists: many(chat_conversation_share_whitelist_entry),
+  chat_conversation_share_whitelists: many(
+    chat_conversation_share_whitelist_entry
+  ),
   chat_conversation_messages: many(chat_conversation_message),
   chat_conversation_files: many(chat_conversation_file),
 }));
@@ -73,7 +75,9 @@ export const chat_conversation_shareRelations = relations(
       fields: [chat_conversation_share.chat_conversation_id],
       references: [chat_conversation.id],
     }),
-    chat_conversation_shares_whitelisted: many(chat_conversation_share_whitelist_entry),
+    chat_conversation_shares_whitelisted: many(
+      chat_conversation_share_whitelist_entry
+    ),
   })
 );
 
@@ -81,15 +85,19 @@ export const chat_conversation_share_whitelistRelations = relations(
   chat_conversation_share_whitelist_entry,
   ({ one }) => ({
     neptun_user_id: one(neptun_user, {
-      fields: [chat_conversation_share_whitelist_entry.whitelisted_neptun_user_id],
+      fields: [
+        chat_conversation_share_whitelist_entry.whitelisted_neptun_user_id,
+      ],
       references: [neptun_user.id],
     }),
     chat_conversation_share: one(chat_conversation_share, {
-      fields: [chat_conversation_share_whitelist_entry.chat_conversation_share_id],
+      fields: [
+        chat_conversation_share_whitelist_entry.chat_conversation_share_id,
+      ],
       references: [chat_conversation_share.id],
     }),
   })
-)
+);
 
 export const chat_conversation_messageRelations = relations(
   chat_conversation_message,
