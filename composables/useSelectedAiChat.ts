@@ -4,16 +4,11 @@ import type {
   AllowedAiModels,
 } from '~/lib/types/ai.models';
 import { generateUUID } from '~/lib/utils';
-const { console } = useLogger();
+// const { console } = useLogger();
 
 function createChatName(time: Date) {
   return `chat-${time.valueOf()}`;
 }
-
-const localStorageSelectedChatId = useLocalStorage(
-  localStorageTopicKey('selected-ai-chat-id'),
-  -1
-);
 
 export const useSelectedAiChat = () => {
   const aiChatReCreationTrigger = useState(
@@ -31,17 +26,6 @@ export const useSelectedAiChat = () => {
     () => selectedAiChatId.value === -1
   );
   const selectedAiChatId = computed(() => {
-    if (
-      IS_CLIENT &&
-      localStorageSelectedChatId.value !== selectedAiChat.value.id
-    ) {
-      console.info(
-        'localStorageSelectedChatId.value',
-        localStorageSelectedChatId.value
-      );
-      localStorageSelectedChatId.value = selectedAiChat.value.id;
-    }
-
     return selectedAiChat?.value?.id ?? -1;
   });
   const selectedAiChatKey = computed(

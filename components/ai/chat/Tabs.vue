@@ -1,9 +1,11 @@
 <script lang="ts" setup>
+const { user } = useUserSession();
+
 type possibleDashboardTabs = 'chat' | 'chats';
 const selectedDashboardTab = ref<possibleDashboardTabs>('chat');
 const selectedDashboardTabFromLocalStorage =
   useLocalStorage<possibleDashboardTabs>(
-    localStorageTopicKey('selected-dashboard-tab'),
+    localStorageTopicKey(`${user.value?.id ?? -1}:selected-dashboard-tab`),
     'chat'
   );
 

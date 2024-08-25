@@ -1,9 +1,10 @@
 export default defineNuxtPlugin((nuxtApp) => {
   const { selectedAiChat } = useSelectedAiChat();
+  const { user } = useUserSession();
 
   nuxtApp.hooks.hook('app:mounted', () => {
     const localStorageSelectedChatId = useLocalStorage(
-      localStorageTopicKey('selected-ai-chat-id'),
+      localStorageTopicKey(`${user.value?.id ?? -1}:selected-ai-chat-id`),
       -1
     );
 
