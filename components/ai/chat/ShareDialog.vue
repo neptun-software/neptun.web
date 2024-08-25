@@ -78,7 +78,7 @@ const onSubmit = handleSubmit(async (values) => {
     return;
   }
 
-  toast('You submitted the following values:', {
+  /* toast('You submitted the following values:', {
     description: h(
       'pre',
       {
@@ -87,7 +87,7 @@ const onSubmit = handleSubmit(async (values) => {
       },
       h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))
     ),
-  });
+  }); */
 
   const shareCreated = await $fetch(
     `/api/users/${user.value?.id}/chats/${selectedAiChatId.value}/shares`,
@@ -138,6 +138,19 @@ const onSubmit = handleSubmit(async (values) => {
         toast.error('Failed to create whitelist entries!');
       });
   }
+
+  refresh();
+});
+
+const { data, status, error, refresh } = useFetch(
+  `/api/users/${user.value?.id ?? -1}/chats/${selectedAiChatId.value}/shares`
+);
+
+const requestUrl = useRequestURL();
+const url = computed(() => {
+  return `http${IS_DEV ? '' : 's'}://${requestUrl.host}/shared/chats/${
+    data.value
+  }`;
 });
 </script>
 
@@ -157,7 +170,7 @@ const onSubmit = handleSubmit(async (values) => {
       <ShadcnDialogContent>
         <ShadcnDialogHeader>
           <ShadcnDialogTitle
-            >Share your chat with friends or colleagues (wip)</ShadcnDialogTitle
+            >Share your chat with friends or colleagues</ShadcnDialogTitle
           >
           <ShadcnDialogDescription>
             You can make it public, for everybody who has the link, you could
@@ -168,7 +181,11 @@ const onSubmit = handleSubmit(async (values) => {
           </ShadcnDialogDescription>
         </ShadcnDialogHeader>
 
-        <form class="space-y-6" @submit="onSubmit">
+        <form
+          v-if="status === 'success' && !data"
+          class="space-y-6"
+          @submit="onSubmit"
+        >
           <ShadcnFormField
             v-slot="{ value, handleChange }"
             type="checkbox"
@@ -277,6 +294,17 @@ const onSubmit = handleSubmit(async (values) => {
             </ShadcnDialogClose>
           </ShadcnDialogFooter>
         </form>
+        <div v-else>
+          You have already published this chat!<br />
+          <div class="flex items-center gap-2 px-2 py-1 border rounded-sm">
+            {{ url }}
+            <CopyToClipboard :text="url" />
+          </div>
+        </div>
+        <div v-if="error">
+          Failed to check if chat is published.<br />
+          <ShadcnButton type="button" @click="refresh">Retry</ShadcnButton>
+        </div>
       </ShadcnDialogContent>
     </ShadcnDialog>
   </div>

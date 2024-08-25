@@ -28,19 +28,29 @@ export default defineEventHandler(async (event) => {
   }
   const uuid = maybeUuid.data?.uuid;
 
+  const fetchedChatConversationShareWhitelistEntries =
+    await readAllChatConversationShareWhitelistEntries(uuid);
+  const shareHasWhitelist = fetchedChatConversationShareWhitelistEntries.length > 0;
+
   const info = await readShareInfo(uuid);
   if (!info.shareExists) {
     return sendError(
       event,
       createError({
         statusCode: 404,
-        statusMessage: 'Not Found',
-        data: null,
+        statusMessage: 'Not Found (share not found)',
+        message: 'The share does not exist.',
+        data: {
+          shareInfo: {
+            ...info,
+            shareHasWhitelist
+          }
+        },
       })
     );
   }
 
-  if (info.shareIsPrivate) {
+  if (info.shareIsPrivate && info.shareHasPassword) {
     const authHeader = event.node.req.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Basic ')) {
       setResponseHeader(
@@ -52,7 +62,14 @@ export default defineEventHandler(async (event) => {
         event,
         createError({
           statusCode: 401,
-          statusMessage: 'Unauthorized',
+          statusMessage: 'Unauthorized (incorrect credentials)',
+          message: 'You are not authorized to view this chat.',
+          data: {
+            shareInfo: {
+              ...info,
+              shareHasWhitelist
+            }
+          }
         })
       );
     }
@@ -71,22 +88,27 @@ export default defineEventHandler(async (event) => {
         event,
         createError({
           statusCode: 401,
-          statusMessage: 'Unauthorized',
+          statusMessage: 'Unauthorized (incorrect credentials)',
+          message: 'You are not authorized to view this chat.',
+          data: {
+            shareInfo: {
+              ...info,
+              shareHasWhitelist
+            }
+          }
         })
       );
     }
   }
 
   // TODO: check for oAuth emails too
-  const fetchedChatConversationShareWhitelistEntries =
-    await readAllChatConversationShareWhitelistEntries(uuid);
   if (fetchedChatConversationShareWhitelistEntries.length !== 0) {
     const session = await requireUserSession(event);
     const user = session.user;
     const email = user.primary_email;
 
     if (
-      fetchedChatConversationShareWhitelistEntries
+      !fetchedChatConversationShareWhitelistEntries
         .map((entry) => entry.neptun_user_id.primary_email)
         .includes(email)
     ) {
@@ -94,7 +116,14 @@ export default defineEventHandler(async (event) => {
         event,
         createError({
           statusCode: 403,
-          statusMessage: 'Forbidden',
+          statusMessage: 'Forbidden (not on whitelist)',
+          message: 'You are not on the whitelist.',
+          data: {
+            shareInfo: {
+              ...info,
+              shareHasWhitelist
+            }
+          }
         })
       );
     }
@@ -104,5 +133,6 @@ export default defineEventHandler(async (event) => {
 
   return {
     chatMessages: fetchedChatMessages,
+    shareInfo: info,
   };
 });

@@ -1,6 +1,7 @@
 import { and, eq, like } from 'drizzle-orm';
 import {
   chat_conversation_share,
+  type ReadChatConversation,
   type ChatConversationShareToCreate,
   type ReadChatConversationShare,
 } from '~/lib/types/database.tables/schema';
@@ -29,6 +30,25 @@ export const createChatConversationShare = async (
   return createdChatConversationShare[0];
 };
 
+export const readShareUuid = async (
+  chat_id: ReadChatConversation['id']
+) => {
+  const shareUUid = await db
+    .select()
+    .from(chat_conversation_share)
+    .where(eq(chat_conversation_share.chat_conversation_id, chat_id))
+    .then((data) => {
+      return data[0]?.share_uuid ?? null;
+    })
+    .catch((err) => {
+      if (LOG_BACKEND)
+        console.error('Failed to fetch share from database', err);
+      return null;
+    });
+
+  return shareUUid;
+}
+
 export const readShareInfo = async (
   id: ReadChatConversationShare['share_uuid']
 ) => {
@@ -41,6 +61,7 @@ export const readShareInfo = async (
         shareExists: data.length > 0,
         shareIsActive: data[0]?.is_shared ?? false,
         shareIsPrivate: data[0]?.is_protected ?? false,
+        shareHasPassword: (data[0]?.hashed_password && data[0]?.hashed_password.length > 0) ? true : false,
       };
     })
     .catch((err) => {
@@ -50,6 +71,7 @@ export const readShareInfo = async (
         shareExists: false,
         shareIsActive: false,
         shareIsPrivate: false,
+        shareHasPassword: false,
       };
     });
 

@@ -1,10 +1,10 @@
 import { eq } from 'drizzle-orm';
 import {
-  chat_conversation_share,
   chat_conversation_share_whitelist_entry,
   type ReadChatConversationShare,
   type ChatConversationShareWhitelistToCreate,
   type ReadChatConversationShareWhitelist,
+  neptun_user,
 } from '~/lib/types/database.tables/schema';
 
 export const createChatConversationShareWhitelistEntries = async (
@@ -31,18 +31,32 @@ export const createChatConversationShareWhitelistEntries = async (
 export const readAllChatConversationShareWhitelistEntries = async (
   share_id: ReadChatConversationShare['share_uuid']
 ) => {
-  const chatConversationShareWhitelistEntry =
-    await db.query.chat_conversation_share_whitelist_entry.findMany({
+  const chatConversationShareWhitelistEntries =
+    await db.query.chat_conversation_share.findFirst({
+      where: (chat_conversation_share, { eq }) => eq(chat_conversation_share.share_uuid, share_id),
       with: {
-        chat_conversation_share: {
+        chat_conversation_shares_whitelisted: {
           columns: {},
+          with: {
+            neptun_user_id: {
+              columns: {
+                primary_email: true,
+              },
+              extras: {
+                primary_email: decryptColumn(neptun_user.primary_email).as(
+                  'primary_email'
+                ),
+              },
+            },
+          },
         },
-        neptun_user_id: {},
       },
-      where: eq(chat_conversation_share.share_uuid, share_id),
+      columns: {
+        share_uuid: true,
+      },
     });
 
-  return chatConversationShareWhitelistEntry;
+  return chatConversationShareWhitelistEntries?.chat_conversation_shares_whitelisted ?? [];
 };
 
 export const deleteChatConversationShareWhitelistEntry = async (
