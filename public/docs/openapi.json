@@ -1,695 +1,723 @@
 {
-    "openapi": "3.1.0",
-    "info": {
+  "openapi": "3.1.0",
+  "info": {
       "title": "Neptun: Nitro Server Routes",
-      "version": "v0"
+      "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:42124",
+      "description": "Local Development Server",
+      "variables": {}
     },
-    "servers": [
-      {
-        "url": "http://localhost:42124",
-        "description": "Local Development Server",
-        "variables": {}
-      },
-      {
-        "url": "http://localhost:42124",
-        "description": "Production Server",
-        "variables": {}
+    {
+      "url": "https://neptun-webui.vercel.app",
+      "description": "Production Server",
+      "variables": {}
+    }
+  ],
+  "paths": {
+    "/api/ai/huggingface/{model_publisher}/{model_name}/chat": {
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "model_publisher",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "model_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
-    ],
-    "paths": {
-      "/api/ai/huggingface/{model_publisher}/{model_name}/chat": {
-        "get": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "model_publisher",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "model_name",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
+    },
+    "/api/auth/check": {
+      "head": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/sign-up": {
+      "post": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/html-to-markdown/{url}": {
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/shared/chats/{uuid}": {
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/chats/{chat_id}/files/{message_id}": {
+      "post": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/chats/{chat_id}/files": {
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/chats/{chat_id}": {
+      "delete": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       },
-      "/api/auth/check": {
-        "head": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
+      "patch": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/chats/{chat_id}/messages": {
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       },
-      "/api/auth/login": {
-        "post": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
+      "post": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/chats/{chat_id}/messages/last": {
+      "delete": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/chats/{chat_id}/shares/{share_id}/whitelist-entries": {
+      "post": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "share_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/chats/{chat_id}/shares": {
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       },
-      "/api/auth/logout": {
-        "post": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
+      "post": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/chats": {
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}": {
+      "delete": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       },
-      "/api/auth/sign-up": {
-        "post": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
+      "patch": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/auth/github.app": {
+      "get": {
+        "tags": [
+          "App Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/auth/github": {
+      "get": {
+        "tags": [
+          "App Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "tags": [
+          "App Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/__nuxt_error": {
+      "get": {
+        "tags": [
+          "Internal"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/_auth/session": {
+      "delete": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       },
-      "/api/html-to-markdown/{url}": {
-        "get": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "url",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
-      },
-      "/api/shared/chats/{uuid}": {
-        "get": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "uuid",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
+      }
+    },
+    "/api/_mdc/highlight": {
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
-      },
-      "/api/users/{user_id}/chats/{chat_id}/files/{message_id}": {
-        "post": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "chat_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "message_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
+      }
+    },
+    "/__site-config__/debug.json": {
+      "get": {
+        "tags": [
+          "Internal"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
-      },
-      "/api/users/{user_id}/chats/{chat_id}/files": {
-        "get": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "chat_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
+      }
+    },
+    "/robots.txt": {
+      "get": {
+        "tags": [
+          "App Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
-      },
-      "/api/users/{user_id}/chats/{chat_id}": {
-        "delete": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "chat_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        },
-        "patch": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "chat_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
+      }
+    },
+    "/__robots__/debug.json": {
+      "get": {
+        "tags": [
+          "Internal"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
-      },
-      "/api/users/{user_id}/chats/{chat_id}/messages": {
-        "get": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "chat_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        },
-        "post": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "chat_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
+      }
+    },
+    "/__robots__/debug-path.json": {
+      "get": {
+        "tags": [
+          "Internal"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
-      },
-      "/api/users/{user_id}/chats/{chat_id}/messages/last": {
-        "delete": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "chat_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
+      }
+    },
+    "/_nitro/openapi.json": {
+      "get": {
+        "tags": [
+          "Internal"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
-      },
-      "/api/users/{user_id}/chats/{chat_id}/shares/{share_id}/whitelist-entries": {
-        "post": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "chat_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "share_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
+      }
+    },
+    "/_nitro/scalar": {
+      "get": {
+        "tags": [
+          "Internal"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
-      },
-      "/api/users/{user_id}/chats/{chat_id}/shares": {
-        "post": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "chat_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
+      }
+    },
+    "/_nitro/swagger": {
+      "get": {
+        "tags": [
+          "Internal"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
-      },
-      "/api/users/{user_id}/chats": {
-        "get": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
+      }
+    },
+    "/_ipx/{*param1}": {
+      "get": {
+        "tags": [
+          "Internal"
+        ],
+        "parameters": [
+          {
+            "name": "*param1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        }
-      },
-      "/api/users/{user_id}": {
-        "delete": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        },
-        "patch": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [
-            {
-              "name": "user_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/auth/github.app": {
-        "get": {
-          "tags": [
-            "App Routes"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/auth/github": {
-        "get": {
-          "tags": [
-            "App Routes"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/auth/google": {
-        "get": {
-          "tags": [
-            "App Routes"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/__nuxt_error": {
-        "get": {
-          "tags": [
-            "Internal"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/api/_auth/session": {
-        "delete": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        },
-        "get": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/api/_mdc/highlight": {
-        "get": {
-          "tags": [
-            "API Routes"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/__site-config__/debug.json": {
-        "get": {
-          "tags": [
-            "Internal"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/robots.txt": {
-        "get": {
-          "tags": [
-            "App Routes"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/__robots__/debug.json": {
-        "get": {
-          "tags": [
-            "Internal"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/__robots__/debug-path.json": {
-        "get": {
-          "tags": [
-            "Internal"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/_nitro/openapi.json": {
-        "get": {
-          "tags": [
-            "Internal"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/_nitro/scalar": {
-        "get": {
-          "tags": [
-            "Internal"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/_nitro/swagger": {
-        "get": {
-          "tags": [
-            "Internal"
-          ],
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
-          }
-        }
-      },
-      "/_ipx/{*param1}": {
-        "get": {
-          "tags": [
-            "Internal"
-          ],
-          "parameters": [
-            {
-              "name": "*param1",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK"
-            }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
     }
+  }
 }
