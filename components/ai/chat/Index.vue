@@ -218,7 +218,7 @@ onMounted(async () => {
   await loadChatMessages(user.value?.id ?? -1, selectedAiChat.value.id).then(
     () => {
       isLoading.value = false;
-      currentChatMessageHistoryClear();
+      // currentChatMessageHistoryClear();
     }
   );
 });
@@ -262,33 +262,50 @@ async function generateMarkdown() {
 }
 
 // Send Message on CTRL + ENTER && allow message history
+let historyIndex = -1;
 function handleInputFieldKeyboardEvents(event: KeyboardEvent) {
   if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
     submitMessage();
   }
 
   if ((event.ctrlKey || event.metaKey) && event.key === 'ArrowUp') {
-    currentChatMessageRedo();
+    // currentChatMessageRedo();
+    if (historyIndex < currentChatMessageHistory.value.length - 1) {
+      historyIndex++;
+      currentChatMessage.value =
+        currentChatMessageHistory.value[historyIndex].snapshot;
+    }
   }
 
   if ((event.ctrlKey || event.metaKey) && event.key === 'ArrowDown') {
-    currentChatMessageUndo();
+    // currentChatMessageUndo();
+    if (historyIndex > 0) {
+      historyIndex--;
+      currentChatMessage.value =
+        currentChatMessageHistory.value[historyIndex].snapshot;
+    } else if (historyIndex === 0) {
+      currentChatMessage.value = '';
+      historyIndex = -1;
+    }
   }
 }
 
 function submitMessage() {
   if (currentChatMessage.value.trim() === '') return;
+  globalChatMessage.value = currentChatMessage.value;
   currentChatMessageCommit();
   handleChatMessageSubmit();
 }
 
+const globalChatMessage = useState('global-chat-message', () => '');
+
 const {
-  // history: currentChatMessageHistory,
+  history: currentChatMessageHistory,
   commit: currentChatMessageCommit,
-  undo: currentChatMessageUndo,
-  redo: currentChatMessageRedo,
-  clear: currentChatMessageHistoryClear,
-} = useManualRefHistory(currentChatMessage, {
+  // undo: currentChatMessageUndo,
+  // redo: currentChatMessageRedo,
+  // clear: currentChatMessageHistoryClear,
+} = useManualRefHistory(globalChatMessage, {
   capacity: 3,
 });
 
