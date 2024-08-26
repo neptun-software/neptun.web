@@ -1,9 +1,10 @@
-import { and, eq, like } from 'drizzle-orm';
+import { and, eq, exists, like } from 'drizzle-orm';
 import {
   chat_conversation_share,
   type ReadChatConversation,
   type ChatConversationShareToCreate,
   type ReadChatConversationShare,
+  chat_conversation_message,
 } from '~/lib/types/database.tables/schema';
 
 export const createChatConversationShare = async (
@@ -85,6 +86,9 @@ export const readChatConversationShareMessages = async (
     await db.query.chat_conversation_message.findMany({
       with: {
         chat_conversation: {
+          columns: {
+            id: true,
+          },
           with: {
             chat_conversation_shares: {
               where: eq(chat_conversation_share.share_uuid, id),
@@ -97,11 +101,9 @@ export const readChatConversationShareMessages = async (
               },
             },
           },
-          columns: {
-            id: true,
-          },
         },
       },
+      where: eq(chat_conversation_message.chat_conversation_id, chat_conversation_share.chat_conversation_id),
       columns: {
         id: true,
         message: true,
