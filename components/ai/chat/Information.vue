@@ -221,19 +221,29 @@ const colorMode = useColorMode();
         </fieldset>
       </div>
       <div v-else>
-        <template v-if="selectedAiChatIsPlayground">
-          <h4 class="font-bold">Files are only stored for persisted chats.</h4>
-          <p>
-            Click on "Persist Chat History", to generated and view persisted
-            fetched files.
-          </p>
-        </template>
-        <template v-else>
-          <h4 class="font-bold">
-            No fetched files available for selected chat.
-          </h4>
-          <p>Chat with the AI, to generate and view fetched files.</p>
-        </template>
+        <ClientOnly>
+          <template v-if="selectedAiChatIsPlayground">
+            <h4 class="font-bold">
+              Files are only stored for persisted chats.
+            </h4>
+            <p>
+              Click on "Persist Chat History", to generated and view persisted
+              fetched files.
+            </p>
+          </template>
+          <template v-else>
+            <h4 class="font-bold">
+              No fetched files available for selected chat.
+            </h4>
+            <p>Chat with the AI, to generate and view fetched files.</p>
+          </template>
+          <template #fallback>
+            <h4 class="font-bold">
+              No fetched files available for selected chat.
+            </h4>
+            <p>Chat with the AI, to generate and view fetched files.</p>
+          </template>
+        </ClientOnly>
       </div>
     </fieldset>
   </div>

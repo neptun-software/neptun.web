@@ -156,157 +156,161 @@ const url = computed(() => {
 
 <template>
   <div>
-    <ShadcnDialog>
-      <ShadcnDialogTrigger as-child>
-        <ShadcnButton
-          type="button"
-          size="icon"
-          variant="ghost"
-          :disabled="selectedAiChatIsPlayground"
-        >
-          <Share class="size-6" />
-        </ShadcnButton>
-      </ShadcnDialogTrigger>
-      <ShadcnDialogContent>
-        <ShadcnDialogHeader>
-          <ShadcnDialogTitle
-            >Share your chat with friends or colleagues</ShadcnDialogTitle
+    <ClientOnly>
+      <ShadcnDialog>
+        <ShadcnDialogTrigger as-child>
+          <ShadcnButton
+            type="button"
+            size="icon"
+            variant="ghost"
+            :disabled="selectedAiChatIsPlayground"
           >
-          <ShadcnDialogDescription>
-            You can make it public, for everybody who has the link, you could
-            also make it password protected and you could whitelist other
-            users.<br />
-            Others can not edit your chat or send messages, they are just
-            viewers.
-          </ShadcnDialogDescription>
-        </ShadcnDialogHeader>
-
-        <form
-          v-if="status === 'success' && !data"
-          class="space-y-6"
-          @submit="onSubmit"
-        >
-          <ShadcnFormField
-            v-slot="{ value, handleChange }"
-            type="checkbox"
-            name="is_unprotected"
-          >
-            <ShadcnFormItem
-              class="flex flex-row items-start p-4 space-y-0 border rounded-md gap-x-3"
+            <Share class="size-6" />
+          </ShadcnButton>
+        </ShadcnDialogTrigger>
+        <ShadcnDialogContent>
+          <ShadcnDialogHeader>
+            <ShadcnDialogTitle
+              >Share your chat with friends or colleagues</ShadcnDialogTitle
             >
-              <ShadcnFormControl>
-                <ShadcnCheckbox
-                  :checked="value"
-                  @update:checked="handleChange"
-                />
-              </ShadcnFormControl>
-              <div class="space-y-1 leading-none">
-                <ShadcnFormLabel>
-                  Every chat you publish is public by default, if you do not
-                  disable this flag.
-                </ShadcnFormLabel>
-                <ShadcnFormDescription>
-                  If you uncheck this checkbox, you can define a password and/or
-                  a whitelist.
-                </ShadcnFormDescription>
-                <ShadcnFormMessage />
-              </div>
-            </ShadcnFormItem>
-          </ShadcnFormField>
+            <ShadcnDialogDescription>
+              You can make it public, for everybody who has the link, you could
+              also make it password protected and you could whitelist other
+              users.<br />
+              Others can not edit your chat or send messages, they are just
+              viewers.
+            </ShadcnDialogDescription>
+          </ShadcnDialogHeader>
 
-          <template v-if="!formValues.is_unprotected">
-            <ShadcnSeparator />
-
-            <ShadcnFormField v-slot="{ componentField }" name="password">
-              <ShadcnFormItem>
-                <ShadcnFormLabel>Password</ShadcnFormLabel>
+          <form
+            v-if="status === 'success' && !data"
+            class="space-y-6"
+            @submit="onSubmit"
+          >
+            <ShadcnFormField
+              v-slot="{ value, handleChange }"
+              type="checkbox"
+              name="is_unprotected"
+            >
+              <ShadcnFormItem
+                class="flex flex-row items-start p-4 space-y-0 border rounded-md gap-x-3"
+              >
                 <ShadcnFormControl>
-                  <div class="relative">
-                    <ShadcnInput
-                      :type="passwordIsVisible ? 'text' : 'password'"
-                      placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                      v-bind="componentField"
-                    />
-                    <ShadcnButton
-                      type="button"
-                      variant="link"
-                      size="icon"
-                      @click="togglePasswordVisibility"
-                      class="absolute top-0 right-0 flex items-center justify-center pr-3"
-                    >
-                      <span v-if="passwordIsVisible">
-                        <EyeOff class="w-5 h-5" />
-                      </span>
-                      <span v-else>
-                        <Eye class="w-5 h-5" />
-                      </span>
-                    </ShadcnButton>
-                  </div>
+                  <ShadcnCheckbox
+                    :checked="value"
+                    @update:checked="handleChange"
+                  />
                 </ShadcnFormControl>
-                <ShadcnFormDescription>
-                  Secure your chat with a password.
-                </ShadcnFormDescription>
-                <ShadcnFormMessage />
+                <div class="space-y-1 leading-none">
+                  <ShadcnFormLabel>
+                    Every chat you publish is public by default, if you do not
+                    disable this flag.
+                  </ShadcnFormLabel>
+                  <ShadcnFormDescription>
+                    If you uncheck this checkbox, you can define a password
+                    and/or a whitelist.
+                  </ShadcnFormDescription>
+                  <ShadcnFormMessage />
+                </div>
               </ShadcnFormItem>
             </ShadcnFormField>
 
-            <ShadcnFormField v-slot="{ value }" name="email_whitelist">
-              <ShadcnFormItem>
-                <ShadcnFormLabel>Emails you want to whitelist</ShadcnFormLabel>
-                <ShadcnFormControl>
-                  <ShadcnTagsInput :model-value="value">
-                    <ShadcnTagsInputItem
-                      v-for="item in value"
-                      :key="item"
-                      :value="item"
-                    >
-                      <ShadcnTagsInputItemText />
-                      <ShadcnTagsInputItemDelete />
-                    </ShadcnTagsInputItem>
+            <template v-if="!formValues.is_unprotected">
+              <ShadcnSeparator />
 
-                    <ShadcnTagsInputInput
-                      placeholder="Whitelisted user emails..."
-                      @keydown.enter.prevent="validateTag"
-                    />
-                  </ShadcnTagsInput>
-                </ShadcnFormControl>
-                <ShadcnFormDescription>
-                  Add the emails you want to whitelist. You can add multiple.
-                  Only primary emails! The emails are checked when you click
-                  publish. You get no feedback, if the emails are actually
-                  connected to a user, so that this feature can not be abused
-                  for brute-forcing that easily. (You are automatically
-                  whitelisted, of course.)
-                </ShadcnFormDescription>
-                <ShadcnFormMessage />
-              </ShadcnFormItem>
-            </ShadcnFormField>
-          </template>
+              <ShadcnFormField v-slot="{ componentField }" name="password">
+                <ShadcnFormItem>
+                  <ShadcnFormLabel>Password</ShadcnFormLabel>
+                  <ShadcnFormControl>
+                    <div class="relative">
+                      <ShadcnInput
+                        :type="passwordIsVisible ? 'text' : 'password'"
+                        placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                        v-bind="componentField"
+                      />
+                      <ShadcnButton
+                        type="button"
+                        variant="link"
+                        size="icon"
+                        @click="togglePasswordVisibility"
+                        class="absolute top-0 right-0 flex items-center justify-center pr-3"
+                      >
+                        <span v-if="passwordIsVisible">
+                          <EyeOff class="w-5 h-5" />
+                        </span>
+                        <span v-else>
+                          <Eye class="w-5 h-5" />
+                        </span>
+                      </ShadcnButton>
+                    </div>
+                  </ShadcnFormControl>
+                  <ShadcnFormDescription>
+                    Secure your chat with a password.
+                  </ShadcnFormDescription>
+                  <ShadcnFormMessage />
+                </ShadcnFormItem>
+              </ShadcnFormField>
 
-          <ShadcnDialogFooter>
-            <ShadcnButton type="submit">
-              Publish with the configured settings
-            </ShadcnButton>
-            <ShadcnDialogClose as-child>
-              <ShadcnButton type="button" variant="secondary">
-                Close
+              <ShadcnFormField v-slot="{ value }" name="email_whitelist">
+                <ShadcnFormItem>
+                  <ShadcnFormLabel
+                    >Emails you want to whitelist</ShadcnFormLabel
+                  >
+                  <ShadcnFormControl>
+                    <ShadcnTagsInput :model-value="value">
+                      <ShadcnTagsInputItem
+                        v-for="item in value"
+                        :key="item"
+                        :value="item"
+                      >
+                        <ShadcnTagsInputItemText />
+                        <ShadcnTagsInputItemDelete />
+                      </ShadcnTagsInputItem>
+
+                      <ShadcnTagsInputInput
+                        placeholder="Whitelisted user emails..."
+                        @keydown.enter.prevent="validateTag"
+                      />
+                    </ShadcnTagsInput>
+                  </ShadcnFormControl>
+                  <ShadcnFormDescription>
+                    Add the emails you want to whitelist. You can add multiple.
+                    Only primary emails! The emails are checked when you click
+                    publish. You get no feedback, if the emails are actually
+                    connected to a user, so that this feature can not be abused
+                    for brute-forcing that easily. (You are automatically
+                    whitelisted, of course.)
+                  </ShadcnFormDescription>
+                  <ShadcnFormMessage />
+                </ShadcnFormItem>
+              </ShadcnFormField>
+            </template>
+
+            <ShadcnDialogFooter>
+              <ShadcnButton type="submit">
+                Publish with the configured settings
               </ShadcnButton>
-            </ShadcnDialogClose>
-          </ShadcnDialogFooter>
-        </form>
-        <div v-else>
-          You have already published this chat!<br />
-          <div class="flex items-center gap-2 px-2 py-1 border rounded-sm">
-            {{ url }}
-            <CopyToClipboard :text="url" />
+              <ShadcnDialogClose as-child>
+                <ShadcnButton type="button" variant="secondary">
+                  Close
+                </ShadcnButton>
+              </ShadcnDialogClose>
+            </ShadcnDialogFooter>
+          </form>
+          <div v-else>
+            You have already published this chat!<br />
+            <div class="flex items-center gap-2 px-2 py-1 border rounded-sm">
+              {{ url }}
+              <CopyToClipboard :text="url" />
+            </div>
           </div>
-        </div>
-        <div v-if="error">
-          Failed to check if chat is published.<br />
-          <ShadcnButton type="button" @click="refresh">Retry</ShadcnButton>
-        </div>
-      </ShadcnDialogContent>
-    </ShadcnDialog>
+          <div v-if="error">
+            Failed to check if chat is published.<br />
+            <ShadcnButton type="button" @click="refresh">Retry</ShadcnButton>
+          </div>
+        </ShadcnDialogContent>
+      </ShadcnDialog>
+    </ClientOnly>
   </div>
 </template>
 
