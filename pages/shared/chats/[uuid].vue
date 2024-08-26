@@ -61,6 +61,10 @@ const chatMessages = computed(() => {
 onMounted(() => {
   execute();
 });
+
+useHead({
+  title: `Chat Share - ${route.params.uuid}`,
+});
 </script>
 
 <template>
