@@ -5,6 +5,7 @@ import {
   type ChatConversationShareToCreate,
   type ReadChatConversationShare,
   chat_conversation_message,
+  chat_conversation,
 } from '~/lib/types/database.tables/schema';
 
 export const createChatConversationShare = async (
@@ -53,7 +54,12 @@ export const readShareUuid = async (
 export const readShareInfo = async (
   id: ReadChatConversationShare['share_uuid']
 ) => {
-  const shareStatus = await db
+  const shareStatus: {
+    shareExists: boolean;
+    shareIsActive: boolean;
+    shareIsPrivate: boolean;
+    shareHasPassword: boolean;
+  } = await db
     .select()
     .from(chat_conversation_share)
     .where(eq(chat_conversation_share.share_uuid, id))
@@ -103,7 +109,15 @@ export const readChatConversationShareMessages = async (
           },
         },
       },
-      where: eq(chat_conversation_message.chat_conversation_id, chat_conversation_share.chat_conversation_id),
+      where: exists(
+        db.select().from(chat_conversation_share)
+          .where(
+            and(
+              eq(chat_conversation_share.chat_conversation_id, chat_conversation_message.chat_conversation_id),
+              eq(chat_conversation_share.share_uuid, id)
+            )
+          )
+      ),
       columns: {
         id: true,
         message: true,

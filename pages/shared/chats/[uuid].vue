@@ -1,31 +1,73 @@
 <script lang="ts" setup>
 import type { Message } from 'ai';
 import { Loader2 } from 'lucide-vue-next';
-
-// TODO: correct typescript typings
+import type { AsyncDataRequestStatus } from '#app';
+import type { FetchError } from 'ofetch';
 
 const route = useRoute(); // $route should work too, but most of the time it doesn't
 
-function useProtectedFetch(url: string) {
-  const data = ref<any>(null);
-  const error = ref<any>(null);
-  const status = ref<any>('idle');
-  const password = ref<any>('');
+type ChatMessages = {
+  message: string;
+  id: number;
+  created_at: Date | null;
+  updated_at: Date | null;
+  actor: string;
+  chat_conversation: {
+    id: number;
+    chat_conversation_shares: {
+      id: number;
+      created_at: Date | null;
+      updated_at: Date | null;
+      is_shared: boolean;
+      is_protected: boolean;
+    }[];
+  };
+}[];
+
+type ShareInfo = {
+  shareExists: boolean;
+  shareIsActive: boolean;
+  shareIsPrivate: boolean;
+  shareHasPassword: boolean;
+};
+
+function convertStringsToDates(data: any) {
+  if (typeof data !== 'object' || data === null) return data;
+
+  for (const key in data) {
+    if (typeof data[key] === 'string' && !isNaN(Date.parse(data[key]))) {
+      data[key] = new Date(data[key]);
+    } else if (typeof data[key] === 'object') {
+      convertStringsToDates(data[key]);
+    }
+  }
+
+  return data;
+}
+
+// TODO: move to composables, if more shared resources are being introduced
+function useFetchResource<T>(url: string) {
+  const data = ref<T>();
+  const error = ref<FetchError<any> | null>(null);
+  const status = ref<AsyncDataRequestStatus>('idle');
+  const password = ref<string>('');
 
   const credentials = computed(() => btoa(`:${password.value}`));
 
   const execute = async () => {
     status.value = 'pending';
+
     try {
       const response = await $fetch(url, {
         headers: {
           Authorization: `Basic ${credentials.value}`,
         },
       });
-      data.value = response;
+
+      data.value = convertStringsToDates(response);
       status.value = 'success';
       error.value = null;
-    } catch (e) {
+    } catch (e: any) {
       error.value = e;
       status.value = 'error';
     }
@@ -40,14 +82,14 @@ function useProtectedFetch(url: string) {
   };
 }
 
-const { data, error, status, password, execute } = useProtectedFetch(
-  `/api/shared/chats/${route.params.uuid}`
-);
+const { data, error, status, password, execute } = useFetchResource<{
+  chatMessages: ChatMessages;
+  shareInfo: ShareInfo;
+}>(`/api/shared/chats/${route.params.uuid}`);
 
 const chatMessages = computed(() => {
   return (
     data.value?.chatMessages?.map(
-      // @ts-ignore
       ({ id, message, actor }) =>
         ({
           id: `${String(id)}-${String(Date.now())}`,
@@ -114,7 +156,13 @@ useHead({
     </template>
     <div v-if="status !== 'error'">
       <ShadcnScrollArea>
-        <AiChatMessages v-if="status === 'success'" :messages="chatMessages" />
+        <AiChatMessages
+          v-if="status === 'success' && chatMessages.length > 0"
+          :messages="chatMessages"
+        />
+        <p class="text-center" v-else>
+          There are no chat messages in this chat share...
+        </p>
 
         <template v-if="status === 'pending'">
           <MessagesSkeleton />
@@ -126,6 +174,7 @@ useHead({
       v-if="status === 'success'"
       class="sticky mx-auto mt-2 transform -translate-x-1/2 bottom-2 left-1/2"
       @click="execute"
+      :disabled="chatMessages.length === 0"
     >
       Refresh Chat
     </ShadcnButton>
