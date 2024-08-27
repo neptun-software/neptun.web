@@ -1,26 +1,20 @@
 <script lang="ts" setup>
-// TODO: fix resizable only working if page is completely rerendered
-
 const { selectedAiChatKey } = useSelectedAiChat();
-const { width } = useWindowSize();
 const isInfoHidden = ref(false);
 </script>
 
 <template>
   <div class="h-full">
     <ClientOnly>
-      <!-- TODO: replace with css, instead of useWindowSize, so that it doesn't take so long, because everything is rendered on the client, every time -->
+      <!-- Panel group for larger screens -->
       <ShadcnResizablePanelGroup
-        v-if="width >= 1024"
         id="handle-group-1"
         direction="horizontal"
-        class="max-w-full mt-2"
+        class="max-w-full mt-2 panel-group"
       >
         <ShadcnResizablePanel
           id="handle-panel-1"
-          v-bind:class="{
-            hidden: isInfoHidden,
-          }"
+          :class="{ hidden: isInfoHidden }"
           :min-size="25"
           :default-size="25"
         >
@@ -38,12 +32,15 @@ const isInfoHidden = ref(false);
           class="px-2"
         >
           <AiChat :key="selectedAiChatKey" />
-          <!-- MESSAGES OF CHAT (needs key, to rerender chat, so that useChat gets a new ID, useChat can not be put anywhere als then the setup script, because some functionality depends on that environment) -->
+          <!-- MESSAGES OF CHAT (needs key, to rerender chat, so that useChat gets a new ID, useChat can not be put anywhere else than the setup script, because some functionality depends on that environment) -->
         </ShadcnResizablePanel>
       </ShadcnResizablePanelGroup>
-      <div v-else class="pt-2 pr-2">
+
+      <!-- Single panel for smaller screens -->
+      <div class="single-panel">
         <AiChat :key="selectedAiChatKey" />
       </div>
+
       <template #fallback>
         <div class="pt-2 pr-2">
           <AiChat :key="selectedAiChatKey" />
@@ -53,4 +50,28 @@ const isInfoHidden = ref(false);
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.panel-group {
+  display: flex;
+}
+
+/* Hide the panel group on screens smaller than 1024px */
+@media (max-width: 1023px) {
+  .panel-group {
+    display: none;
+  }
+}
+
+/* Show the single panel only on screens smaller than 1024px */
+.single-panel {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .single-panel {
+    display: block;
+    padding-top: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+</style>
