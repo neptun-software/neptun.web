@@ -5,6 +5,8 @@ import {
   validatePasswordInput,
 } from '~/lib/types/input.validation';
 import { toast } from 'vue-sonner';
+import { Eye, EyeOff } from 'lucide-vue-next';
+
 const { console } = useLogger();
 
 const auth = useAuth();
@@ -47,6 +49,11 @@ async function signUp() {
     redirectCode: 303,
   });
 }
+
+const passwordIsVisible = ref(false);
+const togglePasswordVisibility = () => {
+  passwordIsVisible.value = !passwordIsVisible.value;
+};
 </script>
 
 <template>
@@ -69,7 +76,7 @@ async function signUp() {
                   type="email"
                   name="email"
                   v-model="email"
-                  placeholder="m@example.com"
+                  placeholder="your.name@domain.tld"
                   required
                   autocomplete="email"
                 />
@@ -86,15 +93,33 @@ async function signUp() {
             </div>
             <div>
               <div class="grid gap-2 mb-1">
-                <ShadcnInput
-                  id="password"
-                  type="password"
-                  name="password"
-                  v-model="password"
-                  required
-                  autocomplete="current-password"
-                />
                 <ShadcnLabel for="password">Password</ShadcnLabel>
+                <div class="relative">
+                  <ShadcnInput
+                    @keydown.enter="signUp()"
+                    :type="passwordIsVisible ? 'text' : 'password'"
+                    placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                    id="password"
+                    name="password"
+                    v-model="password"
+                    required
+                    autocomplete="current-password"
+                  />
+                  <ShadcnButton
+                    type="button"
+                    variant="link"
+                    size="icon"
+                    @click="togglePasswordVisibility"
+                    class="absolute top-0 right-0 flex items-center justify-center pr-3"
+                  >
+                    <span v-if="passwordIsVisible">
+                      <EyeOff class="w-5 h-5" />
+                    </span>
+                    <span v-else>
+                      <Eye class="w-5 h-5" />
+                    </span>
+                  </ShadcnButton>
+                </div>
               </div>
 
               <ul v-if="passwordErrors?.length > 0" class="pl-5 list-disc">
@@ -142,10 +167,11 @@ async function signUp() {
                 </a>
               </ShadcnButton>
             </div>
+            <ShadcnSeparator />
           </div>
           <div class="mt-4 text-sm text-center">
             Already have an account?
-            <NuxtLink to="/login" class="underline"> Sign in </NuxtLink>
+            <NuxtLink to="/login" class="underline"> Log In </NuxtLink>
           </div>
         </form>
       </ShadcnCardContent>

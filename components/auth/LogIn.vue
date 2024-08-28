@@ -5,6 +5,8 @@ import {
   validatePasswordInput,
 } from '~/lib/types/input.validation';
 import { toast } from 'vue-sonner';
+import { Eye, EyeOff } from 'lucide-vue-next';
+
 const { console } = useLogger();
 
 const auth = useAuth();
@@ -47,13 +49,18 @@ async function signIn() {
     redirectCode: 303,
   });
 }
+
+const passwordIsVisible = ref(false);
+const togglePasswordVisibility = () => {
+  passwordIsVisible.value = !passwordIsVisible.value;
+};
 </script>
 
 <template>
   <div>
     <ShadcnCard class="mx-2 max-full">
       <ShadcnCardHeader>
-        <ShadcnCardTitle class="text-2xl"> Login </ShadcnCardTitle>
+        <ShadcnCardTitle class="text-2xl"> Log In </ShadcnCardTitle>
         <ShadcnCardDescription>
           Enter your email below to login to your account
         </ShadcnCardDescription>
@@ -70,7 +77,7 @@ async function signIn() {
                   type="email"
                   name="email"
                   v-model="email"
-                  placeholder="m@example.com"
+                  placeholder="your.name@domain.tld"
                   required
                   autocomplete="email"
                 />
@@ -96,15 +103,32 @@ async function signIn() {
                     Forgot your password?
                   </NuxtLink>
                 </div>
-                <ShadcnInput
-                  @keydown.enter="signIn()"
-                  id="password"
-                  type="password"
-                  name="password"
-                  v-model="password"
-                  required
-                  autocomplete="current-password"
-                />
+                <div class="relative">
+                  <ShadcnInput
+                    @keydown.enter="signIn()"
+                    :type="passwordIsVisible ? 'text' : 'password'"
+                    placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                    id="password"
+                    name="password"
+                    v-model="password"
+                    required
+                    autocomplete="current-password"
+                  />
+                  <ShadcnButton
+                    type="button"
+                    variant="link"
+                    size="icon"
+                    @click="togglePasswordVisibility"
+                    class="absolute top-0 right-0 flex items-center justify-center pr-3"
+                  >
+                    <span v-if="passwordIsVisible">
+                      <EyeOff class="w-5 h-5" />
+                    </span>
+                    <span v-else>
+                      <Eye class="w-5 h-5" />
+                    </span>
+                  </ShadcnButton>
+                </div>
               </div>
 
               <ul v-if="passwordErrors?.length > 0" class="pl-5 list-disc">
@@ -157,7 +181,7 @@ async function signIn() {
           </div>
           <div class="mt-4 text-sm text-center">
             Don't have an account?
-            <NuxtLink to="/sign-up" class="underline"> Sign up </NuxtLink>
+            <NuxtLink to="/sign-up" class="underline"> Sign Up </NuxtLink>
           </div>
         </form>
       </ShadcnCardContent>
