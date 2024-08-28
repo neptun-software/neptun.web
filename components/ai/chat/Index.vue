@@ -366,26 +366,26 @@ async function downloadChatMessages(event = null, type: 'json' = 'json') {
     class="relative flex flex-col h-full min-h-[60vh] max-h-[75vh] rounded-xl bg-muted/50 p-4 order-1 2xl:order-2"
   >
     <div class="absolute z-10 left-3 top-3">
-      <ShadcnDrawer>
-        <ShadcnDrawerTrigger as-child>
-          <ShadcnButton variant="ghost" size="icon" class="lg:hidden">
-            <Settings2 class="size-6" />
-            <span class="sr-only">Settings</span>
-          </ShadcnButton>
-        </ShadcnDrawerTrigger>
-        <ShadcnDrawerContent class="max-h-[90vh] p-2">
-          <ShadcnDrawerHeader>
-            <ShadcnDrawerTitle>Configuration and Chats</ShadcnDrawerTitle>
-            <ShadcnDrawerDescription>
-              Configure the settings for the model and switch between chats.
-            </ShadcnDrawerDescription>
-          </ShadcnDrawerHeader>
-          <AiChatModelConfiguration />
-          <ShadcnSeparator class="my-2 bg-transparent" />
-          <AiChats :useSmall="true" />
-        </ShadcnDrawerContent>
-      </ShadcnDrawer>
       <div class="flex gap-1">
+        <ShadcnDrawer>
+          <ShadcnDrawerTrigger as-child>
+            <ShadcnButton variant="ghost" size="icon" class="lg:hidden">
+              <Settings2 class="size-6" />
+              <span class="sr-only">Settings</span>
+            </ShadcnButton>
+          </ShadcnDrawerTrigger>
+          <ShadcnDrawerContent class="max-h-[90vh] p-2">
+            <ShadcnDrawerHeader>
+              <ShadcnDrawerTitle>Configuration and Chats</ShadcnDrawerTitle>
+              <ShadcnDrawerDescription>
+                Configure the settings for the model and switch between chats.
+              </ShadcnDrawerDescription>
+            </ShadcnDrawerHeader>
+            <AiChatModelConfiguration />
+            <ShadcnSeparator class="my-2 bg-transparent" />
+            <AiChats :useSmall="true" />
+          </ShadcnDrawerContent>
+        </ShadcnDrawer>
         <ShadcnButton
           type="button"
           size="icon"

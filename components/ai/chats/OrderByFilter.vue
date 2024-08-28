@@ -79,7 +79,7 @@ const applyDrag = (filters: Filter[], dropResult: DropResult): Filter[] => {
             class="flex flex-wrap items-center gap-2 p-1 border rounded-md draggable-item bg-background"
           >
             <div class="flex items-center w-full max-w-full gap-1 xl:w-fit">
-              <GripVertical class="w-8 h-8 cursor-grabbing" />
+              <GripVertical class="w-4 h-4 min-w-4 min-h-4 cursor-grabbing" />
               <ShadcnSelect v-model="filter.column">
                 <ShadcnSelectTrigger>
                   <ShadcnSelectValue placeholder="Select column" />

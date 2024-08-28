@@ -140,13 +140,13 @@ const {
 } = useFetchChats(user.value?.id ?? -1);
 
 (async () => {
-  await fetchChats(fetchChatsUrl.value);
+  await fetchChats();
 })();
 
 watchDebounced(
   fetchChatsUrl,
   async () => {
-    await fetchChats(fetchChatsUrl.value);
+    await fetchChats();
   },
   { debounce: 300, maxWait: 500 }
 );
@@ -304,9 +304,15 @@ const refreshAnimationIsActive = ref(false);
         <Loader2 class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
         <p class="flex-grow">Loading chats<LoadingDots /></p>
       </div>
+      <!-- TODO: improve this, so that you can zoom properly without overflow -->
       <ShadcnScrollArea
         class="h-[calc(100%-2.25rem)]"
-        :class="{ 'h-40': useSmall }"
+        :class="{
+          'h-40': useSmall,
+          hidden: useSmall && (batchDeleteSelectorIsActive || filterVisible),
+          'h-[29.5rem]': batchDeleteSelectorIsActive || filterVisible,
+          'h-[23.5rem]': batchDeleteSelectorIsActive && filterVisible,
+        }"
         v-if="
           filteredChats &&
           Array.isArray(filteredChats) &&
@@ -394,9 +400,12 @@ const refreshAnimationIsActive = ref(false);
               </ShadcnAlertDialog>
             </div>
 
-            <div
+            <!-- TODO: fix overflow-scroll not applying because of min-w-fit, which is needed for the layout to work -->
+            <ShadcnScrollArea
               class="flex-[1] min-w-fit flex flex-col justify-between min-h-full"
+              :class="{ 'min-w-0': useSmall }"
             >
+              <ShadcnScrollBar orientation="horizontal" />
               <div
                 class="flex h-full gap-1 p-1 border border-b-0 rounded-md rounded-b-none text-muted-foreground"
               >
@@ -434,7 +443,7 @@ const refreshAnimationIsActive = ref(false);
                   />
                 </div>
               </div>
-            </div>
+            </ShadcnScrollArea>
           </div>
         </div>
       </ShadcnScrollArea>

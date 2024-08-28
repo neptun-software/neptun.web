@@ -127,3 +127,13 @@ body {
   transform-origin: center center;
   transform: translate(-50%, -50%);
 }
+
+input,
+textarea,
+select {
+  font-size: 16px !important; /* Ensure the font size is 16px or larger */
+}
+
+input {
+  -webkit-text-size-adjust: 100% !important; /* Forcing text size adjust for Safari */
+}

@@ -286,7 +286,7 @@ const url = computed(() => {
               </ShadcnFormField>
             </template>
 
-            <ShadcnDialogFooter>
+            <ShadcnDialogFooter class="flex gap-2">
               <ShadcnButton type="submit">
                 Publish with the configured settings
               </ShadcnButton>
@@ -304,9 +304,14 @@ const url = computed(() => {
               <CopyToClipboard :text="url" />
             </div>
           </div>
-          <div v-if="error">
+          <div
+            class="flex items-center justify-between gap-2 py-1 pl-2 pr-1 border rounded-sm border-destructive"
+            v-if="error"
+          >
             Failed to check if chat is published.<br />
-            <ShadcnButton type="button" @click="refresh">Retry</ShadcnButton>
+            <ShadcnButton type="button" variant="destructive" @click="refresh">
+              Retry
+            </ShadcnButton>
           </div>
         </ShadcnDialogContent>
       </ShadcnDialog>

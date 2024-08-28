@@ -24,7 +24,7 @@ watch(headerNavigationElement, (newHeaderNavigationElement) => {
   <div class="grid w-full pl-2">
     <div class="flex flex-col">
       <header
-        class="sticky left-0 z-20 flex items-center justify-between gap-1 py-2 border-b bg-background"
+        class="sticky left-0 z-20 flex items-center justify-between gap-1 py-2 pt-4 border-b bg-background"
         :style="{ top: headerNavigationHeight + 'px' }"
       >
         <div class="flex items-center gap-2">

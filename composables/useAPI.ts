@@ -317,8 +317,8 @@ export function useFetchChats(user_id: number) {
     return `/api/users/${user_id}/chats?${chatsFilters.value}`;
   });
 
-  const fetchChats = async (url: string) => {
-    const { data, status, error, refresh } = await useFetch(url, {
+  const fetchChats = async () => {
+    const { data, status, error, refresh } = await useFetch(fetchChatsUrl.value, {
       method: 'GET' as HTTPMethod,
       lazy: true,
       pick: ['chats'] as any,
