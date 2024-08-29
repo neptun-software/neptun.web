@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { templates, type TemplateData } from '~/lib/(templates)/templates';
+import type { BundledLanguage } from 'shiki';
+import { Loader2 } from 'lucide-vue-next';
 
 const database = ref(templates) as Ref<TemplateData[]>;
 
@@ -17,6 +19,7 @@ const data: Ref<TemplateData[]> = ref([]);
 
 const page = ref(1);
 const pageSize = ref(2);
+const isLoading = ref(false);
 
 fetchData({
   currentPage: page.value,
@@ -30,8 +33,10 @@ function fetchData({
   currentPage: number;
   currentPageSize: number;
 }) {
+  isLoading.value = true;
   fetch(currentPage, currentPageSize).then((responseData) => {
     data.value = responseData;
+    isLoading.value = false;
   });
 }
 
@@ -55,8 +60,9 @@ const useSsrSaveId = () => useId();
 </script>
 
 <template>
-  <DevOnly>
-    <div class="inline-grid items-center grid-cols-2 gap-x-4">
+  <div>
+    <!-- <DevOnly>
+    <div class="inline-grid items-center grid-cols-2 p-4 gap-x-4">
       <div opacity="50">total:</div>
       <div>{{ database.length }}</div>
       <div opacity="50">pageCount:</div>
@@ -70,39 +76,79 @@ const useSsrSaveId = () => useId();
       <div opacity="50">isLastPage:</div>
       <div>{{ isLastPage }}</div>
     </div>
-  </DevOnly>
-  <div class="flex gap-1 my-4">
-    <ShadcnButton :disabled="isFirstPage" @click="prev">prev</ShadcnButton>
-    <ShadcnButton
-      v-for="item in pageCount"
-      :key="item"
-      :disabled="currentPage === item"
-      @click="currentPage = item"
+  </DevOnly> -->
+
+    <div class="flex gap-1 mb-2">
+      <ShadcnButton :disabled="isFirstPage" @click="prev">prev</ShadcnButton>
+      <ShadcnButton
+        v-for="item in pageCount"
+        :key="item"
+        :disabled="currentPage === item"
+        @click="currentPage = item"
+      >
+        {{ item }}
+      </ShadcnButton>
+      <ShadcnButton :disabled="isLastPage" @click="next">next</ShadcnButton>
+    </div>
+
+    <div
+      v-if="isLoading"
+      class="flex items-center justify-center gap-2 px-3 py-2 mt-2 border border-blue-200 rounded-lg bg-background"
     >
-      {{ item }}
-    </ShadcnButton>
-    <ShadcnButton :disabled="isLastPage" @click="next">next</ShadcnButton>
-  </div>
+      <Loader2 class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
+      <p class="flex-grow">Loading templates<LoadingDots /></p>
+    </div>
 
-  <div class="grid grid-cols-1 gap-2 lg:grid-cols-2" v-if="data.length > 0">
-    <div class="px-4 py-2 border rounded-md" v-for="d in data" :key="d.id">
-      <h3 class="text-lg font-bold">{{ d.name }}</h3>
-      <div v-if="d.readme" class="border rounded-md">{{ d.readme }}</div>
-      <div v-for="c in d.code" :key="useSsrSaveId.toString()">
-        <code>
-          {{ c.fileName }}
-        </code>
+    <div class="grid grid-cols-1 gap-2 lg:grid-cols-2" v-if="data.length > 0">
+      <div class="p-2 border rounded-md" v-for="d in data" :key="d.id">
+        <h3 class="text-lg font-bold">{{ d.name }}</h3>
+        <div v-if="d.readme" class="border rounded-md">{{ d.readme }}</div>
 
-        <div class="px-2 py-1 border rounded-md">
-          <ClientOnly>
-            <MDC :value="c.code" />
-            <template #fallback>
-              <div class="overflow-x-auto break-words whitespace-pre-wrap">
-                {{ c.code }}
-              </div>
-            </template>
-          </ClientOnly>
-        </div>
+        <ShadcnTabs :default-value="d.code[0].fileName" class="w-full">
+          <ShadcnScrollArea class="max-w-full">
+            <ShadcnTabsList class="flex justify-start flex-grow">
+              <ShadcnScrollBar orientation="horizontal" />
+              <ShadcnTabsTrigger
+                v-for="c in d.code"
+                :key="useSsrSaveId.toString()"
+                :value="c.fileName"
+              >
+                <code>
+                  {{ c.fileName }}
+                </code>
+              </ShadcnTabsTrigger>
+            </ShadcnTabsList>
+          </ShadcnScrollArea>
+          <ShadcnTabsContent
+            class="relative"
+            v-for="c in d.code"
+            :key="useSsrSaveId.toString()"
+            :value="c.fileName"
+          >
+            <ShadcnScrollArea class="h-screen px-2 py-1 border rounded-md">
+              <ClientOnly>
+                <MDC
+                  :value="`\`\`\`${
+                ( 
+                  supportedShikiLanguages.includes(c.fileName.split('.')[c.fileName.split('.').length - 1] as BundledLanguage) 
+                  ? c.fileName.split('.')[c.fileName.split('.').length - 1] 
+                  : 'text'
+                )
+              }\n${c.code?.trim()} \n\`\`\``"
+                />
+                <template #fallback>
+                  <div class="overflow-x-auto break-words whitespace-pre-wrap">
+                    {{ c.code }}
+                  </div>
+                </template>
+              </ClientOnly>
+            </ShadcnScrollArea>
+
+            <div class="absolute top-0 right-0">
+              <CopyToClipboard :text="c.code?.trim()" />
+            </div>
+          </ShadcnTabsContent>
+        </ShadcnTabs>
       </div>
     </div>
   </div>
