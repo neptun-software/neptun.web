@@ -31,6 +31,10 @@ export default defineNuxtConfig({
   },
 
   robots: {
+    enabled: true,
+    metaTag: true,
+    blockNonSeoBots: true,
+    allow: ['/home', '/templates', '/sign-up', '/sign-in'],
     disallow: protectedRoutes, // replace with https://nuxtseo.com/robots/guides/route-rules#inline-route-rules in the future
   },
 
