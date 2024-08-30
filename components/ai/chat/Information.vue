@@ -28,12 +28,12 @@ const colorMode = useColorMode();
 </script>
 
 <template>
-  <div class="relative flex flex-col items-start order-2 gap-8 2xl:order-1">
+  <ShadcnScrollArea
+    class="relative flex flex-col items-start order-2 h-[calc(100%-3.5rem)] gap-8 2xl:order-1"
+  >
     <AiChatModelConfiguration />
     <fieldset class="flex flex-col w-full h-full gap-6 p-4 border rounded-lg">
-      <legend class="px-1 -ml-1 text-sm font-medium">
-        Generated Configuration File
-      </legend>
+      <legend class="px-1 -ml-1 text-sm font-medium">Code Blocks</legend>
       <div
         class="flex flex-wrap gap-3"
         v-if="!selectedAiChatIsPlayground && fetchedFiles.length > 0"
@@ -224,29 +224,33 @@ const colorMode = useColorMode();
         <ClientOnly>
           <template v-if="selectedAiChatIsPlayground">
             <h4 class="font-bold">
-              Files are only stored for persisted chats.
+              Snippets are only stored for persisted chats.
             </h4>
             <p>
-              Click on "Persist Chat History", to generated and view persisted
-              fetched files.
+              Click on "Persist Chat History", to generated and view code
+              snippets.
             </p>
           </template>
           <template v-else>
             <h4 class="font-bold">
-              No fetched files available for selected chat.
+              No code snippets available for selected chat.
             </h4>
-            <p>Chat with the AI, to generate and view fetched files.</p>
+            <p>
+              Chat with the AI, to generate and view generated code snippets.
+            </p>
           </template>
           <template #fallback>
             <h4 class="font-bold">
               No fetched files available for selected chat.
             </h4>
-            <p>Chat with the AI, to generate and view fetched files.</p>
+            <p>
+              Chat with the AI, to generate and view generated code snippets.
+            </p>
           </template>
         </ClientOnly>
       </div>
     </fieldset>
-  </div>
+  </ShadcnScrollArea>
 </template>
 
 <style scoped>

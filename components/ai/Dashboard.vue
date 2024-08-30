@@ -42,7 +42,7 @@ const isInfoHidden = ref(false);
       </div>
 
       <template #fallback>
-        <div class="pt-2 pr-2">
+        <div class="single-panel">
           <AiChat :key="selectedAiChatKey" />
         </div>
       </template>
@@ -64,6 +64,7 @@ const isInfoHidden = ref(false);
 
 /* Show the single panel only on screens smaller than 1024px */
 .single-panel {
+  height: 100%;
   display: none !important;
 }
 

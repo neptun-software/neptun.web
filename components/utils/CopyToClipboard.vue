@@ -29,7 +29,7 @@ const {
     <ShadcnButton
       variant="link"
       size="icon"
-      :disabled="!isClipboardSupported"
+      :disabled="!isClipboardSupported || text.trim() === ''"
       @click="copyToClipboard(source)"
     >
       <template v-if="isCopied">

@@ -11,6 +11,7 @@ import {
   Mouse,
   Download,
   Settings2,
+  MessageCircleReply,
 } from 'lucide-vue-next';
 import { useChat, type Message } from '@ai-sdk/vue'; // NOTE: can only be called in setup scripts ("Could not get current instance, check to make sure that `useSwrv` is declared in the top level of the setup function.")
 import { toast } from 'vue-sonner';
@@ -376,16 +377,28 @@ async function downloadChatMessages(event = null, type: 'json' = 'json') {
           </ShadcnDrawerTrigger>
           <ShadcnDrawerContent class="max-h-[90vh] p-2">
             <ShadcnDrawerHeader>
-              <ShadcnDrawerTitle>Configuration and Chats</ShadcnDrawerTitle>
+              <ShadcnDrawerTitle>Model Configuration</ShadcnDrawerTitle>
               <ShadcnDrawerDescription>
-                Configure the settings for the model and switch between chats.
+                Configure the settings for the model.
               </ShadcnDrawerDescription>
             </ShadcnDrawerHeader>
             <AiChatModelConfiguration />
-            <ShadcnSeparator class="my-2 bg-transparent" />
-            <AiChats :useSmall="true" />
           </ShadcnDrawerContent>
         </ShadcnDrawer>
+        <ShadcnDialog>
+          <ShadcnDialogTrigger as-child>
+            <ShadcnButton variant="ghost" size="icon" class="lg:hidden">
+              <MessageCircleReply class="size-6" />
+              <span class="sr-only">Chats</span>
+            </ShadcnButton>
+          </ShadcnDialogTrigger>
+          <ShadcnDialogContent>
+            <ShadcnScrollArea class="relative max-h-[70vh]">
+              <AiChats />
+              <ShadcnSeparator class="my-1 bg-transparent" />
+            </ShadcnScrollArea>
+          </ShadcnDialogContent>
+        </ShadcnDialog>
         <ShadcnButton
           type="button"
           size="icon"
