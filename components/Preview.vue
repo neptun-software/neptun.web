@@ -42,30 +42,60 @@ onMounted(() => {
           class="absolute top-2 lg:-top-8 left-1/2 transform -translate-x-1/2 w-[90%] mx-auto h-24 lg:h-80 bg-blue-950/50 rounded-full blur-3xl opacity-70"
         ></div>
 
-        <ClientOnly fallback-tag="div">
-          <NuxtImg
-            v-if="colorMode.preference === 'light'"
-            ref="floatingImage"
-            class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
-            src="/assets/preview-light.jpg"
-            alt="app preview image light"
-          />
-          <NuxtImg
-            v-else
-            ref="floatingImage"
-            class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
-            src="/assets/preview-dark.jpg"
-            alt="app preview image dark"
-          />
-          <template #fallback>
-            <NuxtImg
-              ref="floatingImage"
-              class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
-              src="/assets/preview-light.jpg"
-              alt="app preview image light"
-            />
+        <SlidingTabs :tabs="['All_Chats', 'Active_Chat']">
+          <template v-slot:All_Chats>
+            <ClientOnly fallback-tag="div">
+              <NuxtImg
+                v-if="colorMode.preference === 'light'"
+                ref="floatingImage"
+                class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+                src="/assets/preview-light.png"
+                alt="app preview image light"
+              />
+              <NuxtImg
+                v-else
+                ref="floatingImage"
+                class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+                src="/assets/preview-dark.png"
+                alt="app preview image dark"
+              />
+              <template #fallback>
+                <NuxtImg
+                  ref="floatingImage"
+                  class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+                  src="/assets/preview-light.png"
+                  alt="app preview image light"
+                />
+              </template>
+            </ClientOnly>
           </template>
-        </ClientOnly>
+          <template v-slot:Active_Chat>
+            <ClientOnly fallback-tag="div">
+              <NuxtImg
+                v-if="colorMode.preference === 'light'"
+                ref="floatingImage"
+                class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+                src="/assets/preview-light-info.png"
+                alt="app preview image light"
+              />
+              <NuxtImg
+                v-else
+                ref="floatingImage"
+                class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+                src="/assets/preview-dark-info.png"
+                alt="app preview image dark"
+              />
+              <template #fallback>
+                <NuxtImg
+                  ref="floatingImage"
+                  class="floating-image w-full md:w-[1200px] mx-2 relative rounded-lg leading-none flex items-center border border-t-2 border-t-primary/30"
+                  src="/assets/preview-light-info.png"
+                  alt="app preview image light"
+                />
+              </template>
+            </ClientOnly>
+          </template>
+        </SlidingTabs>
 
         <!-- gradient effect img -->
         <div

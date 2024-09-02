@@ -11,7 +11,6 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
 
 <template>
   <section id="home" class="relative overflow-x-hidden">
-    <!-- hm... -->
     <!-- <PlanetSystem
       :imagePaths="[
         '/assets/icons/docker-icon.svg',
@@ -81,15 +80,6 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
         ]"
       /> -->
       <Features />
-      <!-- WIP, needed for displaying different UI previews -->
-      <!-- <SlidingTabs :tabs="['All_Chats', 'Active_Chat']">
-        <template v-slot:All_Chats>
-          <p>All Chats Preview.</p>
-        </template>
-        <template v-slot:Active_Chat>
-          <p>Active Chat Information Preview.</p>
-        </template>
-      </SlidingTabs> -->
     </SecondarySection>
     <!-- <Cursor /> -->
     <!-- <SimpleCursor /> -->
