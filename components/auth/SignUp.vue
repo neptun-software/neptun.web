@@ -5,7 +5,6 @@ import {
   validatePasswordInput,
 } from '~/lib/types/input.validation';
 import { toast } from 'vue-sonner';
-import { Eye, EyeOff } from 'lucide-vue-next';
 
 const { console } = useLogger();
 
@@ -49,11 +48,6 @@ async function signUp() {
     redirectCode: 303,
   });
 }
-
-const passwordIsVisible = ref(false);
-const togglePasswordVisibility = () => {
-  passwordIsVisible.value = !passwordIsVisible.value;
-};
 </script>
 
 <template>
@@ -94,32 +88,7 @@ const togglePasswordVisibility = () => {
             <div>
               <div class="grid gap-2 mb-1">
                 <ShadcnLabel for="password">Password</ShadcnLabel>
-                <div class="relative">
-                  <ShadcnInput
-                    @keydown.enter="signUp()"
-                    :type="passwordIsVisible ? 'text' : 'password'"
-                    placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                    id="password"
-                    name="password"
-                    v-model="password"
-                    required
-                    autocomplete="current-password"
-                  />
-                  <ShadcnButton
-                    type="button"
-                    variant="link"
-                    size="icon"
-                    @click="togglePasswordVisibility"
-                    class="absolute top-0 right-0 flex items-center justify-center pr-3"
-                  >
-                    <span v-if="passwordIsVisible">
-                      <EyeOff class="w-5 h-5" />
-                    </span>
-                    <span v-else>
-                      <Eye class="w-5 h-5" />
-                    </span>
-                  </ShadcnButton>
-                </div>
+                <PasswordInput :onEnter="signUp" v-model="password" />
               </div>
 
               <ul v-if="passwordErrors?.length > 0" class="pl-5 list-disc">

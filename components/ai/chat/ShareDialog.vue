@@ -4,7 +4,6 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { toast } from 'vue-sonner';
 import * as z from 'zod';
-import { Eye, EyeOff } from 'lucide-vue-next';
 
 const { selectedAiChatId, selectedAiChatIsPlayground } = useSelectedAiChat();
 const { user } = useUserSession();
@@ -31,11 +30,6 @@ const {
     email_whitelist: [],
   },
 });
-
-const passwordIsVisible = ref(false);
-const togglePasswordVisibility = () => {
-  passwordIsVisible.value = !passwordIsVisible.value;
-};
 
 const validateTag = async (event: KeyboardEvent) => {
   // await validateField('email_whitelist')
@@ -218,30 +212,16 @@ const url = computed(() => {
             <template v-if="!formValues.is_unprotected">
               <ShadcnSeparator />
 
-              <ShadcnFormField v-slot="{ componentField }" name="password">
+              <ShadcnFormField v-slot="{ value, handleChange }" name="password">
                 <ShadcnFormItem>
                   <ShadcnFormLabel>Password</ShadcnFormLabel>
                   <ShadcnFormControl>
                     <div class="relative">
-                      <ShadcnInput
-                        :type="passwordIsVisible ? 'text' : 'password'"
-                        placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                        v-bind="componentField"
+                      <PasswordInput
+                        :modelValue="value"
+                        @update:modelValue="handleChange"
+                        :onEnter="onSubmit"
                       />
-                      <ShadcnButton
-                        type="button"
-                        variant="link"
-                        size="icon"
-                        @click="togglePasswordVisibility"
-                        class="absolute top-0 right-0 flex items-center justify-center pr-3"
-                      >
-                        <span v-if="passwordIsVisible">
-                          <EyeOff class="w-5 h-5" />
-                        </span>
-                        <span v-else>
-                          <Eye class="w-5 h-5" />
-                        </span>
-                      </ShadcnButton>
                     </div>
                   </ShadcnFormControl>
                   <ShadcnFormDescription>
