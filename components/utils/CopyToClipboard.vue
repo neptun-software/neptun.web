@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import { Copy, CopyCheck } from 'lucide-vue-next';
 import type { HTMLAttributes } from 'vue';
+import type { ButtonVariants } from '../ui/button';
 
 const props = defineProps<{
   text: string;
   mime?: string;
   class?: HTMLAttributes['class'];
+  variant?: ButtonVariants['variant'];
 }>();
 
 // const mime = 'text/markdown'; // Unknown error (NotAllowedError: Failed to execute 'write' on 'Clipboard': Type text/markdown not supported on write.)
@@ -27,7 +29,7 @@ const {
 <template>
   <div :class="props.class">
     <ShadcnButton
-      variant="link"
+      :variant="variant ?? 'link'"
       size="icon"
       :disabled="!isClipboardSupported || text.trim() === ''"
       @click="copyToClipboard(source)"

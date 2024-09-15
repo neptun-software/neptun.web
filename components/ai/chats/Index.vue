@@ -175,7 +175,7 @@ const calculatedChatsListHeight = computed(() => {
 
 <template>
   <div class="h-[calc(100%-2.75rem-0.5rem)] p-2 border rounded-md">
-    <div ref="controlsRef" class="sticky top-0 left-0 z-20 pb-2 bg-background">
+    <div ref="controlsRef" class="sticky top-0 left-0 z-10 pb-2 bg-background">
       <div class="flex flex-wrap items-center w-full gap-1">
         <div class="relative w-full">
           <ShadcnInput

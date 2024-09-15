@@ -50,7 +50,9 @@ const {
           <ShadcnButton
             variant="ghost"
             size="icon"
-            :disabled="!isSpeechSynthesisSupported"
+            :disabled="
+              !isSpeechSynthesisSupported || messageAsPlainText.trim() === ''
+            "
             @click="
               () => {
                 if (!isSpeaking) speakText();
@@ -70,7 +72,11 @@ const {
       </ShadcnTooltip>
       <ShadcnTooltip>
         <ShadcnTooltipTrigger as-child>
-          <CopyToClipboard class="text-foreground" :text="messageAsPlainText" />
+          <CopyToClipboard
+            class="text-foreground"
+            :text="messageAsPlainText"
+            variant="ghost"
+          />
         </ShadcnTooltipTrigger>
         <ShadcnTooltipContent side="top">
           Copy to Clipboard
