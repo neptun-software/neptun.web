@@ -1,21 +1,21 @@
 export interface TemplateData {
-    id: number;
-    name: string;
-    code: {
-        fileName: string;
-        code: string;
-    }[];
-    readme: string;
+  id: number;
+  name: string;
+  code: {
+    fileName: string;
+    code: string;
+  }[];
+  readme: string;
 }
 
 export const templates: TemplateData[] = [
-    {
-        id: 1,
-        name: 'Full-Stack Website Starter',
-        code: [
-            {
-                fileName: 'docker-compose.yml',
-                code: `
+  {
+    id: 1,
+    name: 'Full-Stack Website Starter',
+    code: [
+      {
+        fileName: 'docker-compose.yml',
+        code: `
 version: '3.8'
 
 services:
@@ -47,10 +47,10 @@ volumes:
     driver: local
   
         `,
-            },
-            {
-                fileName: 'redis.conf',
-                code: `
+      },
+      {
+        fileName: 'redis.conf',
+        code: `
 # Redis configuration file example.
 #
 # Note that in order to read the configuration file, Redis must be
@@ -1107,17 +1107,17 @@ hz 10
 aof-rewrite-incremental-fsync yes
   
         `,
-            },
-            {
-                fileName: 'postgres.extensions.sql',
-                code: `
+      },
+      {
+        fileName: 'postgres.extensions.sql',
+        code: `
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
             `,
-            },
-            {
-                fileName: 'postgres.datagrip.source-config',
-                code: `
+      },
+      {
+        fileName: 'postgres.datagrip.source-config',
+        code: `
 #DataSourceSettings#
 #LocalDataSource: neptun.dev.postgres@localhost
 #BEGIN#
@@ -1125,10 +1125,10 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 #END#
   
         `,
-            },
-            {
-                fileName: 'redis.datagrip.source-config',
-                code: `
+      },
+      {
+        fileName: 'redis.datagrip.source-config',
+        code: `
 #DataSourceSettings#
 #LocalDataSource: neptun.dev.redis@localhost
 #BEGIN#
@@ -1136,17 +1136,17 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 #END#
   
         `,
-            },
-        ],
-        readme: '',
-    },
-    {
-        id: 2,
-        name: 'Postgres Database Starter',
-        code: [
-            {
-                fileName: 'docker-compose.yml',
-                code: `
+      },
+    ],
+    readme: '',
+  },
+  {
+    id: 2,
+    name: 'Postgres Database Starter',
+    code: [
+      {
+        fileName: 'docker-compose.yml',
+        code: `
 version: '3.8'
 
 services:
@@ -1167,17 +1167,17 @@ volumes:
     driver: local
   
         `,
-            },
-            {
-                fileName: 'postgres.extensions.sql',
-                code: `
+      },
+      {
+        fileName: 'postgres.extensions.sql',
+        code: `
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
             `,
-            },
-            {
-                fileName: 'postgres.datagrip.source-config',
-                code: `
+      },
+      {
+        fileName: 'postgres.datagrip.source-config',
+        code: `
 #DataSourceSettings#
 #LocalDataSource: neptun.dev.postgres@localhost
 #BEGIN#
@@ -1185,17 +1185,17 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 #END#
   
         `,
-            },
-        ],
-        readme: '',
-    },
-    {
-        id: 3,
-        name: 'Redis (keydb) Database Starter',
-        code: [
-            {
-                fileName: 'docker-compose.yml',
-                code: `
+      },
+    ],
+    readme: '',
+  },
+  {
+    id: 3,
+    name: 'Redis (keydb) Database Starter',
+    code: [
+      {
+        fileName: 'docker-compose.yml',
+        code: `
 version: '3.8'
 
 services:
@@ -1214,10 +1214,10 @@ volumes:
     driver: local
   
         `,
-            },
-            {
-                fileName: 'redis.conf',
-                code: `
+      },
+      {
+        fileName: 'redis.conf',
+        code: `
 # Redis configuration file example.
 #
 # Note that in order to read the configuration file, Redis must be
@@ -2274,10 +2274,10 @@ hz 10
 aof-rewrite-incremental-fsync yes
   
         `,
-            },
-            {
-                fileName: 'redis.datagrip.source-config',
-                code: `
+      },
+      {
+        fileName: 'redis.datagrip.source-config',
+        code: `
 #DataSourceSettings#
 #LocalDataSource: neptun.dev.redis@localhost
 #BEGIN#
@@ -2285,8 +2285,8 @@ aof-rewrite-incremental-fsync yes
 #END#
   
         `,
-            },
-        ],
-        readme: '',
-    }
+      },
+    ],
+    readme: '',
+  },
 ];

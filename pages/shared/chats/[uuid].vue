@@ -95,7 +95,7 @@ const chatMessages = computed(() => {
           id: `${String(id)}-${String(Date.now())}`,
           content: message,
           role: actor,
-        } as Message)
+        }) as Message
     ) || []
   );
 });

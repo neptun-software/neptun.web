@@ -30,7 +30,8 @@ export default defineEventHandler(async (event) => {
 
   const fetchedChatConversationShareWhitelistEntries =
     await readAllChatConversationShareWhitelistEntries(uuid);
-  const shareHasWhitelist = fetchedChatConversationShareWhitelistEntries.length > 0;
+  const shareHasWhitelist =
+    fetchedChatConversationShareWhitelistEntries.length > 0;
 
   const info = await readShareInfo(uuid);
   if (!info.shareExists) {
@@ -43,8 +44,8 @@ export default defineEventHandler(async (event) => {
         data: {
           shareInfo: {
             ...info,
-            shareHasWhitelist
-          }
+            shareHasWhitelist,
+          },
         },
       })
     );
@@ -67,9 +68,9 @@ export default defineEventHandler(async (event) => {
           data: {
             shareInfo: {
               ...info,
-              shareHasWhitelist
-            }
-          }
+              shareHasWhitelist,
+            },
+          },
         })
       );
     }
@@ -93,9 +94,9 @@ export default defineEventHandler(async (event) => {
           data: {
             shareInfo: {
               ...info,
-              shareHasWhitelist
-            }
-          }
+              shareHasWhitelist,
+            },
+          },
         })
       );
     }
@@ -121,9 +122,9 @@ export default defineEventHandler(async (event) => {
           data: {
             shareInfo: {
               ...info,
-              shareHasWhitelist
-            }
-          }
+              shareHasWhitelist,
+            },
+          },
         })
       );
     }

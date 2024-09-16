@@ -33,7 +33,8 @@ export const readAllChatConversationShareWhitelistEntries = async (
 ) => {
   const chatConversationShareWhitelistEntries =
     await db.query.chat_conversation_share.findFirst({
-      where: (chat_conversation_share, { eq }) => eq(chat_conversation_share.share_uuid, share_id),
+      where: (chat_conversation_share, { eq }) =>
+        eq(chat_conversation_share.share_uuid, share_id),
       with: {
         chat_conversation_shares_whitelisted: {
           columns: {},
@@ -56,7 +57,10 @@ export const readAllChatConversationShareWhitelistEntries = async (
       },
     });
 
-  return chatConversationShareWhitelistEntries?.chat_conversation_shares_whitelisted ?? [];
+  return (
+    chatConversationShareWhitelistEntries?.chat_conversation_shares_whitelisted ??
+    []
+  );
 };
 
 export const deleteChatConversationShareWhitelistEntry = async (

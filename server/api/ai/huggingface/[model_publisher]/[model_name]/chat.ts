@@ -22,14 +22,15 @@ async function persistCodeBlocks(
   markdown: string,
   event: H3Event<EventHandlerRequest>
 ) {
-  const codeBlocks = await getCodeBlocksFromMarkdown(markdown);
+  try {
+    const codeBlocks = await getCodeBlocksFromMarkdown(markdown);
+    if (LOG_BACKEND) console.log('codeBlocks', codeBlocks);
 
-  if (LOG_BACKEND) console.log('codeBlocks', codeBlocks);
-  if (codeBlocks.length > 0) {
-    if (LOG_BACKEND)
-      console.log(`persisting ${codeBlocks.length} code block(s)...`);
+    if (codeBlocks.length > 0) {
+      if (LOG_BACKEND) {
+        console.log(`persisting ${codeBlocks.length} code block(s)...`);
+      }
 
-    try {
       const persistedCodeBlocks = await event.$fetch(
         `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
         {
@@ -52,9 +53,10 @@ async function persistCodeBlocks(
       }
 
       return persistedCodeBlocks;
-    } catch (error) {
-      if (LOG_BACKEND) console.error('Persisting code blocks errored:', error);
     }
+  } catch (error) {
+    if (LOG_BACKEND) console.error('Persisting code blocks errored:', error);
+    return null;
   }
 
   return null;

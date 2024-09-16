@@ -318,11 +318,14 @@ export function useFetchChats(user_id: number) {
   });
 
   const fetchChats = async () => {
-    const { data, status, error, refresh } = await useFetch(fetchChatsUrl.value, {
-      method: 'GET' as HTTPMethod,
-      lazy: true,
-      pick: ['chats'] as any,
-    });
+    const { data, status, error, refresh } = await useFetch(
+      fetchChatsUrl.value,
+      {
+        method: 'GET' as HTTPMethod,
+        lazy: true,
+        pick: ['chats'] as any,
+      }
+    );
 
     watch(status, () => {
       fetchedChats.value = data.value as { chats: FullyFeaturedChat[] } | null;

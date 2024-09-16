@@ -72,12 +72,14 @@ const useSsrSaveId = () => useId();
             <ClientOnly>
               <MDC
                 :value="`\`\`\`${
-                ( 
-                  supportedShikiLanguages.includes(c.fileName.split('.')[c.fileName.split('.').length - 1] as BundledLanguage) 
-                  ? c.fileName.split('.')[c.fileName.split('.').length - 1] 
-                  : 'text'
-                )
-              }\n${c.code?.trim()} \n\`\`\``"
+                  supportedShikiLanguages.includes(
+                    c.fileName.split('.')[
+                      c.fileName.split('.').length - 1
+                    ] as BundledLanguage
+                  )
+                    ? c.fileName.split('.')[c.fileName.split('.').length - 1]
+                    : 'text'
+                }\n${c.code?.trim()} \n\`\`\``"
               />
               <template #fallback>
                 <div class="overflow-x-auto break-words whitespace-pre-wrap">

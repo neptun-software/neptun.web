@@ -32,9 +32,7 @@ export const createChatConversationShare = async (
   return createdChatConversationShare[0];
 };
 
-export const readShareUuid = async (
-  chat_id: ReadChatConversation['id']
-) => {
+export const readShareUuid = async (chat_id: ReadChatConversation['id']) => {
   const shareUUid = await db
     .select()
     .from(chat_conversation_share)
@@ -49,7 +47,7 @@ export const readShareUuid = async (
     });
 
   return shareUUid;
-}
+};
 
 export const readShareInfo = async (
   id: ReadChatConversationShare['share_uuid']
@@ -68,7 +66,10 @@ export const readShareInfo = async (
         shareExists: data.length > 0,
         shareIsActive: data[0]?.is_shared ?? false,
         shareIsPrivate: data[0]?.is_protected ?? false,
-        shareHasPassword: (data[0]?.hashed_password && data[0]?.hashed_password.length > 0) ? true : false,
+        shareHasPassword:
+          data[0]?.hashed_password && data[0]?.hashed_password.length > 0
+            ? true
+            : false,
       };
     })
     .catch((err) => {
@@ -110,10 +111,15 @@ export const readChatConversationShareMessages = async (
         },
       },
       where: exists(
-        db.select().from(chat_conversation_share)
+        db
+          .select()
+          .from(chat_conversation_share)
           .where(
             and(
-              eq(chat_conversation_share.chat_conversation_id, chat_conversation_message.chat_conversation_id),
+              eq(
+                chat_conversation_share.chat_conversation_id,
+                chat_conversation_message.chat_conversation_id
+              ),
               eq(chat_conversation_share.share_uuid, id)
             )
           )
