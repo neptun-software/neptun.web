@@ -49,7 +49,7 @@
     "octokit": "^4.0.2",
     "pinia": "^2.1.7",
     "postgres": "^3.4.4",
-    "radix-vue": "^1.9.1",
+    "radix-vue": "^1.9.5",
     "rehype-parse": "^9.0.0",
     "rehype-remark": "^10.0.0",
     "remark-flexible-code-titles": "^1.2.0",
@@ -61,7 +61,7 @@
     "vee-validate": "^4.13.2",
     "vue": "latest",
     "vue-dndrop": "^1.3.1",
-    "vue-sonner": "^1.1.3",
+    "vue-sonner": "^1.1.5",
     "vue3-lottie": "^3.3.0",
     "zod": "^3.23.8"
   },
