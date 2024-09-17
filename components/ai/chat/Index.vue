@@ -203,7 +203,7 @@ async function loadChatMessages(user_id: number, chat_id: number) {
               id: `${String(id)}-${String(Date.now())}`,
               content: message,
               role: actor,
-            }) as Message
+            } as Message)
         );
 
         setChatMessages(messages);
@@ -343,23 +343,9 @@ async function deleteLast() {
     });
 }
 
-async function downloadChatMessages(event = null, type: 'json' = 'json') {
-  const blob = new Blob([JSON.stringify(chatMessages.value)], {
-    type: `application/${type}`,
-  });
-
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.style.display = 'none';
-  a.href = url;
-  a.download = `chat-messages.${type}`;
-  document.body.appendChild(a);
-  a.click();
-  window.URL.revokeObjectURL(url);
-  document.body.removeChild(a);
+async function downloadChatMessages(event = null) {
+  await downloadAsFile(chatMessages.value, 'chat-messages');
 }
-
-// const isDesktop = useMediaQuery('(min-width: 768px)');
 </script>
 
 <template>

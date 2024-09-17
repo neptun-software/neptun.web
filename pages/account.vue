@@ -117,6 +117,8 @@ definePageMeta({
             </div>
           </div>
         </div>
+        <ShadcnSeparator class="h-1 my-2" />
+        <CLI />
         <DevOnly>
           <ShadcnSeparator class="h-1 my-2" />
           <b>Debug:</b> {{ session }}

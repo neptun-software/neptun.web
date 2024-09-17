@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import { unified } from 'unified';
-import remarkParse from 'remark-parse';
-import strip from 'strip-markdown';
-import remarkStringify from 'remark-stringify';
 import { Volume2, CirclePause } from 'lucide-vue-next';
 
 const props = defineProps<{
@@ -10,18 +6,9 @@ const props = defineProps<{
 }>();
 
 const messageAsPlainText = ref(props.message);
-const processMarkdown = async (markdown: string) => {
-  const file = await unified()
-    .use(remarkParse)
-    .use(strip)
-    .use(remarkStringify)
-    .process(markdown);
-
-  messageAsPlainText.value = String(file);
-};
 
 onMounted(async () => {
-  await processMarkdown(props.message);
+  messageAsPlainText.value = await stripMarkdown(props.message);
 });
 
 /* SPEECH SYNTHESIS */

@@ -1,6 +1,10 @@
 import { supportedShikiLanguages } from '~/utils/formatters';
 import type { BundledLanguage } from 'shiki';
 import { supportedFileExtensionsMap } from '~/utils/formatters';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import strip from 'strip-markdown';
+import remarkStringify from 'remark-stringify';
 
 // `remark-code-blocks` doesn't work anymore and writing remark plugins is a pain (spent about 2 hours on it...), that's why I am trying to do this using regex magic
 export async function getCodeBlocksFromMarkdown(
@@ -46,3 +50,13 @@ interface CodeBlock {
   extension: string;
   text: string;
 }
+
+export const stripMarkdown = async (markdown: string) => {
+  const file = await unified()
+    .use(remarkParse)
+    .use(strip)
+    .use(remarkStringify)
+    .process(markdown);
+
+  return String(file);
+};
