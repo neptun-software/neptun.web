@@ -36,7 +36,7 @@ const isSmScreen = useMediaQuery('(max-width: 1023px)');
           </ShadcnResizablePanel>
           <ShadcnResizableHandle
             id="handle-handle-1"
-            @click="isInfoHidden = !isInfoHidden"
+            @dblclick="isInfoHidden = !isInfoHidden"
             with-handle
           />
           <ShadcnResizablePanel
