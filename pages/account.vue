@@ -59,7 +59,7 @@ definePageMeta({
     <ShadcnSeparator class="h-1 my-2" />
     <AuthState>
       <template #default="{ loggedIn }">
-        <div class="flex flex-wrap gap-8">
+        <div class="flex flex-wrap gap-2 lg:gap-8">
           <div>
             <ShadcnLabel for="email">Email</ShadcnLabel>
             <div class="flex gap-2">

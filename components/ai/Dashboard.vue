@@ -8,7 +8,7 @@ const isSmScreen = useMediaQuery('(max-width: 1023px)');
   <div class="h-full">
     <ClientOnly>
       <template #fallback>
-        <div class="single-panel">
+        <div class="h-full py-2 pr-2">
           <AiChat :key="selectedAiChatKey" />
         </div>
       </template>

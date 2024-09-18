@@ -51,7 +51,7 @@ const sortedRoutes = computed(() => {
     <div v-if="windowWidth <= 700 && layout === 'navigation'">
       <ShadcnDropdownMenu>
         <ShadcnDropdownMenuTrigger><Menu /></ShadcnDropdownMenuTrigger>
-        <ShadcnDropdownMenuContent>
+        <ShadcnDropdownMenuContent class="ml-4">
           <ShadcnDropdownMenuItem v-for="route in visibleRoutes">
             <NuxtLink :to="route.path" activeClass="underline">
               <p :key="useSsrSaveId">{{ route.name }}</p>

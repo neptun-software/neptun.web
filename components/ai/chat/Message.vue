@@ -17,20 +17,10 @@ defineProps<{
     <div
       v-if="message.role === 'assistant'"
       class="px-4 py-2 border rounded-lg bg-background border-slate-200 max-w-[80%] relative dark:border-border"
-      :id="`message-${message.id}`"
+      :id="`message-${message.id}-assistant`"
       :data-message-created-at="message.createdAt"
     >
-      <ClientOnly>
-        <MDC
-          class="overflow-x-auto break-words whitespace-pre-wrap"
-          :value="message.content"
-        />
-        <template #fallback>
-          <div class="overflow-x-auto break-words whitespace-pre-wrap">
-            {{ message.content }}
-          </div>
-        </template>
-      </ClientOnly>
+      <AiChatMessageContent :content="message.content" />
       <ShadcnSeparator class="my-4" label="Controls" />
       <AiChatMessageControls
         :message="message.content"
@@ -41,17 +31,10 @@ defineProps<{
     <div
       v-if="message.role === 'user'"
       class="px-4 py-2 border rounded-lg bg-background border-slate-200 max-w-[80%] dark:border-border"
-      :id="`message-${message.id}`"
+      :id="`message-${message.id}-user`"
       :data-message-created-at="message.createdAt"
     >
-      <ClientOnly>
-        <MDC :value="message.content" />
-        <template #fallback>
-          <div class="overflow-x-auto break-words whitespace-pre-wrap">
-            {{ message.content }}
-          </div>
-        </template>
-      </ClientOnly>
+      <AiChatMessageContent :content="message.content" />
     </div>
   </div>
 </template>
