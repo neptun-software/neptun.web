@@ -64,6 +64,13 @@ export default defineNuxtConfig({
     headers: {
       crossOriginEmbedderPolicy:
         process.env.NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp', // to allow devtools
+      contentSecurityPolicy: {
+        "img-src": [
+          "http://localhost:42124",
+          "https://neptun-webui.vercel.app",
+          "https://avatars.githubusercontent.com"
+        ]
+      }
     },
   },
 

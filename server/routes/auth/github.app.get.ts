@@ -73,9 +73,19 @@ export default defineEventHandler(async (event) => {
 
       const {
         id: githubUserId,
-        name: githubUserName,
         avatar_url: githubUserAvatarUrl,
       } = account;
+
+      // prefer login, then name, then email
+      const githubUserName =
+        'login' in account && account.login
+          ? account.login
+          : account.name && account.name.length > 0
+            ? account.name
+            : 'email' in account && account.email
+              ? account?.email
+              : 'Unknown';
+
       let githubUserAccountType = '';
       if ('type' in account) {
         const { type: githubUserAccountTypeFound } = account;
@@ -103,7 +113,7 @@ export default defineEventHandler(async (event) => {
         const { id: userId } = user;
         const githubAppInstallationToCreate = {
           github_account_id: githubUserId,
-          github_account_name: githubUserName ?? '',
+          github_account_name: githubUserName,
           github_account_avatar_url: githubUserAvatarUrl,
           github_account_type: githubUserAccountType,
           neptun_user_id: userId,

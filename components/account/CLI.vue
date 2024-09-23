@@ -57,7 +57,7 @@ async function downloadConfiguration() {
           <template v-if="error">
             <p class="text-red-500">Failed to fetch CLI configuration.</p>
           </template>
-          <span class="absolute right-0 flex items-center top-2">
+          <span class="absolute right-0 flex items-center gap-2 top-2">
             <ShadcnButton
               type="button"
               size="icon"

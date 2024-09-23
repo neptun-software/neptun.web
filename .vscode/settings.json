@@ -42,6 +42,7 @@
     "sveltekit",
     "Swrv",
     "tailwindcss",
+    "tanstack",
     "typecheck",
     "undici",
     "unref",

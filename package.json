@@ -30,6 +30,7 @@
     "@octokit/plugin-paginate-rest": "^11.3.3",
     "@pinia/nuxt": "^0.5.1",
     "@radix-icons/vue": "^1.0.0",
+    "@tanstack/vue-table": "^8.20.5",
     "@vee-validate/zod": "^4.13.2",
     "ai": "^3.2.22",
     "class-variance-authority": "^0.7.0",

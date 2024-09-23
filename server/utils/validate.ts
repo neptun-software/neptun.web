@@ -64,8 +64,8 @@ async function validateParams<S, E = S>(
     data,
     success,
   } = secondValidationStep
-    ? secondValidationStep(maybeValidatedParams.data!)
-    : { success: true, data: null, validationErrorMessage: '' };
+      ? secondValidationStep(maybeValidatedParams.data!)
+      : { success: true, data: null, validationErrorMessage: '' };
   if (secondValidationStep) {
     if (!success || !data) {
       return {
@@ -302,6 +302,42 @@ export async function validateParamChatId(
   );
 }
 
+/* VALIDATE ROUTE PARAMS(user_id, installation_id) */
+export async function validateParamInstallationId(
+  event: H3Event<EventHandlerRequest>
+): Promise<ValidationResult<InstallationIdType>> {
+  return validateParams<InstallationIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-ignore
+        const user_id = Number(params?.user_id); // => NaN if not a number, not present
+        // @ts-ignore
+        const installation_id = Number(params?.installation_id);
+        event.context.validated.params['user_id'] = user_id;
+        event.context.validated.params['installation_id'] = installation_id;
+
+        return InstallationIdSchema.safeParse({ user_id, installation_id });
+      });
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            user_id: result.data.user_id,
+            installation_id: result.data.installation_id,
+          },
+        };
+      } else {
+        return result;
+      }
+    },
+    'Successfully validated routeParams(user_id, installation_id).',
+    'Invalid routeParams(user_id, installation_id).',
+    'queryParams(user_id, installation_id):',
+    (user, data) => user.id !== data.user_id // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
+  );
+}
+
 /* VALIDATE ROUTE PARAMS(user_id, chat_id, share_id) */
 export async function validateParamShareId(
   event: H3Event<EventHandlerRequest>
@@ -462,6 +498,13 @@ export const ChatIdSchema = z.object({
 });
 
 type ChatIdType = z.infer<typeof ChatIdSchema>;
+
+export const InstallationIdSchema = z.object({
+  user_id: primaryIdSchema,
+  installation_id: primaryIdSchema,
+});
+
+type InstallationIdType = z.infer<typeof InstallationIdSchema>;
 
 export const ShareIdSchema = z.object({
   user_id: primaryIdSchema,

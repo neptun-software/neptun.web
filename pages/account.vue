@@ -117,12 +117,10 @@ definePageMeta({
             </div>
           </div>
         </div>
-        <ShadcnSeparator class="h-1 my-2" />
-        <CLI />
-        <DevOnly>
+        <!-- <DevOnly>
           <ShadcnSeparator class="h-1 my-2" />
           <b>Debug:</b> {{ session }}
-        </DevOnly>
+        </DevOnly> -->
         <ShadcnSeparator class="h-1 my-2" />
         <ShadcnButton
           class="mr-1"
@@ -170,6 +168,22 @@ definePageMeta({
         </ShadcnButton>
       </template>
     </AuthState>
+
+    <ShadcnSeparator class="h-1 my-2" />
+
+    <AccountSection>
+      <template #header> CLI Configuration </template>
+      <template #content>
+        <CLI />
+      </template>
+    </AccountSection>
+
+    <AccountSection>
+      <template #header> Neptun (Github) App Installations </template>
+      <template #content>
+        <Installations />
+      </template>
+    </AccountSection>
   </div>
 </template>
 

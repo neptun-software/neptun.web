@@ -26,11 +26,19 @@ export const createGithubAppInstallation = async (
   return createdGithubAppInstallation[0];
 };
 
+// User can have multiple, because user can link multiple github organizations.
 export const readAllGithubAppInstallationsOfUser = async (
   userId: ReadUser['id']
 ) => {
   const fetchedGithubAppInstallations = await db
-    .select()
+    .select({
+      id: github_app_installation.id,
+      github_account_name: github_app_installation.github_account_name,
+      github_account_type: github_app_installation.github_account_type,
+      github_account_avatar_url: github_app_installation.github_account_avatar_url,
+      created_at: github_app_installation.created_at,
+      updated_at: github_app_installation.updated_at,
+    })
     .from(github_app_installation)
     .where(eq(github_app_installation.neptun_user_id, userId))
     .catch((err) => {
