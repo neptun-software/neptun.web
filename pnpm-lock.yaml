@@ -87,8 +87,8 @@ importers:
         specifier: ^1.5.0
         version: 1.5.2(magicast@0.3.4)(rollup@4.21.0)
       nuxt-security:
-        specifier: 2.0.0-rc.9
-        version: 2.0.0-rc.9(magicast@0.3.4)(rollup@4.21.0)
+        specifier: 2.0.0
+        version: 2.0.0(magicast@0.3.4)(rollup@4.21.0)(webpack-sources@3.2.3)
       nuxt-time:
         specifier: ^1.0.0
         version: 1.0.2(magicast@0.3.4)(nuxt@3.13.0(@parcel/watcher@2.4.1)(@types/node@22.5.0)(drizzle-orm@0.32.2(@neondatabase/serverless@0.9.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.4)(react@18.3.1))(eslint@8.57.0)(ioredis@5.4.1)(magicast@0.3.4)(optionator@0.9.4)(rollup@4.21.0)(sass@1.77.8)(terser@5.31.6)(typescript@5.5.4)(vite@5.4.2(@types/node@22.5.0)(sass@1.77.8)(terser@5.31.6))(vue-tsc@2.0.29(typescript@5.5.4)))(rollup@4.21.0)(webpack-sources@3.2.3)
@@ -4587,8 +4587,8 @@ packages:
   nuxt-posthog@1.5.2:
     resolution: {integrity: sha512-ZEL1AnZzmMcT0oz8g0iC/I6frBA7hw9SiAbYd7NoYTnz1i6n4e1a6I4plu3mevS4bENgettGt5MdH10joeM9cQ==}
 
-  nuxt-security@2.0.0-rc.9:
-    resolution: {integrity: sha512-kymOhnPcwhKj8g20GXgrFC6h7Oub7+53yqD0byovCDb50a3hlSRdSLlSBoP2/ca4dtnbu8FWJd5/KuUHBGHWXw==}
+  nuxt-security@2.0.0:
+    resolution: {integrity: sha512-zlcB8uNDLipuJ0r1UHnns4rj8WwIfrni+DQeE8h9PIytCgRCBzuxsf/xNNTKJqXkoV4VGF2XGwrIzM9zdL4xFg==}
 
   nuxt-site-config-kit@2.2.15:
     resolution: {integrity: sha512-uN+JOijDt0u35rBhI3GhRHvPKncm2Nu/P3QMRIi+mwt4F/tQtlvLa1XUANkeEy8InTnPTVgs6dSDSqHP4sBXzg==}
@@ -11397,15 +11397,16 @@ snapshots:
       - rollup
       - supports-color
 
-  nuxt-csurf@1.6.2(magicast@0.3.4)(rollup@4.21.0):
+  nuxt-csurf@1.6.2(magicast@0.3.4)(rollup@4.21.0)(webpack-sources@3.2.3):
     dependencies:
-      '@nuxt/kit': 3.13.0(magicast@0.3.4)(rollup@4.21.0)
+      '@nuxt/kit': 3.13.2(magicast@0.3.4)(rollup@4.21.0)(webpack-sources@3.2.3)
       defu: 6.1.4
       uncsrf: 1.1.1
     transitivePeerDependencies:
       - magicast
       - rollup
       - supports-color
+      - webpack-sources
 
   nuxt-monaco-editor@1.2.9(magicast@0.3.4)(monaco-editor@0.51.0)(rollup@4.21.0)(vite@5.4.2(@types/node@22.5.0)(sass@1.77.8)(terser@5.31.6)):
     dependencies:
@@ -11466,19 +11467,20 @@ snapshots:
       - rollup
       - supports-color
 
-  nuxt-security@2.0.0-rc.9(magicast@0.3.4)(rollup@4.21.0):
+  nuxt-security@2.0.0(magicast@0.3.4)(rollup@4.21.0)(webpack-sources@3.2.3):
     dependencies:
-      '@nuxt/kit': 3.13.0(magicast@0.3.4)(rollup@4.21.0)
+      '@nuxt/kit': 3.13.2(magicast@0.3.4)(rollup@4.21.0)(webpack-sources@3.2.3)
       basic-auth: 2.0.1
       defu: 6.1.4
-      nuxt-csurf: 1.6.2(magicast@0.3.4)(rollup@4.21.0)
+      nuxt-csurf: 1.6.2(magicast@0.3.4)(rollup@4.21.0)(webpack-sources@3.2.3)
       pathe: 1.1.2
-      unplugin-remove: 1.0.3(rollup@4.21.0)
+      unplugin-remove: 1.0.3(rollup@4.21.0)(webpack-sources@3.2.3)
       xss: 1.0.15
     transitivePeerDependencies:
       - magicast
       - rollup
       - supports-color
+      - webpack-sources
 
   nuxt-site-config-kit@2.2.15(magicast@0.3.4)(rollup@4.21.0)(vue@3.5.8(typescript@5.5.4)):
     dependencies:
@@ -13159,7 +13161,7 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unplugin-remove@1.0.3(rollup@4.21.0):
+  unplugin-remove@1.0.3(rollup@4.21.0)(webpack-sources@3.2.3):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/generator': 7.25.5
@@ -13167,10 +13169,11 @@ snapshots:
       '@babel/traverse': 7.25.4
       '@rollup/pluginutils': 5.1.0(rollup@4.21.0)
       magic-string: 0.30.11
-      unplugin: 1.12.2
+      unplugin: 1.14.1(webpack-sources@3.2.3)
     transitivePeerDependencies:
       - rollup
       - supports-color
+      - webpack-sources
 
   unplugin-vue-router@0.10.7(rollup@4.21.0)(vue-router@4.4.3(vue@3.5.8(typescript@5.5.4)))(vue@3.5.8(typescript@5.5.4)):
     dependencies:

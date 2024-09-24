@@ -45,7 +45,7 @@
     "nuxt-monaco-editor": "^1.2.9",
     "nuxt-og-image": "3.0.0-rc.64",
     "nuxt-posthog": "^1.5.0",
-    "nuxt-security": "2.0.0-rc.9",
+    "nuxt-security": "2.0.0",
     "nuxt-time": "^1.0.0",
     "octokit": "^4.0.2",
     "pinia": "^2.1.7",
