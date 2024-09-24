@@ -35,7 +35,7 @@ export default defineNuxtConfig({
     metaTag: true,
     blockNonSeoBots: true,
     allow: ['/home', '/templates', '/sign-up', '/sign-in'],
-    disallow: protectedRoutes, // replace with https://nuxtseo.com/robots/guides/route-rules#inline-route-rules in the future
+    disallow: protectedRoutes.filter((route) => !(route === '/')), // replace with https://nuxtseo.com/robots/guides/route-rules#inline-route-rules in the future
   },
 
   vite: {
