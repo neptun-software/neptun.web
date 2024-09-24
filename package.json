@@ -19,7 +19,7 @@
     "db:studio": "drizzle-kit studio --config drizzle.config.ts --host 127.0.0.1"
   },
   "dependencies": {
-    "@ai-sdk/vue": "^0.0.28",
+    "@ai-sdk/vue": "^0.0.51",
     "@formkit/auto-animate": "^0.8.2",
     "@huggingface/inference": "^2.7.0",
     "@neondatabase/serverless": "^0.9.4",
@@ -32,7 +32,7 @@
     "@radix-icons/vue": "^1.0.0",
     "@tanstack/vue-table": "^8.20.5",
     "@vee-validate/zod": "^4.13.2",
-    "ai": "^3.2.22",
+    "ai": "^3.4.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.32.0",

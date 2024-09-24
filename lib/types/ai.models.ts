@@ -29,7 +29,9 @@ type ModelConfiguration = {
 };
 
 export const POSSIBLE_AI_MODELS: PossibleAiModels = {
-  OpenAssistant: {
+  // TODO: add https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct
+  // Service not available anymore.
+  /* OpenAssistant: {
     'oasst-sft-4-pythia-12b-epoch-3.5': {
       publisher: 'OpenAssistant',
       name: 'oasst-sft-4-pythia-12b-epoch-3.5',
@@ -40,20 +42,20 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
       type: 'chat', // OpenAssistant
       configuration: (inputs: string) => {
         return {
-          /* https://huggingface.co/OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5 */
+          // https://huggingface.co/OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5
           model: 'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5',
           inputs: inputs, // `<|prompter|>${prompt}<|endoftext|><|assistant|>`
           parameters: {
             max_new_tokens: 500,
-            typical_p: 0.2 /* higher means, more creative */,
-            repetition_penalty: 1.1 /* repetition is less likely because the model receives penalty */,
-            truncate: 2046 - 500 /* max_new_tokens of this model is 2046 */,
+            typical_p: 0.2, // higher means, more creative
+            repetition_penalty: 1.1, // repetition is less likely because the model receives penalty
+            truncate: 2046 - 500, // max_new_tokens of this model is 2046
             return_full_text: false,
           },
         };
       },
     },
-  },
+  }, */
   mistralai: {
     /* mistralai/Mistral-7B-v0.3 is too large */
     'Mistral-7B-Instruct-v0.1': {
@@ -90,9 +92,12 @@ export const ALLOWED_AI_MODELS = Object.keys(POSSIBLE_AI_MODELS).flatMap(
     )
 );
 
+export const defaultAiModelProvider = 'mistralai';
+export const defaultAiModel = 'Mistral-7B-Instruct-v0.1';
+export const defaultAiModelDomain = `${defaultAiModelProvider}/${defaultAiModel}`;
 export const allowedModelsConst = [
+  defaultAiModelDomain,
   'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5',
-  'mistralai/Mistral-7B-Instruct-v0.1',
 ] as const;
 
 export type AllowedAiModels = `${(typeof allowedModelsConst)[number]}`;
@@ -101,15 +106,15 @@ export type AllowedAiModelPaths =
 
 export enum AllowedAiModelPublishersEnum {
   OpenAssistant = 'OpenAssistant',
-  Mistral = 'mistralai',
+  Mistral = defaultAiModelProvider,
 }
 
 export enum AllowedAiModelNamesEnum {
   OpenAssistant = 'oasst-sft-4-pythia-12b-epoch-3.5',
-  Mistral = 'Mistral-7B-Instruct-v0.1',
+  Mistral = defaultAiModel,
 }
 
 export enum AllowedAiModelsEnum {
   OpenAssistant = 'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5',
-  Mistral = 'mistralai/Mistral-7B-Instruct-v0.1',
+  Mistral = defaultAiModelDomain,
 }

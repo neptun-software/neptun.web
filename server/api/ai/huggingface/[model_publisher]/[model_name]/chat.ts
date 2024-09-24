@@ -4,158 +4,15 @@ import {
   experimental_buildOpenAssistantPrompt,
   experimental_buildLlama2Prompt,
 } from 'ai/prompts';
-import { ALLOWED_AI_MODELS, POSSIBLE_AI_MODELS } from '~/lib/types/ai.models';
+import { ALLOWED_AI_MODELS, defaultAiModel, defaultAiModelProvider, POSSIBLE_AI_MODELS } from '~/lib/types/ai.models';
 import {
   validateParamAiModelName,
   validateQueryChatId,
 } from '~/server/utils/validate';
 import type { User } from '#auth-utils';
-import type { H3Event, EventHandlerRequest } from 'h3';
 import type { Actor } from '~/lib/types/database.tables/schema';
-import { getCodeBlocksFromMarkdown } from '~/utils/parse';
 import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema';
-
-async function persistCodeBlocks(
-  user_id: number,
-  chat_id: number,
-  message_id: number,
-  markdown: string,
-  event: H3Event<EventHandlerRequest>
-) {
-  try {
-    const codeBlocks = await getCodeBlocksFromMarkdown(markdown);
-    if (LOG_BACKEND) console.log('codeBlocks', codeBlocks);
-
-    if (codeBlocks.length > 0) {
-      if (LOG_BACKEND) {
-        console.log(`persisting ${codeBlocks.length} code block(s)...`);
-      }
-
-      const persistedCodeBlocks = await event.$fetch(
-        `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
-        {
-          // .event.$fetch used because it contains the current session
-          method: 'POST',
-          body: {
-            files: codeBlocks,
-          },
-        }
-      );
-
-      if (LOG_BACKEND) {
-        console.info(
-          'persistCodeBlocks:',
-          persistedCodeBlocks,
-          user_id,
-          chat_id,
-          message_id
-        );
-      }
-
-      return persistedCodeBlocks;
-    }
-  } catch (error) {
-    if (LOG_BACKEND) console.error('Persisting code blocks errored:', error);
-    return null;
-  }
-
-  return null;
-}
-
-async function persistChatMessage(
-  user_id: number,
-  chat_id: number,
-  messageText: string,
-  actor: 'user' | 'assistant' = 'user',
-  event: H3Event<EventHandlerRequest>
-) {
-  if (chat_id >= 1) {
-    try {
-      const persistedChatMessage = await event.$fetch(
-        `/api/users/${user_id}/chats/${chat_id}/messages`,
-        {
-          // .event.$fetch used because it contains the current session
-          method: 'POST',
-          body: {
-            message: messageText,
-            actor,
-          },
-        }
-      );
-
-      if (LOG_BACKEND)
-        console.info(
-          'persistChatMessage:',
-          persistedChatMessage,
-          user_id,
-          chat_id,
-          messageText
-        );
-
-      const chatMessage =
-        persistedChatMessage && 'chatMessage' in persistedChatMessage
-          ? persistedChatMessage.chatMessage
-            ? persistedChatMessage.chatMessage[0]
-            : null
-          : null;
-      return chatMessage;
-    } catch (error) {
-      if (LOG_BACKEND) console.error('Persisting chat message errored:', error);
-    }
-  }
-
-  return null;
-}
-
-async function persistAiChatMessage(
-  user_id: number,
-  chat_id: number,
-  messageText: string,
-  event: H3Event<EventHandlerRequest>
-) {
-  const persistedChatMessage = await persistChatMessage(
-    user_id,
-    chat_id,
-    messageText,
-    'assistant',
-    event
-  );
-
-  if (!persistedChatMessage) return persistedChatMessage;
-  const {
-    neptun_user_id,
-    chat_conversation_id,
-    id: message_id,
-    message,
-  } = persistedChatMessage;
-  const persistedCodeBlocks = await persistCodeBlocks(
-    neptun_user_id,
-    chat_conversation_id,
-    message_id,
-    message,
-    event
-  );
-
-  if (
-    persistedCodeBlocks &&
-    'chatFiles' in persistedCodeBlocks &&
-    persistedCodeBlocks.chatFiles
-  ) {
-    return {
-      chat_message: persistedChatMessage,
-      code_blocks: persistedCodeBlocks.chatFiles, // TODO: find out how to get type, if not clear, what route it is (made it [message_id]/[file_id] instead of /[message_id] and /[file_id] for now)
-    };
-  }
-}
-
-async function persistUserChatMessage(
-  user_id: number,
-  chat_id: number,
-  messageText: string,
-  event: H3Event<EventHandlerRequest>
-) {
-  await persistChatMessage(user_id, chat_id, messageText, 'user', event);
-}
+import { persistUserChatMessage, persistAiChatMessage } from '~/utils/chat';
 
 export default defineLazyEventHandler(async () => {
   const apiKey = useRuntimeConfig().huggingfaceApiKey;
@@ -254,6 +111,14 @@ export default defineLazyEventHandler(async () => {
       let inputs = String(messages);
       const minimalMessages = messages as Pick<Message, 'content' | 'role'>[];
       if (model_name === 'oasst-sft-4-pythia-12b-epoch-3.5') {
+        return sendError(
+          event,
+          createError({
+            statusCode: 400,
+            statusMessage: 'Service not available anymore.',
+          })
+        )
+
         inputs = experimental_buildOpenAssistantPrompt(minimalMessages); // basically convertToCoreMessages from 'ai'
         // if (LOG_BACKEND) console.info('using custom prompt builder for OpenAssistant');
       } else if (model_name === 'Mistral-7B-Instruct-v0.1') {
@@ -266,8 +131,8 @@ export default defineLazyEventHandler(async () => {
       // if (LOG_BACKEND) console.info('---');
 
       const response = Hf.textGenerationStream(
-        POSSIBLE_AI_MODELS?.[model_publisher ?? 'OpenAssistant']?.[
-          model_name ?? 'oasst-sft-4-pythia-12b-epoch-3.5'
+        POSSIBLE_AI_MODELS?.[model_publisher ?? defaultAiModelProvider]?.[
+          model_name ?? defaultAiModel
         ]?.configuration(inputs)
       );
 

@@ -10,7 +10,10 @@ import {
   CalendarClock,
   Bot,
 } from 'lucide-vue-next';
-import type { AllowedAiModels } from '~/lib/types/ai.models';
+import {
+  defaultAiModelDomain,
+  type AllowedAiModels,
+} from '~/lib/types/ai.models';
 import type { MinimalChat, FullyFeaturedChat } from '~/lib/types/chat';
 
 const props = defineProps<{
@@ -24,7 +27,7 @@ const { selectedAiChat, resetSelectedAiChatToDefaults } = useSelectedAiChat();
 const chatToEdit = ref<MinimalChat>({
   id: -1,
   name: `chat-${Date.now()}`,
-  model: 'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5',
+  model: defaultAiModelDomain,
 });
 
 function setSelectedChat(
@@ -80,11 +83,7 @@ const deleteChat = async (id: number) => {
   await persistChatConversationDelete(user?.value?.id ?? -1, id);
 
   if (selectedAiChat.value.id === id) {
-    setSelectedChat(
-      -1,
-      `chat-${Date.now()}`,
-      'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5'
-    );
+    setSelectedChat(-1, `chat-${Date.now()}`, defaultAiModelDomain);
   }
 
   await fetchedChatsRefresh.value();
@@ -100,11 +99,7 @@ const batchDeleteChats = async () => {
   batchDeleteSelectorIsActive.value = false;
   chatsSelectedForDeletion.value = [];
 
-  setSelectedChat(
-    -1,
-    `chat-${Date.now()}`,
-    'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5'
-  );
+  setSelectedChat(-1, `chat-${Date.now()}`, defaultAiModelDomain);
 
   await fetchedChatsRefresh.value();
 };

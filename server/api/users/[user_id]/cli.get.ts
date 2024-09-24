@@ -1,3 +1,5 @@
+import { defaultAiModelDomain } from "~/lib/types/ai.models";
+
 export default defineEventHandler(async (event) => {
   const sessionState = await requireUserSession(event);
 
@@ -27,7 +29,7 @@ export default defineEventHandler(async (event) => {
     "active_chat": {
       "chat_id": -1,
       "chat_name": `chat-${Date.now()}`,
-      "model": "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5"
+      "model": defaultAiModelDomain
     }
   }
 

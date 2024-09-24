@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { ALLOWED_AI_MODELS, POSSIBLE_AI_MODELS } from '~/lib/types/ai.models';
+import {
+  ALLOWED_AI_MODELS,
+  defaultAiModelDomain,
+  POSSIBLE_AI_MODELS,
+} from '~/lib/types/ai.models';
 
 const { user } = useUserSession();
 const { selectedAiChat, selectedAiChatIsPlayground } = useSelectedAiChat();
@@ -25,7 +29,7 @@ watch(
         <ShadcnLabel for="model">Model</ShadcnLabel>
         <ShadcnSelect
           v-model="selectedAiChat.model"
-          default-value="OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5"
+          :default-value="defaultAiModelDomain"
         >
           <ShadcnSelectTrigger
             :disabled="!selectedAiChatIsPlayground"

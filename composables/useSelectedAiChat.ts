@@ -1,7 +1,8 @@
 import type { MinimalChat } from '~/lib/types/chat';
-import type {
-  AllowedAiModelPaths,
-  AllowedAiModels,
+import {
+  defaultAiModelDomain,
+  type AllowedAiModelPaths,
+  type AllowedAiModels,
 } from '~/lib/types/ai.models';
 import { generateUUID } from '~/lib/utils';
 // const { console } = useLogger();
@@ -35,7 +36,7 @@ export const useSelectedAiChat = () => {
 
   function selectedAiChatDefaults(
     time: Date,
-    model: AllowedAiModels = 'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5'
+    model: AllowedAiModels = defaultAiModelDomain
   ) {
     return {
       id: -1,
@@ -47,10 +48,9 @@ export const useSelectedAiChat = () => {
   const resetSelectedAiChatToDefaults = (
     model: AllowedAiModels | undefined = undefined
   ) => {
-    // somehow setting this to 'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5' instead of undefined causes some weird errors sometimes
     selectedAiChat.value = selectedAiChatDefaults(
       new Date(),
-      model ?? 'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5'
+      model ?? defaultAiModelDomain
     );
     aiChatReCreationTrigger.value = generateUUID();
   };
@@ -82,7 +82,7 @@ export const useAiChatPlayground = () => {
   }
 
   function resetAiPlaygroundChat(
-    model: AllowedAiModels = 'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5'
+    model: AllowedAiModels = defaultAiModelDomain
   ) {
     aiPlaygroundChatMessages.value = []; // setChatMessages([]); is done by rerendering the whole component which recreates the useChat composable with a new id
     resetSelectedAiChatToDefaults(model);

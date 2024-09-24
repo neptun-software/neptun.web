@@ -584,14 +584,9 @@ async function downloadChatMessages(event = null) {
                 </ShadcnAlertDialogHeader>
                 <ShadcnAlertDialogFooter>
                   <ShadcnAlertDialogCancel>Cancel</ShadcnAlertDialogCancel>
-                  <ShadcnAlertDialogAction
-                    @click="
-                      resetAiPlaygroundChat(
-                        'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5'
-                      )
-                    "
-                    >Continue</ShadcnAlertDialogAction
-                  >
+                  <ShadcnAlertDialogAction @click="resetAiPlaygroundChat">
+                    Continue
+                  </ShadcnAlertDialogAction>
                 </ShadcnAlertDialogFooter>
               </ShadcnAlertDialogContent>
             </ShadcnAlertDialog>
