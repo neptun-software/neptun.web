@@ -16,6 +16,7 @@ import {
 import { useChat, type Message } from '@ai-sdk/vue'; // NOTE: can only be called in setup scripts ("Could not get current instance, check to make sure that `useSwrv` is declared in the top level of the setup function.")
 import { toast } from 'vue-sonner';
 import { generateUUID } from '~/lib/utils';
+import { AllowedAiModelsEnum } from '~/lib/types/ai.models';
 const { console } = useLogger();
 
 const { loadFiles } = useFetchFiles();
@@ -103,6 +104,14 @@ watch(
     chatMessagesKey.value = generateUUID();
     if (selectedAiChat.value.id !== -1) {
       await loadFiles(user.value?.id ?? -1, selectedAiChat.value.id);
+    }
+
+    // Sanitize Llama3 messages (cannot be done in backend)
+    if (selectedAiChat.value.model === AllowedAiModelsEnum.metaLlama) {
+      chatMessages.value = chatMessages.value.map((message) => ({
+        ...message,
+        content: getSanitizedMessageContent(message.content),
+      }));
     }
 
     console.info('Setting chat history messages backup...');

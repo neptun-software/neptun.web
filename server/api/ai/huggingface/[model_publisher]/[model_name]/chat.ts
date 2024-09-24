@@ -4,7 +4,7 @@ import {
   experimental_buildOpenAssistantPrompt,
   experimental_buildLlama2Prompt,
 } from 'ai/prompts';
-import { ALLOWED_AI_MODELS, defaultAiModel, defaultAiModelProvider, POSSIBLE_AI_MODELS } from '~/lib/types/ai.models';
+import { ALLOWED_AI_MODELS, AllowedAiModelNamesEnum, defaultAiModel, defaultAiModelProvider, POSSIBLE_AI_MODELS } from '~/lib/types/ai.models';
 import {
   validateParamAiModelName,
   validateQueryChatId,
@@ -12,7 +12,7 @@ import {
 import type { User } from '#auth-utils';
 import type { Actor } from '~/lib/types/database.tables/schema';
 import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema';
-import { persistUserChatMessage, persistAiChatMessage } from '~/utils/chat';
+import { getSanitizedMessageContent } from '~/utils/chat';
 
 export default defineLazyEventHandler(async () => {
   const apiKey = useRuntimeConfig().huggingfaceApiKey;
@@ -110,7 +110,7 @@ export default defineLazyEventHandler(async () => {
 
       let inputs = String(messages);
       const minimalMessages = messages as Pick<Message, 'content' | 'role'>[];
-      if (model_name === 'oasst-sft-4-pythia-12b-epoch-3.5') {
+      if (model_name === AllowedAiModelNamesEnum.OpenAssistant) {
         return sendError(
           event,
           createError({
@@ -119,11 +119,14 @@ export default defineLazyEventHandler(async () => {
           })
         )
 
-        inputs = experimental_buildOpenAssistantPrompt(minimalMessages); // basically convertToCoreMessages from 'ai'
+        // inputs = experimental_buildOpenAssistantPrompt(minimalMessages); // basically convertToCoreMessages from 'ai'
         // if (LOG_BACKEND) console.info('using custom prompt builder for OpenAssistant');
-      } else if (model_name === 'Mistral-7B-Instruct-v0.1') {
+      } else if (model_name === AllowedAiModelNamesEnum.Mistral) {
         inputs = experimental_buildLlama2Prompt(minimalMessages);
         // if (LOG_BACKEND) console.info('using custom prompt builder for Llama2');
+      } else if (model_name === AllowedAiModelNamesEnum.metaLlama) {
+        inputs = buildMetaLlama3Prompt(minimalMessages);
+        // if (LOG_BACKEND) console.info('using custom prompt builder for metaLlama');
       }
 
       // if (LOG_BACKEND) console.info('---');
@@ -140,7 +143,8 @@ export default defineLazyEventHandler(async () => {
       const stream = HuggingFaceStream(response, {
         async onFinal(messageText: string) {
           // onCompletion, onFinal, onToken and onText is called for each token (word, punctuation)
-          await persistAiChatMessage(user.id, chat_id, messageText, event);
+          const messageContent = getSanitizedMessageContent(messageText);
+          await persistAiChatMessage(user.id, chat_id, messageContent, event);
         },
       }); // Converts the response into a friendly text-stream
 

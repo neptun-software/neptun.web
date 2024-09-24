@@ -113,7 +113,7 @@ export const SelectOauthAccountSchema = SelectOauthAccountSchemaBase.pick({
 
 /* CHATS */
 
-export const POSSIBLE_AI_MODELS = pgEnum('ai_model_enum', allowedModelsConst);
+export const POSSIBLE_AI_MODELS = pgEnum('ai_model_enum', allowedModelsConst); // ALTER TYPE ai_model_enum ADD VALUE 'xxx';
 export const chat_conversation = pgTable('chat_conversation', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
