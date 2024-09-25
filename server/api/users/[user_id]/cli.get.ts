@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
   const CLI_CONFIGURATION = {
     "utils": {
       "neptun_api_server_host": `${url}api`,
+      "neptun_github_app_url": "https://github.com/apps/neptun-github-app/installations/new"
     },
     "auth": {
       "neptun_session_cookie": session,
