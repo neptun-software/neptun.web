@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
 import { navigateTo } from '#imports';
-import { useUiStore } from '~/stores/useUiStore';
 
 const props = defineProps<{
   class?: HTMLAttributes['class'];
 }>();
 
 const { loggedIn, user, clear } = useUserSession();
-const uiStore = useUiStore();
-const { headerNavigationElement } = storeToRefs(uiStore); // don't bind using :ref (VNodeRef and not Element)!!!
+const { headerNavigationElement } = useUiStore(); // don't bind using :ref (VNodeRef and not Element)!!!
 </script>
 
 <template>

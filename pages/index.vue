@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Import } from 'lucide-vue-next';
-import { useUiStore } from '~/stores/useUiStore';
 
 definePageMeta({
   name: 'Dashboard',
@@ -8,8 +7,7 @@ definePageMeta({
   alias: dashboardAliases,
 });
 
-const uiStore = useUiStore();
-const { headerNavigationElement } = storeToRefs(uiStore);
+const { headerNavigationElement } = useUiStore();
 
 const headerNavigationHeight = ref(0);
 watch(headerNavigationElement, (newHeaderNavigationElement) => {

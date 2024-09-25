@@ -187,7 +187,6 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
     '@nuxtjs/color-mode',
     'nuxt-posthog',
-    '@pinia/nuxt',
     'nuxt-auth-utils',
     '@nuxtjs/mdc',
     '@nuxt/image',
@@ -219,10 +218,6 @@ export default defineNuxtConfig({
       },
       langs: supportedShikiLanguages,
     },
-  },
-
-  pinia: {
-    storesDirs: ['./stores/**'],
   },
 
   css: ['~/assets/css/app.css'],
