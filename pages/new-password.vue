@@ -1,15 +1,17 @@
 <script setup lang="ts">
-definePageMeta({
-  name: 'New Password',
-  alias: ['/forgot-password', '/reset-password'],
-});
-
 import { CheckIcon, CircleIcon, DotIcon } from '@radix-icons/vue';
 import { toast } from 'vue-sonner';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 import { emailSchema, passwordSchema } from '~/lib/types/input.validation';
+
+definePageMeta({
+  name: 'New Password',
+  alias: ['/forgot-password', '/reset-password'],
+});
+
+defineOgImageComponent('NuxtSeo');
 
 const stepIndex = ref(1);
 const steps = [

@@ -6,6 +6,7 @@ import { supportedShikiLanguages } from './utils/formatters';
 // @ts-ignore
 import removeConsole from 'vite-plugin-remove-console';
 
+const productionURL = 'https://neptun-webui.vercel.app';
 const corsHandler = {
   origin: '*',
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'] as HTTPMethod[],
@@ -28,6 +29,15 @@ export default defineNuxtConfig({
 
   devServer: {
     port: 42124,
+  },
+
+  vue: {
+    // https://github.com/nuxt/nuxt/issues/28829
+    propsDestructure: true,
+  },
+
+  site: {
+    url: productionURL,
   },
 
   robots: {
@@ -67,8 +77,8 @@ export default defineNuxtConfig({
       contentSecurityPolicy: {
         "img-src": [
           "http://localhost:42124",
-          "https://neptun-webui.vercel.app",
-          "https://avatars.githubusercontent.com"
+          "https://avatars.githubusercontent.com",
+          productionURL,
         ]
       }
     },
@@ -196,6 +206,7 @@ export default defineNuxtConfig({
     '@nuxtjs/robots',
     'nuxt-monaco-editor',
     '@formkit/auto-animate/nuxt',
+    'nuxt-og-image',
   ],
 
   mdc: {

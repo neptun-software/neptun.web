@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { Timer, Lightbulb } from 'lucide-vue-next';
+/* import { Timer, Lightbulb } from 'lucide-vue-next'; */
 
 definePageMeta({
   name: 'Home',
   alias: ['/root'],
 });
+
+defineOgImageComponent('NuxtSeo');
 
 const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
 </script>
