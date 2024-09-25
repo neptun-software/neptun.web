@@ -6,7 +6,7 @@ definePageMeta({
   alias: ['/root'],
 });
 
-defineOgImageComponent('NuxtSeo');
+// defineOgImageComponent('NuxtSeo');
 
 const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
 </script>

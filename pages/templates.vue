@@ -4,7 +4,7 @@ definePageMeta({
   alias: ['/snippets', '/shared'],
 });
 
-defineOgImageComponent('NuxtSeo');
+// defineOgImageComponent('NuxtSeo');
 </script>
 
 <template>

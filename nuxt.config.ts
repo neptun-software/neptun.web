@@ -206,7 +206,7 @@ export default defineNuxtConfig({
     '@nuxtjs/robots',
     'nuxt-monaco-editor',
     '@formkit/auto-animate/nuxt',
-    'nuxt-og-image',
+    /* 'nuxt-og-image', => still causes vercel serverless function to crash because of shiki (yea fr...) */
   ],
 
   mdc: {

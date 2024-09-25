@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-vue-next';
 import type { AsyncDataRequestStatus } from '#app';
 import type { FetchError } from 'ofetch';
 
-defineOgImageComponent('NuxtSeo');
+// defineOgImageComponent('NuxtSeo');
 
 const route = useRoute(); // $route should work too, but most of the time it doesn't
 

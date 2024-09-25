@@ -4,7 +4,7 @@ definePageMeta({
   alias: ['/register', '/signup'],
 });
 
-defineOgImageComponent('NuxtSeo');
+// defineOgImageComponent('NuxtSeo');
 </script>
 
 <template>

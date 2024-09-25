@@ -11,7 +11,7 @@ definePageMeta({
   alias: ['/forgot-password', '/reset-password'],
 });
 
-defineOgImageComponent('NuxtSeo');
+// defineOgImageComponent('NuxtSeo');
 
 const stepIndex = ref(1);
 const steps = [
