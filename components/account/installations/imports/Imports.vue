@@ -7,25 +7,25 @@ import {
   useVueTable,
   type ColumnDef,
   type ColumnFiltersState,
-  type SortingState,
+  type SortingState
 } from '@tanstack/vue-table';
+import { toast } from 'vue-sonner';
+import { CaretSortIcon } from '@radix-icons/vue';
+import type { Import } from './types';
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from '@/components/ui/table';
-import type { Import } from './types';
 import { NuxtLink } from '#components';
 import { Button } from '~/components/ui/button';
-import { toast } from 'vue-sonner';
 import { valueUpdater } from '~/lib/utils';
-import { CaretSortIcon } from '@radix-icons/vue';
 
 const props = defineProps<{
-  imports: Import[];
+  imports: Import[]
 }>();
 
 const sorting = ref<SortingState>([]);
@@ -39,32 +39,32 @@ const columns: ColumnDef<Import>[] = [
         Button,
         {
           variant: 'ghost',
-          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
         },
         () => ['Repository Name', h(CaretSortIcon, { class: 'ml-2 h-4 w-4' })]
       );
     },
-    cell: ({ row }) => row.getValue('github_repository_name'),
+    cell: ({ row }) => row.getValue('github_repository_name')
   },
   {
     accessorKey: 'github_repository_description',
     header: 'Description',
-    cell: ({ row }) => row.getValue('github_repository_description') || 'N/A',
+    cell: ({ row }) => row.getValue('github_repository_description') || 'N/A'
   },
   {
     accessorKey: 'github_repository_size',
     header: 'Size (KB)',
-    cell: ({ row }) => row.getValue('github_repository_size'),
+    cell: ({ row }) => row.getValue('github_repository_size')
   },
   {
     accessorKey: 'github_repository_language',
     header: 'Language',
-    cell: ({ row }) => row.getValue('github_repository_language') || 'Unknown',
+    cell: ({ row }) => row.getValue('github_repository_language') || 'Unknown'
   },
   {
     accessorKey: 'github_repository_license',
     header: 'License',
-    cell: ({ row }) => row.getValue('github_repository_license') || 'None',
+    cell: ({ row }) => row.getValue('github_repository_license') || 'None'
   },
   {
     accessorKey: 'github_repository_url',
@@ -76,11 +76,11 @@ const columns: ColumnDef<Import>[] = [
         {
           to: websiteUrl || '#',
           target: websiteUrl ? '_blank' : undefined,
-          external: true,
+          external: true
         },
         () => websiteUrl || 'N/A'
       );
-    },
+    }
   },
   {
     accessorKey: 'github_repository_website_url',
@@ -92,35 +92,35 @@ const columns: ColumnDef<Import>[] = [
         {
           to: websiteUrl || '#',
           target: websiteUrl ? '_blank' : undefined,
-          external: true,
+          external: true
         },
         () => websiteUrl || 'N/A'
       );
-    },
+    }
   },
   {
     accessorKey: 'github_repository_is_private',
     header: 'Private',
     cell: ({ row }) =>
-      row.getValue('github_repository_is_private') ? 'Yes' : 'No',
+      row.getValue('github_repository_is_private') ? 'Yes' : 'No'
   },
   {
     accessorKey: 'github_repository_is_fork',
     header: 'Fork',
     cell: ({ row }) =>
-      row.getValue('github_repository_is_fork') ? 'Yes' : 'No',
+      row.getValue('github_repository_is_fork') ? 'Yes' : 'No'
   },
   {
     accessorKey: 'github_repository_is_template',
     header: 'Template',
     cell: ({ row }) =>
-      row.getValue('github_repository_is_template') ? 'Yes' : 'No',
+      row.getValue('github_repository_is_template') ? 'Yes' : 'No'
   },
   {
     accessorKey: 'github_repository_is_archived',
     header: 'Archived',
     cell: ({ row }) =>
-      row.getValue('github_repository_is_archived') ? 'Yes' : 'No',
+      row.getValue('github_repository_is_archived') ? 'Yes' : 'No'
   },
   {
     id: 'actions',
@@ -135,11 +135,11 @@ const columns: ColumnDef<Import>[] = [
             toast.error(
               `Coming Soon... Refreshing repository ${row.original.github_repository_id}...`
             );
-          },
+          }
         },
         () => 'Refresh'
-      ),
-  },
+      )
+  }
 ];
 
 const table = useVueTable({
@@ -150,7 +150,7 @@ const table = useVueTable({
   getCoreRowModel: getCoreRowModel(),
 
   getSortedRowModel: getSortedRowModel(),
-  onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
+  onSortingChange: updaterOrValue => valueUpdater(updaterOrValue, sorting),
 
   onColumnFiltersChange: (updaterOrValue) => {
     return valueUpdater(updaterOrValue, columnFilters);
@@ -162,8 +162,8 @@ const table = useVueTable({
     },
     get columnFilters() {
       return columnFilters.value;
-    },
-  },
+    }
+  }
 });
 
 const selectedInstallationId = useSelectedInstallation();
@@ -173,13 +173,17 @@ const selectedInstallationId = useSelectedInstallation();
   <div>
     <div class="border rounded-md">
       <div class="flex items-center gap-2 p-4">
-        <ShadcnButton @click="() => (selectedInstallationId = -1)"
-          >Back To Overview</ShadcnButton
-        >
+        <ShadcnButton @click="() => (selectedInstallationId = -1)">
+          Back To Overview
+        </ShadcnButton>
         <ShadcnInput
           class="max-w-sm"
           placeholder="Filter by repository name..."
-          :model-value="table.getColumn('github_repository_name')?.getFilterValue() as string"
+          :model-value="
+            table
+              .getColumn('github_repository_name')
+              ?.getFilterValue() as string
+          "
           @update:model-value="
             (value) => {
               const sanitizedValue = value.toString().replace(/\s+/g, '');
@@ -199,11 +203,14 @@ const selectedInstallationId = useSelectedInstallation();
               v-for="headerGroup in table.getHeaderGroups()"
               :key="headerGroup.id"
             >
-              <TableHead v-for="header in headerGroup.headers" :key="header.id">
+              <TableHead
+                v-for="header in headerGroup.headers"
+                :key="header.id"
+              >
                 <component
                   :is="header.isPlaceholder ? 'span' : 'div'"
                   :class="{
-                    'cursor-pointer select-none': header.column.getCanSort(),
+                    'cursor-pointer select-none': header.column.getCanSort()
                   }"
                   @click="header.column.getToggleSortingHandler()"
                 >
@@ -216,21 +223,28 @@ const selectedInstallationId = useSelectedInstallation();
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow
-              v-if="table.getRowModel().rows?.length > 0"
-              v-for="row in table.getRowModel().rows"
-              :key="row.id"
-              :data-state="row.getIsSelected() ? 'selected' : undefined"
-            >
-              <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
-                <FlexRender
-                  :render="cell.column.columnDef.cell"
-                  :props="cell.getContext()"
-                />
-              </TableCell>
-            </TableRow>
+            <template v-if="table.getRowModel().rows?.length > 0">
+              <TableRow
+                v-for="row in table.getRowModel().rows"
+                :key="row.id"
+                :data-state="row.getIsSelected() ? 'selected' : undefined"
+              >
+                <TableCell
+                  v-for="cell in row.getVisibleCells()"
+                  :key="cell.id"
+                >
+                  <FlexRender
+                    :render="cell.column.columnDef.cell"
+                    :props="cell.getContext()"
+                  />
+                </TableCell>
+              </TableRow>
+            </template>
             <TableRow v-else>
-              <TableCell :colspan="columns.length" class="h-24 text-center">
+              <TableCell
+                :colspan="columns.length"
+                class="h-24 text-center"
+              >
                 No results.
               </TableCell>
             </TableRow>

@@ -4,16 +4,16 @@ import gsap from 'gsap';
 const props = defineProps({
   text: {
     type: String,
-    required: true,
+    required: true
   },
   textToLoop: {
     type: Array,
-    default: () => [],
+    default: () => []
   },
   duration: {
     type: Number,
-    default: 2,
-  },
+    default: 2
+  }
 });
 
 const dynamicText = ref(null);
@@ -40,23 +40,26 @@ const updateText = () => {
         { y: 50, opacity: 0 },
         { y: 0, opacity: 1, duration: props.duration / 2, ease: 'power1.out' }
       );
-    },
+    }
   });
 
   currentIndex = newIndex;
-};
+}
 
 onMounted(() => {
   const interval = setInterval(updateText, props.duration * 1000);
   onUnmounted(() => clearInterval(interval));
-});
+})
 </script>
 
 <template>
   <div class="text-slider">
     <p class="inline my-8 text-5xl font-extrabold text-center">
       {{ text }}
-      <span class="dynamic-text" ref="dynamicText">{{ currentText }}</span>
+      <span
+        ref="dynamicText"
+        class="dynamic-text"
+      >{{ currentText }}</span>
     </p>
   </div>
 </template>

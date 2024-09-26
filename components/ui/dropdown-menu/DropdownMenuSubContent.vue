@@ -4,7 +4,7 @@ import {
   DropdownMenuSubContent,
   type DropdownMenuSubContentEmits,
   type DropdownMenuSubContentProps,
-  useForwardPropsEmits,
+  useForwardPropsEmits
 } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
@@ -15,7 +15,7 @@ const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props
 
   return delegated
-})
+});
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 </script>

@@ -14,7 +14,7 @@ export default defineCachedEventHandler(async (event) => {
       createError({
         statusCode: maybeUrl.statusCode,
         statusMessage: maybeUrl.statusMessage,
-        data: maybeUrl.data,
+        data: maybeUrl.data
       })
     );
   }
@@ -36,7 +36,8 @@ export default defineCachedEventHandler(async (event) => {
           .process(html);
 
         markdown = String(file);
-      } catch (error: any) {
+      }
+      catch (error: any) {
         if (LOG_BACKEND) console.error('Failed to parse HTML:', error?.message);
         markdown = `Failed to parse HTML: ${error?.message}`;
       }
@@ -46,7 +47,7 @@ export default defineCachedEventHandler(async (event) => {
     .catch((err) => {
       if (LOG_BACKEND) console.error(err);
       return 'FAILED';
-    });
+    })
 
   if (markdown === 'FAILED')
     return sendError(
@@ -54,9 +55,9 @@ export default defineCachedEventHandler(async (event) => {
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
-        data: markdown,
+        data: markdown
       })
     );
 
   return markdown;
-});
+})

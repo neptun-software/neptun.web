@@ -9,5 +9,5 @@ export default defineNuxtPlugin((nuxtApp) => {
     );
 
     selectedAiChat.value.id = localStorageSelectedChatId.value; // initially set the selected chat, from local storage, on load
-  });
+  })
 });

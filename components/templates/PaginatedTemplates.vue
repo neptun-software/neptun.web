@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { templates, type TemplateData } from '~/lib/(templates)/templates';
 import type { BundledLanguage } from 'shiki';
 import { Loader2 } from 'lucide-vue-next';
+import { templates, type TemplateData } from '~/lib/(templates)/templates';
 
 const database = ref(templates) as Ref<TemplateData[]>;
 
 function fetch(page: number, pageSize: number) {
-  return new Promise<TemplateData[]>((resolve, reject) => {
+  return new Promise<TemplateData[]>((resolve, _reject) => {
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     setTimeout(() => {
@@ -79,7 +79,7 @@ const useSsrSaveId = () => useId();
   </DevOnly> -->
 
     <div class="flex gap-1 mb-2">
-      <ShadcnButton :disabled="isFirstPage" @click="prev">prev</ShadcnButton>
+      <ShadcnButton :disabled="isFirstPage" @click="prev"> prev </ShadcnButton>
       <ShadcnButton
         v-for="item in pageCount"
         :key="item"
@@ -88,7 +88,7 @@ const useSsrSaveId = () => useId();
       >
         {{ item }}
       </ShadcnButton>
-      <ShadcnButton :disabled="isLastPage" @click="next">next</ShadcnButton>
+      <ShadcnButton :disabled="isLastPage" @click="next"> next </ShadcnButton>
     </div>
 
     <div
@@ -99,10 +99,14 @@ const useSsrSaveId = () => useId();
       <p class="flex-grow">Loading templates<LoadingDots /></p>
     </div>
 
-    <div class="grid grid-cols-1 gap-2 lg:grid-cols-2" v-if="data.length > 0">
-      <div class="p-2 border rounded-md" v-for="d in data" :key="d.id">
-        <h3 class="text-lg font-bold">{{ d.name }}</h3>
-        <div v-if="d.readme" class="border rounded-md">{{ d.readme }}</div>
+    <div v-if="data.length > 0" class="grid grid-cols-1 gap-2 lg:grid-cols-2">
+      <div v-for="d in data" :key="d.id" class="p-2 border rounded-md">
+        <h3 class="text-lg font-bold">
+          {{ d.name }}
+        </h3>
+        <div v-if="d.readme" class="border rounded-md">
+          {{ d.readme }}
+        </div>
 
         <ShadcnTabs :default-value="d.code[0].fileName" class="w-full">
           <ShadcnScrollArea class="max-w-full">
@@ -120,9 +124,9 @@ const useSsrSaveId = () => useId();
             </ShadcnTabsList>
           </ShadcnScrollArea>
           <ShadcnTabsContent
-            class="relative"
             v-for="c in d.code"
             :key="useSsrSaveId.toString()"
+            class="relative"
             :value="c.fileName"
           >
             <ShadcnScrollArea class="h-screen px-2 py-1 border rounded-md">

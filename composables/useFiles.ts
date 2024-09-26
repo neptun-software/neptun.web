@@ -17,13 +17,13 @@ export const useFiles = () => {
           value: file.language,
           label:
             supportedShikiLanguagesWithInfo.find(
-              (language) => language.id === file.language
-            )?.name ?? 'Unknown',
-        };
+              language => language.id === file.language
+            )?.name ?? 'Unknown'
+        }
       }),
       (a, b) => a.value === b.value
     );
-  });
+  })
 
   /* DOWNLOADER */
   const fileNameOfFileToDownload = useState(
@@ -38,12 +38,12 @@ export const useFiles = () => {
       fileContent = content;
     }
 
-    const fileType =
-      selectedFileVersion.value?.extension ??
-      selectedFileVersion.value?.language;
+    const fileType
+      = selectedFileVersion.value?.extension
+      ?? selectedFileVersion.value?.language;
     const blob = new Blob([fileContent], {
-      type: 'text/plain',
-    });
+      type: 'text/plain'
+    })
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -52,7 +52,7 @@ export const useFiles = () => {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  };
+  }
 
   /* VERSION SELECT */
   const selectedFileVersionId = useState('selected-file-version-id', () =>
@@ -60,26 +60,26 @@ export const useFiles = () => {
   );
   const selectedFileVersion = computed(() => {
     return versionsForSelectedFileType.value.find(
-      (file) => file.id === Number(selectedFileVersionId.value)
+      file => file.id === Number(selectedFileVersionId.value)
     );
-  });
+  })
   const selectedFileVersionDate = computed(() => {
     return selectedFileVersion.value?.updated_at
       ? new Date(selectedFileVersion.value?.updated_at)
       : null;
-  });
+  })
   const selectedFileVersionMarkdown = computed(() => {
     return `\`\`\`${selectedFileVersion.value?.language}${
       selectedFileVersion.value?.title
         ? `:${selectedFileVersion.value?.title}`
         : ''
     }\n${selectedFileVersion.value?.text}\n\`\`\``;
-  });
+  })
   const versionsForSelectedFileType = computed(() => {
     return fetchedFiles.value.filter(
-      (file) => file.language === filetypeSearchSelectedValue.value
+      file => file.language === filetypeSearchSelectedValue.value
     );
-  });
+  })
 
   watch(selectedFileVersionId, () => {
     if (selectedFileVersion.value) {
@@ -97,9 +97,9 @@ export const useFiles = () => {
   const fileToCompareTo = useState('file-to-compare-to', () => ref<string>(''));
   const versionsForSelectedFileTypeComparison = computed(() => {
     return versionsForSelectedFileType.value.filter(
-      (file) => file.id !== Number(selectedFileVersionId.value)
+      file => file.id !== Number(selectedFileVersionId.value)
     );
-  });
+  })
   const selectedComparisonFileVersionId = useState(
     'selected-comparison-file-version-id',
     () => ref<string>('')
@@ -108,16 +108,16 @@ export const useFiles = () => {
     return selectedComparisonFileVersion.value?.updated_at
       ? new Date(selectedComparisonFileVersion.value?.updated_at)
       : null;
-  });
+  })
   const selectedComparisonFileVersion = computed(() => {
     return versionsForSelectedFileTypeComparison.value.find(
-      (file) => file.id === Number(selectedComparisonFileVersionId.value)
+      file => file.id === Number(selectedComparisonFileVersionId.value)
     );
-  });
+  })
 
   watch(selectedComparisonFileVersionId, () => {
     fileToCompareTo.value = selectedComparisonFileVersion.value?.text ?? '';
-  });
+  })
 
   return {
     fileToCompareTo,
@@ -133,6 +133,6 @@ export const useFiles = () => {
     selectedFileVersion,
     selectedFileVersionDate,
     selectedFileVersionMarkdown,
-    versionsForSelectedFileType,
-  };
-};
+    versionsForSelectedFileType
+  }
+}

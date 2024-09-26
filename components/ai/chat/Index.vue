@@ -11,38 +11,39 @@ import {
   Mouse,
   Download,
   Settings2,
-  MessageCircleReply,
+  MessageCircleReply
 } from 'lucide-vue-next';
 import { useChat, type Message } from '@ai-sdk/vue'; // NOTE: can only be called in setup scripts ("Could not get current instance, check to make sure that `useSwrv` is declared in the top level of the setup function.")
 import { toast } from 'vue-sonner';
 import { generateUUID } from '~/lib/utils';
 import { AllowedAiModelsEnum } from '~/lib/types/ai.models';
+
 const { console } = useLogger();
 
 const { loadFiles } = useFetchFiles();
 const { user } = useUserSession();
 const {
   aiPlaygroundChatMessages: currentAiChatPlaygroundMessagesBackup,
-  resetAiPlaygroundChat,
+  resetAiPlaygroundChat
 } = useAiChatPlayground();
 const { generateMarkdownFromUrl } = useAPI();
 
 /* CHAT AI */
-const { selectedAiChat, selectedAiChatIsPlayground, selectedAiChatKey } =
-  useSelectedAiChat();
-let {
+const { selectedAiChat, selectedAiChatIsPlayground, selectedAiChatKey }
+  = useSelectedAiChat();
+const {
   messages: chatMessages,
   input: currentChatMessage,
   error: chatError,
   handleSubmit: handleChatMessageSubmit,
   reload: reloadLastChatMessage,
   isLoading: chatResponseIsLoading,
-  setMessages: setChatMessages,
+  setMessages: setChatMessages
   /* append: appendChatMessage, */
 } = useChat({
   id: String(selectedAiChat.value.id),
   api: selectedAiChatKey.value,
-  keepLastMessageOnError: true,
+  keepLastMessageOnError: true
 });
 
 watch(chatError, () => {
@@ -67,7 +68,8 @@ const waitForValidRef = (condition: Ref<boolean | undefined>) => {
         },
         { immediate: true }
       );
-    } catch (error) {
+    }
+    catch (error) {
       console.info('Failed to resolve value!');
       reject(error);
     }
@@ -86,17 +88,17 @@ const waitForValidRef = (condition: Ref<boolean | undefined>) => {
 const chatMessagesKey = ref<string>(generateUUID());
 watch(
   () => chatMessages.value.length,
-  async (newLength, oldLength) => {
+  async () => {
     const aiIsDoneResponding = waitForValidRef(chatResponseIsLoading);
 
     if (
-      chatMessages.value[chatMessages.value.length - 1]?.role === 'assistant' &&
-      !isLoading.value // !isLoading.value needed, so that it only shows the toast, if the messages are actually new, and not onMounted (onLoaded)
+      chatMessages.value[chatMessages.value.length - 1]?.role === 'assistant'
+      && !isLoading.value // !isLoading.value needed, so that it only shows the toast, if the messages are actually new, and not onMounted (onLoaded)
     ) {
       toast.promise(aiIsDoneResponding, {
         loading: 'Fetching AI response...',
-        success: (data: any) => 'AI response fetched!',
-        error: (data: any) => 'Failed to fetch AI response!',
+        success: (_data: any) => 'AI response fetched!',
+        error: (_data: any) => 'Failed to fetch AI response!'
       });
     }
 
@@ -108,9 +110,9 @@ watch(
 
     // Sanitize Llama3 messages (cannot be done in backend)
     if (selectedAiChat.value.model === AllowedAiModelsEnum.metaLlama) {
-      chatMessages.value = chatMessages.value.map((message) => ({
+      chatMessages.value = chatMessages.value.map(message => ({
         ...message,
-        content: getSanitizedMessageContent(message.content),
+        content: getSanitizedMessageContent(message.content)
       }));
     }
 
@@ -130,11 +132,11 @@ const {
   result: speechRecognitionResult,
   start: startSpeechRecognition,
   stop: stopSpeechRecognition,
-  error: speechRecognitionError,
+  error: speechRecognitionError
 } = useSpeechRecognition({
   lang: 'en-US',
   interimResults: true,
-  continuous: true,
+  continuous: true
 });
 
 watch(speechRecognitionError, async () => {
@@ -142,7 +144,8 @@ watch(speechRecognitionError, async () => {
     toast.error(
       'Speech recognition was disabled for this page!\nPlease allow it, to use the feature!'
     );
-  } else {
+  }
+  else {
     toast.error(
       `Speech recognition error! (${speechRecognitionError.value?.error})`
     );
@@ -156,15 +159,15 @@ if (isSpeechRecognitionSupported.value && IS_CLIENT) {
 }
 
 /* CONVERT HTML TO MARKDOWN */
-let urlToFetchHtmlFrom = ref('');
+const urlToFetchHtmlFrom = ref('');
 
 /* FILE UPLOAD */
 const {
   /* files: uploadedFiles,  */ open: openFile,
   reset: resetFile,
-  onChange,
+  onChange
 } = useFileDialog({
-  accept: 'text/plain',
+  accept: 'text/plain'
   /* directory: true, */ // TODO: allow importing of file structure
 });
 
@@ -186,7 +189,7 @@ onChange(async (uploadedFiles) => {
 function appendFileUploadToInput(type: string, name: string, text: string) {
   console.info('Appending file upload to input...');
 
-  let prettierFileContent = `\`\`\`${type}:${name}\n${text}\n\`\`\``;
+  const prettierFileContent = `\`\`\`${type}:${name}\n${text}\n\`\`\``;
   currentChatMessage.value = prettierFileContent + currentChatMessage.value;
 }
 
@@ -211,13 +214,14 @@ async function loadChatMessages(user_id: number, chat_id: number) {
             ({
               id: `${String(id)}-${String(Date.now())}`,
               content: message,
-              role: actor,
+              role: actor
             } as Message)
         );
 
         setChatMessages(messages);
       }
-    } catch {
+    }
+    catch {
       console.error('Failed to load chat messages!');
     }
   }
@@ -246,7 +250,7 @@ const scrollToBottom = () => {
   if ($actualScrollArea.value) {
     $actualScrollArea.value.scrollTo({
       top: $actualScrollArea.value.scrollHeight,
-      behavior: 'smooth',
+      behavior: 'smooth'
     });
   }
 };
@@ -282,8 +286,8 @@ function handleInputFieldKeyboardEvents(event: KeyboardEvent) {
     // currentChatMessageRedo();
     if (historyIndex < currentChatMessageHistory.value.length - 1) {
       historyIndex++;
-      currentChatMessage.value =
-        currentChatMessageHistory.value[historyIndex].snapshot;
+      currentChatMessage.value
+        = currentChatMessageHistory.value[historyIndex].snapshot;
     }
   }
 
@@ -291,9 +295,10 @@ function handleInputFieldKeyboardEvents(event: KeyboardEvent) {
     // currentChatMessageUndo();
     if (historyIndex > 0) {
       historyIndex--;
-      currentChatMessage.value =
-        currentChatMessageHistory.value[historyIndex].snapshot;
-    } else if (historyIndex === 0) {
+      currentChatMessage.value
+        = currentChatMessageHistory.value[historyIndex].snapshot;
+    }
+    else if (historyIndex === 0) {
       currentChatMessage.value = '';
       historyIndex = -1;
     }
@@ -311,12 +316,12 @@ const globalChatMessage = useState('global-chat-message', () => '');
 
 const {
   history: currentChatMessageHistory,
-  commit: currentChatMessageCommit,
+  commit: currentChatMessageCommit
   // undo: currentChatMessageUndo,
   // redo: currentChatMessageRedo,
   // clear: currentChatMessageHistoryClear,
 } = useManualRefHistory(globalChatMessage, {
-  capacity: 3,
+  capacity: 3
 });
 
 async function reloadLast() {
@@ -341,7 +346,7 @@ async function deleteLast() {
       selectedAiChat.value.id
     }/messages/last`,
     {
-      method: 'DELETE',
+      method: 'DELETE'
     }
   )
     .then(async () => {
@@ -365,7 +370,11 @@ async function downloadChatMessages(event = null) {
       <div class="flex gap-1">
         <ShadcnDrawer>
           <ShadcnDrawerTrigger as-child>
-            <ShadcnButton variant="ghost" size="icon" class="lg:hidden">
+            <ShadcnButton
+              variant="ghost"
+              size="icon"
+              class="lg:hidden"
+            >
               <Settings2 class="size-6" />
               <span class="sr-only">Settings</span>
             </ShadcnButton>
@@ -382,7 +391,11 @@ async function downloadChatMessages(event = null) {
         </ShadcnDrawer>
         <ShadcnDialog>
           <ShadcnDialogTrigger as-child>
-            <ShadcnButton variant="ghost" size="icon" class="lg:hidden">
+            <ShadcnButton
+              variant="ghost"
+              size="icon"
+              class="lg:hidden"
+            >
               <MessageCircleReply class="size-6" />
               <span class="sr-only">Chats</span>
             </ShadcnButton>
@@ -425,7 +438,10 @@ async function downloadChatMessages(event = null) {
 
     <div class="flex flex-col flex-grow max-w-full min-h-0 pt-10 pb-6">
       <ShadcnScrollArea ref="$scrollArea">
-        <AiChatMessages :messages="chatMessages" :key="chatMessagesKey" />
+        <AiChatMessages
+          :key="chatMessagesKey"
+          :messages="chatMessages"
+        />
 
         <template v-if="isLoading">
           <MessagesSkeleton />
@@ -433,8 +449,8 @@ async function downloadChatMessages(event = null) {
 
         <!-- User Input Draft -->
         <div
-          class="flex justify-end mt-8"
           v-if="currentChatMessage.trim() !== ''"
+          class="flex justify-end mt-8"
         >
           <div
             class="break-words whitespace-pre-wrap max-w-[80%] border border-orange-300 rounded-lg bg-background px-4 py-2"
@@ -449,29 +465,41 @@ async function downloadChatMessages(event = null) {
           class="flex items-center justify-center gap-2 px-3 py-2 mb-2 border border-blue-200 rounded-lg bg-background"
         >
           <Loader2 class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
-          <p class="flex-grow">Waiting for response<LoadingDots /></p>
+          <p class="flex-grow">
+            Waiting for response<LoadingDots />
+          </p>
         </div>
 
         <div
           v-if="chatError"
           class="flex flex-wrap items-center w-full p-4 mt-8 font-black uppercase border-2 rounded-md text-ellipsis border-destructive"
         >
-          <p class="flex-grow">Something went wrong!</p>
-          <ShadcnButton variant="outline" @click="reloadLast"
-            >Try again</ShadcnButton
+          <p class="flex-grow">
+            Something went wrong!
+          </p>
+          <ShadcnButton
+            variant="outline"
+            @click="reloadLast"
           >
+            Try again
+          </ShadcnButton>
         </div>
       </ShadcnScrollArea>
     </div>
 
     <form
-      @submit.prevent="submitMessage"
       class="relative flex-shrink-0 overflow-hidden border rounded-lg bg-background focus-within:ring-1 focus-within:ring-ring"
+      @submit.prevent="submitMessage"
     >
-      <ShadcnLabel for="message" class="sr-only"> Message </ShadcnLabel>
+      <ShadcnLabel
+        for="message"
+        class="sr-only"
+      >
+        Message
+      </ShadcnLabel>
       <ShadcnTextarea
-        v-model="currentChatMessage"
         id="message"
+        v-model="currentChatMessage"
         placeholder="Type your message here..."
         class="p-3 border-0 shadow-none resize-none max-h-28 focus-visible:ring-0"
         @keydown="handleInputFieldKeyboardEvents"
@@ -481,10 +509,10 @@ async function downloadChatMessages(event = null) {
           <ShadcnTooltip>
             <ShadcnTooltipTrigger as-child>
               <ShadcnButton
-                @click="openFile"
                 type="button"
                 variant="ghost"
                 size="icon"
+                @click="openFile"
               >
                 <Paperclip class="size-4" />
                 <span class="sr-only">Attach file</span>
@@ -498,7 +526,11 @@ async function downloadChatMessages(event = null) {
             <ShadcnPopover>
               <ShadcnPopoverTrigger as-child>
                 <ShadcnTooltipTrigger as-child>
-                  <ShadcnButton type="button" variant="ghost" size="icon">
+                  <ShadcnButton
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                  >
                     <Link class="size-4" />
                     <span class="sr-only">URL context</span>
                   </ShadcnButton>
@@ -509,12 +541,14 @@ async function downloadChatMessages(event = null) {
               </ShadcnPopoverTrigger>
               <ShadcnPopoverContent>
                 <div class="grid gap-2 mb-1">
-                  <ShadcnLabel for="url">URL</ShadcnLabel>
+                  <ShadcnLabel for="url">
+                    URL
+                  </ShadcnLabel>
                   <ShadcnInput
                     id="url"
+                    v-model="urlToFetchHtmlFrom"
                     type="url"
                     name="url"
-                    v-model="urlToFetchHtmlFrom"
                     placeholder="https://example.com"
                     required
                   />
@@ -537,16 +571,17 @@ async function downloadChatMessages(event = null) {
                 type="button"
                 variant="ghost"
                 size="icon"
-                v-bind:class="{
+                :class="{
                   'animate-pulse outline-1 outline-destructive outline-dashed':
-                    isListeningToSpeech,
+                    isListeningToSpeech
                 }"
                 @click="
                   () => {
                     if (isListeningToSpeech) {
                       console.info('stopping listening');
                       stopSpeechRecognition();
-                    } else {
+                    }
+                    else {
                       console.info('starting listening');
                       startSpeechRecognition();
                     }
@@ -570,23 +605,24 @@ async function downloadChatMessages(event = null) {
                     variant="ghost"
                     size="icon"
                     :disabled="
-                      chatResponseIsLoading ||
-                      chatMessages.length === 0 ||
-                      !selectedAiChatIsPlayground
+                      chatResponseIsLoading
+                        || chatMessages.length === 0
+                        || !selectedAiChatIsPlayground
                     "
                   >
                     <Trash2 class="size-4" />
                     <span class="sr-only">Clear Chat</span>
                   </ShadcnButton>
                 </ShadcnTooltipTrigger>
-                <ShadcnTooltipContent side="top"> Clear </ShadcnTooltipContent>
+                <ShadcnTooltipContent side="top">
+                  Clear
+                </ShadcnTooltipContent>
               </ShadcnAlertDialogTrigger>
               <ShadcnAlertDialogContent>
                 <ShadcnAlertDialogHeader>
-                  <ShadcnAlertDialogTitle
-                    >Are you sure, that you want to clear the
-                    chat?</ShadcnAlertDialogTitle
-                  >
+                  <ShadcnAlertDialogTitle>
+                    Are you sure, that you want to clear the chat?
+                  </ShadcnAlertDialogTitle>
                   <ShadcnAlertDialogDescription>
                     Chat messages can not be recovered!
                   </ShadcnAlertDialogDescription>
@@ -606,8 +642,8 @@ async function downloadChatMessages(event = null) {
                 type="button"
                 variant="ghost"
                 size="icon"
-                @click="reloadLast"
                 :disabled="chatResponseIsLoading || chatMessages.length === 0"
+                @click="reloadLast"
               >
                 <RefreshCcw class="size-4" />
                 <span class="sr-only">Refresh Last Response</span>
@@ -627,8 +663,8 @@ async function downloadChatMessages(event = null) {
                   variant="outline"
                   size="icon"
                   class="px-2"
-                  @click="currentChatMessage = ''"
                   :disabled="currentChatMessage.trim() === ''"
+                  @click="currentChatMessage = ''"
                 >
                   <Delete class="w-4 h-4" />
                 </ShadcnButton>

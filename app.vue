@@ -9,10 +9,10 @@ const useSsrSaveId = () => useId() ?? new Date().getTime().toString();
 <template>
   <div>
     <ConfigProvider :use-id="useSsrSaveId">
-      <ShadcnToaster closeButton />
+      <ShadcnToaster close-button />
       <NuxtLoadingIndicator
         color="hsl(var(--primary) / 0.9)"
-        errorColor="hsl(var(--destructive))"
+        error-color="hsl(var(--destructive))"
         :height="3"
         :duration="2000"
         :throttle="200"

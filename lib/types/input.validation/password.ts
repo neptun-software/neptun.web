@@ -4,10 +4,10 @@ const MIN_LENGTH = 8;
 const FIELD_VALIDATION = {
   TEST: {
     SPECIAL_CHAR: (value: string) =>
-      /[-._!"`'#%&,:;<>=@{}~\$\(\)\*\+\/\\\?\[\]\^\|]+/.test(value),
+      /[-._!"`'#%&,:;<>=@{}~$()*+/\\?[\]^|]+/.test(value),
     LOWERCASE: (value: string) => /[a-z]/.test(value),
     UPPERCASE: (value: string) => /[A-Z]/.test(value),
-    NUMBER: (value: string) => /.*[0-9].*/.test(value),
+    NUMBER: (value: string) => /.*[0-9].*/.test(value)
   },
   MSG: {
     MIN_LEN: `Password must have ${MIN_LENGTH} characters`,
@@ -15,14 +15,14 @@ const FIELD_VALIDATION = {
     LOWERCASE: 'Password must contain at least one lowercase letter',
     UPPERCASE: 'Password must contain at least one uppercase letter',
     NUMBER: 'Password must contain at least one number',
-    MATCH: 'Password must match',
-  },
-};
+    MATCH: 'Password must match'
+  }
+}
 
 export const patterns = z
   .string()
   .min(MIN_LENGTH, {
-    message: FIELD_VALIDATION.MSG.MIN_LEN,
+    message: FIELD_VALIDATION.MSG.MIN_LEN
   })
   .refine(FIELD_VALIDATION.TEST.SPECIAL_CHAR, FIELD_VALIDATION.MSG.SPECIAL_CHAR)
   .refine(FIELD_VALIDATION.TEST.LOWERCASE, FIELD_VALIDATION.MSG.LOWERCASE)
@@ -34,13 +34,13 @@ export const addPasswordFieldIssue = (field: string, ctx: z.RefinementCtx) => {
     code: 'custom',
     message: FIELD_VALIDATION.MSG.MATCH,
     path: [field],
-    fatal: true,
-  });
-};
+    fatal: true
+  })
+}
 
 export const passwordSchema = patterns;
 
 export const confirmPasswordSchema = {
   password: patterns,
-  confirmPassword: patterns,
-};
+  confirmPassword: patterns
+}

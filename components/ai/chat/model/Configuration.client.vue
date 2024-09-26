@@ -3,7 +3,7 @@ import { Icon } from '@iconify/vue';
 import {
   ALLOWED_AI_MODELS,
   defaultAiModelDomain,
-  POSSIBLE_AI_MODELS,
+  POSSIBLE_AI_MODELS
 } from '~/lib/types/ai.models';
 
 const { user } = useUserSession();
@@ -24,22 +24,30 @@ watch(
 <template>
   <form class="grid items-start w-full gap-6">
     <fieldset class="grid gap-6 p-4 border rounded-lg">
-      <legend class="px-1 -ml-1 text-sm font-medium">Settings</legend>
+      <legend class="px-1 -ml-1 text-sm font-medium">
+        Settings
+      </legend>
       <div class="grid gap-3">
-        <ShadcnLabel for="model">Model</ShadcnLabel>
+        <ShadcnLabel for="model">
+          Model
+        </ShadcnLabel>
         <ShadcnSelect
           v-model="selectedAiChat.model"
           :default-value="defaultAiModelDomain"
         >
           <ShadcnSelectTrigger
-            :disabled="!selectedAiChatIsPlayground"
             id="model"
+            :disabled="!selectedAiChatIsPlayground"
             class="items-start [&_[data-description]]:hidden"
           >
             <ShadcnSelectValue placeholder="Select a model" />
           </ShadcnSelectTrigger>
           <ShadcnSelectContent>
-            <ShadcnSelectItem :value="model" v-for="model in ALLOWED_AI_MODELS">
+            <ShadcnSelectItem
+              v-for="model in ALLOWED_AI_MODELS"
+              :key="model"
+              :value="model"
+            >
               <div class="flex items-start gap-3 text-muted-foreground">
                 <Icon
                   :icon="
@@ -74,7 +82,7 @@ watch(
                         model.split('/')[1]
                       ]['description']
                     "
-                  ></p>
+                  />
                 </div>
               </div>
             </ShadcnSelectItem>
@@ -82,15 +90,15 @@ watch(
         </ShadcnSelect>
         <div class="grid grid-cols-[1fr_auto] gap-1">
           <ShadcnInput
-            :disabled="!selectedAiChatIsPlayground"
             id="chat-name"
-            type="text"
             v-model="selectedAiChat.name"
+            :disabled="!selectedAiChatIsPlayground"
+            type="text"
             placeholder="Name of the chat... (optional)"
             @keydown.enter.prevent="
               async () => {
-                selectedAiChat.id =
-                  (await persistChatConversation(
+                selectedAiChat.id
+                  = (await persistChatConversation(
                     user?.id ?? -1,
                     selectedAiChat.name,
                     selectedAiChat.model
@@ -104,24 +112,26 @@ watch(
             variant="secondary"
             @click="
               async () => {
-                selectedAiChat.id =
-                  (await persistChatConversation(
+                selectedAiChat.id
+                  = (await persistChatConversation(
                     user?.id ?? -1,
                     selectedAiChat.name,
                     selectedAiChat.model
                   )) || -1;
               }
             "
-            >Persist Chat History</ShadcnButton
           >
+            Persist Chat History
+          </ShadcnButton>
         </div>
         <ShadcnButton
           :disabled="selectedAiChatIsPlayground"
           type="button"
           variant="secondary"
           @click="() => resetAiPlaygroundChat()"
-          >New Playground Chat</ShadcnButton
         >
+          New Playground Chat
+        </ShadcnButton>
       </div>
     </fieldset>
   </form>

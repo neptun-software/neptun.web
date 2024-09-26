@@ -11,14 +11,14 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeChatId.statusCode,
         statusMessage: maybeChatId.statusMessage,
-        data: maybeChatId.data,
+        data: maybeChatId.data
       })
     );
   }
   const chat_id = maybeChatId.data?.chat_id;
 
   /* VALIDATE BODY */
-  const body = await readValidatedBody(event, (body) =>
+  const body = await readValidatedBody(event, body =>
     ChatConversationAttributesToUpdateSchema.safeParse(body)
   );
   if (!body.success || !body.data) {
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request. Invalid body(name).',
-        data: body.error,
+        data: body.error
       })
     );
   }
@@ -39,14 +39,14 @@ export default defineEventHandler(async (event) => {
   /* UPDATE CHAT CONVERSATION */
 
   const updatedChatConversation = await updateChatConversation(chat_id, {
-    name,
-  });
+    name
+  })
 
   if (LOG_BACKEND) {
     console.info('updatedChatConversation:', updatedChatConversation);
   }
 
   return {
-    chat: updatedChatConversation,
-  };
+    chat: updatedChatConversation
+  }
 });

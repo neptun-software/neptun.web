@@ -10,11 +10,14 @@ const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props
 
   return delegated
-})
+});
 </script>
 
 <template>
-  <DrawerDescription v-bind="delegatedProps" :class="cn('text-sm text-muted-foreground', props.class)">
+  <DrawerDescription
+    v-bind="delegatedProps"
+    :class="cn('text-sm text-muted-foreground', props.class)"
+  >
     <slot />
   </DrawerDescription>
 </template>

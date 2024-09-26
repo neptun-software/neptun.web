@@ -10,4 +10,4 @@ export default defineEventHandler(async (event) => {
 
   if (LOG_BACKEND) console.info('no active session to clear...');
   return false;
-});
+})

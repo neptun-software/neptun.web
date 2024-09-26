@@ -14,7 +14,7 @@ const { error, formItemId } = useFormField()
   <Label
     :class="cn(
       error && 'text-destructive',
-      props.class,
+      props.class
     )"
     :for="formItemId"
   >

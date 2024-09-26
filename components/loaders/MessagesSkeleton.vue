@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 const isLoading = ref(false);
 const messages = ref<
-  { heightClass: string; width: number; justifyClass: string }[]
+  { heightClass: string, width: number, justifyClass: string }[]
 >([]);
 const heights = [
   'h-10',
@@ -23,8 +23,8 @@ const heights = [
   'h-64',
   'h-72',
   'h-80',
-  'h-96',
-];
+  'h-96'
+]
 
 const generateMessages = () => {
   const amountToGenerate = getRandomInt(2, 8);
@@ -39,22 +39,22 @@ const generateMessages = () => {
 
 const getRandomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
-};
+}
 
 const getRandomHeight = () => {
   const randomIndex = Math.floor(Math.random() * heights.length);
   return heights[randomIndex];
-};
+}
 
 const getRandomWidth = () => {
   const minWidth = 100;
   const maxWidth = 350;
   return Math.floor(Math.random() * (maxWidth - minWidth + 1)) + minWidth;
-};
+}
 
 onMounted(() => {
   generateMessages();
-});
+})
 </script>
 
 <template>

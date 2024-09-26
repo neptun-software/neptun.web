@@ -1,16 +1,16 @@
 <script setup>
-const props = defineProps({
+defineProps({
   cards: {
     type: [
       {
         scr: String,
         icon: Object,
         title: String,
-        description: String,
-      },
+        description: String
+      }
     ],
-    required: true,
-  },
+    required: true
+  }
 });
 
 class Spotlight {

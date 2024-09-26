@@ -11,7 +11,7 @@ const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props
 
   return delegated
-})
+});
 
 const forwarded = useForwardProps(delegatedProps)
 </script>

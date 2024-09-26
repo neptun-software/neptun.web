@@ -1,28 +1,29 @@
-import type { AsyncDataRequestStatus } from '#app';
-import type { HTTPMethod } from 'h3';
-import type { UseFetchOptions } from 'nuxt/app';
-import type { FetchError } from 'ofetch';
-import { toast } from 'vue-sonner';
+import type { HTTPMethod } from 'h3'
+import type { UseFetchOptions } from 'nuxt/app'
+import type { FetchError } from 'ofetch'
+import { toast } from 'vue-sonner'
+import type { AsyncDataRequestStatus } from '#app'
 import type { FullyFeaturedChat /* , MinimalChat */ } from '~/lib/types/chat';
 import type {
   ReadChatConversationFile,
-  ReadChatConversationMessage,
+  ReadChatConversationMessage
 } from '~/lib/types/database.tables/schema';
-import { getCodeBlocksFromMarkdown } from '~/utils/parse';
+import { getCodeBlocksFromMarkdown } from '~/utils/parse'
+
 const { console } = useLogger();
 
 /* import type { UseFetchOptions } from '#app'; */
 
-// TODO: improve => return data, isLoading etc. too.
+// TODO: improve => return _data, isLoading etc. too.
 
 export const useAPI = () => {
   const handleFetch = async <T>(
     url: string,
     options: UseFetchOptions<T> = {},
     toastMessages: {
-      loading: string;
-      success: (data: any) => string;
-      error: (data: any) => string;
+      loading: string
+      success: (_data: any) => string
+      error: (_data: any) => string
     } | null = null
   ): Promise<T> => {
     const fetchPromise = new Promise<T>(async (resolve, reject) => {
@@ -36,16 +37,16 @@ export const useAPI = () => {
         },
         onResponseError({ response }: any) {
           reject(response._data);
-        },
+        }
       });
-    });
+    })
 
     if (toastMessages) {
       toast.promise(fetchPromise, toastMessages);
     }
 
-    return fetchPromise.then((data) => data);
-  };
+    return fetchPromise.then(_data => _data);
+  }
 
   const generateMarkdownFromUrl = async (
     url: string,
@@ -55,9 +56,10 @@ export const useAPI = () => {
 
     try {
       new URL(url);
-    } catch {
+    }
+    catch {
       toast.error('Invalid URL!');
-      return;
+      return
     }
 
     const endpoint = '/api/html-to-markdown/';
@@ -65,11 +67,11 @@ export const useAPI = () => {
 
     const toastMessages = {
       loading: 'Fetching URL and converting its HTML content to Markdown...',
-      success: (data: any) =>
+      success: (_data: any) =>
         'Successfully fetched the URL and converted its HTML content to Markdown!',
-      error: (data: any) =>
-        'Failed to fetch the URL and convert its HTML content to Markdown!',
-    };
+      error: (_data: any) =>
+        'Failed to fetch the URL and convert its HTML content to Markdown!'
+    }
 
     try {
       const markdownOfUrl = await handleFetch<string>(
@@ -78,7 +80,8 @@ export const useAPI = () => {
         toastMessages
       );
       return currentChatMessage + markdownOfUrl;
-    } catch {
+    }
+    catch {
       return currentChatMessage;
     }
   };
@@ -93,16 +96,16 @@ export const useAPI = () => {
       method: 'POST' as HTTPMethod,
       body: { model, name },
       lazy: true,
-      pick: ['chat'] as any,
-    };
+      pick: ['chat'] as any
+    }
 
     console.log({ model, name });
 
     const toastMessages = {
       loading: 'Persisting chat history...',
-      success: (data: any) => 'Chat history persisted!',
-      error: (data: any) => 'Failed to persist chat history!',
-    };
+      success: (_data: any) => 'Chat history persisted!',
+      error: (_data: any) => 'Failed to persist chat history!'
+    }
 
     try {
       const response = await handleFetch<{ chat: FullyFeaturedChat }>(
@@ -117,7 +120,8 @@ export const useAPI = () => {
       );
 
       return response.chat.id;
-    } catch {
+    }
+    catch {
       console.error('Failed to persist chat history!');
     }
   };
@@ -138,17 +142,19 @@ export const useAPI = () => {
             {
               method: 'POST',
               body: {
-                files: codeBlocks,
-              },
+                files: codeBlocks
+              }
             }
           );
 
           return persistedCodeBlocks;
-        } catch {
+        }
+        catch {
           console.error('Failed to persist code blocks!');
         }
       }
-    } catch {
+    }
+    catch {
       console.error('Failed to parse code blocks!');
     }
 
@@ -164,7 +170,7 @@ export const useAPI = () => {
 
     if (!messages) {
       console.error('No messages to persist!');
-      return;
+      return
     }
 
     if (messages.length > 0) {
@@ -172,20 +178,20 @@ export const useAPI = () => {
       const options = {
         method: 'POST' as HTTPMethod,
         body: { messages },
-        lazy: true,
-      };
+        lazy: true
+      }
 
       const toastMessages = {
         loading: 'Persisting chat messages...',
-        success: (data: any) => 'Chat messages persisted!',
-        error: (data: any) => 'Failed to persist chat messages!',
-      };
+        success: (_data: any) => 'Chat messages persisted!',
+        error: (_data: any) => 'Failed to persist chat messages!'
+      }
 
       console.info('Persisting messages...', messages);
 
       try {
         const messagesPersisted = await handleFetch<{
-          chatMessages: ReadChatConversationMessage[];
+          chatMessages: ReadChatConversationMessage[]
         }>(url, options, toastMessages);
 
         for (const message of messagesPersisted.chatMessages) {
@@ -197,12 +203,14 @@ export const useAPI = () => {
                 message.id,
                 message.message
               );
-            } catch {
+            }
+            catch {
               console.error('Failed to persist code blocks!');
             }
           }
         }
-      } catch {
+      }
+      catch {
         console.error('Failed to persist chat messages!');
       }
 
@@ -219,14 +227,14 @@ export const useAPI = () => {
     const options = {
       method: 'PATCH' as HTTPMethod,
       body: { name: chat_name },
-      lazy: true,
-    };
+      lazy: true
+    }
 
     const toastMessages = {
       loading: 'Renaming chat...',
-      success: (data: any) => 'Chat renamed!',
-      error: (data: any) => 'Failed to rename chat!',
-    };
+      success: (_data: any) => 'Chat renamed!',
+      error: (_data: any) => 'Failed to rename chat!'
+    }
 
     try {
       return await handleFetch<{ chat: FullyFeaturedChat }>(
@@ -234,7 +242,8 @@ export const useAPI = () => {
         options,
         toastMessages
       );
-    } catch {
+    }
+    catch {
       console.error('Failed to rename chat!');
     }
   };
@@ -247,18 +256,19 @@ export const useAPI = () => {
       const url = `/api/users/${user_id}/chats/${chat_id}`;
       const options = {
         method: 'DELETE' as HTTPMethod,
-        lazy: true,
-      };
+        lazy: true
+      }
 
       const toastMessages = {
         loading: 'Deleting chat...',
-        success: (data: any) => 'Chat deleted!',
-        error: (data: any) => 'Failed to delete chat!',
-      };
+        success: (_data: any) => 'Chat deleted!',
+        error: (_data: any) => 'Failed to delete chat!'
+      }
 
       try {
         await handleFetch<void>(url, options, toastMessages);
-      } catch {
+      }
+      catch {
         console.error('Failed to delete chat!');
       }
 
@@ -269,18 +279,19 @@ export const useAPI = () => {
     const options = {
       method: 'DELETE' as HTTPMethod,
       lazy: true,
-      body: { chat_ids: chat_id },
-    };
+      body: { chat_ids: chat_id }
+    }
 
     const toastMessages = {
       loading: 'Deleting chats...',
-      success: (data: any) => 'Chats deleted!',
-      error: (data: any) => 'Failed to delete chats!',
-    };
+      success: (_data: any) => 'Chats deleted!',
+      error: (_data: any) => 'Failed to delete chats!'
+    }
 
     try {
       await handleFetch<void>(url, options, toastMessages);
-    } catch {
+    }
+    catch {
       console.error('Failed to delete chats!');
     }
   };
@@ -289,9 +300,9 @@ export const useAPI = () => {
     generateMarkdownFromUrl,
     persistChatConversation,
     persistChatConversationEdit,
-    persistChatConversationDelete,
-  };
-};
+    persistChatConversationDelete
+  }
+}
 
 // Pilot Composable for extended opportunities
 export function useFetchChats(user_id: number) {
@@ -309,13 +320,13 @@ export function useFetchChats(user_id: number) {
   );
   const fetchedChatsRefresh = useState<(opts?: any) => Promise<void>>(
     'fetched-chats-refresh',
-    () => () => Promise.resolve()
+  () => () => Promise.resolve()
   ); // any should be AsyncDataExecuteOptions, but I can not find the type
 
   const chatsFilters = useChatsFilter();
   const fetchChatsUrl = computed(() => {
     return `/api/users/${user_id}/chats?${chatsFilters.value}`;
-  });
+  })
 
   const fetchChats = async () => {
     const { data, status, error, refresh } = await useFetch(
@@ -323,7 +334,7 @@ export function useFetchChats(user_id: number) {
       {
         method: 'GET' as HTTPMethod,
         lazy: true,
-        pick: ['chats'] as any,
+        pick: ['chats'] as any
       }
     );
 
@@ -332,8 +343,8 @@ export function useFetchChats(user_id: number) {
       fetchedChatsStatus.value = status.value;
       fetchedChatsError.value = error.value;
       fetchedChatsRefresh.value = refresh;
-    });
-  };
+    })
+  }
 
   return {
     fetchChatsUrl,
@@ -341,8 +352,8 @@ export function useFetchChats(user_id: number) {
     fetchedChatsStatus,
     fetchedChatsError,
     fetchedChatsRefresh,
-    fetchChats,
-  };
+    fetchChats
+  }
 }
 
 export function useFetchFiles() {
@@ -359,14 +370,15 @@ export function useFetchFiles() {
       }
 
       try {
-        const data = await $fetch(
+        const _data = await $fetch(
           `/api/users/${user_id}/chats/${chat_id}/files`
         );
-        if (data.chatFiles && data.chatFiles.length > 0) {
-          const chatFiles = data.chatFiles;
+        if (_data.chatFiles && _data.chatFiles.length > 0) {
+          const chatFiles = _data.chatFiles;
           fetchedFiles.value = (chatFiles as ReadChatConversationFile[]) ?? [];
         }
-      } catch {
+      }
+      catch {
         console.error('Failed to fetch files!');
       }
     }
@@ -374,6 +386,6 @@ export function useFetchFiles() {
 
   return {
     fetchedFiles,
-    loadFiles,
-  };
+    loadFiles
+  }
 }

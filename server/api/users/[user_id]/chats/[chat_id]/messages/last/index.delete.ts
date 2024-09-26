@@ -1,7 +1,7 @@
 import { takeRightWhile, without /* dropRight */ } from 'es-toolkit';
 import {
   deleteChatConversationMessage,
-  readChatConversationMessages,
+  readChatConversationMessages
 } from '~/server/database/repositories/chatConversationMessages';
 
 // Delete last chat message of chat conversation
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeChatId.statusCode,
         statusMessage: maybeChatId.statusMessage,
-        data: maybeChatId.data,
+        data: maybeChatId.data
       })
     );
   }
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request.',
-        data: 'No messages found, for chat.',
+        data: 'No messages found, for chat.'
       })
     );
   }
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
   // messages, that should not be there
   const userMessagesToDelete = takeRightWhile(
     fetchedChatMessages,
-    (message) => message.actor === 'user'
+    message => message.actor === 'user'
   );
   const messagesDeletedSuccessfully: number[] = [];
   const messagesFailedToDelete: number[] = [];
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
       })
       .catch(() => {
         messagesFailedToDelete.push(message.id);
-      });
+      })
   }
 
   const messagesLeft = without(fetchedChatMessages, ...userMessagesToDelete);
@@ -55,8 +55,8 @@ export default defineEventHandler(async (event) => {
   if (messagesLeft.length < 2) {
     return {
       deletedSuccessfully: messagesDeletedSuccessfully,
-      failedToDelete: messagesFailedToDelete,
-    };
+      failedToDelete: messagesFailedToDelete
+    }
   }
 
   const maybeAssistantMessageToDelete = messagesLeft[messagesLeft.length - 1];
@@ -66,8 +66,8 @@ export default defineEventHandler(async (event) => {
 
   return {
     maybeAssistantMessageToDelete,
-    maybeUserMessageToDelete,
-  };
+    maybeUserMessageToDelete
+  }
 
   // would delete the errored messages and the last 2 messages before:
   /* const indexOfFirstUserMessageToDelete = fetchedChatMessages.indexOf(userMessagesToDelete[0]);

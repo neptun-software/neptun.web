@@ -3,11 +3,11 @@ import type { ChatConversationToCreate } from '~/lib/types/database.tables/schem
 import {
   createChatConversation,
   deleteChatConversations,
-  readAllChatConversationsOfUser,
+  readAllChatConversationsOfUser
 } from '~/server/database/repositories/chatConversations';
 import {
   ChatConversationToCreateSchema,
-  ChatConversationsToDelete,
+  ChatConversationsToDelete
 } from '~/lib/types/database.tables/schema';
 
 export default defineEventHandler(async (event) => {
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeUserId.statusCode,
         statusMessage: maybeUserId.statusMessage,
-        data: maybeUserId.data,
+        data: maybeUserId.data
       })
     );
   }
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
 
   /* 2. VALIDATE BODY(model, name) */
   if (method === 'POST') {
-    const body = await readValidatedBody(event, (body) =>
+    const body = await readValidatedBody(event, body =>
       ChatConversationToCreateSchema.safeParse(body)
     );
     if (!body.success || !body.data) {
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
         createError({
           statusCode: 400,
           statusMessage: 'Bad Request. Invalid body(model, name).',
-          data: body.error,
+          data: body.error
         })
       );
     }
@@ -54,17 +54,18 @@ export default defineEventHandler(async (event) => {
     const chatToCreate: ChatConversationToCreate = {
       neptun_user_id: user_id,
       model,
-      name,
-    };
+      name
+    }
 
     const createdChatConversation = await createChatConversation(chatToCreate);
 
     return {
-      chat: createdChatConversation,
-    };
-  } else if (method === 'DELETE') {
+      chat: createdChatConversation
+    }
+  }
+  else if (method === 'DELETE') {
     /* 3.2 DELETE ALL CHATS / A LIST OF CHAT IDs */
-    const body = await readValidatedBody(event, (body) =>
+    const body = await readValidatedBody(event, body =>
       ChatConversationsToDelete.safeParse(body)
     );
     if (!body.success || !body.data) {
@@ -73,7 +74,7 @@ export default defineEventHandler(async (event) => {
         createError({
           statusCode: 400,
           statusMessage: 'Bad Request. Invalid body(chat_ids).',
-          data: body.error,
+          data: body.error
         })
       );
     }
@@ -82,7 +83,8 @@ export default defineEventHandler(async (event) => {
 
     return await deleteChatConversations(chat_ids);
     // return null; // => No Content
-  } else {
+  }
+  else {
     /* 3.3 READ ALL CHATS */
     const maybeOrderBy = await validateQueryOrderBy(event);
     if (maybeOrderBy.statusCode !== 200) {
@@ -91,7 +93,7 @@ export default defineEventHandler(async (event) => {
         createError({
           statusCode: maybeOrderBy.statusCode,
           statusMessage: maybeOrderBy.statusMessage,
-          data: maybeOrderBy.data,
+          data: maybeOrderBy.data
         })
       );
     }
@@ -109,7 +111,7 @@ export default defineEventHandler(async (event) => {
     );
 
     return {
-      chats: fetchedChatConversations,
-    };
+      chats: fetchedChatConversations
+    }
   }
 });

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 defineProps<{
-  isDisabled: boolean;
-  includeDiff?: boolean;
+  isDisabled: boolean
+  includeDiff?: boolean
 }>();
 
 const {
@@ -10,14 +10,14 @@ const {
   selectedFileVersionDate,
   versionsForSelectedFileTypeComparison,
   selectedComparisonFileVersionId,
-  selectedComparisonFileVersionDate,
+  selectedComparisonFileVersionDate
 } = useFiles();
 </script>
 
 <template>
   <div>
-    <ShadcnLabel
-      >Version<template v-if="selectedFileVersionDate">
+    <ShadcnLabel>
+      Version<template v-if="selectedFileVersionDate">
         (<NuxtTime
           class="text-muted-foreground"
           :datetime="selectedFileVersionDate"
@@ -30,14 +30,18 @@ const {
       </template>
     </ShadcnLabel>
 
-    <ShadcnSelect :disabled="isDisabled" v-model="selectedFileVersionId">
+    <ShadcnSelect
+      v-model="selectedFileVersionId"
+      :disabled="isDisabled"
+    >
       <ShadcnSelectTrigger>
         <ShadcnSelectValue placeholder="Select a version..." />
       </ShadcnSelectTrigger>
       <ShadcnSelectContent>
         <ShadcnSelectItem
-          :value="String(file.id)"
           v-for="file in versionsForSelectedFileType"
+          :key="file.id"
+          :value="String(file.id)"
         >
           {{ file.title }} {{ file.chat_conversation_message_id }}/{{
             file.id
@@ -57,8 +61,8 @@ const {
     </ShadcnSelect>
 
     <template v-if="includeDiff">
-      <ShadcnLabel
-        >Comparison<template v-if="selectedComparisonFileVersionDate">
+      <ShadcnLabel>
+        Comparison<template v-if="selectedComparisonFileVersionDate">
           (<NuxtTime
             class="text-muted-foreground"
             :datetime="selectedComparisonFileVersionDate"
@@ -72,16 +76,17 @@ const {
       </ShadcnLabel>
 
       <ShadcnSelect
-        :disabled="isDisabled"
         v-model="selectedComparisonFileVersionId"
+        :disabled="isDisabled"
       >
         <ShadcnSelectTrigger>
           <ShadcnSelectValue placeholder="Select a version..." />
         </ShadcnSelectTrigger>
         <ShadcnSelectContent>
           <ShadcnSelectItem
-            :value="String(file.id)"
             v-for="file in versionsForSelectedFileTypeComparison"
+            :key="file.id"
+            :value="String(file.id)"
           >
             {{ file.title }} {{ file.chat_conversation_message_id }}/{{
               file.id

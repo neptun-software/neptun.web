@@ -1,43 +1,42 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 import type { HTTPMethod } from 'nuxt-security';
-import { protectedRoutes } from './utils/pages';
-import { supportedShikiLanguages } from './utils/formatters';
-// @ts-ignore
-import removeConsole from 'vite-plugin-remove-console';
+import removeConsole from 'vite-plugin-remove-console'
+import { protectedRoutes } from './utils/pages'
+import { supportedShikiLanguages } from './utils/formatters'
 
 const productionURL = 'https://neptun-webui.vercel.app';
 const corsHandler = {
   origin: '*',
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'] as HTTPMethod[],
   preflight: {
-    statusCode: 204,
-  },
-};
+    statusCode: 204
+  }
+}
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: {
     enabled: true,
     timeline: {
-      enabled: true,
+      enabled: true
     },
     vscode: {
-      reuseExistingServer: true,
-    },
+      reuseExistingServer: true
+    }
   },
 
   devServer: {
-    port: 42124,
+    port: 42124
   },
 
   vue: {
     // https://github.com/nuxt/nuxt/issues/28829
-    propsDestructure: true,
+    propsDestructure: true
   },
 
   site: {
-    url: productionURL,
+    url: productionURL
   },
 
   robots: {
@@ -45,25 +44,25 @@ export default defineNuxtConfig({
     metaTag: true,
     blockNonSeoBots: true,
     allow: ['/home', '/templates', '/sign-up', '/sign-in'],
-    disallow: protectedRoutes.filter((route) => !(route === '/')), // replace with https://nuxtseo.com/robots/guides/route-rules#inline-route-rules in the future
+    disallow: protectedRoutes.filter(route => !(route === '/')) // replace with https://nuxtseo.com/robots/guides/route-rules#inline-route-rules in the future
   },
 
   vite: {
     logLevel: 'warn', // 'info' | 'warn' | 'error' | 'silent'
-    plugins: [removeConsole()],
+    plugins: [removeConsole()]
   },
 
   routeRules: {
     '/api/**': {
       security: {
-        corsHandler,
-      },
+        corsHandler
+      }
     },
     '/auth/**': {
       security: {
-        corsHandler,
-      },
-    },
+        corsHandler
+      }
+    }
   },
 
   // Posthog adds an inline script, which causes `Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE.NotSameOriginAfterDefaultedToSameOriginByCoep`, using the recommended security configuration.
@@ -75,18 +74,18 @@ export default defineNuxtConfig({
       crossOriginEmbedderPolicy:
         process.env.NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp', // to allow devtools
       contentSecurityPolicy: {
-        "img-src": [
-          "http://localhost:42124",
-          "https://avatars.githubusercontent.com",
-          productionURL,
+        'img-src': [
+          'http://localhost:42124',
+          'https://avatars.githubusercontent.com',
+          productionURL
         ]
       }
-    },
+    }
   },
 
   nitro: {
     imports: {
-      dirs: ['./server/utils'],
+      dirs: ['./server/utils']
     },
     experimental: {
       // Scalar support is currently available in nightly channel. (https://nitro.unjs.io/config#experimental, https://nuxt.com/modules/scalar)
@@ -97,8 +96,8 @@ export default defineNuxtConfig({
           description: 'Chat with different AI models using this REST-API.',
           version: '0.0.0',
         }
-      }, */,
-    },
+      }, */
+    }
     /* storage: {
       redis: {
         driver: 'redis',
@@ -110,17 +109,17 @@ export default defineNuxtConfig({
   components: [
     {
       path: '~/components',
-      pathPrefix: false, // disables components/base/Button.vue => <BaseButton /> for auto imports
+      pathPrefix: false // disables components/base/Button.vue => <BaseButton /> for auto imports
     },
     // prefix needed, because pathPrefix: true doesn't work, when files are called `Index.vue` (the keyword index is thrown away completely, also for the component name)
     {
       path: '~/components/ai/chat',
-      prefix: 'AiChat',
+      prefix: 'AiChat'
     },
     {
       path: '~/components/ai/chats',
-      prefix: 'AiChats',
-    },
+      prefix: 'AiChats'
+    }
   ],
 
   runtimeConfig: {
@@ -128,7 +127,7 @@ export default defineNuxtConfig({
     posthog: {
       apiKey: process.env.POSTHOG_API_KEY,
       apiHost: process.env.POSTHOG_API_HOST,
-      isActive: process.env.POSTHOG_ACTIVE,
+      isActive: process.env.POSTHOG_ACTIVE
     },
     sessionPassword: process.env.NUXT_SESSION_PASSWORD,
     cryptoSecret: process.env.CRYPTO_SECRET,
@@ -136,12 +135,12 @@ export default defineNuxtConfig({
     oauth: {
       github: {
         clientId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID,
-        clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET,
+        clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET
       },
       google: {
         clientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
-        clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
-      },
+        clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET
+      }
     },
     github: {
       app: {
@@ -149,46 +148,46 @@ export default defineNuxtConfig({
         appId: process.env.NEPTUN_GITHUB_APP_ID,
         clientId: process.env.NEPTUN_GITHUB_APP_GITHUB_CLIENT_ID,
         clientSecret: process.env.NEPTUN_GITHUB_APP_GITHUB_CLIENT_SECRET,
-        privateKey: process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY,
-      },
+        privateKey: process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY
+      }
     },
     session: {
       /* session persists for 7 days */ name: 'neptun-session',
       password: process.env.NUXT_SESSION_PASSWORD,
       cookie: {
-        sameSite: 'lax',
-      },
+        sameSite: 'lax'
+      }
     },
     public: {
       IS_SERVERLESS: process.env.IS_SERVERLESS,
       LOG_SQL_QUERIES: process.env.LOG_SQL_QUERIES,
-      LOG_BACKEND: process.env.LOG_BACKEND,
-    },
+      LOG_BACKEND: process.env.LOG_BACKEND
+    }
   },
 
   app: {
     head: {
       htmlAttrs: { lang: 'en' },
-      meta: [{ name: 'description', content: '%s - Nuxt Chat App' }],
+      meta: [{ name: 'description', content: '%s - Nuxt Chat App' }]
     },
     pageTransition: {
       name: 'page',
-      mode: 'out-in', // default
+      mode: 'out-in' // default
     },
     layoutTransition: {
       name: 'layout',
-      mode: 'out-in', // default
-    },
+      mode: 'out-in' // default
+    }
   },
 
   router: {
     options: {
-      scrollBehaviorType: 'smooth',
-    },
+      scrollBehaviorType: 'smooth'
+    }
   },
 
   typescript: {
-    typeCheck: true,
+    typeCheck: true
   },
 
   modules: [
@@ -205,13 +204,13 @@ export default defineNuxtConfig({
     'nuxt-security',
     '@nuxtjs/robots',
     'nuxt-monaco-editor',
-    '@formkit/auto-animate/nuxt',
+    '@formkit/auto-animate/nuxt'
     /* 'nuxt-og-image', => still causes vercel serverless function to crash because of shiki (yea fr...) */
   ],
 
   mdc: {
     remarkPlugins: {
-      'remark-flexible-code-titles': {},
+      'remark-flexible-code-titles': {}
     },
     /* rehypePlugins: {
       options: {
@@ -225,24 +224,24 @@ export default defineNuxtConfig({
       highlighter: 'shiki',
       theme: {
         dark: 'github-dark',
-        default: 'github-light',
+        default: 'github-light'
       },
-      langs: supportedShikiLanguages,
-    },
+      langs: supportedShikiLanguages
+    }
   },
 
   css: ['~/assets/css/app.css'],
   build: {
-    transpile: ['gsap'],
+    transpile: ['gsap']
   },
   postcss: {
     plugins: {
       tailwindcss: {},
-      autoprefixer: {},
-    },
+      autoprefixer: {}
+    }
   },
   colorMode: {
-    classSuffix: '',
+    classSuffix: ''
   },
 
   shadcn: {
@@ -254,7 +253,7 @@ export default defineNuxtConfig({
      * Directory that the component lives in.
      * @default "./components/ui"
      */
-    componentDir: './components/ui',
+    componentDir: './components/ui'
   },
 
   posthog: {
@@ -263,16 +262,16 @@ export default defineNuxtConfig({
     host: process.env.POSTHOG_HOST,
     capturePageViews: true,
     disabled:
-      process.env.POSTHOG_ACTIVE ===
-      'false' /* process.dev (deprecated), import.meta.dev (unusable in config file) (https://nuxt.com/docs/api/advanced/import-meta#runtime-app-properties) */,
+      process.env.POSTHOG_ACTIVE
+      === 'false' /* process.dev (deprecated), import.meta.dev (unusable in config file) (https://nuxt.com/docs/api/advanced/import-meta#runtime-app-properties) */
   },
 
   eslint: {
     config: {
       stylistic: {
         quotes: 'single',
-        commaDangle: 'never',
-      },
-    },
-  },
+        commaDangle: 'never'
+      }
+    }
+  }
 });

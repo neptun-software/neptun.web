@@ -9,7 +9,7 @@ const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props
 
   return delegated
-})
+});
 
 const forwardedProps = useForwardProps(delegatedProps)
 </script>
@@ -20,7 +20,7 @@ const forwardedProps = useForwardProps(delegatedProps)
     :class="
       cn(
         'text-lg font-semibold leading-none tracking-tight',
-        props.class,
+        props.class
       )
     "
   >

@@ -1,6 +1,6 @@
 import { defineNuxtRouteMiddleware, navigateTo } from 'nuxt/app';
 
-export default defineNuxtRouteMiddleware((to, _from) => {
+export default defineNuxtRouteMiddleware((_to, _from) => {
   const { loggedIn } = useUserSession();
   const { console } = useLogger();
 

@@ -1,19 +1,29 @@
 <template>
   <div class="container">
     <div class="tabs">
-      <div v-for="tabName in tabs" :key="tabName" class="tab-item">
+      <div
+        v-for="tabName in tabs"
+        :key="tabName"
+        class="tab-item"
+      >
         <input
-          type="radio"
           :id="'radio-' + tabName"
-          name="tabs"
           v-model="selectedTab"
+          type="radio"
+          name="tabs"
           :value="tabName"
-        />
-        <label class="tab" :for="'radio-' + tabName">
+        >
+        <label
+          class="tab"
+          :for="'radio-' + tabName"
+        >
           {{ tabName.replace(/_/g, ' ') }}
         </label>
       </div>
-      <span class="glider" :style="gliderStyle"></span>
+      <span
+        class="glider"
+        :style="gliderStyle"
+      />
     </div>
     <div class="tab-content">
       <slot :name="selectedTab" />
@@ -25,8 +35,8 @@
 const props = defineProps({
   tabs: {
     type: Array,
-    required: true,
-  },
+    required: true
+  }
 });
 
 const tabs = props.tabs;
@@ -35,8 +45,8 @@ const selectedTab = ref(tabs[0]);
 const gliderStyle = computed(() => {
   const index = tabs.indexOf(selectedTab.value);
   return {
-    transform: `translateX(${index * 100}%)`,
-  };
+    transform: `translateX(${index * 100}%)`
+  }
 });
 </script>
 

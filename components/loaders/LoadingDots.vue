@@ -4,15 +4,15 @@ let interval: NodeJS.Timeout;
 
 const updateDots = () => {
   currentDot.value = (currentDot.value % 3) + 1;
-};
+}
 
 onMounted(() => {
   interval = setInterval(updateDots, 300);
-});
+})
 
 onUnmounted(() => {
   clearInterval(interval);
-});
+})
 </script>
 
 <template>

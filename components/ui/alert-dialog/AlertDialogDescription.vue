@@ -2,7 +2,7 @@
 import { type HTMLAttributes, computed } from 'vue'
 import {
   AlertDialogDescription,
-  type AlertDialogDescriptionProps,
+  type AlertDialogDescriptionProps
 } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
@@ -12,7 +12,7 @@ const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props
 
   return delegated
-})
+});
 </script>
 
 <template>

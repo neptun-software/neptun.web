@@ -2,7 +2,7 @@
 import { RefreshCcw } from 'lucide-vue-next';
 
 defineProps<{
-  animationIsActive?: boolean;
+  animationIsActive?: boolean
 }>();
 
 const id = useId();
@@ -11,8 +11,8 @@ const id = useId();
 <template>
   <div :id="'refresh-icon-' + id">
     <AnimatedIcon
-      :animationLink="'/assets/icons/animated/Refresh/refresh.json'"
-      :animationIsActive="animationIsActive"
+      :animation-link="'/assets/icons/animated/Refresh/refresh.json'"
+      :animation-is-active="animationIsActive"
     >
       <RefreshCcw class="w-4 h-4 ml-1" />
     </AnimatedIcon>

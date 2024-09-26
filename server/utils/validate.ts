@@ -1,51 +1,52 @@
-import { primaryIdSchema } from '~/lib/types/database.tables/schema';
-import type { H3Event, EventHandlerRequest } from 'h3';
+import type { H3Event, EventHandlerRequest } from 'h3'
+import type { ZodError } from 'zod'
+import { z } from 'zod'
+import { primaryIdSchema } from '~/lib/types/database.tables/schema'
 import type { User } from '#auth-utils';
 import {
   AllowedAiModelNamesEnum,
-  AllowedAiModelPublishersEnum,
+  AllowedAiModelPublishersEnum
 } from '~/lib/types/ai.models';
-import { z, ZodError } from 'zod';
 import {
   type ChatConversationKeys,
   type OrderByDirection,
   possibleOrderByColumns,
-  possibleOrderByDirections,
+  possibleOrderByDirections
 } from '~/lib/types/chat';
 
 /* EVENT HANDLER */
 
 interface ValidationSuccess<T> {
-  statusCode: 200;
-  statusMessage: string;
-  message: string;
-  data: T;
+  statusCode: 200
+  statusMessage: string
+  message: string
+  data: T
 }
 
 interface ValidationError<T> {
-  statusCode: 400 | 401;
-  statusMessage: string;
-  message: string;
-  data: ZodError<T> | null;
+  statusCode: 400 | 401
+  statusMessage: string
+  message: string
+  data: ZodError<T> | null
 }
 
-type ValidationResult<S, E = S> = ValidationSuccess<S> | ValidationError<E>;
+type ValidationResult<S, E = S> = ValidationSuccess<S> | ValidationError<E>
 
 async function validateParams<S, E = S>(
   event: H3Event<EventHandlerRequest>,
   parseFunction: () => Promise<{
-    success: boolean;
-    data?: S;
-    error?: ZodError<E>;
+    success: boolean
+    data?: S
+    error?: ZodError<E>
   }>,
   validationSuccessMessage: string,
   validationErrorMessage: string,
   logData?: any,
   unauthorizedCheck?: (user: User, data: S) => boolean,
   secondValidationStep?: (data: S) => {
-    validationErrorMessage: string;
-    data: S | null;
-    success: boolean;
+    validationErrorMessage: string
+    data: S | null
+    success: boolean
   }
 ): Promise<ValidationResult<S, E>> {
   const maybeValidatedParams = await parseFunction();
@@ -55,33 +56,33 @@ async function validateParams<S, E = S>(
       statusCode: 400,
       statusMessage: 'Bad Request.',
       message: validationErrorMessage,
-      data: maybeValidatedParams.error || null,
-    };
+      data: maybeValidatedParams.error || null
+    }
   }
 
   const {
     validationErrorMessage: secondValidationErrorMessage,
     data,
-    success,
+    success
   } = secondValidationStep
-      ? secondValidationStep(maybeValidatedParams.data!)
-      : { success: true, data: null, validationErrorMessage: '' };
+    ? secondValidationStep(maybeValidatedParams.data!)
+    : { success: true, data: null, validationErrorMessage: '' };
   if (secondValidationStep) {
     if (!success || !data) {
       return {
         statusCode: 400,
         statusMessage: 'Bad Request.',
         message: secondValidationErrorMessage,
-        data: null,
-      };
+        data: null
+      }
     }
 
     return {
       statusCode: 200,
       statusMessage: 'Successfully validated.',
       message: validationSuccessMessage,
-      data: data,
-    };
+      data: data
+    }
   }
 
   if (LOG_BACKEND) console.info('event.context?.params', event.context?.params);
@@ -98,23 +99,23 @@ async function validateParams<S, E = S>(
   if (logData && LOG_BACKEND) console.info(logData, maybeValidatedParams.data);
 
   if (
-    unauthorizedCheck &&
-    unauthorizedCheck(event.context.user, maybeValidatedParams.data!)
+    unauthorizedCheck
+    && unauthorizedCheck(event.context.user, maybeValidatedParams.data!)
   ) {
     return {
       statusCode: 401,
       statusMessage: 'Unauthorized.',
       message: 'You do not have access to view the information.',
-      data: null,
-    };
+      data: null
+    }
   }
 
   return {
     statusCode: 200,
     statusMessage: 'Successfully validated.',
     message: validationSuccessMessage,
-    data: maybeValidatedParams.data!,
-  };
+    data: maybeValidatedParams.data!
+  }
 }
 
 /* VALIDATE QUERY PARAMS */
@@ -126,15 +127,16 @@ export async function validateQueryChatId(
     event,
     async () => {
       const result = await getValidatedQuery(event, (params) => {
-        // @ts-ignore
+        // @ts-expect-error
         const chat_id = Number(params?.chat_id);
         event.context.validated.query['chat_id'] = chat_id;
 
         return ChatIdQuerySchema.safeParse({ chat_id });
-      });
+      })
       if (result.success) {
         return { success: true, data: { chat_id: result.data.chat_id } };
-      } else {
+      }
+      else {
         return result;
       }
     },
@@ -152,15 +154,16 @@ export async function validateQueryOrderBy(
     event,
     async () => {
       const result = await getValidatedQuery(event, (params) => {
-        // @ts-ignore
+        // @ts-expect-error
         const order_by = params?.order_by;
         event.context.validated.query['order_by'] = order_by;
 
         return OrderByQuerySchema.safeParse({ order_by });
-      });
+      })
       if (result.success) {
         return { success: true, data: { order_by: result.data.order_by } };
-      } else {
+      }
+      else {
         return result;
       }
     },
@@ -185,8 +188,8 @@ export async function validateParamUrl(
       statusCode: 400,
       statusMessage: 'Bad Request.',
       message: 'Invalid routeParams(url).',
-      data: maybeValidatedParams.error,
-    };
+      data: maybeValidatedParams.error
+    }
   }
 
   if (LOG_BACKEND) console.info('url:', maybeValidatedParams.data.url);
@@ -201,17 +204,18 @@ export async function validateParamUrl(
       statusMessage: 'Successfully validated.',
       message: 'Successfully validated routeParams(user_id).',
       data: {
-        url: url,
-      },
-    };
-  } catch {
+        url: url
+      }
+    }
+  }
+  catch {
     return {
       statusCode: 400,
       statusMessage: 'Bad Request.',
       message:
         'Invalid routeParams(url). URL is not conform to official URL format.',
-      data: null,
-    };
+      data: null
+    }
   }
 
   // TODO: improve typing, so that the short-form can be used:
@@ -249,16 +253,17 @@ export async function validateParamUserId(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-ignore
+        // @ts-expect-error
         const user_id = Number(params?.user_id); // => NaN if not a number, not present
         event.context.validated.params['user_id'] = user_id;
 
         // check if user_id is a valid user_id
         return UserIdSchema.safeParse({ user_id });
-      });
+      })
       if (result.success) {
         return { success: true, data: { user_id: result.data.user_id } };
-      } else {
+      }
+      else {
         return result;
       }
     },
@@ -277,21 +282,22 @@ export async function validateParamChatId(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-ignore
+        // @ts-expect-error
         const user_id = Number(params?.user_id); // => NaN if not a number, not present
-        // @ts-ignore
+        // @ts-expect-error
         const chat_id = Number(params?.chat_id);
         event.context.validated.params['user_id'] = user_id;
         event.context.validated.params['chat_id'] = chat_id;
 
         return ChatIdSchema.safeParse({ user_id, chat_id });
-      });
+      })
       if (result.success) {
         return {
           success: true,
-          data: { user_id: result.data.user_id, chat_id: result.data.chat_id },
-        };
-      } else {
+          data: { user_id: result.data.user_id, chat_id: result.data.chat_id }
+        }
+      }
+      else {
         return result;
       }
     },
@@ -310,24 +316,25 @@ export async function validateParamInstallationId(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-ignore
+        // @ts-expect-error
         const user_id = Number(params?.user_id); // => NaN if not a number, not present
-        // @ts-ignore
+        // @ts-expect-error
         const installation_id = Number(params?.installation_id);
         event.context.validated.params['user_id'] = user_id;
         event.context.validated.params['installation_id'] = installation_id;
 
         return InstallationIdSchema.safeParse({ user_id, installation_id });
-      });
+      })
       if (result.success) {
         return {
           success: true,
           data: {
             user_id: result.data.user_id,
-            installation_id: result.data.installation_id,
-          },
-        };
-      } else {
+            installation_id: result.data.installation_id
+          }
+        }
+      }
+      else {
         return result;
       }
     },
@@ -346,28 +353,29 @@ export async function validateParamShareId(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-ignore
+        // @ts-expect-error
         const user_id = Number(params?.user_id); // => NaN if not a number, not present
-        // @ts-ignore
+        // @ts-expect-error
         const chat_id = Number(params?.chat_id);
-        // @ts-ignore
+        // @ts-expect-error
         const share_id = Number(params?.share_id);
         event.context.validated.params['user_id'] = user_id;
         event.context.validated.params['chat_id'] = chat_id;
         event.context.validated.params['share_id'] = share_id;
 
         return ShareIdSchema.safeParse({ user_id, chat_id, share_id });
-      });
+      })
       if (result.success) {
         return {
           success: true,
           data: {
             user_id: result.data.user_id,
             chat_id: result.data.chat_id,
-            share_id: result.data.share_id,
-          },
-        };
-      } else {
+            share_id: result.data.share_id
+          }
+        }
+      }
+      else {
         return result;
       }
     },
@@ -386,28 +394,29 @@ export async function validateParamMessageId(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-ignore
+        // @ts-expect-error
         const user_id = Number(params?.user_id); // => NaN if not a number, not present
-        // @ts-ignore
+        // @ts-expect-error
         const chat_id = Number(params?.chat_id);
-        // @ts-ignore
+        // @ts-expect-error
         const message_id = Number(params?.message_id);
         event.context.validated.params['user_id'] = user_id;
         event.context.validated.params['chat_id'] = chat_id;
         event.context.validated.params['message_id'] = message_id;
 
         return ChatMessageIdSchema.safeParse({ user_id, chat_id, message_id });
-      });
+      })
       if (result.success) {
         return {
           success: true,
           data: {
             user_id: result.data.user_id,
             chat_id: result.data.chat_id,
-            message_id: result.data.message_id,
-          },
-        };
-      } else {
+            message_id: result.data.message_id
+          }
+        }
+      }
+      else {
         return result;
       }
     },
@@ -429,24 +438,25 @@ export async function validateParamAiModelName(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-ignore
+        // @ts-expect-error
         const model_publisher = params?.model_publisher;
-        // @ts-ignore
+        // @ts-expect-error
         const model_name = params?.model_name;
         event.context.validated.params['model_publisher'] = model_publisher;
         event.context.validated.params['model_name'] = model_name;
 
         return ModelSchema.safeParse({ model_publisher, model_name });
-      });
+      })
       if (result.success) {
         return {
           success: true,
           data: {
             model_publisher: result.data.model_publisher,
-            model_name: result.data.model_name,
-          },
-        };
-      } else {
+            model_name: result.data.model_name
+          }
+        }
+      }
+      else {
         return result;
       }
     },
@@ -472,9 +482,10 @@ export async function validateParamUuid(
       if (result.success) {
         return {
           success: true,
-          data: { uuid: result.data.uuid },
-        };
-      } else {
+          data: { uuid: result.data.uuid }
+        }
+      }
+      else {
         return result;
       }
     },
@@ -487,56 +498,56 @@ export async function validateParamUuid(
 /* ROUTE PARAMETER SCHEMAs */
 
 export const UserIdSchema = z.object({
-  user_id: primaryIdSchema,
-});
+  user_id: primaryIdSchema
+})
 
-type UserIdType = z.infer<typeof UserIdSchema>;
+type UserIdType = z.infer<typeof UserIdSchema>
 
 export const ChatIdSchema = z.object({
   user_id: primaryIdSchema,
-  chat_id: primaryIdSchema,
-});
+  chat_id: primaryIdSchema
+})
 
-type ChatIdType = z.infer<typeof ChatIdSchema>;
+type ChatIdType = z.infer<typeof ChatIdSchema>
 
 export const InstallationIdSchema = z.object({
   user_id: primaryIdSchema,
-  installation_id: primaryIdSchema,
-});
+  installation_id: primaryIdSchema
+})
 
-type InstallationIdType = z.infer<typeof InstallationIdSchema>;
+type InstallationIdType = z.infer<typeof InstallationIdSchema>
 
 export const ShareIdSchema = z.object({
   user_id: primaryIdSchema,
   chat_id: primaryIdSchema,
-  share_id: primaryIdSchema,
-});
+  share_id: primaryIdSchema
+})
 
-type ShareIdType = z.infer<typeof ShareIdSchema>;
+type ShareIdType = z.infer<typeof ShareIdSchema>
 
 export const ChatMessageIdSchema = z.object({
   user_id: primaryIdSchema,
   chat_id: primaryIdSchema,
-  message_id: primaryIdSchema,
-});
+  message_id: primaryIdSchema
+})
 
-type ChatMessageIdType = z.infer<typeof ChatMessageIdSchema>;
+type ChatMessageIdType = z.infer<typeof ChatMessageIdSchema>
 
 /**
  * **INFO**: Doesn't use the z.url() because it doesn't allow URLs in the format of encodeURIComponent
  */
 export const UrlSchema = z.object({
-  url: z.string().trim(),
-});
+  url: z.string().trim()
+})
 
-type UrlType = z.infer<typeof UrlSchema>;
+type UrlType = z.infer<typeof UrlSchema>
 
 export const ModelSchema = z.object({
   model_publisher: z.nativeEnum(AllowedAiModelPublishersEnum),
-  model_name: z.nativeEnum(AllowedAiModelNamesEnum),
-});
+  model_name: z.nativeEnum(AllowedAiModelNamesEnum)
+})
 
-type ModelType = z.infer<typeof ModelSchema>;
+type ModelType = z.infer<typeof ModelSchema>
 
 /* QUERY SCHEMAs */
 
@@ -544,10 +555,10 @@ type ModelType = z.infer<typeof ModelSchema>;
  * **NOTE**: can be -1, if none selected
  */
 export const ChatIdQuerySchema = z.object({
-  chat_id: z.number().int(),
-});
+  chat_id: z.number().int()
+})
 
-type ChatIdQueryType = z.infer<typeof ChatIdQuerySchema>;
+type ChatIdQueryType = z.infer<typeof ChatIdQuerySchema>
 
 const OrderByQuerySchema = z.object({
   order_by: z
@@ -559,26 +570,26 @@ const OrderByQuerySchema = z.object({
           // allows "column:direction" syntax
           const [column, direction] = part.split(':');
           return (
-            possibleOrderByColumns.includes(column as ChatConversationKeys) &&
-            possibleOrderByDirections.includes(direction as OrderByDirection)
+            possibleOrderByColumns.includes(column as ChatConversationKeys)
+            && possibleOrderByDirections.includes(direction as OrderByDirection)
           );
-        });
+        })
       },
       {
         message:
-          "order_by must be a comma-separated list of 'column:direction' pairs, e.g. 'updated_at:desc,created_at:asc'",
+          'order_by must be a comma-separated list of \'column:direction\' pairs, e.g. \'updated_at:desc,created_at:asc\''
       }
     )
-    .optional(),
-});
+    .optional()
+})
 
-type OrderByQueryType = z.infer<typeof OrderByQuerySchema>;
+type OrderByQueryType = z.infer<typeof OrderByQuerySchema>
 
 export const ChatUuidSchema = z.object({
-  uuid: z.string().uuid(),
-});
+  uuid: z.string().uuid()
+})
 
-type ChatUuidType = z.infer<typeof ChatUuidSchema>;
+type ChatUuidType = z.infer<typeof ChatUuidSchema>
 
 /* BODY SCHEMAs */
 

@@ -2,36 +2,39 @@
 import type { Message } from '@ai-sdk/vue';
 
 defineProps<{
-  message: Message;
+  message: Message
 }>();
 </script>
 
 <template>
   <div
     class="flex max-w-full my-2 prose text-foreground"
-    v-bind:class="{
+    :class="{
       'justify-start': message.role === 'assistant',
-      'justify-end': message.role === 'user',
+      'justify-end': message.role === 'user'
     }"
   >
     <div
       v-if="message.role === 'assistant'"
-      class="px-4 py-2 border rounded-lg bg-background border-slate-200 max-w-[80%] relative dark:border-border"
       :id="`message-${message.id}-assistant`"
+      class="px-4 py-2 border rounded-lg bg-background border-slate-200 max-w-[80%] relative dark:border-border"
       :data-message-created-at="message.createdAt"
     >
       <AiChatMessageContent :content="message.content" />
-      <ShadcnSeparator class="my-4" label="Controls" />
+      <ShadcnSeparator
+        class="my-4"
+        label="Controls"
+      />
       <AiChatMessageControls
-        :message="message.content"
         :key="message.content"
+        :message="message.content"
       />
     </div>
 
     <div
       v-if="message.role === 'user'"
-      class="px-4 py-2 border rounded-lg bg-background border-slate-200 max-w-[80%] dark:border-border"
       :id="`message-${message.id}-user`"
+      class="px-4 py-2 border rounded-lg bg-background border-slate-200 max-w-[80%] dark:border-border"
       :data-message-created-at="message.createdAt"
     >
       <AiChatMessageContent :content="message.content" />

@@ -2,7 +2,9 @@
 
 <template>
   <div>
-    <h2 class="my-2 text-xl font-bold"><slot name="header" /></h2>
+    <h2 class="my-2 text-xl font-bold">
+      <slot name="header" />
+    </h2>
     <slot name="content" />
     <ShadcnSeparator class="h-1 my-2" />
   </div>

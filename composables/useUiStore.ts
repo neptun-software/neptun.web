@@ -3,5 +3,5 @@ export const useUiStore = () => {
 
   return {
     headerNavigationElement
-  };
-};
+  }
+}

@@ -10,11 +10,11 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeChatId.statusCode,
         statusMessage: maybeChatId.statusMessage,
-        data: maybeChatId.data,
+        data: maybeChatId.data
       })
     );
   }
   const chat_id = maybeChatId.data?.chat_id;
 
   return await readShareUuid(chat_id);
-});
+})

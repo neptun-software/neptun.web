@@ -1,6 +1,7 @@
 <script setup>
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+// eslint-disable-next-line vue/require-prop-types
 defineProps(['src', 'icon', 'title', 'description', 'index']);
 </script>
 
@@ -17,7 +18,7 @@ defineProps(['src', 'icon', 'title', 'description', 'index']);
       >
         <div
           class="absolute inset-0 translate-z-0 bg-slate-800 rounded-full blur-[80px]"
-        ></div>
+        />
       </div>
 
       <Card
@@ -26,7 +27,7 @@ defineProps(['src', 'icon', 'title', 'description', 'index']);
         <div
           class="w-[40%] h-[40%] absolute inset-0 m-auto -translate-y-[10%] blur-3xl -z-10 rounded-full bg-indigo-600"
           aria-hidden="true"
-        ></div>
+        />
 
         <CardHeader>
           <div class="flex items-center justify-between mb-4">
@@ -38,7 +39,7 @@ defineProps(['src', 'icon', 'title', 'description', 'index']);
               height="200"
               :alt="title"
             />
-            <component v-else class="text-white size-10" :is="icon" />
+            <component :is="icon" v-else class="text-white size-10" />
 
             <span
               class="text-5xl font-medium transition-all delay-75 text-muted-foreground/15 group-hover/number:text-muted-foreground/30"
@@ -46,7 +47,9 @@ defineProps(['src', 'icon', 'title', 'description', 'index']);
             >
           </div>
 
-          <CardTitle class="text-white">{{ title }}</CardTitle>
+          <CardTitle class="text-white">
+            {{ title }}
+          </CardTitle>
         </CardHeader>
 
         <CardContent class="text-muted-foreground">

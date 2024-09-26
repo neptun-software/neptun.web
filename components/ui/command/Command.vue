@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 
 const props = withDefaults(defineProps<ComboboxRootProps & { class?: HTMLAttributes['class'] }>(), {
   open: true,
-  modelValue: '',
+  modelValue: ''
 })
 
 const emits = defineEmits<ComboboxRootEmits>()
@@ -15,7 +15,7 @@ const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props
 
   return delegated
-})
+});
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 </script>

@@ -4,14 +4,14 @@ import { ScrollAreaScrollbar, type ScrollAreaScrollbarProps, ScrollAreaThumb } f
 import { cn } from '@/lib/utils'
 
 const props = withDefaults(defineProps<ScrollAreaScrollbarProps & { class?: HTMLAttributes['class'] }>(), {
-  orientation: 'vertical',
+  orientation: 'vertical'
 })
 
 const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props
 
   return delegated
-})
+});
 </script>
 
 <template>

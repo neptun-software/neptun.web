@@ -1,13 +1,13 @@
-import { generateUUID } from '~/lib/utils';
+import { and, eq, like, sql } from 'drizzle-orm'
 import {
   neptun_user,
   neptun_user_oauth_account,
   type ReadOauthAccount,
   type GetUser,
   type ReadUser,
-  type UserToCreate,
+  type UserToCreate
 } from '../../../lib/types/database.tables/schema';
-import { and, eq, like, sql } from 'drizzle-orm';
+import { generateUUID } from '~/lib/utils';
 
 export const validateUserCredentials = async (
   email: ReadUser['primary_email'],
@@ -17,7 +17,7 @@ export const validateUserCredentials = async (
   const fetchedUser = await db
     .select({
       id: neptun_user.id,
-      primary_email: decryptColumn(neptun_user.primary_email),
+      primary_email: decryptColumn(neptun_user.primary_email)
     })
     .from(neptun_user)
     .where(
@@ -34,12 +34,12 @@ export const validateUserCredentials = async (
       if (LOG_BACKEND)
         console.error('Failed to fetch user from database:', err);
       return null;
-    });
+    })
 
   if (!fetchedUser) return null;
 
   return fetchedUser[0];
-};
+}
 
 export const createUser = async (user: UserToCreate) => {
   /* TODO: only allow, if email is verified via email code => needs extended login flow */
@@ -47,24 +47,24 @@ export const createUser = async (user: UserToCreate) => {
     .insert(neptun_user)
     .values({
       primary_email: encryptColumn(user.primary_email), // SELECT encode(encrypt('e.mail@example.com', 'secret', 'aes'), 'hex') AS encrypted_primary_email; --encrypt
-      hashed_password: encryptSecret(user.password), // SELECT crypt('password', gen_salt('bf', 12)) AS hashed_password; --encrypt
+      hashed_password: encryptSecret(user.password) // SELECT crypt('password', gen_salt('bf', 12)) AS hashed_password; --encrypt
     })
-    // @ts-ignore (is allowed, just not properly typed)
+    // @ts-expect-error (is allowed, just not properly typed)
     .returning({
       id: neptun_user.id,
       primary_email: decryptColumn(
         neptun_user.primary_email
-      ) /* decode(${neptun_user.primary_email}, 'hex') instead of ('\x' || ${neptun_user.primary_email}) instead of concat('\x', ${neptun_user.primary_email}) */,
+      ) /* decode(${neptun_user.primary_email}, 'hex') instead of ('\x' || ${neptun_user.primary_email}) instead of concat('\x', ${neptun_user.primary_email}) */
     })
     .catch((err) => {
       if (LOG_BACKEND)
         console.error('Failed to insert user into database', err);
       return null;
-    });
+    })
 
   if (!createdUser) return null;
   return createdUser[0];
-};
+}
 
 // Needed for Oauth, if no user exists yet.
 export const createEmptyUser = async () => {
@@ -74,22 +74,22 @@ export const createEmptyUser = async () => {
       primary_email: encryptColumn(
         `${generateUUID()}@account.oAuth`
       ) /* TODO: do not allow login with email and password, if email and password are placeholders */,
-      hashed_password: encryptSecret('NONE'),
+      hashed_password: encryptSecret('NONE')
     })
-    // @ts-ignore (is allowed, just not properly typed)
+    // @ts-expect-error (is allowed, just not properly typed)
     .returning({
       id: neptun_user.id,
-      primary_email: decryptColumn(neptun_user.primary_email),
+      primary_email: decryptColumn(neptun_user.primary_email)
     })
     .catch((err) => {
       if (LOG_BACKEND)
         console.error('Failed to insert user into database', err);
       return null;
-    });
+    })
 
   if (!createdUser) return null;
   return createdUser[0];
-};
+}
 
 export const readUserUsingPrimaryEmail = async (
   email: ReadUser['primary_email']
@@ -98,25 +98,25 @@ export const readUserUsingPrimaryEmail = async (
   const fetchedUser = await db
     .select({
       id: neptun_user.id,
-      primary_email: decryptColumn(neptun_user.primary_email),
+      primary_email: decryptColumn(neptun_user.primary_email)
     })
     .from(neptun_user)
     .where(like(neptun_user.primary_email, encryptColumn(email)))
     .catch((err) => {
       if (LOG_BACKEND) console.error('Failed to fetch user from database', err);
       return null;
-    });
+    })
 
   if (!fetchedUser) return null;
 
   return fetchedUser[0]; // [][0] => undefined :)
-};
+}
 
 export const readUserIdsOfPrimaryEmails = async (
   emails: ReadUser['primary_email'][]
 ) => {
   /* const encryptedEmails = emails.map(email => sql.join([sql`(SELECT `, encryptColumn(email), sql` AS TEXT)`]));
-  const fetchedUsers = await db.execute<ReadChatConversationShare>(sql`SELECT "id" FROM "neptun_user" WHERE "neptun_user"."primary_email" IN (${sql.join(encryptedEmails, sql`, `)})`); 
+  const fetchedUsers = await db.execute<ReadChatConversationShare>(sql`SELECT "id" FROM "neptun_user" WHERE "neptun_user"."primary_email" IN (${sql.join(encryptedEmails, sql`, `)})`);
     return (fetchedUsers as ReadChatConversationShare[]).map(({ id }) => {
     return {
       id
@@ -136,10 +136,10 @@ export const readUserIdsOfPrimaryEmails = async (
       return null;
     }) */
 
-  const encryptedEmails = emails.map((email) => encryptColumn(email));
+  const encryptedEmails = emails.map(email => encryptColumn(email));
   const fetchedUsers = await db
     .select({
-      id: neptun_user.id,
+      id: neptun_user.id
     })
     .from(neptun_user)
     .where(
@@ -149,12 +149,12 @@ export const readUserIdsOfPrimaryEmails = async (
       if (LOG_BACKEND)
         console.error('Failed to fetch users from database', err);
       return null;
-    });
+    })
 
   if (!fetchedUsers) return null;
 
   return fetchedUsers;
-};
+}
 
 export const readUserUsingGithubOauthId = async (
   github_oauth_id: ReadOauthAccount['oauth_user_id']
@@ -171,16 +171,16 @@ export const readUserUsingGithubOauthId = async (
     with: {
       neptun_user: {
         columns: {
-          id: true,
-        },
-      },
-    },
+          id: true
+        }
+      }
+    }
   });
 
   if (!fetchedUser) return null;
 
   return fetchedUser.neptun_user;
-};
+}
 
 export const updateUser = async (
   id: ReadUser['id'],
@@ -193,41 +193,41 @@ export const updateUser = async (
     if (!primary_email) return null;
 
     return {
-      primary_email: encryptColumn(primary_email),
-    };
-  };
+      primary_email: encryptColumn(primary_email)
+    }
+  }
 
   const updated_password = () => {
     if (!password) return null;
 
     return {
-      hashed_password: encryptSecret(password),
-    };
-  };
+      hashed_password: encryptSecret(password)
+    }
+  }
 
   const updatedUserInformation = {
     ...updated_primary_email(),
-    ...updated_password(),
-  };
+    ...updated_password()
+  }
 
   const updatedUser = await db
     .update(neptun_user)
     .set(updatedUserInformation)
     .where(eq(neptun_user.id, id))
-    // @ts-ignore (is allowed, just not properly typed)
+    // @ts-expect-error (is allowed, just not properly typed)
     .returning({
       id: neptun_user.id,
-      primary_email: decryptColumn(neptun_user.primary_email),
+      primary_email: decryptColumn(neptun_user.primary_email)
     })
     .catch((err) => {
       if (LOG_BACKEND) console.error('Failed to update user in database', err);
       return null;
-    });
+    })
 
   if (!updatedUser) return null;
 
   return updatedUser[0];
-};
+}
 
 export const deleteUser = async (id: ReadUser['id']) => {
   return await db
@@ -238,5 +238,5 @@ export const deleteUser = async (id: ReadUser['id']) => {
       if (LOG_BACKEND)
         console.error('Failed to delete user from database', err);
       return false;
-    });
-};
+    })
+}

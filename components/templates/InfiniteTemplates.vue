@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { templates, type TemplateData } from '~/lib/(templates)/templates';
-import type { BundledLanguage } from 'shiki';
-import { Loader2 } from 'lucide-vue-next';
+import type { BundledLanguage } from 'shiki'
+import { Loader2 } from 'lucide-vue-next'
+import { templates, type TemplateData } from '~/lib/(templates)/templates'
 
 const database = ref(templates) as Ref<TemplateData[]>;
 const data: Ref<TemplateData[]> = ref([]);
@@ -17,7 +17,7 @@ function fetch(page: number, pageSize: number) {
     setTimeout(() => {
       resolve(database.value.slice(start, end));
     }, 100);
-  });
+  })
 }
 
 async function loadMore() {
@@ -35,19 +35,36 @@ async function loadMore() {
 }
 
 useInfiniteScroll(document, loadMore, {
-  distance: 100,
-});
+  distance: 100
+})
 
 const useSsrSaveId = () => useId();
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-2 lg:grid-cols-2" v-if="data.length > 0">
-    <div class="p-2 border rounded-md" v-for="d in data" :key="d.id">
-      <h3 class="text-lg font-bold">{{ d.name }}</h3>
-      <div v-if="d.readme" class="border rounded-md">{{ d.readme }}</div>
+  <div
+    v-if="data.length > 0"
+    class="grid grid-cols-1 gap-2 lg:grid-cols-2"
+  >
+    <div
+      v-for="d in data"
+      :key="d.id"
+      class="p-2 border rounded-md"
+    >
+      <h3 class="text-lg font-bold">
+        {{ d.name }}
+      </h3>
+      <div
+        v-if="d.readme"
+        class="border rounded-md"
+      >
+        {{ d.readme }}
+      </div>
 
-      <ShadcnTabs :default-value="d.code[0].fileName" class="w-full">
+      <ShadcnTabs
+        :default-value="d.code[0].fileName"
+        class="w-full"
+      >
         <ShadcnScrollArea class="max-w-full">
           <ShadcnTabsList class="flex justify-start flex-grow">
             <ShadcnScrollBar orientation="horizontal" />
@@ -63,9 +80,9 @@ const useSsrSaveId = () => useId();
           </ShadcnTabsList>
         </ShadcnScrollArea>
         <ShadcnTabsContent
-          class="relative"
           v-for="c in d.code"
           :key="useSsrSaveId.toString()"
+          class="relative"
           :value="c.fileName"
         >
           <ShadcnScrollArea class="h-screen px-2 py-1 border rounded-md">
@@ -102,7 +119,9 @@ const useSsrSaveId = () => useId();
     class="flex items-center justify-center gap-2 px-3 py-2 mt-2 border border-blue-200 rounded-lg bg-background"
   >
     <Loader2 class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
-    <p class="flex-grow">Loading more templates<LoadingDots /></p>
+    <p class="flex-grow">
+      Loading more templates<LoadingDots />
+    </p>
   </div>
 
   <div

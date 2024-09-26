@@ -10,16 +10,16 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeChatId.statusCode,
         statusMessage: maybeChatId.statusMessage,
-        data: maybeChatId.data,
+        data: maybeChatId.data
       })
     );
   }
   const chat_id = maybeChatId.data?.chat_id;
 
-  const fetchedChatFiles =
-    await readAllChatConversationFilesOfChatConversation(chat_id);
+  const fetchedChatFiles
+    = await readAllChatConversationFilesOfChatConversation(chat_id);
 
   return {
-    chatFiles: fetchedChatFiles,
-  };
+    chatFiles: fetchedChatFiles
+  }
 });

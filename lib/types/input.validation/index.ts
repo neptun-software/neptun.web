@@ -2,26 +2,27 @@ import { z } from 'zod';
 import {
   passwordSchema,
   confirmPasswordSchema,
-  addPasswordFieldIssue,
-} from './password';
+  addPasswordFieldIssue
+} from './password'
+
 export { passwordSchema, confirmPasswordSchema };
 
 export const emailSchema = z.string().min(5).email(); // a@b.c => 5
 
 export const UserLogInSchema = z.object({
   email: emailSchema,
-  password: passwordSchema,
-});
+  password: passwordSchema
+})
 
 export const UserUpdateSchema = z.object({
   email: emailSchema.optional(),
-  password: passwordSchema.optional(),
-});
+  password: passwordSchema.optional()
+})
 
 export const UserSignUpSchema = z
   .object({
     email: emailSchema,
-    ...confirmPasswordSchema,
+    ...confirmPasswordSchema
   })
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {

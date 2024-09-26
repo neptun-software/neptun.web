@@ -10,9 +10,9 @@ const initializeAnimation = () => {
     duration: 2,
     ease: 'power1.inOut',
     yoyo: true,
-    repeat: -1,
-  });
-};
+    repeat: -1
+  })
+}
 
 watch(floatingImage, (newValue) => {
   if (newValue) {
@@ -26,7 +26,7 @@ onMounted(() => {
       initializeAnimation();
     }
   }, 100);
-});
+})
 </script>
 
 <template>
@@ -35,15 +35,17 @@ onMounted(() => {
       class="grid max-w-full gap-8 py-20 mx-auto place-items-center lg:max-w-screen-xl md:py-32"
     >
       <div class="relative mt-14">
-        <h3 class="pb-4 font-bold text-center text-9xl">What?</h3>
+        <h3 class="pb-4 font-bold text-center text-9xl">
+          What?
+        </h3>
 
         <!-- gradient shadow -->
         <div
           class="absolute top-2 lg:-top-8 left-1/2 transform -translate-x-1/2 w-[90%] mx-auto h-24 lg:h-80 bg-blue-950/50 rounded-full blur-3xl opacity-70"
-        ></div>
+        />
 
         <SlidingTabs :tabs="['All_Chats', 'Active_Chat']">
-          <template v-slot:All_Chats>
+          <template #All_Chats>
             <ClientOnly fallback-tag="div">
               <NuxtImg
                 v-if="colorMode.preference === 'light'"
@@ -69,7 +71,7 @@ onMounted(() => {
               </template>
             </ClientOnly>
           </template>
-          <template v-slot:Active_Chat>
+          <template #Active_Chat>
             <ClientOnly fallback-tag="div">
               <NuxtImg
                 v-if="colorMode.preference === 'light'"
@@ -100,7 +102,7 @@ onMounted(() => {
         <!-- gradient effect img -->
         <div
           class="absolute bottom-0 left-0 w-full h-20 rounded-lg md:h-28 bg-gradient-to-b from-background/0 via-background/50 to-background"
-        ></div>
+        />
       </div>
     </div>
   </section>

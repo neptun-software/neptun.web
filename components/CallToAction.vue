@@ -2,8 +2,8 @@
 import { gsap } from 'gsap';
 
 defineProps<{
-  text?: string;
-  href?: string;
+  text?: string
+  href?: string
 }>();
 
 const { x: scrollX, y: scrollY } = useWindowScroll(); // needed, so that the button doesn't have a fucking seizure, when you scroll
@@ -26,8 +26,8 @@ const handleMouseMove = (e: MouseEvent) => {
       x: (mousePosX - rect.width / 2) * 0.4,
       y: (mousePosY - rect.height / 2) * 0.4,
       duration: 0.8,
-      ease: 'power3.out',
-    });
+      ease: 'power3.out'
+    })
   }
 };
 
@@ -37,8 +37,8 @@ const handleMouseLeave = () => {
       x: 0,
       y: 0,
       duration: 0.8,
-      ease: 'elastic.out(1,0.3)',
-    });
+      ease: 'elastic.out(1,0.3)'
+    })
   }
 };
 
@@ -49,18 +49,23 @@ useEventListener(magneticButton, 'mouseleave', handleMouseLeave);
 
 onMounted(() => {
   updateBoundingRect();
-});
+})
 </script>
 
 <template>
   <button ref="magneticButton">
     <template v-if="href">
-      <NuxtLink class="cta-button" :to="href">
-        {{ text }} <slot></slot>
+      <NuxtLink
+        class="cta-button"
+        :to="href"
+      >
+        {{ text }} <slot />
       </NuxtLink>
     </template>
     <template v-else>
-      <div class="cta-button">{{ text }} <slot></slot></div>
+      <div class="cta-button">
+        {{ text }} <slot />
+      </div>
     </template>
   </button>
 </template>

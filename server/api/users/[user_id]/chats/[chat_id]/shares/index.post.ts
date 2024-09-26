@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeChatId.statusCode,
         statusMessage: maybeChatId.statusMessage,
-        data: maybeChatId.data,
+        data: maybeChatId.data
       })
     );
   }
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   /* VALIDATE BODY */
   const body = await readValidatedBody(event, (body) => {
     return InsertChatConversationShareSchema.safeParse(body);
-  });
+  })
   if (!body.success || !body.data) {
     return sendError(
       event,
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
         statusCode: 400,
         statusMessage:
           'Bad Request. Invalid body({ is_shared?(true), is_protected?(false), hashed_password?(null) }).',
-        data: body.error,
+        data: body.error
       })
     );
   }
@@ -37,19 +37,20 @@ export default defineEventHandler(async (event) => {
   try {
     const createdChatConversationShare = await createChatConversationShare({
       ...validatedBody,
-      chat_conversation_id: chat_id,
-    });
+      chat_conversation_id: chat_id
+    })
 
     return {
-      share: createdChatConversationShare,
-    };
-  } catch (error) {
+      share: createdChatConversationShare
+    }
+  }
+  catch (error) {
     return sendError(
       event,
       createError({
         statusCode: 500,
         statusMessage: 'Internal Server Error',
-        data: error,
+        data: error
       })
     );
   }

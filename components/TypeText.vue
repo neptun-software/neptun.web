@@ -2,12 +2,12 @@
 const props = defineProps({
   typeData: {
     type: Array as () => string[],
-    required: true,
+    required: true
   },
   period: {
     type: Number,
-    default: 2000,
-  },
+    default: 2000
+  }
 });
 
 class TxtType {
@@ -36,7 +36,8 @@ class TxtType {
 
     if (this.isDeleting) {
       this.txt = fullTxt.substring(0, this.txt.length - 1);
-    } else {
+    }
+    else {
       this.txt = fullTxt.substring(0, this.txt.length + 1);
     }
 
@@ -53,7 +54,8 @@ class TxtType {
     if (!this.isDeleting && this.txt === fullTxt) {
       delta = this.period;
       this.isDeleting = true;
-    } else if (this.isDeleting && this.txt === '') {
+    }
+    else if (this.isDeleting && this.txt === '') {
       this.isDeleting = false;
       this.loopNum++;
       delta = 500;
@@ -83,12 +85,15 @@ onMounted(() => {
   <div class="flex flex-col items-center w-full">
     <div>
       <p class="px-4 py-2 mb-1 rounded-md bg-secondary w-96 min-h-24">
-        <a href="" class="typewrite">
-          <span class="wrap"></span>
+        <a
+          href=""
+          class="typewrite"
+        >
+          <span class="wrap" />
         </a>
       </p>
       <div class="flex gap-2">
-        <slot></slot>
+        <slot />
       </div>
     </div>
   </div>

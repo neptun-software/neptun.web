@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
+import { toast } from 'vue-sonner';
 import {
   validateEmailInput,
-  validatePasswordInput,
+  validatePasswordInput
 } from '~/lib/types/input.validation';
-import { toast } from 'vue-sonner';
 
 const { console } = useLogger();
 
@@ -27,34 +27,38 @@ async function signUp() {
   const { error } = await auth.signUp(email.value, password.value);
 
   if (error) {
-    // @ts-ignore
+    // @ts-expect-error
     console.info('error:', error?.message, error?.data);
-    // @ts-ignore
+    // @ts-expect-error
     emailErrors.value = error?.data?.data?.issues
       .filter((issue: any) => issue.path[0] === 'email')
       .map((issue: any) => issue.message);
-    // @ts-ignore
+    // @ts-expect-error
     passwordErrors.value = error?.data?.data?.issues
       .filter((issue: any) => issue.path[0] === 'password')
       .map((issue: any) => issue.message);
 
-    // @ts-ignore
+    // @ts-expect-error
     toast.error(error?.message);
     return;
   }
 
   await fetch(); // reloadNuxtApp({ ttl: 0, force: true, persistState: false, path: "/dashboard" });
   navigateTo('/dashboard', {
-    redirectCode: 303,
+    redirectCode: 303
   });
 }
+
+const useSsrSaveId = () => useId() ?? new Date().getTime().toString();
 </script>
 
 <template>
   <div>
     <ShadcnCard class="max-w-full mx-2">
       <ShadcnCardHeader>
-        <ShadcnCardTitle class="text-xl"> Sign Up </ShadcnCardTitle>
+        <ShadcnCardTitle class="text-xl">
+          Sign Up
+        </ShadcnCardTitle>
         <ShadcnCardDescription>
           Enter your information to create an account
         </ShadcnCardDescription>
@@ -64,46 +68,68 @@ async function signUp() {
           <div class="grid gap-4">
             <div>
               <div class="grid gap-2 mb-1">
-                <ShadcnLabel for="email">Email</ShadcnLabel>
+                <ShadcnLabel for="email">
+                  Email
+                </ShadcnLabel>
                 <ShadcnInput
                   id="email"
+                  v-model="email"
                   type="email"
                   name="email"
-                  v-model="email"
                   placeholder="your.name@domain.tld"
                   required
                   autocomplete="email"
                 />
               </div>
 
-              <ul v-if="emailErrors?.length > 0" class="pl-5 list-disc">
+              <ul
+                v-if="emailErrors?.length > 0"
+                class="pl-5 list-disc"
+              >
                 <li
                   v-for="error in emailErrors"
+                  :key="useSsrSaveId"
                   class="text-sm font-bold text-destructive"
                 >
-                  {{ error }}<br />
+                  {{ error }}<br>
                 </li>
               </ul>
             </div>
             <div>
               <div class="grid gap-2 mb-1">
-                <ShadcnLabel for="password">Password</ShadcnLabel>
-                <PasswordInput :onEnter="signUp" v-model="password" />
+                <ShadcnLabel for="password">
+                  Password
+                </ShadcnLabel>
+                <PasswordInput
+                  v-model="password"
+                  :on-enter="signUp"
+                />
               </div>
 
-              <ul v-if="passwordErrors?.length > 0" class="pl-5 list-disc">
+              <ul
+                v-if="passwordErrors?.length > 0"
+                class="pl-5 list-disc"
+              >
                 <li
                   v-for="error in passwordErrors"
+                  :key="useSsrSaveId"
                   class="text-sm font-bold text-destructive"
                 >
-                  {{ error }}<br />
+                  {{ error }}<br>
                 </li>
               </ul>
             </div>
-            <ShadcnButton type="button" class="w-full" @click="signUp()">
+            <ShadcnButton
+              type="button"
+              class="w-full"
+              @click="signUp()"
+            >
               Create an account
             </ShadcnButton>
-            <ShadcnSeparator label="or Oauth" class="my-2" />
+            <ShadcnSeparator
+              label="or Oauth"
+              class="my-2"
+            />
             <div class="flex flex-col gap-1">
               <ShadcnButton
                 type="button"
@@ -140,7 +166,12 @@ async function signUp() {
           </div>
           <div class="mt-4 text-sm text-center">
             Already have an account?
-            <NuxtLink to="/login" class="underline"> Log In </NuxtLink>
+            <NuxtLink
+              to="/login"
+              class="underline"
+            >
+              Log In
+            </NuxtLink>
           </div>
         </form>
       </ShadcnCardContent>

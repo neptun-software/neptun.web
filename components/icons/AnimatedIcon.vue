@@ -2,8 +2,8 @@
 import { Vue3Lottie } from 'vue3-lottie';
 
 const props = defineProps<{
-  animationIsActive?: boolean;
-  animationLink: string;
+  animationIsActive?: boolean
+  animationLink: string
 }>();
 
 // pauseAnimation prop only works 2 times somehow, that is why I have to rerender every time
@@ -25,15 +25,15 @@ watch(
     <ClientOnly>
       <Vue3Lottie
         :key="animationKey"
-        :animationLink="animationLink"
+        :animation-link="animationLink"
         :height="20"
         :width="20"
-        :autoPlay="animationIsActive"
+        :auto-play="animationIsActive"
         :loop="false"
-        :playOnHover="false"
+        :play-on-hover="false"
       />
       <template #fallback>
-        <slot></slot>
+        <slot />
       </template>
     </ClientOnly>
   </div>

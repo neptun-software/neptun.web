@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
       return true;
     }
     return false;
-  });
+  })
 
   if (isProtected) {
     if (LOG_BACKEND) {
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const session = await requireUserSession(event); // should return error if no session
-    event.context.user =
-      session.user; /* Context is accessible in the route, that runs after the middleware. */
+    event.context.user
+      = session.user; /* Context is accessible in the route, that runs after the middleware. */
   }
 });

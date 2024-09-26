@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'vue';
 import { navigateTo } from '#imports';
 
 const props = defineProps<{
-  class?: HTMLAttributes['class'];
+  class?: HTMLAttributes['class']
 }>();
 
 const { loggedIn, user, clear } = useUserSession();
@@ -22,20 +22,18 @@ const { headerNavigationElement } = useUiStore(); // don't bind using :ref (VNod
       <AppLinks layout="navigation" />
       <div class="flex items-center gap-2">
         <ShadcnButton
-          variant="outline"
           v-if="loggedIn"
+          variant="outline"
           class="truncate"
           @click="clear().finally(async () => await navigateTo('/home'))"
         >
           Sign Out
-          <span class="hidden ml-1 lg:block"
-            >{{ user?.primary_email.substring(0, 15)
-            }}{{
-              user?.primary_email && user?.primary_email.length > 15
-                ? '...'
-                : ''
-            }}</span
-          >
+          <span class="hidden ml-1 lg:block">{{ user?.primary_email.substring(0, 15)
+          }}{{
+            user?.primary_email && user?.primary_email.length > 15
+              ? '...'
+              : ''
+          }}</span>
         </ShadcnButton>
         <ThemeToggle />
       </div>

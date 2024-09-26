@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeChatId.statusCode,
         statusMessage: maybeChatId.statusMessage,
-        data: maybeChatId.data,
+        data: maybeChatId.data
       })
     );
   }
@@ -18,4 +18,4 @@ export default defineEventHandler(async (event) => {
 
   return await deleteChatConversation(chat_id);
   // return null; // => No Content
-});
+})

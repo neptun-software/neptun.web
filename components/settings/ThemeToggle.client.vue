@@ -20,24 +20,27 @@ const colorMode = useColorMode();
           <span class="sr-only">Toggle theme</span>
         </ShadcnButton>
       </ShadcnDropdownMenuTrigger>
-      <ShadcnDropdownMenuContent align="end" class="flex flex-col gap-1">
+      <ShadcnDropdownMenuContent
+        align="end"
+        class="flex flex-col gap-1"
+      >
         <ShadcnDropdownMenuItem
           class="cursor-pointer"
-          @click="colorMode.preference = 'light'"
-          v-bind:class="{
+          :class="{
             'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground':
-              colorMode.value === 'light',
+              colorMode.value === 'light'
           }"
+          @click="colorMode.preference = 'light'"
         >
           Light
         </ShadcnDropdownMenuItem>
         <ShadcnDropdownMenuItem
           class="cursor-pointer"
-          @click="colorMode.preference = 'dark'"
-          v-bind:class="{
+          :class="{
             'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground':
-              colorMode.value === 'dark',
+              colorMode.value === 'dark'
           }"
+          @click="colorMode.preference = 'dark'"
         >
           Dark
         </ShadcnDropdownMenuItem>

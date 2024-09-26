@@ -2,7 +2,7 @@
 import { Trash2 } from 'lucide-vue-next';
 
 defineProps<{
-  animationIsActive?: boolean;
+  animationIsActive?: boolean
 }>();
 
 const id = useId();
@@ -11,8 +11,8 @@ const id = useId();
 <template>
   <div :id="'trash-icon-' + id">
     <AnimatedIcon
-      :animationLink="'/assets/icons/animated/Trash V2/trashV2.json'"
-      :animationIsActive="animationIsActive"
+      :animation-link="'/assets/icons/animated/Trash V2/trashV2.json'"
+      :animation-is-active="animationIsActive"
     >
       <Trash2 class="w-4 h-4 ml-1" />
     </AnimatedIcon>

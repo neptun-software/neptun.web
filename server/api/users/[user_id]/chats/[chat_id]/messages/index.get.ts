@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeChatId.statusCode,
         statusMessage: maybeChatId.statusMessage,
-        data: maybeChatId.data,
+        data: maybeChatId.data
       })
     );
   }
@@ -19,6 +19,6 @@ export default defineEventHandler(async (event) => {
   const fetchedChatMessages = await readChatConversationMessages(chat_id);
 
   return {
-    chatMessages: fetchedChatMessages,
-  };
+    chatMessages: fetchedChatMessages
+  }
 });

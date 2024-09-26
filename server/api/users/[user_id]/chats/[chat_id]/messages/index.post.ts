@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeChatId.statusCode,
         statusMessage: maybeChatId.statusMessage,
-        data: maybeChatId.data,
+        data: maybeChatId.data
       })
     );
   }
@@ -21,14 +21,14 @@ export default defineEventHandler(async (event) => {
   /* VALIDATE BODY */
   const body = await readValidatedBody(event, (body) => {
     return ChatConversationMessagesToCreateUniversalSchema.safeParse(body);
-  });
+  })
   if (!body.success || !body.data) {
     return sendError(
       event,
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request. Invalid body(message | messages).',
-        data: body.error,
+        data: body.error
       })
     );
   }
@@ -41,36 +41,37 @@ export default defineEventHandler(async (event) => {
       message: message,
       actor: actor,
       neptun_user_id: user_id,
-      chat_conversation_id: chat_id,
-    };
+      chat_conversation_id: chat_id
+    }
 
     const createdMessage = await createChatConversationMessages([
-      conversationMessageToCreate,
-    ]);
+      conversationMessageToCreate
+    ])
 
     return {
-      chatMessage: createdMessage,
-    };
-  } else if (validatedBody && 'messages' in validatedBody) {
+      chatMessage: createdMessage
+    }
+  }
+  else if (validatedBody && 'messages' in validatedBody) {
     const messages = validatedBody.messages.map(({ content, role }) => ({
       message: content,
       actor: role,
       neptun_user_id: user_id,
-      chat_conversation_id: chat_id,
+      chat_conversation_id: chat_id
     }));
 
     const createdMessages = await createChatConversationMessages(messages);
 
     return {
-      chatMessages: createdMessages,
-    };
+      chatMessages: createdMessages
+    }
   }
 
   return sendError(
     event,
     createError({
       statusCode: 400,
-      statusMessage: 'Bad Request. Invalid body(message | messages).',
+      statusMessage: 'Bad Request. Invalid body(message | messages).'
     })
   );
-});
+})

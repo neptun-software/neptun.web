@@ -2,15 +2,15 @@
 // Thanks to https://codepen.io/Mamboleoo/pen/obWGYr ♥
 
 const props = defineProps({
-  text: String,
-});
+  text: String
+})
 
 const colorMode = useColorMode();
 const colors = computed(() => {
   return colorMode.preference === 'dark'
     ? ['#00FFFF', '#1E90FF', '#00BFFF', '#00CED1', '#00B2FF']
     : ['#0e7490', '#083344', '#042f2e', '#082f49', '#60a5fa'];
-});
+})
 
 const { x, y } = useMouse();
 const { pressed } = useMousePressed(); // touch and click
@@ -23,37 +23,37 @@ const isLoaded = ref(false);
 
 watch(colors, () => {
   initScene();
-});
+})
 
 watch(x, (newX) => {
   mouse.value.x = newX;
-});
+})
 
 watch(y, (newY) => {
   mouse.value.y = newY;
-});
+})
 
 watch(pressed, () => {
   radius.value = radius.value === 5 ? 1 : radius.value + 1;
-});
+})
 
 watch(width, () => {
   initScene();
-});
+})
 
 watch(height, () => {
   initScene();
-});
+})
 
 interface Mouse {
-  x: number;
-  y: number;
+  x: number
+  y: number
 }
 
 class Particle {
   x: number;
   y: number;
-  dest: { x: number; y: number };
+  dest: { x: number, y: number };
   r: number;
   vx: number;
   vy: number;
@@ -147,12 +147,12 @@ const render = () => {
 
   requestAnimationFrame(render);
   ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
-  particles.forEach((particle) =>
+  particles.forEach(particle =>
     particle.render(ctx, mouse.value, radius.value)
   );
 
   isLoaded.value = true;
-};
+}
 
 onMounted(() => {
   if (isDesktop.value) {
@@ -166,7 +166,11 @@ const isDesktop = useMediaQuery('(min-width: 1024px)');
 
 <template>
   <div class="h-full overflow-hidden bg-slate-950">
-    <canvas ref="canvas" id="scene" class="z-10"></canvas>
+    <canvas
+      id="scene"
+      ref="canvas"
+      class="z-10"
+    />
     <div class="absolute left-0 w-full bg-cyan-600">
       <div>
         <svg
@@ -215,7 +219,7 @@ const isDesktop = useMediaQuery('(min-width: 1024px)');
     <div
       class="absolute top-0 left-0 flex items-center justify-center w-full h-full text-slate-200"
     >
-      <slot v-if="!isLoaded"></slot>
+      <slot v-if="!isLoaded" />
     </div>
   </div>
 </template>

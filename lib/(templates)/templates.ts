@@ -1,11 +1,11 @@
 export interface TemplateData {
-  id: number;
-  name: string;
+  id: number
+  name: string
   code: {
-    fileName: string;
-    code: string;
-  }[];
-  readme: string;
+    fileName: string
+    code: string
+  }[]
+  readme: string
 }
 
 export const templates: TemplateData[] = [
@@ -46,7 +46,7 @@ volumes:
   neptun_redis_data:
     driver: local
   
-        `,
+        `
       },
       {
         fileName: 'redis.conf',
@@ -1106,14 +1106,14 @@ hz 10
 # big latency spikes.
 aof-rewrite-incremental-fsync yes
   
-        `,
+        `
       },
       {
         fileName: 'postgres.extensions.sql',
         code: `
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-            `,
+            `
       },
       {
         fileName: 'postgres.datagrip.source-config',
@@ -1124,7 +1124,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 <data-source source="LOCAL" name="neptun.dev.postgres@localhost" uuid="8197c0d4-d4bd-453b-80b4-546de1ba6e15"><database-info product="PostgreSQL" version="16.2 (Debian 16.2-1.pgdg120+2)" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.6.0" dbms="POSTGRES" exact-version="16.2" exact-driver-version="42.6"><identifier-quote-string>&quot;</identifier-quote-string></database-info><case-sensitivity plain-identifiers="lower" quoted-identifiers="exact"/><driver-ref>postgresql</driver-ref><synchronize>true</synchronize><jdbc-driver>org.postgresql.Driver</jdbc-driver><jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url><secret-storage>master_key</secret-storage><user-name>postgres</user-name><schema-mapping><introspection-scope><node kind="database" qname="@"><node kind="schema" qname="@"/></node></introspection-scope></schema-mapping><working-dir>$ProjectFileDir$</working-dir></data-source>
 #END#
   
-        `,
+        `
       },
       {
         fileName: 'redis.datagrip.source-config',
@@ -1135,10 +1135,10 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 <data-source source="LOCAL" name="neptun.dev.redis@localhost" uuid="99b0bab4-55e0-4aa0-9655-a4df552b70a0"><database-info product="Redis Standalone" version="6.3.4" jdbc-version="4.2" driver-name="Redis JDBC Driver" driver-version="1.5" dbms="REDIS" exact-version="6.3.4" exact-driver-version="1.5"><jdbc-catalog-is-schema>true</jdbc-catalog-is-schema></database-info><case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed"/><driver-ref>redis</driver-ref><synchronize>true</synchronize><jdbc-driver>jdbc.RedisDriver</jdbc-driver><jdbc-url>jdbc:redis://localhost:6379/0</jdbc-url><secret-storage>master_key</secret-storage><auth-provider>no-auth</auth-provider><user-name>redis</user-name><schema-mapping/><working-dir>$ProjectFileDir$</working-dir></data-source>
 #END#
   
-        `,
-      },
+        `
+      }
     ],
-    readme: '',
+    readme: ''
   },
   {
     id: 2,
@@ -1166,14 +1166,14 @@ volumes:
   neptun_postgres_data:
     driver: local
   
-        `,
+        `
       },
       {
         fileName: 'postgres.extensions.sql',
         code: `
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-            `,
+            `
       },
       {
         fileName: 'postgres.datagrip.source-config',
@@ -1184,10 +1184,10 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 <data-source source="LOCAL" name="neptun.dev.postgres@localhost" uuid="8197c0d4-d4bd-453b-80b4-546de1ba6e15"><database-info product="PostgreSQL" version="16.2 (Debian 16.2-1.pgdg120+2)" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.6.0" dbms="POSTGRES" exact-version="16.2" exact-driver-version="42.6"><identifier-quote-string>&quot;</identifier-quote-string></database-info><case-sensitivity plain-identifiers="lower" quoted-identifiers="exact"/><driver-ref>postgresql</driver-ref><synchronize>true</synchronize><jdbc-driver>org.postgresql.Driver</jdbc-driver><jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url><secret-storage>master_key</secret-storage><user-name>postgres</user-name><schema-mapping><introspection-scope><node kind="database" qname="@"><node kind="schema" qname="@"/></node></introspection-scope></schema-mapping><working-dir>$ProjectFileDir$</working-dir></data-source>
 #END#
   
-        `,
-      },
+        `
+      }
     ],
-    readme: '',
+    readme: ''
   },
   {
     id: 3,
@@ -1213,7 +1213,7 @@ volumes:
   neptun_redis_data:
     driver: local
   
-        `,
+        `
       },
       {
         fileName: 'redis.conf',
@@ -2273,7 +2273,7 @@ hz 10
 # big latency spikes.
 aof-rewrite-incremental-fsync yes
   
-        `,
+        `
       },
       {
         fileName: 'redis.datagrip.source-config',
@@ -2284,9 +2284,9 @@ aof-rewrite-incremental-fsync yes
 <data-source source="LOCAL" name="neptun.dev.redis@localhost" uuid="99b0bab4-55e0-4aa0-9655-a4df552b70a0"><database-info product="Redis Standalone" version="6.3.4" jdbc-version="4.2" driver-name="Redis JDBC Driver" driver-version="1.5" dbms="REDIS" exact-version="6.3.4" exact-driver-version="1.5"><jdbc-catalog-is-schema>true</jdbc-catalog-is-schema></database-info><case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed"/><driver-ref>redis</driver-ref><synchronize>true</synchronize><jdbc-driver>jdbc.RedisDriver</jdbc-driver><jdbc-url>jdbc:redis://localhost:6379/0</jdbc-url><secret-storage>master_key</secret-storage><auth-provider>no-auth</auth-provider><user-name>redis</user-name><schema-mapping/><working-dir>$ProjectFileDir$</working-dir></data-source>
 #END#
   
-        `,
-      },
+        `
+      }
     ],
-    readme: '',
-  },
-];
+    readme: ''
+  }
+]

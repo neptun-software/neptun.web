@@ -1,4 +1,4 @@
-import { defaultAiModelDomain } from "~/lib/types/ai.models";
+import { defaultAiModelDomain } from '~/lib/types/ai.models';
 
 export default defineEventHandler(async (event) => {
   const sessionState = await requireUserSession(event);
@@ -15,24 +15,25 @@ export default defineEventHandler(async (event) => {
   const url = event.context.siteConfig.get().url;
 
   const CLI_CONFIGURATION = {
-    "utils": {
-      "neptun_api_server_host": `${url}api`,
-      "neptun_github_app_url": "https://github.com/apps/neptun-github-app/installations/new"
+    utils: {
+      neptun_api_server_host: `${url}api`,
+      neptun_github_app_url:
+        'https://github.com/apps/neptun-github-app/installations/new'
     },
-    "auth": {
-      "neptun_session_cookie": session,
-      "user": {
-        "id": userId,
-        "email": email,
-        "oauth": oauth
+    auth: {
+      neptun_session_cookie: session,
+      user: {
+        id: userId,
+        email: email,
+        oauth: oauth
       }
     },
-    "active_chat": {
-      "chat_id": -1,
-      "chat_name": `chat-${Date.now()}`,
-      "model": defaultAiModelDomain
+    active_chat: {
+      chat_id: -1,
+      chat_name: `chat-${Date.now()}`,
+      model: defaultAiModelDomain
     }
   }
 
   return CLI_CONFIGURATION;
-});
+})
