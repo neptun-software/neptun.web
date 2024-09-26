@@ -475,6 +475,28 @@
         }
       }
     },
+    "/api/users/{user_id}/cli": {
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/users/{user_id}": {
       "delete": {
         "tags": [
@@ -497,6 +519,58 @@
         }
       },
       "patch": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/installations/{installation_id}/imports": {
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "installation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/installations": {
+      "get": {
         "tags": [
           "API Routes"
         ],
