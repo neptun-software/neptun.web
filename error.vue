@@ -8,7 +8,7 @@ defineProps({
 const handleError = () => clearError({ redirect: '/home' });
 </script>
 
-<template #error="{ error }">
+<template>
   <NuxtLayout>
     <div class="flex flex-col items-center justify-center h-full bg-slate-950">
       <BubbleText :text="String(error?.statusCode ?? 500)">

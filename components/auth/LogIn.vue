@@ -48,8 +48,6 @@ async function signIn() {
     redirectCode: 303
   });
 }
-
-const useSsrSaveId = () => useId() ?? new Date().getTime().toString();
 </script>
 
 <template>
@@ -88,8 +86,8 @@ const useSsrSaveId = () => useId() ?? new Date().getTime().toString();
                 class="pl-5 list-disc"
               >
                 <li
-                  v-for="error in emailErrors"
-                  :key="useSsrSaveId"
+                  v-for="(error, index) in emailErrors"
+                  :key="index"
                   class="text-sm font-bold text-destructive"
                 >
                   {{ error }}<br>
@@ -120,8 +118,8 @@ const useSsrSaveId = () => useId() ?? new Date().getTime().toString();
                 class="pl-5 list-disc"
               >
                 <li
-                  v-for="error in passwordErrors"
-                  :key="useSsrSaveId"
+                  v-for="(error, index) in passwordErrors"
+                  :key="index"
                   class="text-sm font-bold text-destructive"
                 >
                   {{ error }}<br>

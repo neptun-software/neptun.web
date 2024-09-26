@@ -31,7 +31,6 @@ const visibleRoutes = computed(() => {
 });
 
 const { width: windowWidth } = useWindowSize();
-const useSsrSaveId = () => useId();
 
 const sortedRoutes = computed(() => {
   const homeRoute = visibleRoutes.value.find(route => route.path === '/home');
@@ -58,13 +57,13 @@ const sortedRoutes = computed(() => {
         <ShadcnDropdownMenuContent class="ml-4">
           <ShadcnDropdownMenuItem
             v-for="route in visibleRoutes"
-            :key="useSsrSaveId"
+            :key="route.path"
           >
             <NuxtLink
               :to="route.path"
               active-class="underline"
             >
-              <p :key="useSsrSaveId">
+              <p>
                 {{ route.name }}
               </p>
             </NuxtLink>
@@ -83,7 +82,7 @@ const sortedRoutes = computed(() => {
     >
       <li
         v-for="route in sortedRoutes"
-        :key="useSsrSaveId"
+        :key="route.path"
       >
         <NuxtLink
           v-if="layout === 'navigation' && route.path === '/home'"

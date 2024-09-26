@@ -7,7 +7,6 @@ defineProps<{
   messages: Message[]
 }>();
 
-const useSsrSaveId = () => useId();
 const $messagesList = ref<HTMLElement | null>(null);
 
 // adds "copy code" button to each code block
@@ -51,7 +50,7 @@ onMounted(() => {
   <div ref="$messagesList">
     <AiChatMessage
       v-for="message in messages"
-      :key="useSsrSaveId()"
+      :key="message.id"
       :message="message"
     />
   </div>

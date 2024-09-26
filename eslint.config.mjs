@@ -6,6 +6,7 @@ export default withNuxt({
     'vue/multi-word-component-names': 'off',
     'vue/no-v-html': 'off',
     '@typescript-eslint/triple-slash-reference': 'off',
-    '@typescript-eslint/no-explicit-any': 'off'
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off'
   }
 });

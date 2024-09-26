@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { BundledLanguage } from 'shiki'
-import { Loader2 } from 'lucide-vue-next'
-import { templates, type TemplateData } from '~/lib/(templates)/templates'
+import type { BundledLanguage } from 'shiki';
+import { Loader2 } from 'lucide-vue-next';
+import { templates, type TemplateData } from '~/lib/(templates)/templates';
 
 const database = ref(templates) as Ref<TemplateData[]>;
 const data: Ref<TemplateData[]> = ref([]);
@@ -17,7 +17,7 @@ function fetch(page: number, pageSize: number) {
     setTimeout(() => {
       resolve(database.value.slice(start, end));
     }, 100);
-  })
+  });
 }
 
 async function loadMore() {
@@ -36,9 +36,7 @@ async function loadMore() {
 
 useInfiniteScroll(document, loadMore, {
   distance: 100
-})
-
-const useSsrSaveId = () => useId();
+});
 </script>
 
 <template>
@@ -69,8 +67,8 @@ const useSsrSaveId = () => useId();
           <ShadcnTabsList class="flex justify-start flex-grow">
             <ShadcnScrollBar orientation="horizontal" />
             <ShadcnTabsTrigger
-              v-for="c in d.code"
-              :key="useSsrSaveId.toString()"
+              v-for="(c, index) in d.code"
+              :key="index"
               :value="c.fileName"
             >
               <code>
@@ -80,8 +78,8 @@ const useSsrSaveId = () => useId();
           </ShadcnTabsList>
         </ShadcnScrollArea>
         <ShadcnTabsContent
-          v-for="c in d.code"
-          :key="useSsrSaveId.toString()"
+          v-for="(c, index) in d.code"
+          :key="index"
           class="relative"
           :value="c.fileName"
         >

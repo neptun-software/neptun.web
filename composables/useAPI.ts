@@ -26,8 +26,8 @@ export const useAPI = () => {
       error: (_data: any) => string
     } | null = null
   ): Promise<T> => {
-    const fetchPromise = new Promise<T>(async (resolve, reject) => {
-      await useFetch(url, {
+    const fetchPromise = new Promise<T>((resolve, reject) => {
+      useFetch(url, {
         ...options,
         onResponse({ response }: any) {
           // THIS IS CALLED EVERY TIME, ALSO IF RESPONSE IS NOT OK!
@@ -38,14 +38,14 @@ export const useAPI = () => {
         onResponseError({ response }: any) {
           reject(response._data);
         }
-      });
-    })
+      }).catch(reject);
+    });
 
     if (toastMessages) {
       toast.promise(fetchPromise, toastMessages);
     }
 
-    return fetchPromise.then(_data => _data);
+    return fetchPromise;
   }
 
   const generateMarkdownFromUrl = async (
@@ -266,7 +266,7 @@ export const useAPI = () => {
       }
 
       try {
-        await handleFetch<void>(url, options, toastMessages);
+        await handleFetch(url, options, toastMessages);
       }
       catch {
         console.error('Failed to delete chat!');
@@ -289,7 +289,7 @@ export const useAPI = () => {
     }
 
     try {
-      await handleFetch<void>(url, options, toastMessages);
+      await handleFetch(url, options, toastMessages);
     }
     catch {
       console.error('Failed to delete chats!');

@@ -64,7 +64,6 @@ type Installation = {
   updated_at: string
 };
 
-const useSsrSaveId = () => useId();
 const columns: ColumnDef<Installation>[] = [
   {
     accessorKey: 'github_account_avatar_url',

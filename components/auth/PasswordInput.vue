@@ -2,29 +2,34 @@
 import { Eye, EyeOff } from 'lucide-vue-next';
 
 interface Props {
-  onEnter: () => Promise<any>
-  modelValue: string // password
+  onEnter: () => Promise<any>;
+  modelValue: string; // password
 }
 
 const props = defineProps<Props>();
+
+const emit = defineEmits(['update:modelValue']);
+const onInput = (value: string) => {
+  emit('update:modelValue', value);
+};
+
 const passwordIsVisible = ref(false);
 const togglePasswordVisibility = () => {
   passwordIsVisible.value = !passwordIsVisible.value;
-}
+};
 </script>
 
 <template>
   <div class="relative">
     <ShadcnInput
       id="password"
-      v-model="props.modelValue"
       :type="passwordIsVisible ? 'text' : 'password'"
       placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
       name="password"
       required
       autocomplete="current-password"
       @keydown.enter="props.onEnter()"
-      @input="$emit('update:modelValue', $event.target.value)"
+      @input="onInput($event.target.value)"
     />
     <ShadcnButton
       type="button"

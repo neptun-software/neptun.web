@@ -39,12 +39,15 @@ defineProps(['src', 'icon', 'title', 'description', 'index']);
               height="200"
               :alt="title"
             />
-            <component :is="icon" v-else class="text-white size-10" />
+            <component
+              :is="icon"
+              v-else
+              class="text-white size-10"
+            />
 
             <span
               class="text-5xl font-medium transition-all delay-75 text-muted-foreground/15 group-hover/number:text-muted-foreground/30"
-              >0{{ index + 1 }}</span
-            >
+            >0{{ index + 1 }}</span>
           </div>
 
           <CardTitle class="text-white">

@@ -357,7 +357,7 @@ async function deleteLast() {
     });
 }
 
-async function downloadChatMessages(event = null) {
+async function downloadChatMessages(_event = null) {
   await downloadAsFile(chatMessages.value, 'chat-messages');
 }
 </script>

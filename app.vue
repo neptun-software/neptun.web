@@ -3,7 +3,6 @@ import { ConfigProvider } from 'radix-vue';
 
 const router = useRouter();
 const currentRouteName = computed(() => router.currentRoute.value.name);
-const useSsrSaveId = () => useId() ?? new Date().getTime().toString();
 </script>
 
 <template>
