@@ -49,8 +49,17 @@ export default defineNuxtConfig({
 
   vite: {
     logLevel: 'warn', // 'info' | 'warn' | 'error' | 'silent'
-    plugins: [removeConsole()]
+    plugins: [removeConsole()],
+    css: {
+      preprocessorOptions: {
+        sass: {
+          api: 'modern-compiler'
+        }
+      }
+    }
   },
+
+  css: ['~/assets/css/app.css'],
 
   routeRules: {
     '/api/**': {
@@ -230,7 +239,6 @@ export default defineNuxtConfig({
     }
   },
 
-  css: ['~/assets/css/app.css'],
   build: {
     transpile: ['gsap']
   },
