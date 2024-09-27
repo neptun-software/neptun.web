@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
       event,
       createError({
         statusCode: 400,
-        statusMessage: 'Bad Request.',
+        statusMessage: 'Bad Request. Missing installation_id.',
         message: 'Missing installation_id.'
       })
     );
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
       event,
       createError({
         statusCode: 400,
-        statusMessage: 'Bad Request.',
+        statusMessage: 'Bad Request. Invalid installation_id. Must be a number.',
         message: 'Invalid installation_id. Must be a number.'
       })
     );
@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
           event,
           createError({
             statusCode: 400,
-            statusMessage: 'Bad Request.',
+            statusMessage: 'Bad Request. Invalid installation_id. The installation doesn\'t belong to any Github App.',
             message:
               'Invalid installation_id. The installation doesn\'t belong to any Github App.'
           })
@@ -260,11 +260,14 @@ export default defineEventHandler(async (event) => {
             return sendRedirect(event, `/home`);
           }
           catch (error) {
-            if (LOG_BACKEND) console.error(2, error);
-            if (LOG_BACKEND)
+            if (LOG_BACKEND) {
               console.info(
                 'Failed to create github app installation repositories in database.'
               );
+
+              console.error(2, error);
+            }
+
             return sendError(
               event,
               createError({
@@ -277,11 +280,14 @@ export default defineEventHandler(async (event) => {
           }
         }
         catch (error) {
-          if (LOG_BACKEND) console.error(1, error);
-          if (LOG_BACKEND)
+          if (LOG_BACKEND) {
             console.info(
               'Failed to create github app installation repositories in database.'
             );
+
+            console.error(1, error);
+          }
+
           return sendError(
             event,
             createError({
@@ -293,48 +299,60 @@ export default defineEventHandler(async (event) => {
           );
         }
       }
-      catch {
-        if (LOG_BACKEND)
+      catch (error) {
+        if (LOG_BACKEND) {
           console.info(
             'Failed to find user. You have to install the app, with a Github Account, that you registered an account on neptun!'
           );
+
+          console.error(error);
+        }
+
         return sendError(
           event,
           createError({
             statusCode: 400,
-            statusMessage: 'Bad Request.',
+            statusMessage: 'Bad Request. Failed to find user. You have to install the app, with a Github Account, that you registered an account on neptun!',
             message:
               'Failed to find user. You have to install the app, with a Github Account, that you registered an account on neptun!'
           })
         );
       }
     }
-    catch {
-      if (LOG_BACKEND)
+    catch (error) {
+      if (LOG_BACKEND) {
         console.info(
           'Invalid installation_id. The installation is not found or the user does not have access to it.'
         );
+
+        console.error(error);
+      }
+
       return sendError(
         event,
         createError({
           statusCode: 400,
-          statusMessage: 'Bad Request.',
+          statusMessage: 'Bad Request. Invalid installation_id. The installation is not found or the user does not have access to it.',
           message:
             'Invalid installation_id. The installation is not found or the user does not have access to it.'
         })
       );
     }
   }
-  catch {
-    if (LOG_BACKEND)
+  catch (error) {
+    if (LOG_BACKEND) {
       console.info(
         'Invalid installation_id. The installation doesn\'t belong to any Github App.'
       );
+
+      console.error(error);
+    }
+
     return sendError(
       event,
       createError({
         statusCode: 400,
-        statusMessage: 'Bad Request.',
+        statusMessage: 'Bad Request. Invalid installation_id. The installation doesn\'t belong to any Github App.',
         message:
           'Invalid installation_id. The installation doesn\'t belong to any Github App.'
       })
