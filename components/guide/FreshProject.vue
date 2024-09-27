@@ -10,17 +10,17 @@ const formSchema = [
     'project-type': z.union([
       z.literal('web-site', {
         message:
-          'No project type selected. Project type is required. Possible values: Website, Webservice or Webapp.'
+          'No project type selected. Project type is required. Possible values: Website, Webservice or Webapp.',
       }),
       z.literal('web-service'),
-      z.literal('web-app')
-    ])
+      z.literal('web-app'),
+    ]),
   }),
   z.object({
     'project-language': z.union([
       z.literal('typescript', {
         message:
-          'No project type selected. Project type is required. Possible values: Typescript, Javascript, PHP, Go, Python, Java, Kotlin, Ruby or Elixir.'
+          'No project type selected. Project type is required. Possible values: Typescript, Javascript, PHP, Go, Python, Java, Kotlin, Ruby or Elixir.',
       }),
       z.literal('javascript'),
       z.literal('php'),
@@ -29,29 +29,29 @@ const formSchema = [
       z.literal('java'),
       z.literal('kotlin'),
       z.literal('ruby'),
-      z.literal('elixir')
-    ])
-  })
-]
+      z.literal('elixir'),
+    ]),
+  }),
+];
 
 const stepIndex = ref(1);
 const steps = [
   {
     step: 1,
     title: 'Type',
-    description: 'Choose the type of project.'
+    description: 'Choose the type of project.',
   },
   {
     step: 2,
     title: 'Language',
-    description: 'Choose a preferred programming language.'
+    description: 'Choose a preferred programming language.',
   },
   {
     step: 3,
     title: 'Done!',
-    description: 'That\'s it. You can now start coding.'
-  }
-]
+    description: "That's it. You can now start coding.",
+  },
+];
 
 const canGoNext = computed(() => stepIndex.value < steps.length);
 const canGoBack = computed(() => stepIndex.value > 1);
@@ -72,11 +72,11 @@ function onSubmit(values: any) {
       'pre',
       {
         class:
-          'mt-2 w-fit max-w-full overflow-x-auto rounded-md bg-slate-950 p-2'
+          'mt-2 w-fit max-w-full overflow-x-auto rounded-md bg-slate-950 p-2',
       },
       h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))
-    )
-  })
+    ),
+  });
 }
 
 const doCreateGitRepository = ref(false);
@@ -101,10 +101,7 @@ const doCreateGitRepository = ref(false);
         }
       "
     >
-      <ShadcnStepper
-        v-model="stepIndex"
-        class="flex items-start w-full gap-2"
-      >
+      <ShadcnStepper v-model="stepIndex" class="flex items-start w-full gap-2">
         <ShadcnStepperItem
           v-for="step in steps"
           :key="step.step"
@@ -127,15 +124,12 @@ const doCreateGitRepository = ref(false);
               size="icon"
               class="z-10 rounded-full shrink-0"
               :class="[
-                state === 'active'
-                  && 'ring-2 ring-ring ring-offset-2 ring-offset-background'
+                state === 'active' &&
+                  'ring-2 ring-ring ring-offset-2 ring-offset-background',
               ]"
               :disabled="state !== 'completed' && !meta.valid"
             >
-              <Check
-                v-if="state === 'completed'"
-                class="size-5"
-              />
+              <Check v-if="state === 'completed'" class="size-5" />
               <Circle v-if="state === 'active'" />
               <Dot v-if="state === 'inactive'" />
             </ShadcnButton>
@@ -160,10 +154,7 @@ const doCreateGitRepository = ref(false);
 
       <div class="flex flex-col gap-4 mt-4">
         <template v-if="stepIndex === 1">
-          <ShadcnFormField
-            v-slot="{ componentField }"
-            name="project-type"
-          >
+          <ShadcnFormField v-slot="{ componentField }" name="project-type">
             <ShadcnFormItem>
               <ShadcnFormLabel>Project Type</ShadcnFormLabel>
 
@@ -196,10 +187,7 @@ const doCreateGitRepository = ref(false);
         </template>
 
         <template v-if="stepIndex === 2">
-          <ShadcnFormField
-            v-slot="{ componentField }"
-            name="project-language"
-          >
+          <ShadcnFormField v-slot="{ componentField }" name="project-language">
             <ShadcnFormItem>
               <ShadcnFormLabel>Preferred Programming Language</ShadcnFormLabel>
 
@@ -221,27 +209,13 @@ const doCreateGitRepository = ref(false);
                     <ShadcnSelectItem value="javascript">
                       Javascript
                     </ShadcnSelectItem>
-                    <ShadcnSelectItem value="php">
-                      PHP
-                    </ShadcnSelectItem>
-                    <ShadcnSelectItem value="go">
-                      Go
-                    </ShadcnSelectItem>
-                    <ShadcnSelectItem value="python">
-                      Python
-                    </ShadcnSelectItem>
-                    <ShadcnSelectItem value="java">
-                      Java
-                    </ShadcnSelectItem>
-                    <ShadcnSelectItem value="kotlin">
-                      Kotlin
-                    </ShadcnSelectItem>
-                    <ShadcnSelectItem value="ruby">
-                      Ruby
-                    </ShadcnSelectItem>
-                    <ShadcnSelectItem value="elixir">
-                      Elixir
-                    </ShadcnSelectItem>
+                    <ShadcnSelectItem value="php"> PHP </ShadcnSelectItem>
+                    <ShadcnSelectItem value="go"> Go </ShadcnSelectItem>
+                    <ShadcnSelectItem value="python"> Python </ShadcnSelectItem>
+                    <ShadcnSelectItem value="java"> Java </ShadcnSelectItem>
+                    <ShadcnSelectItem value="kotlin"> Kotlin </ShadcnSelectItem>
+                    <ShadcnSelectItem value="ruby"> Ruby </ShadcnSelectItem>
+                    <ShadcnSelectItem value="elixir"> Elixir </ShadcnSelectItem>
                   </ShadcnSelectGroup>
                 </ShadcnSelectContent>
               </ShadcnSelect>
@@ -252,7 +226,7 @@ const doCreateGitRepository = ref(false);
 
         <template v-if="stepIndex === 3">
           This is your configuration:
-          <span class="prose">
+          <span class="prose dark:prose-invert">
             <code>
               {{ JSON.stringify(values, null, 2) }}
             </code>
@@ -291,11 +265,7 @@ const doCreateGitRepository = ref(false);
           >
             Next
           </ShadcnButton>
-          <ShadcnButton
-            v-if="stepIndex === 3"
-            size="sm"
-            type="submit"
-          >
+          <ShadcnButton v-if="stepIndex === 3" size="sm" type="submit">
             Generate Project
           </ShadcnButton>
         </div>

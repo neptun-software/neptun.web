@@ -7,7 +7,7 @@ import {
   useVueTable,
   type ColumnDef,
   getSortedRowModel,
-  type SortingState
+  type SortingState,
 } from '@tanstack/vue-table';
 import { toast } from 'vue-sonner';
 import { CaretSortIcon } from '@radix-icons/vue';
@@ -18,7 +18,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from '@/components/ui/table';
 import { NuxtImg } from '#components';
 import Button from '~/components/ui/button/Button.vue';
@@ -56,12 +56,12 @@ const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);
 
 type Installation = {
-  id: number
-  github_account_name: string
-  github_account_type: string
-  github_account_avatar_url: string
-  created_at: string
-  updated_at: string
+  id: number;
+  github_account_name: string;
+  github_account_type: string;
+  github_account_avatar_url: string;
+  created_at: string;
+  updated_at: string;
 };
 
 const columns: ColumnDef<Installation>[] = [
@@ -73,13 +73,13 @@ const columns: ColumnDef<Installation>[] = [
         src: row.original.github_account_avatar_url,
         nonce: useSsrSaveId(),
         alt: 'Avatar',
-        class: 'w-10 h-10 rounded-full'
-      })
+        class: 'w-10 h-10 rounded-full',
+      }),
   },
   {
     accessorKey: 'id',
     header: 'ID',
-    cell: ({ row }) => row.index + 1
+    cell: ({ row }) => row.index + 1,
   },
   {
     accessorKey: 'github_account_name',
@@ -88,27 +88,27 @@ const columns: ColumnDef<Installation>[] = [
         Button,
         {
           variant: 'ghost',
-          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
         () => ['Account Name', h(CaretSortIcon, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) =>
-      h('div', { class: 'lowercase' }, row.getValue('github_account_name'))
+      h('div', { class: 'lowercase' }, row.getValue('github_account_name')),
   },
   {
     accessorKey: 'github_account_type',
-    header: 'Account Type (User or Organization)'
+    header: 'Account Type (User or Organization)',
   },
   {
     accessorKey: 'created_at',
     header: 'Created At',
-    cell: ({ row }) => new Date(row.original.created_at).toLocaleString()
+    cell: ({ row }) => new Date(row.original.created_at).toLocaleString(),
   },
   {
     accessorKey: 'updated_at',
     header: 'Updated At',
-    cell: ({ row }) => new Date(row.original.updated_at).toLocaleString()
+    cell: ({ row }) => new Date(row.original.updated_at).toLocaleString(),
   },
   {
     id: 'actions',
@@ -123,11 +123,11 @@ const columns: ColumnDef<Installation>[] = [
             toast.error(
               `Coming Soon... Deleting installation ${row.original.id}...`
             );
-          }
+          },
         },
         () => 'Delete'
-      )
-  }
+      ),
+  },
 ];
 
 const table = useVueTable({
@@ -138,7 +138,7 @@ const table = useVueTable({
   getCoreRowModel: getCoreRowModel(),
 
   getSortedRowModel: getSortedRowModel(),
-  onSortingChange: updaterOrValue => valueUpdater(updaterOrValue, sorting),
+  onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
 
   onColumnFiltersChange: (updaterOrValue) => {
     return valueUpdater(updaterOrValue, columnFilters);
@@ -150,8 +150,8 @@ const table = useVueTable({
     },
     get columnFilters() {
       return columnFilters.value;
-    }
-  }
+    },
+  },
 });
 
 const selectedInstallationId = useSelectedInstallation();
@@ -163,13 +163,11 @@ watch(selectedInstallationId, async (newValue) => {
       resolvedImports.value = await $fetch<Import[]>(
         `/api/users/${user.value?.id ?? -1}/installations/${newValue}/imports`
       );
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to fetch imports:', error);
       resolvedImports.value = null;
     }
-  }
-  else {
+  } else {
     resolvedImports.value = null;
   }
 });
@@ -178,9 +176,7 @@ watch(selectedInstallationId, async (newValue) => {
 <template>
   <div>
     <div v-if="error">
-      <p class="text-red-500">
-        Failed to fetch imports.
-      </p>
+      <p class="text-red-500">Failed to fetch imports.</p>
     </div>
     <div v-else>
       <template v-if="selectedInstallationId === -1">
@@ -209,7 +205,7 @@ watch(selectedInstallationId, async (newValue) => {
               />
             </div>
 
-            <ShadcnScrollArea class="max-w-[calc(100vw-8rem)] w-full">
+            <ShadcnScrollArea class="w-full max-w-[calc(100vw-4.4rem)]">
               <Table>
                 <ShadcnScrollBar orientation="horizontal" />
                 <TableHeader class="w-full">
@@ -225,7 +221,7 @@ watch(selectedInstallationId, async (newValue) => {
                         :is="header.isPlaceholder ? 'span' : 'div'"
                         :class="{
                           'cursor-pointer select-none':
-                            header.column.getCanSort()
+                            header.column.getCanSort(),
                         }"
                         @click="header.column.getToggleSortingHandler()"
                       >

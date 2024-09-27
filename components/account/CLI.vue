@@ -17,9 +17,9 @@ const cliConfigurationToCopy = computed(() => {
     active_chat: {
       chat_id: selectedAiChatId.value,
       chat_name: selectedAiChatName.value,
-      model: selectedAiChatModel.value
-    }
-  }
+      model: selectedAiChatModel.value,
+    },
+  };
 });
 
 const cliConfigurationMarkdown = computed(() => {
@@ -28,11 +28,11 @@ const cliConfigurationMarkdown = computed(() => {
     null,
     2
   )}\n\`\`\``;
-})
+});
 
 const textForClipboard = computed(() => {
   return JSON.stringify(cliConfigurationToCopy.value, null, 2);
-})
+});
 
 async function downloadConfiguration() {
   await downloadAsFile(cliConfigurationToCopy.value, 'neptun-config');
@@ -43,7 +43,7 @@ async function downloadConfiguration() {
   <div
     class="relative px-4 py-2 my-2 border rounded-lg bg-background border-slate-200 dark:border-border"
   >
-    <ShadcnScrollArea class="max-w-[calc(100vw-8rem)]">
+    <ShadcnScrollArea class="max-w-[calc(100vw-(7rem))]">
       <ShadcnScrollBar orientation="horizontal" />
       <div>
         <ClientOnly fallback-tag="div">
@@ -55,9 +55,7 @@ async function downloadConfiguration() {
             <ShadcnSkeleton class="w-full h-10 bg-slate-400" />
           </template>
           <template v-if="error">
-            <p class="text-red-500">
-              Failed to fetch CLI configuration.
-            </p>
+            <p class="text-red-500">Failed to fetch CLI configuration.</p>
           </template>
           <span class="absolute right-0 flex items-center gap-2 top-2">
             <ShadcnButton
