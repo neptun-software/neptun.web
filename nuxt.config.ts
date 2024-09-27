@@ -1,9 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 import type { HTTPMethod } from 'nuxt-security';
-import removeConsole from 'vite-plugin-remove-console'
-import { protectedRoutes } from './utils/pages'
-import { supportedShikiLanguages } from './utils/formatters'
+import removeConsole from 'vite-plugin-remove-console';
+import { protectedRoutes } from './utils/pages';
+import { supportedShikiLanguages } from './utils/formatters';
 
 const productionURL = 'https://neptun-webui.vercel.app';
 const corsHandler = {
@@ -13,6 +13,9 @@ const corsHandler = {
     statusCode: 204
   }
 }
+
+const NODE_ENV = process.env.NODE_ENV;
+console.log(`NODE_ENV: ${NODE_ENV}`);
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
@@ -80,8 +83,7 @@ export default defineNuxtConfig({
   security: {
     rateLimiter: false,
     headers: {
-      crossOriginEmbedderPolicy:
-        process.env.NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp', // to allow devtools
+      crossOriginEmbedderPolicy: NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp', // to allow devtools
       contentSecurityPolicy: {
         'img-src': [
           'http://localhost:42124',
@@ -158,7 +160,7 @@ export default defineNuxtConfig({
         clientId: process.env.NEPTUN_GITHUB_APP_GITHUB_CLIENT_ID,
         clientSecret: process.env.NEPTUN_GITHUB_APP_GITHUB_CLIENT_SECRET,
         // Do not ask me why...
-        privateKey: Buffer.from(
+        privateKey: NODE_ENV === 'development' ? process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY : Buffer.from(
           String(
             process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY?.replace(/\\n/g, '\n').trim()
           ),
@@ -166,8 +168,9 @@ export default defineNuxtConfig({
         ).toString("utf-8")
       }
     },
+    /* session persists for 7 days */
     session: {
-      /* session persists for 7 days */ name: 'neptun-session',
+      name: 'neptun-session',
       password: process.env.NUXT_SESSION_PASSWORD,
       cookie: {
         sameSite: 'lax'
