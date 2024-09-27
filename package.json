@@ -84,5 +84,8 @@
     "vite-plugin-remove-console": "^2.2.0",
     "vite-plugin-checker": "^0.8.0",
     "vue-tsc": "~2.1.6"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

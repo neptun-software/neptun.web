@@ -17,7 +17,7 @@ const corsHandler = {
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: {
-    enabled: false,
+    enabled: true,
     timeline: {
       enabled: false
     },
@@ -157,7 +157,13 @@ export default defineNuxtConfig({
         appId: process.env.NEPTUN_GITHUB_APP_ID,
         clientId: process.env.NEPTUN_GITHUB_APP_GITHUB_CLIENT_ID,
         clientSecret: process.env.NEPTUN_GITHUB_APP_GITHUB_CLIENT_SECRET,
-        privateKey: process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY
+        // Do not ask me why...
+        privateKey: Buffer.from(
+          String(
+            process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY?.replace(/\\n/g, '\n').trim()
+          ),
+          "base64",
+        ).toString("utf-8")
       }
     },
     session: {
