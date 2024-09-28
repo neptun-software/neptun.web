@@ -3,8 +3,8 @@
 import type { HTTPMethod } from 'nuxt-security';
 import { protectedRoutes } from './utils/pages';
 import { supportedShikiLanguages } from './utils/formatters';
-import wasm from "vite-plugin-wasm";
-import topLevelAwait from "vite-plugin-top-level-await";
+// import wasm from "vite-plugin-wasm";
+// import topLevelAwait from "vite-plugin-top-level-await";
 import removeConsole from 'vite-plugin-remove-console';
 
 const productionURL = 'https://neptun-webui.vercel.app';
@@ -36,10 +36,10 @@ export default defineNuxtConfig({
     port: 42124
   },
 
-  vue: {
+  /* vue: {
     // https://github.com/nuxt/nuxt/issues/28829
     propsDestructure: true
-  },
+  }, */
 
   site: {
     url: productionURL
@@ -54,6 +54,11 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    logLevel: 'warn', // 'info' | 'warn' | 'error' | 'silent'
+    plugins: [removeConsole()],
+  },
+
+  /* vite: {
     logLevel: 'warn', // 'info' | 'warn' | 'error' | 'silent'
     plugins: [
       wasm(),
@@ -70,14 +75,14 @@ export default defineNuxtConfig({
     build: {
       rollupOptions: {
         external: ['env', 'wasi_snapshot_preview1'],
-        // external: [/.*shiki.*/],
       },
     },
     optimizeDeps: {
       exclude: ['shiki'],
     },
-    assetsInclude: ['**/*.wasm'],
-  },
+  }, */
+  // external: [/.*shiki.*/],
+  //assetsInclude: ['**/*.wasm'],
 
   css: ['~/assets/css/app.css'],
 
@@ -222,7 +227,7 @@ export default defineNuxtConfig({
   },
 
   typescript: {
-    typeCheck: true // unable to fix typeerror. see https://github.com/atinux/nuxt-auth-utils/issues/191
+    typeCheck: false // unable to fix typeerror. see https://github.com/atinux/nuxt-auth-utils/issues/191
   },
 
   modules: [
