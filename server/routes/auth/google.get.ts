@@ -4,11 +4,11 @@ export default oauthGoogleEventHandler({
   config: {
     scope: ['email']
   },
-  async onSuccess(event, { user /* , tokens */ }) {
+  async onSuccess(event, { user }) { // tokens
     const user_email
-      = user?.email; /* maybe add email_verified, picture for icon */
+      = user?.email; // maybe add email_verified, picture for icon
     const user_id
-      = user?.sub; /* id_token includes sub and stores other data too, expires tho */
+      = user?.sub; // id_token includes sub and stores other data too, expires tho
 
     const createdOrFetchedUserAndConnectedOauthAccount
       = await createOauthAccount({

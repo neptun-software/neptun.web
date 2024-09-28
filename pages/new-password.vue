@@ -8,8 +8,8 @@ import { emailSchema, passwordSchema } from '~/lib/types/input.validation';
 
 definePageMeta({
   name: 'New Password',
-  alias: ['/forgot-password', '/reset-password']
-})
+  alias: ['/forgot-password', '/reset-password'],
+});
 
 // defineOgImageComponent('NuxtSeo');
 
@@ -18,23 +18,23 @@ const steps = [
   {
     step: 1,
     title: 'Email',
-    description: 'Enter your email address'
+    description: 'Enter your email address',
   },
   {
     step: 2,
     title: 'OTP',
-    description: 'Enter your onetime password'
+    description: 'Enter your onetime password',
   },
   {
     step: 3,
     title: 'New Password',
-    description: 'Enter your new password'
-  }
-]
+    description: 'Enter your new password',
+  },
+];
 
 const formSchema = [
   z.object({
-    email: emailSchema
+    email: emailSchema,
   }),
   z.object({
     /* TODO: make this work. Somehow displays "Required", even if it's a valid input and the input is set
@@ -62,12 +62,12 @@ const formSchema = [
 
       // TODO: validate the OTP
     }), */
-    otp: z.any()
+    otp: z.any(),
   }),
   z.object({
-    password: passwordSchema
-  })
-]
+    password: passwordSchema,
+  }),
+];
 
 const otp = ref(Array(5).fill(''));
 const otpIsValid = ref(false);
@@ -80,14 +80,14 @@ const onSubmit = handleSubmit((values) => {
       'pre',
       { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' },
       h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))
-    )
-  })
+    ),
+  });
 });
 
 const handleComplete = (e: string[]) => {
   console.log('Completed OTP:', e.join(''));
   otpIsValid.value = true;
-}
+};
 
 const handleModelValueUpdate = (arrStr: string[]) => {
   arrStr.forEach((val, index) => {
@@ -146,15 +146,12 @@ const handleModelValueUpdate = (arrStr: string[]) => {
                   size="icon"
                   class="z-10 rounded-full shrink-0"
                   :class="[
-                    state === 'active'
-                      && 'ring-2 ring-ring ring-offset-2 ring-offset-background'
+                    state === 'active' &&
+                      'ring-2 ring-ring ring-offset-2 ring-offset-background',
                   ]"
                   :disabled="state !== 'completed' && !meta.valid"
                 >
-                  <CheckIcon
-                    v-if="state === 'completed'"
-                    class="size-5"
-                  />
+                  <CheckIcon v-if="state === 'completed'" class="size-5" />
                   <CircleIcon v-if="state === 'active'" />
                   <DotIcon v-if="state === 'inactive'" />
                 </ShadcnButton>
@@ -293,11 +290,7 @@ const handleModelValueUpdate = (arrStr: string[]) => {
                   >
                     Next
                   </ShadcnButton>
-                  <ShadcnButton
-                    v-if="stepIndex === 3"
-                    size="sm"
-                    type="submit"
-                  >
+                  <ShadcnButton v-if="stepIndex === 3" size="sm" type="submit">
                     Set new password
                   </ShadcnButton>
                 </div>

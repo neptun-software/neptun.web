@@ -1,9 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 import type { HTTPMethod } from 'nuxt-security';
-import removeConsole from 'vite-plugin-remove-console';
 import { protectedRoutes } from './utils/pages';
 import { supportedShikiLanguages } from './utils/formatters';
+import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
+import removeConsole from 'vite-plugin-remove-console';
 
 const productionURL = 'https://neptun-webui.vercel.app';
 const corsHandler = {
@@ -20,7 +22,8 @@ console.log(`NODE_ENV: ${NODE_ENV}`);
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: {
-    enabled: true,
+    enabled: false,
+    componentInspector: false, // https://github.com/nuxt/devtools/issues/722
     timeline: {
       enabled: false
     },
@@ -52,14 +55,28 @@ export default defineNuxtConfig({
 
   vite: {
     logLevel: 'warn', // 'info' | 'warn' | 'error' | 'silent'
-    plugins: [removeConsole()],
+    plugins: [
+      wasm(),
+      topLevelAwait(),
+      removeConsole()
+    ],
     css: {
       preprocessorOptions: {
         sass: {
           api: 'modern-compiler'
         }
       }
-    }
+    },
+    build: {
+      rollupOptions: {
+        external: ['env', 'wasi_snapshot_preview1'],
+        // external: [/.*shiki.*/],
+      },
+    },
+    optimizeDeps: {
+      exclude: ['shiki'],
+    },
+    assetsInclude: ['**/*.wasm'],
   },
 
   css: ['~/assets/css/app.css'],
@@ -101,7 +118,7 @@ export default defineNuxtConfig({
     experimental: {
       // Scalar support is currently available in nightly channel. (https://nitro.unjs.io/config#experimental, https://nuxt.com/modules/scalar)
       openAPI:
-        true /* { // enables /_nitro/scalar and /_nitro/swagger and /_nitro/openapi.json (currently only in dev mode)
+        true, /* { // enables /_nitro/scalar and /_nitro/swagger and /_nitro/openapi.json (currently only in dev mode)
         meta: {
           title: 'Nuxai API Documentation',
           description: 'Chat with different AI models using this REST-API.',
@@ -205,7 +222,7 @@ export default defineNuxtConfig({
   },
 
   typescript: {
-    typeCheck: true
+    typeCheck: true // unable to fix typeerror. see https://github.com/atinux/nuxt-auth-utils/issues/191
   },
 
   modules: [
@@ -222,8 +239,8 @@ export default defineNuxtConfig({
     'nuxt-security',
     '@nuxtjs/robots',
     'nuxt-monaco-editor',
-    '@formkit/auto-animate/nuxt'
-    /* 'nuxt-og-image', => still causes vercel serverless function to crash because of shiki (yea fr...) */
+    '@formkit/auto-animate/nuxt',
+    /* 'nuxt-og-image', */
   ],
 
   mdc: {
@@ -249,7 +266,8 @@ export default defineNuxtConfig({
   },
 
   build: {
-    transpile: ['gsap']
+    // https://github.com/nuxt-modules/og-image/issues/249#issuecomment-2324007569
+    transpile: ['gsap', 'shiki']
   },
   postcss: {
     plugins: {

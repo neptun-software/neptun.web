@@ -16,7 +16,12 @@
     "db:pull": "drizzle-kit introspect --config drizzle.config.ts",
     "db:generate": "drizzle-kit generate --dialect postgresql --schema ./lib/types/database.tables/schema.ts --out=./server/database/migrations",
     "db:migrate": "bun run ./server/utils/migrate.ts",
-    "db:studio": "drizzle-kit studio --config drizzle.config.ts --host 127.0.0.1"
+    "db:studio": "drizzle-kit studio --config drizzle.config.ts --host 127.0.0.1",
+    "fresh": "pnpm rebuild && npx nuxi cleanup",
+    "types": "npx nuxi prepare",
+    "upgrade": "npx nuxi upgrade",
+    "info": "npx nuxi info",
+    "statistics": "npx nuxi analyze"
   },
   "dependencies": {
     "@ai-sdk/vue": "^0.0.51",
@@ -24,6 +29,7 @@
     "@huggingface/inference": "^2.7.0",
     "@neondatabase/serverless": "^0.9.5",
     "@nuxt/image": "^1.8.0",
+    "@nuxt/kit": "^3.13.2",
     "@nuxtjs/mdc": "^0.8.3",
     "@nuxtjs/robots": "^4.1.7",
     "@octokit/plugin-paginate-rest": "^11.3.3",
@@ -33,15 +39,15 @@
     "ai": "^3.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "drizzle-orm": "^0.32.0",
+    "drizzle-orm": "^0.33.0",
     "drizzle-zod": "^0.5.1",
     "es-toolkit": "^1.21.0",
     "gsap": "^3.12.5",
     "lucide-vue-next": "^0.446.0",
-    "nuxt": "3.13.0",
-    "@nuxt/kit": "3.13.0",
-    "nuxt-auth-utils": "^0.3.9",
+    "nuxt": "^3.13.2",
+    "nuxt-auth-utils": "^0.3.0",
     "nuxt-monaco-editor": "^1.2.9",
+    "nuxt-og-image": "^3.0.2",
     "nuxt-posthog": "^1.5.3",
     "nuxt-security": "2.0.0-rc.9",
     "nuxt-time": "^1.0.0",
@@ -55,14 +61,14 @@
     "shadcn-nuxt": "^0.10.4",
     "strip-markdown": "^6.0.0",
     "tailwind-merge": "^2.4.0",
+    "undici": "^6.19.8",
     "vaul-vue": "^0.2.0",
     "vee-validate": "^4.13.2",
     "vue": "^3.4.38",
     "vue-dndrop": "^1.3.1",
     "vue-sonner": "^1.2.1",
     "vue3-lottie": "^3.3.1",
-    "zod": "^3.23.8",
-    "undici": "^6.19.8"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@iconify-json/radix-icons": "^1.2.0",
@@ -72,20 +78,28 @@
     "@nuxtjs/tailwindcss": "^6.12.1",
     "@octokit/types": "^13.5.1",
     "@tailwindcss/typography": "^0.5.15",
-    "@vueuse/core": "^10.11.0",
-    "@vueuse/nuxt": "^10.11.0",
+    "@vueuse/core": "^11.0.0",
+    "@vueuse/nuxt": "^11.0.0",
     "autoprefixer": "^10.4.19",
-    "drizzle-kit": "^0.23.0",
+    "drizzle-kit": "^0.24.2",
     "postcss": "^8.4.47",
     "sass": "^1.77.8",
     "tailwindcss": "^3.4.13",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.5.3",
     "vite-plugin-remove-console": "^2.2.0",
-    "vite-plugin-checker": "^0.8.0",
-    "vue-tsc": "~2.1.6"
+    "vite-plugin-top-level-await": "^1.4.4",
+    "vite-plugin-wasm": "^3.3.0",
+    "vue-tsc": "^2.0.29"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite-plugin-checker": "^0.8.0",
+      "vue-tsc": "2.0.29",
+      "drizzle-orm": "^0.33.0"
+    }
   }
 }

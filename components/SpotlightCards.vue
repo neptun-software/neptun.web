@@ -6,11 +6,11 @@ defineProps({
         scr: String,
         icon: Object,
         title: String,
-        description: String
-      }
+        description: String,
+      },
     ],
-    required: true
-  }
+    required: true,
+  },
 });
 
 class Spotlight {
@@ -86,15 +86,15 @@ onUnmounted(() => {
         class="grid items-start max-w-sm gap-6 mx-auto lg:grid-cols-3 lg:max-w-none group"
         data-spotlight
       >
-        <SpotlightCard
-          v-for="(card, index) in cards"
-          :key="index"
-          :src="card.src"
-          :icon="card.icon"
-          :title="card.title"
-          :description="card.description"
-          :index="index"
-        />
+        <template v-for="(card, index) in cards" :key="index">
+          <SpotlightCard
+            :src="card.src"
+            :icon="card.icon"
+            :title="card.title"
+            :description="card.description"
+            :index="index"
+          />
+        </template>
       </div>
     </div>
   </div>

@@ -4,32 +4,32 @@ import gsap from 'gsap';
 const props = defineProps({
   imagePaths: {
     type: Array,
-    required: true
+    required: true,
   },
   exclusionRadius: {
     type: Number,
-    default: 600
+    default: 600,
   },
   paddingX: {
     type: Number,
-    default: 100
+    default: 100,
   },
   paddingY: {
     type: Number,
-    default: 200
+    default: 200,
   },
   maxUsagePerImage: {
     type: Number,
-    default: 1
+    default: 1,
   },
   imageSizeMin: {
     type: Number,
-    default: 30
+    default: 30,
   },
   imageSizeMax: {
     type: Number,
-    default: 100
-  }
+    default: 100,
+  },
 });
 
 const exclusionRadius = props.exclusionRadius;
@@ -56,9 +56,9 @@ const initializeStars = () => {
   const starCount = starImages.length;
 
   stars.value = Array.from({ length: starCount }, (_, index) => {
-    const size
-      = Math.random() * (props.imageSizeMax - props.imageSizeMin)
-      + props.imageSizeMin;
+    const size =
+      Math.random() * (props.imageSizeMax - props.imageSizeMin) +
+      props.imageSizeMin;
     let x, y, distance;
 
     do {
@@ -77,9 +77,9 @@ const initializeStars = () => {
         height: `${size}px`,
         top: `${y}px`,
         left: `${x}px`,
-        transform: `translate(-50%, -50%)`
-      }
-    }
+        transform: `translate(-50%, -50%)`,
+      },
+    };
   });
 };
 
@@ -96,33 +96,26 @@ const handleMouseMove = (event) => {
         deltaY * movement * 0.1
       }px)`,
       duration: 0.3,
-      ease: 'power1.out'
-    })
+      ease: 'power1.out',
+    });
   });
-}
+};
 
 onMounted(() => {
   initializeStars();
   window.addEventListener('mousemove', handleMouseMove);
-})
+});
 
 onBeforeUnmount(() => {
   window.removeEventListener('mousemove', handleMouseMove);
-})
+});
 </script>
 
 <template>
-  <div
-    ref="container"
-    class="container"
-  >
-    <img
-      v-for="(star, index) in stars"
-      :key="index"
-      :src="star.src"
-      :style="star.style"
-      class="star"
-    >
+  <div ref="container" class="container">
+    <template v-for="(star, index) in stars" :key="index">
+      <NuxtImg :src="star.src" :style="star.style" class="star" />
+    </template>
   </div>
 </template>
 
