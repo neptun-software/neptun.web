@@ -24,7 +24,7 @@
     "db:studio": "drizzle-kit studio --config drizzle.config.ts --host 127.0.0.1"
   },
   "dependencies": {
-    "@ai-sdk/vue": "^0.0.53",
+    "@ai-sdk/vue": "^0.0.54",
     "@formkit/auto-animate": "^0.8.2",
     "@huggingface/inference": "^2.7.0",
     "@neondatabase/serverless": "^0.9.5",

@@ -13,8 +13,8 @@ importers:
   .:
     dependencies:
       '@ai-sdk/vue':
-        specifier: ^0.0.53
-        version: 0.0.53(vue@3.5.10(typescript@5.6.2))(zod@3.23.8)
+        specifier: ^0.0.54
+        version: 0.0.54(vue@3.5.10(typescript@5.6.2))(zod@3.23.8)
       '@formkit/auto-animate':
         specifier: ^0.8.2
         version: 0.8.2
@@ -250,6 +250,15 @@ packages:
 
   '@ai-sdk/vue@0.0.53':
     resolution: {integrity: sha512-FNScuIvM8N4Pj4Xto11blgI97c5cjjTelyk0M0MkyU+sLSbpQNDE78CRq5cW1oeVkJzzdv63+xh8jaFNe+2vnQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      vue: ^3.3.4
+    peerDependenciesMeta:
+      vue:
+        optional: true
+
+  '@ai-sdk/vue@0.0.54':
+    resolution: {integrity: sha512-Ltu6gbuii8Qlp3gg7zdwdnHdS4M8nqKDij2VVO1223VOtIFwORFJzKqpfx44U11FW8z2TPVBYN+FjkyVIcN2hg==}
     engines: {node: '>=18'}
     peerDependencies:
       vue: ^3.3.4
@@ -6204,6 +6213,16 @@ snapshots:
       zod: 3.23.8
 
   '@ai-sdk/vue@0.0.53(vue@3.5.10(typescript@5.6.2))(zod@3.23.8)':
+    dependencies:
+      '@ai-sdk/provider-utils': 1.0.20(zod@3.23.8)
+      '@ai-sdk/ui-utils': 0.0.46(zod@3.23.8)
+      swrv: 1.0.4(vue@3.5.10(typescript@5.6.2))
+    optionalDependencies:
+      vue: 3.5.10(typescript@5.6.2)
+    transitivePeerDependencies:
+      - zod
+
+  '@ai-sdk/vue@0.0.54(vue@3.5.10(typescript@5.6.2))(zod@3.23.8)':
     dependencies:
       '@ai-sdk/provider-utils': 1.0.20(zod@3.23.8)
       '@ai-sdk/ui-utils': 0.0.46(zod@3.23.8)
