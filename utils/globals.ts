@@ -7,7 +7,7 @@ export const IS_SERVER = import.meta.server; // import.meta.nitro
 // export let LOG_FRONTEND = JSON.parse(process.env.LOG_FRONTEND ?? 'false');
 
 if (IS_DEV) {
-  console.log(
+  console.info(
     `IS_DEV: ${IS_DEV} \nLOG_FRONTEND: ${'useLogger()'} \nIS_PRERENDER: ${IS_PRERENDER} \nIS_CLIENT: ${IS_CLIENT} \nIS_SERVER: ${IS_SERVER}`
   );
 }

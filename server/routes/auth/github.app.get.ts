@@ -181,7 +181,7 @@ export default defineEventHandler(async (event) => {
                * ```
                *
                */
-              const repositories = response.data as Repositories;
+              const repositories = response.data as unknown as Repositories;
 
               // removes repository_selection and total_count
               const filteredRepositories = Object.keys(repositories)
@@ -190,13 +190,14 @@ export default defineEventHandler(async (event) => {
                   return repositories[Number(key)];
                 })
 
-              if (LOG_BACKEND)
+              /* if (LOG_BACKEND) {
                 console.log(
                   'PAGE: ',
-                  repositories['repository_selection'],
-                  repositories['total_count'],
-                  filteredRepositories.map(repository => repository.name)
-                );
+                    repositories['repository_selection'],
+                    repositories['total_count'],
+                    filteredRepositories.map(repository => repository.name)
+                  );
+              } */
 
               // should be response.data.repositories, but is response.data[number][]
               return filteredRepositories.map((repository) => {
@@ -221,14 +222,16 @@ export default defineEventHandler(async (event) => {
             }
           );
 
-          if (LOG_BACKEND)
+          /* if (LOG_BACKEND) {
             console.log(
               'PAGES: filteredRepositories',
-              filteredRepositories.length,
-              filteredRepositories.map(
-                repository => repository.github_repository_name
-              )
-            );
+                filteredRepositories.length,
+                filteredRepositories.map(
+                  repository => repository.github_repository_name
+                )
+              );
+          } */
+
           // console.dir(repositories, { depth: 1 });
 
           try {

@@ -11,7 +11,7 @@ export const LOG_BACKEND = JSON.parse(process.env.LOG_BACKEND ?? 'false');
 export const ENCRYPTION_SECRET = process.env.CRYPTO_SECRET ?? 'secret';
 
 if (IS_DEV) {
-  console.log(
+  console.info(
     `IS_SERVERLESS: ${IS_SERVERLESS} \nLOG_SQL_QUERIES: ${LOG_SQL_QUERIES} \nLOG_BACKEND: ${LOG_BACKEND}`
   );
 }

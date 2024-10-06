@@ -73,7 +73,7 @@ const columns: ColumnDef<Installation>[] = [
         src: row.original.github_account_avatar_url,
         nonce: useSsrSaveId(),
         alt: 'Avatar',
-        class: 'w-10 h-10 rounded-full',
+        class: 'rounded-full max-h-10 min-w-10',
       }),
   },
   {
@@ -174,7 +174,7 @@ watch(selectedInstallationId, async (newValue) => {
 </script>
 
 <template>
-  <div>
+  <div class="overflow-hidden">
     <div v-if="error">
       <p class="text-red-500">Failed to fetch imports.</p>
     </div>
@@ -205,7 +205,7 @@ watch(selectedInstallationId, async (newValue) => {
               />
             </div>
 
-            <ShadcnScrollArea class="w-full max-w-[calc(100vw-4.4rem)]">
+            <ShadcnScrollArea class="w-full">
               <Table>
                 <ShadcnScrollBar orientation="horizontal" />
                 <TableHeader class="w-full">

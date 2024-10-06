@@ -41,9 +41,9 @@ async function downloadConfiguration() {
 
 <template>
   <div
-    class="relative px-4 py-2 my-2 border rounded-lg bg-background border-slate-200 dark:border-border"
+    class="relative my-2 overflow-hidden border rounded-lg bg-background border-slate-200 dark:border-border"
   >
-    <ShadcnScrollArea class="max-w-[calc(100vw-(7rem))]">
+    <ShadcnScrollArea class="max-w-[calc(100vw-(1rem))] px-2 py-2">
       <ShadcnScrollBar orientation="horizontal" />
       <div>
         <ClientOnly fallback-tag="div">
@@ -52,12 +52,12 @@ async function downloadConfiguration() {
             :value="cliConfigurationMarkdown"
           />
           <template #fallback>
-            <ShadcnSkeleton class="w-full h-10 bg-slate-400" />
+            <ShadcnSkeleton class="w-full h-10 my-2 bg-slate-400" />
           </template>
           <template v-if="error">
             <p class="text-red-500">Failed to fetch CLI configuration.</p>
           </template>
-          <span class="absolute right-0 flex items-center gap-2 top-2">
+          <span class="absolute flex items-center gap-2 right-2 top-2">
             <ShadcnButton
               type="button"
               size="icon"

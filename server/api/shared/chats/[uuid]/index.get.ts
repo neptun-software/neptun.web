@@ -14,7 +14,7 @@ async function userIsAuthorizedToViewChat(
 
 // Read all messages of a shared chat conversation
 // Basic Auth is just base64 encoded, but we use ssl, so it should be fine, because the resource is not that important
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
   const maybeUuid = await validateParamUuid(event);
   if (maybeUuid.statusCode !== 200) {
     return sendError(

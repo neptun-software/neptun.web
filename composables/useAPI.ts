@@ -99,8 +99,6 @@ export const useAPI = () => {
       pick: ['chat'] as any
     }
 
-    console.log({ model, name });
-
     const toastMessages = {
       loading: 'Persisting chat history...',
       success: (_data: any) => 'Chat history persisted!',
@@ -320,7 +318,7 @@ export function useFetchChats(user_id: number) {
   );
   const fetchedChatsRefresh = useState<(opts?: any) => Promise<void>>(
     'fetched-chats-refresh',
-  () => () => Promise.resolve()
+    () => () => Promise.resolve()
   ); // any should be AsyncDataExecuteOptions, but I can not find the type
 
   const chatsFilters = useChatsFilter();

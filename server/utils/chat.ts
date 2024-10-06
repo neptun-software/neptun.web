@@ -25,36 +25,36 @@ export async function persistCodeBlocks(
 ) {
   try {
     const codeBlocks = await getCodeBlocksFromMarkdown(markdown);
-    if (LOG_BACKEND) console.log('codeBlocks', codeBlocks);
+    if (LOG_BACKEND) // console.log('codeBlocks', codeBlocks);
 
-    if (codeBlocks.length > 0) {
-      if (LOG_BACKEND) {
-        console.log(`persisting ${codeBlocks.length} code block(s)...`);
-      }
-
-      const persistedCodeBlocks = await event.$fetch(
-        `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
-        {
-          // .event.$fetch used because it contains the current session
-          method: 'POST',
-          body: {
-            files: codeBlocks
-          }
+      if (codeBlocks.length > 0) {
+        if (LOG_BACKEND) {
+          // console.log(`persisting ${codeBlocks.length} code block(s)...`);
         }
-      );
 
-      if (LOG_BACKEND) {
-        console.info(
-          'persistCodeBlocks:',
-          persistedCodeBlocks,
-          user_id,
-          chat_id,
-          message_id
+        const persistedCodeBlocks = await event.$fetch(
+          `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
+          {
+            // .event.$fetch used because it contains the current session
+            method: 'POST',
+            body: {
+              files: codeBlocks
+            }
+          }
         );
-      }
 
-      return persistedCodeBlocks;
-    }
+        if (LOG_BACKEND) {
+          console.info(
+            'persistCodeBlocks:',
+            persistedCodeBlocks,
+            user_id,
+            chat_id,
+            message_id
+          );
+        }
+
+        return persistedCodeBlocks;
+      }
   }
   catch (error) {
     if (LOG_BACKEND) console.error('Persisting code blocks errored:', error);

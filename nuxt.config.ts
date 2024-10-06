@@ -17,7 +17,7 @@ const corsHandler = {
 }
 
 const NODE_ENV = process.env.NODE_ENV;
-console.log(`NODE_ENV: ${NODE_ENV}`);
+console.info(`NODE_ENV: ${NODE_ENV}`);
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
@@ -33,7 +33,7 @@ export default defineNuxtConfig({
   },
 
   devServer: {
-    port: 42124
+    port: 42124,
   },
 
   /* vue: {
@@ -110,6 +110,7 @@ export default defineNuxtConfig({
         'img-src': [
           'http://localhost:42124',
           'https://avatars.githubusercontent.com',
+          'https://eu.i.posthog.com',
           productionURL
         ]
       }

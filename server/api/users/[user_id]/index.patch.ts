@@ -22,20 +22,20 @@ export default defineEventHandler(async (event) => {
     UserUpdateSchema.safeParse(body)
   );
   if (!body.success || !body.data) {
-    if (LOG_BACKEND) console.log('body.error', body.error);
+    if (LOG_BACKEND) // console.log('body.error', body.error);
 
-    return sendError(
-      event,
-      createError({
-        statusCode: 400,
-        statusMessage: 'Bad Request.',
-        message: 'Invalid body(?email, ?password).',
-        data: body.error
-      })
-    );
+      return sendError(
+        event,
+        createError({
+          statusCode: 400,
+          statusMessage: 'Bad Request.',
+          message: 'Invalid body(?email, ?password).',
+          data: body.error
+        })
+      );
   }
   const validatedBody = body.data;
-  const { email, password } = validatedBody;
+  const { email, password } = validatedBody || {};
 
   if (!email && !password) {
     return sendError(
@@ -53,21 +53,21 @@ export default defineEventHandler(async (event) => {
 
   const updatedUser = await updateUser(user_id, email, password);
 
-  if (LOG_BACKEND) console.log('updatedUser', updatedUser);
+  if (LOG_BACKEND) // console.log('updatedUser', updatedUser);
 
-  if (updatedUser) {
-    const loggedInAt = new Date();
-    const session = await getUserSession(event);
+    if (updatedUser) {
+      const loggedInAt = new Date();
+      const session = await getUserSession(event);
 
-    if (session.user) {
-      session.user.primary_email = updatedUser.primary_email;
+      if (session.user) {
+        session.user.primary_email = updatedUser.primary_email;
+      }
+
+      await replaceUserSession(event, {
+        user: session.user,
+        loggedInAt
+      })
     }
-
-    await replaceUserSession(event, {
-      user: session.user,
-      loggedInAt
-    })
-  }
 
   return {
     user: updatedUser

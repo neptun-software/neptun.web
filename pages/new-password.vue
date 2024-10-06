@@ -85,7 +85,7 @@ const onSubmit = handleSubmit((values) => {
 });
 
 const handleComplete = (e: string[]) => {
-  console.log('Completed OTP:', e.join(''));
+  // console.log('Completed OTP:', e.join(''));
   otpIsValid.value = true;
 };
 
@@ -96,7 +96,7 @@ const handleModelValueUpdate = (arrStr: string[]) => {
     }
   });
 
-  console.log('Updated model value:', otp.value);
+  // console.log('Updated model value:', otp.value);
   setFieldValue('otp', [...otp.value]);
   validate();
 

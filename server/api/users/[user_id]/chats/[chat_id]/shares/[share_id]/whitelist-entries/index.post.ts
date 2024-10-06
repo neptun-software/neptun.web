@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
   const validatedBody = body.data;
 
   const user_ids = await readUserIdsOfPrimaryEmails(validatedBody);
-  console.log('user_ids', user_ids);
+  // console.log('user_ids', user_ids);
   const emailWhiteList = user_ids ?? []; // checking !user_ids || user_ids.length === 0 and returning an error would be bad, because people could use this feature for brute-forcing
   emailWhiteList?.push({
     id: user_id
@@ -49,7 +49,8 @@ export default defineEventHandler(async (event) => {
       chat_conversation_share_id: share_id
     }
   });
-  console.log('entriesToCreate', entriesToCreate);
+
+  // console.log('entriesToCreate', entriesToCreate);
   const createdChatConversationShareWhitelistEntries
     = await createChatConversationShareWhitelistEntries(entriesToCreate);
 
