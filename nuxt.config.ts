@@ -56,6 +56,13 @@ export default defineNuxtConfig({
   vite: {
     logLevel: 'warn', // 'info' | 'warn' | 'error' | 'silent'
     plugins: [removeConsole()],
+    css: {
+      preprocessorOptions: {
+        sass: {
+          api: 'modern-compiler',
+        }
+      }
+    },
   },
 
   /* vite: {

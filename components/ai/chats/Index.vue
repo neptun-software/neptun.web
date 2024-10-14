@@ -34,7 +34,7 @@ function setSelectedChat(
   id: number,
   name: string,
   model: AllowedAiModels,
-  force: boolean = false
+  force = false
 ) {
   if (selectedAiChat.value.id === id && force === false) {
     resetSelectedAiChatToDefaults(); // doesn't reset messages
@@ -58,7 +58,7 @@ const saveEdit = async (id: number, previousName: string) => {
       chatToEdit.value?.name
     );
 
-    if (data && data.chat?.name) {
+    if (data?.chat?.name) {
       const { name: chatName } = data.chat;
 
       setSelectedChat(

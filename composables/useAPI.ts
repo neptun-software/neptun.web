@@ -8,13 +8,17 @@ import type {
   ReadChatConversationFile,
   ReadChatConversationMessage
 } from '~/lib/types/database.tables/schema';
-import { getCodeBlocksFromMarkdown } from '~/utils/parse'
+import { getCodeBlocksFromMarkdown } from '~/utils/parse';
+import type { AsyncDataOptions } from 'nuxt/app';
 
 const { console } = useLogger();
 
 /* import type { UseFetchOptions } from '#app'; */
 
 // TODO: improve => return _data, isLoading etc. too.
+interface FetchResponse<T> extends Response {
+  _data?: T;
+}
 
 export const useAPI = () => {
   const handleFetch = async <T>(
@@ -22,20 +26,20 @@ export const useAPI = () => {
     options: UseFetchOptions<T> = {},
     toastMessages: {
       loading: string
-      success: (_data: any) => string
-      error: (_data: any) => string
+      success: (_data: unknown) => string
+      error: (_data: unknown) => string
     } | null = null
   ): Promise<T> => {
     const fetchPromise = new Promise<T>((resolve, reject) => {
       useFetch(url, {
         ...options,
-        onResponse({ response }: any) {
+        onResponse(response: FetchResponse<T>) {
           // THIS IS CALLED EVERY TIME, ALSO IF RESPONSE IS NOT OK!
           if (response.ok) {
-            resolve(response._data);
+            resolve(response._data as T);
           }
         },
-        onResponseError({ response }: any) {
+        onResponseError(response: FetchResponse<T>) {
           reject(response._data);
         }
       }).catch(reject);
@@ -67,9 +71,9 @@ export const useAPI = () => {
 
     const toastMessages = {
       loading: 'Fetching URL and converting its HTML content to Markdown...',
-      success: (_data: any) =>
+      success: (_data: unknown) =>
         'Successfully fetched the URL and converted its HTML content to Markdown!',
-      error: (_data: any) =>
+      error: (_data: unknown) =>
         'Failed to fetch the URL and convert its HTML content to Markdown!'
     }
 
@@ -96,13 +100,13 @@ export const useAPI = () => {
       method: 'POST' as HTTPMethod,
       body: { model, name },
       lazy: true,
-      pick: ['chat'] as any
+      pick: ['chat'] as ('chat')[]
     }
 
     const toastMessages = {
       loading: 'Persisting chat history...',
-      success: (_data: any) => 'Chat history persisted!',
-      error: (_data: any) => 'Failed to persist chat history!'
+      success: (_data: unknown) => 'Chat history persisted!',
+      error: (_data: unknown) => 'Failed to persist chat history!'
     }
 
     try {
@@ -181,8 +185,8 @@ export const useAPI = () => {
 
       const toastMessages = {
         loading: 'Persisting chat messages...',
-        success: (_data: any) => 'Chat messages persisted!',
-        error: (_data: any) => 'Failed to persist chat messages!'
+        success: (_data: unknown) => 'Chat messages persisted!',
+        error: (_data: unknown) => 'Failed to persist chat messages!'
       }
 
       console.info('Persisting messages...', messages);
@@ -230,8 +234,8 @@ export const useAPI = () => {
 
     const toastMessages = {
       loading: 'Renaming chat...',
-      success: (_data: any) => 'Chat renamed!',
-      error: (_data: any) => 'Failed to rename chat!'
+      success: (_data: unknown) => 'Chat renamed!',
+      error: (_data: unknown) => 'Failed to rename chat!'
     }
 
     try {
@@ -259,8 +263,8 @@ export const useAPI = () => {
 
       const toastMessages = {
         loading: 'Deleting chat...',
-        success: (_data: any) => 'Chat deleted!',
-        error: (_data: any) => 'Failed to delete chat!'
+        success: (_data: unknown) => 'Chat deleted!',
+        error: (_data: unknown) => 'Failed to delete chat!'
       }
 
       try {
@@ -282,8 +286,8 @@ export const useAPI = () => {
 
     const toastMessages = {
       loading: 'Deleting chats...',
-      success: (_data: any) => 'Chats deleted!',
-      error: (_data: any) => 'Failed to delete chats!'
+      success: (_data: unknown) => 'Chats deleted!',
+      error: (_data: unknown) => 'Failed to delete chats!'
     }
 
     try {
@@ -316,7 +320,8 @@ export function useFetchChats(user_id: number) {
     'fetched-chats-error',
     () => null
   );
-  const fetchedChatsRefresh = useState<(opts?: any) => Promise<void>>(
+  // biome-ignore lint/suspicious/noExplicitAny: Can be any.
+  const fetchedChatsRefresh = useState<(opts?: AsyncDataOptions<any, any>) => Promise<void>>(
     'fetched-chats-refresh',
     () => () => Promise.resolve()
   ); // any should be AsyncDataExecuteOptions, but I can not find the type
@@ -332,7 +337,7 @@ export function useFetchChats(user_id: number) {
       {
         method: 'GET' as HTTPMethod,
         lazy: true,
-        pick: ['chats'] as any
+        pick: ['chats'] as never[]
       }
     );
 

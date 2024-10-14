@@ -7,6 +7,28 @@ const currentRouteName = computed(() => router.currentRoute.value.name);
 
 <template>
   <div>
+    <!-- <ConfigProvider :use-id="useSsrSaveId">
+      <ShadcnToaster close-button />
+      <NuxtLoadingIndicator
+        color="hsl(var(--primary) / 0.9)"
+        error-color="hsl(var(--destructive))"
+        :height="3"
+        :duration="2000"
+        :throttle="200"
+      />
+      <DynamicMeta :key="currentRouteName" />
+      <div>
+        <NuxtRouteAnnouncer />
+        <NuxtLayout> Hello, World! </NuxtLayout>
+      </div>
+    </ConfigProvider> -->
+
+    <!-- 
+    Loading Indicator: https://github.com/nuxt/nuxt/issues/18630, https://nuxt.com/docs/api/composables/use-loading-indicator
+    DynamicMeta: key is needed, so that the component is rerendered without a prop change
+    div: needed for transitions to work properly
+    -->
+
     <ConfigProvider :use-id="useSsrSaveId">
       <ShadcnToaster close-button />
       <NuxtLoadingIndicator
@@ -16,11 +38,8 @@ const currentRouteName = computed(() => router.currentRoute.value.name);
         :duration="2000"
         :throttle="200"
       />
-      <!-- when it shows: https://github.com/nuxt/nuxt/issues/18630, https://nuxt.com/docs/api/composables/use-loading-indicator -->
       <DynamicMeta :key="currentRouteName" />
-      <!-- key is needed, so that the component is rerendered without a prop change -->
       <div>
-        <!-- needed for transitions to work properly -->
         <NuxtRouteAnnouncer />
         <NuxtLayout>
           <NuxtPage />
