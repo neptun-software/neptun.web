@@ -9,149 +9,83 @@
         viewBox="0 0 701 1024"
         style="overflow: visible"
       >
-        <g
-          class="bubbles-large"
-          stroke-width="7"
-        >
+        <g class="bubbles-large" stroke-width="7">
           <g>
             <g transform="translate(10 940)">
-              <circle
-                cx="35"
-                cy="35"
-                r="35"
-              />
+              <circle cx="35" cy="35" r="35" />
             </g>
           </g>
           <g>
             <g transform="translate(373 940)">
-              <circle
-                cx="35"
-                cy="35"
-                r="35"
-              />
+              <circle cx="35" cy="35" r="35" />
             </g>
           </g>
           <g>
             <g transform="translate(408 940)">
-              <circle
-                cx="35"
-                cy="35"
-                r="35"
-              />
+              <circle cx="35" cy="35" r="35" />
             </g>
           </g>
           <g>
             <g transform="translate(621 940)">
-              <circle
-                cx="35"
-                cy="35"
-                r="35"
-              />
+              <circle cx="35" cy="35" r="35" />
             </g>
           </g>
           <g>
             <g transform="translate(179 940)">
-              <circle
-                cx="35"
-                cy="35"
-                r="35"
-              />
+              <circle cx="35" cy="35" r="35" />
             </g>
           </g>
         </g>
 
-        <g
-          class="bubbles-small"
-          stroke-width="4"
-        >
+        <g class="bubbles-small" stroke-width="4">
           <g>
             <g transform="translate(147 984)">
-              <circle
-                cx="15"
-                cy="15"
-                r="15"
-              />
+              <circle cx="15" cy="15" r="15" />
             </g>
           </g>
           <g>
             <g transform="translate(255 984)">
-              <circle
-                cx="15"
-                cy="15"
-                r="15"
-              />
+              <circle cx="15" cy="15" r="15" />
             </g>
           </g>
           <g>
             <g transform="translate(573 984)">
-              <circle
-                cx="15"
-                cy="15"
-                r="15"
-              />
+              <circle cx="15" cy="15" r="15" />
             </g>
           </g>
           <g>
             <g transform="translate(429 984)">
-              <circle
-                cx="15"
-                cy="15"
-                r="15"
-              />
+              <circle cx="15" cy="15" r="15" />
             </g>
           </g>
           <g>
             <g transform="translate(91 984)">
-              <circle
-                cx="15"
-                cy="15"
-                r="15"
-              />
+              <circle cx="15" cy="15" r="15" />
             </g>
           </g>
           <g>
             <g transform="translate(640 984)">
-              <circle
-                cx="15"
-                cy="15"
-                r="15"
-              />
+              <circle cx="15" cy="15" r="15" />
             </g>
           </g>
           <g>
             <g transform="translate(321 984)">
-              <circle
-                cx="15"
-                cy="15"
-                r="15"
-              />
+              <circle cx="15" cy="15" r="15" />
             </g>
           </g>
           <g>
             <g transform="translate(376 984)">
-              <circle
-                cx="15"
-                cy="15"
-                r="15"
-              />
+              <circle cx="15" cy="15" r="15" />
             </g>
           </g>
           <g>
             <g transform="translate(376 984)">
-              <circle
-                cx="15"
-                cy="15"
-                r="15"
-              />
+              <circle cx="15" cy="15" r="15" />
             </g>
           </g>
           <g>
             <g transform="translate(497 984)">
-              <circle
-                cx="15"
-                cy="15"
-                r="15"
-              />
+              <circle cx="15" cy="15" r="15" />
             </g>
           </g>
         </g>
@@ -215,7 +149,7 @@ $total-bubbles-small: 7;
 
 // generate a random value for position
 @function random-position($limit) {
-  @return math.div($limit, 10) * (1 + 0.5 * (1 - 2 * random())); // a rough approximation for "random" positioning
+  @return math.div($limit, 10) * (1 + 0.5 * (1 - 2 * math.random())); // a rough approximation for "random" positioning
 }
 
 .container {
