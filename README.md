@@ -1,6 +1,6 @@
 # Neptun Website
 
-The website of the neptun-tool.
+The website of the neptun-tool. View status [here](https://pfn4gnjb.status.cron-job.org).
 
 ## Info
 
