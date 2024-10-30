@@ -23,7 +23,7 @@ const currentRouteName = computed(() => router.currentRoute.value.name);
       </div>
     </ConfigProvider> -->
 
-    <!-- 
+    <!--
     Loading Indicator: https://github.com/nuxt/nuxt/issues/18630, https://nuxt.com/docs/api/composables/use-loading-indicator
     DynamicMeta: key is needed, so that the component is rerendered without a prop change
     div: needed for transitions to work properly

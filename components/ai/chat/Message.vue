@@ -2,7 +2,7 @@
 import type { Message } from '@ai-sdk/vue';
 
 defineProps<{
-  message: Message;
+  message: Message
 }>();
 </script>
 
@@ -11,7 +11,7 @@ defineProps<{
     class="flex max-w-full my-2 prose dark:prose-invert text-foreground"
     :class="{
       'justify-start': message.role === 'assistant',
-      'justify-end': message.role === 'user',
+      'justify-end': message.role === 'user'
     }"
   >
     <div
@@ -21,7 +21,10 @@ defineProps<{
       :data-message-created-at="message.createdAt"
     >
       <AiChatMessageContent :content="message.content" />
-      <ShadcnSeparator class="my-4" label="Controls" />
+      <ShadcnSeparator
+        class="my-4"
+        label="Controls"
+      />
       <AiChatMessageControls
         :key="message.content"
         :message="message.content"

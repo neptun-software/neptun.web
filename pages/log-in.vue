@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   name: 'Login',
-  alias: ['/sign-in', '/login'],
+  alias: ['/sign-in', '/login']
 });
 
 // defineOgImageComponent('NuxtSeo');

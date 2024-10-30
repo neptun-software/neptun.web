@@ -1,5 +1,5 @@
 import type { HTTPMethod } from 'h3'
-import type { UseFetchOptions } from 'nuxt/app'
+import type { UseFetchOptions, AsyncDataOptions } from 'nuxt/app'
 import type { FetchError } from 'ofetch'
 import { toast } from 'vue-sonner'
 import type { AsyncDataRequestStatus } from '#app'
@@ -9,7 +9,6 @@ import type {
   ReadChatConversationMessage
 } from '~/lib/types/database.tables/schema';
 import { getCodeBlocksFromMarkdown } from '~/utils/parse';
-import type { AsyncDataOptions } from 'nuxt/app';
 
 const { console } = useLogger();
 
@@ -17,7 +16,7 @@ const { console } = useLogger();
 
 // TODO: improve => return _data, isLoading etc. too.
 interface FetchResponse<T> extends Response {
-  _data?: T;
+  _data?: T
 }
 
 export const useAPI = () => {
@@ -323,7 +322,7 @@ export function useFetchChats(user_id: number) {
   // biome-ignore lint/suspicious/noExplicitAny: Can be any.
   const fetchedChatsRefresh = useState<(opts?: AsyncDataOptions<any, any>) => Promise<void>>(
     'fetched-chats-refresh',
-    () => () => Promise.resolve()
+  () => () => Promise.resolve()
   ); // any should be AsyncDataExecuteOptions, but I can not find the type
 
   const chatsFilters = useChatsFilter();

@@ -1,5 +1,5 @@
 import { App } from 'octokit';
-import { type GetResponseTypeFromEndpointMethod } from '@octokit/types'
+import type { GetResponseTypeFromEndpointMethod } from '@octokit/types'
 import { createGithubAppInstallation } from '~/server/database/repositories/githubAppInstallations'
 import { createGithubAppInstallationRepositories } from '~/server/database/repositories/githubAppInstallationsRepositories'
 import { readUserUsingGithubOauthId } from '~/server/database/repositories/users'

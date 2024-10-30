@@ -4,7 +4,7 @@ import { render } from 'vue';
 import CopyToClipboard from '~/components/utils/CopyToClipboard.vue';
 
 defineProps<{
-  messages: Message[];
+  messages: Message[]
 }>();
 
 const $messagesList = ref<HTMLElement | null>(null);
@@ -29,7 +29,7 @@ onMounted(() => {
               const copyComponent = h(CopyToClipboard, {
                 class:
                   'absolute top-2 right-2 transition opacity-20 hover:opacity-100',
-                text: codeBlock.textContent ?? 'NO CODE', // TODO: parse mime type out of className language-<some-language> and validate it => else text
+                text: codeBlock.textContent ?? 'NO CODE' // TODO: parse mime type out of className language-<some-language> and validate it => else text
               });
 
               render(copyComponent, codeBlock);
@@ -39,7 +39,7 @@ onMounted(() => {
       },
       {
         childList: true,
-        subtree: true,
+        subtree: true
       }
     );
   }
@@ -48,7 +48,10 @@ onMounted(() => {
 
 <template>
   <div ref="$messagesList">
-    <template v-for="message in messages" :key="message.id">
+    <template
+      v-for="message in messages"
+      :key="message.id"
+    >
       <AiChatMessage :message="message" />
     </template>
   </div>

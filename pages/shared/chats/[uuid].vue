@@ -9,28 +9,28 @@ import type { AsyncDataRequestStatus } from '#app';
 const route = useRoute(); // $route should work too, but most of the time it doesn't
 
 type ChatMessages = {
-  message: string;
-  id: number;
-  created_at: Date | null;
-  updated_at: Date | null;
-  actor: string;
+  message: string
+  id: number
+  created_at: Date | null
+  updated_at: Date | null
+  actor: string
   chat_conversation: {
-    id: number;
+    id: number
     chat_conversation_shares: {
-      id: number;
-      created_at: Date | null;
-      updated_at: Date | null;
-      is_shared: boolean;
-      is_protected: boolean;
-    }[];
-  };
+      id: number
+      created_at: Date | null
+      updated_at: Date | null
+      is_shared: boolean
+      is_protected: boolean
+    }[]
+  }
 }[];
 
 type ShareInfo = {
-  shareExists: boolean;
-  shareIsActive: boolean;
-  shareIsPrivate: boolean;
-  shareHasPassword: boolean;
+  shareExists: boolean
+  shareIsActive: boolean
+  shareIsPrivate: boolean
+  shareHasPassword: boolean
 };
 
 function convertStringsToDates(data: any) {
@@ -39,7 +39,8 @@ function convertStringsToDates(data: any) {
   for (const key in data) {
     if (typeof data[key] === 'string' && !isNaN(Date.parse(data[key]))) {
       data[key] = new Date(data[key]);
-    } else if (typeof data[key] === 'object') {
+    }
+    else if (typeof data[key] === 'object') {
       convertStringsToDates(data[key]);
     }
   }
@@ -62,14 +63,15 @@ function useFetchResource<T>(url: string) {
     try {
       const response = await $fetch(url, {
         headers: {
-          Authorization: `Basic ${credentials.value}`,
-        },
+          Authorization: `Basic ${credentials.value}`
+        }
       });
 
       data.value = convertStringsToDates(response);
       status.value = 'success';
       error.value = null;
-    } catch (e: any) {
+    }
+    catch (e: any) {
       error.value = e;
       status.value = 'error';
     }
@@ -80,13 +82,13 @@ function useFetchResource<T>(url: string) {
     error,
     status,
     execute,
-    password,
+    password
   };
 }
 
 const { data, error, status, password, execute } = useFetchResource<{
-  chatMessages: ChatMessages;
-  shareInfo: ShareInfo;
+  chatMessages: ChatMessages
+  shareInfo: ShareInfo
 }>(`/api/shared/chats/${route.params.uuid}`);
 
 const chatMessages = computed(() => {
@@ -96,7 +98,7 @@ const chatMessages = computed(() => {
         ({
           id: `${String(id)}-${String(Date.now())}`,
           content: message,
-          role: actor,
+          role: actor
         } as Message)
     ) || []
   );
@@ -107,7 +109,7 @@ onMounted(() => {
 });
 
 useHead({
-  title: `Chat Share - ${route.params.uuid}`,
+  title: `Chat Share - ${route.params.uuid}`
 });
 </script>
 
@@ -118,7 +120,9 @@ useHead({
       class="flex items-center justify-center gap-2 px-3 py-2 mb-2 border border-blue-200 rounded-lg bg-background"
     >
       <Loader2 class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
-      <p class="flex-grow">Loading chat share<LoadingDots /></p>
+      <p class="flex-grow">
+        Loading chat share<LoadingDots />
+      </p>
     </div>
 
     <template v-if="error">
@@ -130,10 +134,12 @@ useHead({
           Chat share is not active.
         </template>
         <template v-else-if="error?.data?.data?.shareInfo?.shareIsPrivate">
-          <h2 class="text-3xl font-extrabold">Chat share is private.</h2>
+          <h2 class="text-3xl font-extrabold">
+            Chat share is private.
+          </h2>
 
           <template v-if="error?.data?.data?.shareInfo?.shareHasPassword">
-            Please enter the password to view it: <br />
+            Please enter the password to view it: <br>
             <div class="flex justify-center gap-1 my-2">
               <ShadcnInput
                 v-model="password"
@@ -141,7 +147,9 @@ useHead({
                 type="password"
                 placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
               />
-              <ShadcnButton @click="execute"> Submit </ShadcnButton>
+              <ShadcnButton @click="execute">
+                Submit
+              </ShadcnButton>
             </div>
           </template>
           <template v-if="error?.data?.data?.shareInfo?.shareHasWhitelist">
@@ -150,7 +158,7 @@ useHead({
             </template>
           </template>
         </template>
-        <br />
+        <br>
         <span>
           {{ error?.data?.statusCode }} {{ error?.data?.statusMessage }}
         </span>
@@ -162,7 +170,10 @@ useHead({
           v-if="status === 'success' && chatMessages.length > 0"
           :messages="chatMessages"
         />
-        <p v-else class="text-center">
+        <p
+          v-else
+          class="text-center"
+        >
           There are no chat messages in this chat share...
         </p>
 
