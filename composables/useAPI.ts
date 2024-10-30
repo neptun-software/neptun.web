@@ -30,22 +30,52 @@ export const useAPI = () => {
     } | null = null
   ): Promise<T> => {
     const fetchPromise = new Promise<T>((resolve, reject) => {
+      console.info('Starting fetch request to:', url, 'with options:', options);
+
       useFetch(url, {
         ...options,
-        onResponse(response: FetchResponse<T>) {
-          // THIS IS CALLED EVERY TIME, ALSO IF RESPONSE IS NOT OK!
-          if (response.ok) {
+        onRequest({ request, options }) {
+          console.log('Request:', request, 'Options:', options);
+        },
+        onRequestError({ request, options, error }) {
+          console.error('Request error:', error);
+          reject(error);
+        },
+        onResponse({ request, response, options }) {
+          console.log('Response received:', response);
+
+          if (response.ok && response._data) {
+            // THIS IS CALLED EVERY TIME, ALSO IF RESPONSE IS NOT OK!
+            console.log('Response data:', response._data);
             resolve(response._data as T);
+          } else {
+            const error = new Error(
+              `Response not ok or no data: ${response.statusText}`
+            );
+
+            console.error('Response error:', error);
+
+            reject(error);
           }
         },
-        onResponseError(response: FetchResponse<T>) {
-          reject(response._data);
+        onResponseError({ request, response, options }) {
+          console.error('Response error data:', response._data);
+          reject(response._data || new Error(`HTTP ${response.status}`));
         },
-      }).catch(reject);
+      }).catch((error) => {
+        console.error('Fetch error:', error);
+        reject(error);
+      });
     });
 
     if (toastMessages) {
-      toast.promise(fetchPromise, toastMessages);
+      toast.promise(fetchPromise, {
+        ...toastMessages,
+        error: (error) => {
+          console.error('Toast error:', error);
+          return toastMessages.error(error);
+        },
+      });
     }
 
     return fetchPromise;
