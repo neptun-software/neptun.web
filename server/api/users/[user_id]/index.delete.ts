@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeUserId.statusCode,
         statusMessage: maybeUserId.statusMessage,
-        data: maybeUserId.data
+        data: maybeUserId.data,
       })
     );
   }
@@ -22,4 +22,4 @@ export default defineEventHandler(async (event) => {
   }
 
   return deletionSuccessful;
-})
+});

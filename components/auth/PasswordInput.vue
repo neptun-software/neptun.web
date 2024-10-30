@@ -2,8 +2,8 @@
 import { Eye, EyeOff } from 'lucide-vue-next';
 
 interface Props {
-  onEnter: () => Promise<any>
-  modelValue: string // password
+  onEnter: () => Promise<any>;
+  modelValue: string; // password
 }
 
 const props = defineProps<Props>();

@@ -8,19 +8,19 @@ const steps = [
   {
     step: 1,
     title: 'Files',
-    description: 'Import project files from github or local.'
+    description: 'Import project files from github or local.',
   },
   {
     step: 2,
     title: 'Context',
-    description: 'Provide some context about the project.'
+    description: 'Provide some context about the project.',
   },
   {
     step: 3,
     title: 'Done!',
-    description: 'That\'s it. You can now use the configurations.'
-  }
-]
+    description: "That's it. You can now use the configurations.",
+  },
+];
 
 const canGoNext = computed(() => stepIndex.value < steps.length);
 const canGoBack = computed(() => stepIndex.value > 1);
@@ -38,8 +38,8 @@ function goBack() {
 const files = ref<File[]>([]);
 const dropZoneRef = ref<HTMLDivElement>();
 const { isOverDropZone } = useDropZone(dropZoneRef, {
-  onDrop
-})
+  onDrop,
+});
 
 function onDrop(droppedFiles: File[] | null) {
   if (droppedFiles) {
@@ -60,7 +60,7 @@ const inputFileRef = ref<HTMLInputElement | null>(null);
 function updateInputFileValue() {
   if (inputFileRef.value) {
     const dataTransfer = new DataTransfer();
-    files.value.forEach(file => dataTransfer.items.add(file));
+    files.value.forEach((file) => dataTransfer.items.add(file));
     inputFileRef.value.files = dataTransfer.files;
   }
 }
@@ -74,10 +74,7 @@ function generateConfigurationFiles() {
 </script>
 
 <template>
-  <ShadcnStepper
-    v-model="stepIndex"
-    class="flex items-start w-full gap-2"
-  >
+  <ShadcnStepper v-model="stepIndex" class="flex items-start w-full gap-2">
     <ShadcnStepperItem
       v-for="step in steps"
       :key="step.step"
@@ -98,15 +95,12 @@ function generateConfigurationFiles() {
           size="icon"
           class="z-10 rounded-full shrink-0"
           :class="[
-            state === 'active'
-              && 'ring-2 ring-ring ring-offset-2 ring-offset-background'
+            state === 'active' &&
+              'ring-2 ring-ring ring-offset-2 ring-offset-background',
           ]"
           :disabled="state !== 'completed' && !allowedToGoNext"
         >
-          <Check
-            v-if="state === 'completed'"
-            class="size-5"
-          />
+          <Check v-if="state === 'completed'" class="size-5" />
           <Circle v-if="state === 'active'" />
           <Dot v-if="state === 'inactive'" />
         </ShadcnButton>
@@ -132,17 +126,10 @@ function generateConfigurationFiles() {
   <div class="flex flex-col gap-4 mt-4">
     <template v-if="stepIndex === 1">
       <p>Import Data</p>
-      <ShadcnTabs
-        default-value="local"
-        class="w-full"
-      >
+      <ShadcnTabs default-value="local" class="w-full">
         <ShadcnTabsList class="flex justify-start flex-grow">
-          <ShadcnTabsTrigger value="local">
-            Local
-          </ShadcnTabsTrigger>
-          <ShadcnTabsTrigger value="github">
-            Github
-          </ShadcnTabsTrigger>
+          <ShadcnTabsTrigger value="local"> Local </ShadcnTabsTrigger>
+          <ShadcnTabsTrigger value="github"> Github </ShadcnTabsTrigger>
         </ShadcnTabsList>
         <ShadcnTabsContent value="local">
           <div class="flex flex-col gap-2 p-4 border rounded-md">
@@ -163,18 +150,13 @@ function generateConfigurationFiles() {
             <div>
               <strong>Uploaded Files:</strong>
               <ShadcnScrollArea class="h-36">
-                <div
-                  v-for="(file, index) in files"
-                  :key="index"
-                >
+                <div v-for="(file, index) in files" :key="index">
                   <p>Name: {{ file.name }}</p>
                   <p>Size: {{ file.size }}</p>
                   <p>Type: {{ file.type || 'Unknown' }}</p>
                   <p>Last modified: {{ file.lastModified }}</p>
                 </div>
-                <p v-if="files.length === 0">
-                  No files uploaded yet...
-                </p>
+                <p v-if="files.length === 0">No files uploaded yet...</p>
               </ShadcnScrollArea>
             </div>
           </div>
@@ -188,7 +170,8 @@ function generateConfigurationFiles() {
                 target="_blank"
                 :external="true"
                 to="https://github.com/neptun-software/neptun.github.app"
-              >here</NuxtLink>
+                >here</NuxtLink
+              >
               for more information.
             </p>
           </div>

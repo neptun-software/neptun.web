@@ -10,9 +10,9 @@ const initializeAnimation = () => {
     duration: 2,
     ease: 'power1.inOut',
     yoyo: true,
-    repeat: -1
-  })
-}
+    repeat: -1,
+  });
+};
 
 watch(floatingImage, (newValue) => {
   if (newValue) {
@@ -26,7 +26,7 @@ onMounted(() => {
       initializeAnimation();
     }
   }, 100);
-})
+});
 </script>
 
 <template>
@@ -35,9 +35,7 @@ onMounted(() => {
       class="grid max-w-full gap-8 py-20 mx-auto place-items-center lg:max-w-screen-xl md:py-32"
     >
       <div class="relative mt-14">
-        <h3 class="pb-4 font-bold text-center text-9xl">
-          What?
-        </h3>
+        <h3 class="pb-4 font-bold text-center text-9xl">What?</h3>
 
         <!-- gradient shadow -->
         <div

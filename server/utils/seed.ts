@@ -2,7 +2,7 @@ import {
   neptun_user,
   neptun_user_oauth_account,
   chat_conversation,
-  chat_conversation_message /* , POSSIBLE_OAUTH_PROVIDERS */
+  chat_conversation_message /* , POSSIBLE_OAUTH_PROVIDERS */,
 } from '../../lib/types/database.tables/schema';
 import { IS_DEV } from './globals'; // needed, if run as package.json script
 
@@ -11,8 +11,8 @@ const tables = [
   neptun_user,
   neptun_user_oauth_account,
   chat_conversation,
-  chat_conversation_message
-]
+  chat_conversation_message,
+];
 async function seedDatabase() {
   const instance = db;
   if (!instance) return;
@@ -30,8 +30,8 @@ async function seedDatabase() {
         throw createError({
           statusCode: 500,
           statusMessage: 'Internal Server Error',
-          message: 'Failed to clear database'
-        })
+          message: 'Failed to clear database',
+        });
       });
   }
 
@@ -48,8 +48,8 @@ async function seedDatabase() {
       throw createError({
         statusCode: 500,
         statusMessage: 'Internal Server Error',
-        message: 'Failed to seed database'
-      })
+        message: 'Failed to seed database',
+      });
     });
 }
 

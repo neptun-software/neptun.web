@@ -2,8 +2,8 @@
 import { Vue3Lottie } from 'vue3-lottie';
 
 const props = defineProps<{
-  animationIsActive?: boolean
-  animationLink: string
+  animationIsActive?: boolean;
+  animationLink: string;
 }>();
 
 // pauseAnimation prop only works 2 times somehow, that is why I have to rerender every time

@@ -1,7 +1,7 @@
 import { UserLogInSchema } from '~/lib/types/input.validation';
 import {
   createUser,
-  readUserUsingPrimaryEmail
+  readUserUsingPrimaryEmail,
 } from '~/server/database/repositories/users';
 
 export default defineEventHandler(async (event) => {
@@ -15,14 +15,14 @@ export default defineEventHandler(async (event) => {
 
     return await replaceUserSession(event, {
       user: session.user,
-      loggedInAt
-    })
+      loggedInAt,
+    });
   }
 
   /* 1. VALIDATE INPUT */
   const result = await readValidatedBody(event, (body) => {
     return UserLogInSchema.safeParse(body);
-  })
+  });
 
   if (LOG_BACKEND) console.info('result', JSON.stringify(result));
   if (!result.success || !result.data)
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
-        data: result.error
+        data: result.error,
       })
     );
   const body = result.data!;
@@ -57,8 +57,8 @@ export default defineEventHandler(async (event) => {
 
   const userToCreate = {
     primary_email: email,
-    password
-  }
+    password,
+  };
 
   const createdUser = await createUser(userToCreate);
 
@@ -74,14 +74,14 @@ export default defineEventHandler(async (event) => {
 
   const user = {
     id: createdUser.id,
-    primary_email: createdUser.primary_email
-  }
+    primary_email: createdUser.primary_email,
+  };
 
   const loggedInAt = new Date();
   if (LOG_BACKEND) console.info('setting new session');
 
   return await setUserSession(event, {
     user,
-    loggedInAt
-  })
+    loggedInAt,
+  });
 });

@@ -1,8 +1,8 @@
 import { App } from 'octokit';
-import type { GetResponseTypeFromEndpointMethod } from '@octokit/types'
-import { createGithubAppInstallation } from '~/server/database/repositories/githubAppInstallations'
-import { createGithubAppInstallationRepositories } from '~/server/database/repositories/githubAppInstallationsRepositories'
-import { readUserUsingGithubOauthId } from '~/server/database/repositories/users'
+import type { GetResponseTypeFromEndpointMethod } from '@octokit/types';
+import { createGithubAppInstallation } from '~/server/database/repositories/githubAppInstallations';
+import { createGithubAppInstallationRepositories } from '~/server/database/repositories/githubAppInstallationsRepositories';
+import { readUserUsingGithubOauthId } from '~/server/database/repositories/users';
 
 export default defineEventHandler(async (event) => {
   const runtimeConfig = useRuntimeConfig(event);
@@ -11,11 +11,11 @@ export default defineEventHandler(async (event) => {
     privateKey: runtimeConfig.github.app.privateKey,
     oauth: {
       clientId: runtimeConfig.github.app.clientId,
-      clientSecret: runtimeConfig.github.app.clientSecret
+      clientSecret: runtimeConfig.github.app.clientSecret,
     },
     webhooks: {
-      secret: runtimeConfig.github.app.webhookSecret
-    }
+      secret: runtimeConfig.github.app.webhookSecret,
+    },
   });
 
   const query = getQuery(event);
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request. Missing installation_id.',
-        message: 'Missing installation_id.'
+        message: 'Missing installation_id.',
       })
     );
   }
@@ -39,8 +39,9 @@ export default defineEventHandler(async (event) => {
       event,
       createError({
         statusCode: 400,
-        statusMessage: 'Bad Request. Invalid installation_id. Must be a number.',
-        message: 'Invalid installation_id. Must be a number.'
+        statusMessage:
+          'Bad Request. Invalid installation_id. Must be a number.',
+        message: 'Invalid installation_id. Must be a number.',
       })
     );
   }
@@ -51,22 +52,23 @@ export default defineEventHandler(async (event) => {
 
     try {
       const { data: installation } = await octokit.rest.apps.getInstallation({
-        installation_id: installationId
-      })
+        installation_id: installationId,
+      });
 
       const { account } = installation;
       if (account === null) {
         if (LOG_BACKEND)
           console.info(
-            'Invalid installation_id. The installation doesn\'t belong to any Github App.'
+            "Invalid installation_id. The installation doesn't belong to any Github App."
           );
         return sendError(
           event,
           createError({
             statusCode: 400,
-            statusMessage: 'Bad Request. Invalid installation_id. The installation doesn\'t belong to any Github App.',
+            statusMessage:
+              "Bad Request. Invalid installation_id. The installation doesn't belong to any Github App.",
             message:
-              'Invalid installation_id. The installation doesn\'t belong to any Github App.'
+              "Invalid installation_id. The installation doesn't belong to any Github App.",
           })
         );
       }
@@ -74,8 +76,8 @@ export default defineEventHandler(async (event) => {
       const { id: githubUserId, avatar_url: githubUserAvatarUrl } = account;
 
       // prefer login, then name, then email
-      const githubUserName
-        = 'login' in account && account.login
+      const githubUserName =
+        'login' in account && account.login
           ? account.login
           : account.name && account.name.length > 0
             ? account.name
@@ -102,7 +104,7 @@ export default defineEventHandler(async (event) => {
               statusCode: 404,
               statusMessage: 'Not Found.',
               message:
-                'User not found. You have to install the app, with a Github Account, that you registered an account on neptun!'
+                'User not found. You have to install the app, with a Github Account, that you registered an account on neptun!',
             })
           );
         }
@@ -113,8 +115,8 @@ export default defineEventHandler(async (event) => {
           github_account_name: githubUserName,
           github_account_avatar_url: githubUserAvatarUrl,
           github_account_type: githubUserAccountType,
-          neptun_user_id: userId
-        }
+          neptun_user_id: userId,
+        };
 
         // console.log('User ID:', installation.account?.id);
 
@@ -132,7 +134,7 @@ export default defineEventHandler(async (event) => {
             createError({
               statusCode: 500,
               statusMessage: 'Internal Server Error.',
-              message: 'Failed to create github app installation in database.'
+              message: 'Failed to create github app installation in database.',
             })
           );
         }
@@ -145,17 +147,17 @@ export default defineEventHandler(async (event) => {
             octokit.rest.apps.listReposAccessibleToInstallation,
             {
               installation_id: installationId,
-              per_page: 100
+              per_page: 100,
             },
             (response) => {
               type Repository = GetResponseTypeFromEndpointMethod<
                 typeof octokit.rest.apps.listReposAccessibleToInstallation
-              >['data']['repositories'][0]
+              >['data']['repositories'][0];
               type Repositories = {
-                [key: number]: Repository
-                repository_selection: string
-                total_count: number
-              }
+                [key: number]: Repository;
+                repository_selection: string;
+                total_count: number;
+              };
 
               /**
                * Contains valid type.
@@ -185,10 +187,10 @@ export default defineEventHandler(async (event) => {
 
               // removes repository_selection and total_count
               const filteredRepositories = Object.keys(repositories)
-                .filter(key => !isNaN(Number(key)))
+                .filter((key) => !isNaN(Number(key)))
                 .map((key) => {
                   return repositories[Number(key)];
-                })
+                });
 
               /* if (LOG_BACKEND) {
                 console.log(
@@ -216,8 +218,8 @@ export default defineEventHandler(async (event) => {
                   github_repository_is_template:
                     repository.is_template ?? false,
                   github_repository_is_archived: repository.archived,
-                  github_app_installation_id: githubAppInstallationId
-                }
+                  github_app_installation_id: githubAppInstallationId,
+                };
               });
             }
           );
@@ -235,8 +237,8 @@ export default defineEventHandler(async (event) => {
           // console.dir(repositories, { depth: 1 });
 
           try {
-            const createdGithubAppInstallationRepositories
-              = await createGithubAppInstallationRepositories(
+            const createdGithubAppInstallationRepositories =
+              await createGithubAppInstallationRepositories(
                 filteredRepositories
               );
             if (!createdGithubAppInstallationRepositories) {
@@ -255,14 +257,13 @@ export default defineEventHandler(async (event) => {
                   statusCode: 500,
                   statusMessage: 'Internal Server Error.',
                   message:
-                    'Failed to create github app installation repositories in database. There are no repositories connected to this installation.'
+                    'Failed to create github app installation repositories in database. There are no repositories connected to this installation.',
                 })
               );
             }
 
             return sendRedirect(event, `/home`);
-          }
-          catch (error) {
+          } catch (error) {
             if (LOG_BACKEND) {
               console.info(
                 'Failed to create github app installation repositories in database.'
@@ -277,12 +278,11 @@ export default defineEventHandler(async (event) => {
                 statusCode: 500,
                 statusMessage: 'Fetch Error.',
                 message:
-                  'Failed to fetch repositories connected to this installation.'
+                  'Failed to fetch repositories connected to this installation.',
               })
             );
           }
-        }
-        catch (error) {
+        } catch (error) {
           if (LOG_BACKEND) {
             console.info(
               'Failed to create github app installation repositories in database.'
@@ -297,12 +297,11 @@ export default defineEventHandler(async (event) => {
               statusCode: 500,
               statusMessage: 'Fetch Error.',
               message:
-                'Failed to fetch repositories connected to this installation.'
+                'Failed to fetch repositories connected to this installation.',
             })
           );
         }
-      }
-      catch (error) {
+      } catch (error) {
         if (LOG_BACKEND) {
           console.info(
             'Failed to find user. You have to install the app, with a Github Account, that you registered an account on neptun!'
@@ -315,14 +314,14 @@ export default defineEventHandler(async (event) => {
           event,
           createError({
             statusCode: 400,
-            statusMessage: 'Bad Request. Failed to find user. You have to install the app, with a Github Account, that you registered an account on neptun!',
+            statusMessage:
+              'Bad Request. Failed to find user. You have to install the app, with a Github Account, that you registered an account on neptun!',
             message:
-              'Failed to find user. You have to install the app, with a Github Account, that you registered an account on neptun!'
+              'Failed to find user. You have to install the app, with a Github Account, that you registered an account on neptun!',
           })
         );
       }
-    }
-    catch (error) {
+    } catch (error) {
       if (LOG_BACKEND) {
         console.info(
           'Invalid installation_id. The installation is not found or the user does not have access to it.'
@@ -335,17 +334,17 @@ export default defineEventHandler(async (event) => {
         event,
         createError({
           statusCode: 400,
-          statusMessage: 'Bad Request. Invalid installation_id. The installation is not found or the user does not have access to it.',
+          statusMessage:
+            'Bad Request. Invalid installation_id. The installation is not found or the user does not have access to it.',
           message:
-            'Invalid installation_id. The installation is not found or the user does not have access to it.'
+            'Invalid installation_id. The installation is not found or the user does not have access to it.',
         })
       );
     }
-  }
-  catch (error) {
+  } catch (error) {
     if (LOG_BACKEND) {
       console.info(
-        'Invalid installation_id. The installation doesn\'t belong to any Github App.'
+        "Invalid installation_id. The installation doesn't belong to any Github App."
       );
 
       console.error(error);
@@ -355,9 +354,10 @@ export default defineEventHandler(async (event) => {
       event,
       createError({
         statusCode: 400,
-        statusMessage: 'Bad Request. Invalid installation_id. The installation doesn\'t belong to any Github App.',
+        statusMessage:
+          "Bad Request. Invalid installation_id. The installation doesn't belong to any Github App.",
         message:
-          'Invalid installation_id. The installation doesn\'t belong to any Github App.'
+          "Invalid installation_id. The installation doesn't belong to any Github App.",
       })
     );
   }

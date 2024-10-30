@@ -1,6 +1,6 @@
 import {
   type ChatConversationFileToCreate,
-  InsertFileUniversalSchema
+  InsertFileUniversalSchema,
 } from '~/lib/types/database.tables/schema';
 import { createChatConversationFiles } from '~/server/database/repositories/chatConversationFiles';
 
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeMessageId.statusCode,
         statusMessage: maybeMessageId.statusMessage,
-        data: maybeMessageId.data
+        data: maybeMessageId.data,
       })
     );
   }
@@ -25,25 +25,25 @@ export default defineEventHandler(async (event) => {
   /* VALIDATE BODY */
   const body = await readValidatedBody(event, (body) => {
     return InsertFileUniversalSchema.safeParse(body);
-  })
+  });
   if (!body.success || !body.data) {
     return sendError(
       event,
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request. Invalid body(file | files).',
-        data: body.error
+        data: body.error,
       })
     );
   }
   const validatedBody = body.data;
 
   if (
-    validatedBody
-    && 'text' in validatedBody
-    && 'title' in validatedBody
-    && 'language' in validatedBody
-    && 'extension' in validatedBody
+    validatedBody &&
+    'text' in validatedBody &&
+    'title' in validatedBody &&
+    'language' in validatedBody &&
+    'extension' in validatedBody
   ) {
     const { text, title, language, extension } = validatedBody;
 
@@ -54,18 +54,17 @@ export default defineEventHandler(async (event) => {
       extension: extension,
       neptun_user_id: user_id,
       chat_conversation_id: chat_id,
-      chat_conversation_message_id: message_id
+      chat_conversation_message_id: message_id,
     } as ChatConversationFileToCreate;
 
     const createdFile = await createChatConversationFiles([
-      conversationMessageFileToCreate
-    ])
+      conversationMessageFileToCreate,
+    ]);
 
     return {
-      chatFile: createdFile
-    }
-  }
-  else if (validatedBody && 'files' in validatedBody) {
+      chatFile: createdFile,
+    };
+  } else if (validatedBody && 'files' in validatedBody) {
     const files = validatedBody.files.map(
       ({ text, title, language, extension }) => ({
         text,
@@ -74,22 +73,22 @@ export default defineEventHandler(async (event) => {
         extension,
         neptun_user_id: user_id,
         chat_conversation_id: chat_id,
-        chat_conversation_message_id: message_id
+        chat_conversation_message_id: message_id,
       })
     );
 
     const createdFiles = await createChatConversationFiles(files);
 
     return {
-      chatFiles: createdFiles
-    }
+      chatFiles: createdFiles,
+    };
   }
 
   return sendError(
     event,
     createError({
       statusCode: 400,
-      statusMessage: 'Bad Request. Invalid body(file | files).'
+      statusMessage: 'Bad Request. Invalid body(file | files).',
     })
   );
-})
+});

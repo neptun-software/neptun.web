@@ -2,14 +2,14 @@
 import { Volume2, CirclePause } from 'lucide-vue-next';
 
 const props = defineProps<{
-  message: string
+  message: string;
 }>();
 
 const messageAsPlainText = ref(props.message);
 
 onMounted(async () => {
   messageAsPlainText.value = await stripMarkdown(props.message);
-})
+});
 
 /* SPEECH SYNTHESIS */
 // TODO: find out, why the speaker sometimes suddenly stops
@@ -20,13 +20,13 @@ const {
   // utterance: currentUtterance,
   // error: speechSynthesisError,
   stop: stopSpeaking,
-  speak: speakText
+  speak: speakText,
 } = useSpeechSynthesis(messageAsPlainText, {
   lang: 'en-US',
   pitch: 1,
   rate: 1,
-  volume: 1
-})
+  volume: 1,
+});
 </script>
 
 <template>
@@ -55,9 +55,7 @@ const {
             </template>
           </ShadcnButton>
         </ShadcnTooltipTrigger>
-        <ShadcnTooltipContent side="top">
-          Read Message
-        </ShadcnTooltipContent>
+        <ShadcnTooltipContent side="top"> Read Message </ShadcnTooltipContent>
       </ShadcnTooltip>
       <ShadcnTooltip>
         <ShadcnTooltipTrigger as-child>

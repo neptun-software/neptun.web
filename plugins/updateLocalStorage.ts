@@ -9,5 +9,5 @@ export default defineNuxtPlugin(() => {
     );
 
     localStorageSelectedChatId.value = selectedAiChat.value.id;
-  })
+  });
 });

@@ -6,11 +6,11 @@ export default defineNitroPlugin(() => {
     const loggedInAt = new Date();
     await replaceUserSession(event, {
       user: session.user,
-      loggedInAt
-    })
+      loggedInAt,
+    });
   });
 
   /* sessionHooks.hook('clear', async (session, event) => {
     if (LOG_BACKEND) console.info('session cleared...');
   }); */
-})
+});

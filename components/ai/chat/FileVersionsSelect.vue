@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 defineProps<{
-  isDisabled: boolean
-  includeDiff?: boolean
+  isDisabled: boolean;
+  includeDiff?: boolean;
 }>();
 
 const {
@@ -10,7 +10,7 @@ const {
   selectedFileVersionDate,
   versionsForSelectedFileTypeComparison,
   selectedComparisonFileVersionId,
-  selectedComparisonFileVersionDate
+  selectedComparisonFileVersionDate,
 } = useFiles();
 </script>
 
@@ -30,10 +30,7 @@ const {
       </template>
     </ShadcnLabel>
 
-    <ShadcnSelect
-      v-model="selectedFileVersionId"
-      :disabled="isDisabled"
-    >
+    <ShadcnSelect v-model="selectedFileVersionId" :disabled="isDisabled">
       <ShadcnSelectTrigger>
         <ShadcnSelectValue placeholder="Select a version..." />
       </ShadcnSelectTrigger>

@@ -1,13 +1,13 @@
 import {
   readChatConversationShareMessages,
   readShareInfo,
-  sharePasswordIsValid
+  sharePasswordIsValid,
 } from '~/server/database/repositories/chatConversationShares';
 import { readAllChatConversationShareWhitelistEntries } from '~/server/database/repositories/chatConversationShareWhitelists';
 
 async function userIsAuthorizedToViewChat(
   share_id: string,
-  { username, password }: { username: string, password: string }
+  { username, password }: { username: string; password: string }
 ) {
   return username === '' && (await sharePasswordIsValid(share_id, password));
 }
@@ -22,16 +22,16 @@ export default defineCachedEventHandler(async (event) => {
       createError({
         statusCode: maybeUuid.statusCode,
         statusMessage: maybeUuid.statusMessage,
-        data: maybeUuid.data
+        data: maybeUuid.data,
       })
     );
   }
   const uuid = maybeUuid.data?.uuid;
 
-  const fetchedChatConversationShareWhitelistEntries
-    = await readAllChatConversationShareWhitelistEntries(uuid);
-  const shareHasWhitelist
-    = fetchedChatConversationShareWhitelistEntries.length > 0;
+  const fetchedChatConversationShareWhitelistEntries =
+    await readAllChatConversationShareWhitelistEntries(uuid);
+  const shareHasWhitelist =
+    fetchedChatConversationShareWhitelistEntries.length > 0;
 
   const info = await readShareInfo(uuid);
   if (!info.shareExists) {
@@ -44,9 +44,9 @@ export default defineCachedEventHandler(async (event) => {
         data: {
           shareInfo: {
             ...info,
-            shareHasWhitelist
-          }
-        }
+            shareHasWhitelist,
+          },
+        },
       })
     );
   }
@@ -68,9 +68,9 @@ export default defineCachedEventHandler(async (event) => {
           data: {
             shareInfo: {
               ...info,
-              shareHasWhitelist
-            }
-          }
+              shareHasWhitelist,
+            },
+          },
         })
       );
     }
@@ -82,7 +82,7 @@ export default defineCachedEventHandler(async (event) => {
     if (
       !(await userIsAuthorizedToViewChat(uuid, {
         username,
-        password
+        password,
       }))
     ) {
       return sendError(
@@ -94,9 +94,9 @@ export default defineCachedEventHandler(async (event) => {
           data: {
             shareInfo: {
               ...info,
-              shareHasWhitelist
-            }
-          }
+              shareHasWhitelist,
+            },
+          },
         })
       );
     }
@@ -110,7 +110,7 @@ export default defineCachedEventHandler(async (event) => {
 
     if (
       !fetchedChatConversationShareWhitelistEntries
-        .map(entry => entry.neptun_user_id.primary_email)
+        .map((entry) => entry.neptun_user_id.primary_email)
         .includes(email)
     ) {
       return sendError(
@@ -122,9 +122,9 @@ export default defineCachedEventHandler(async (event) => {
           data: {
             shareInfo: {
               ...info,
-              shareHasWhitelist
-            }
-          }
+              shareHasWhitelist,
+            },
+          },
         })
       );
     }
@@ -134,6 +134,6 @@ export default defineCachedEventHandler(async (event) => {
 
   return {
     chatMessages: fetchedChatMessages,
-    shareInfo: info
-  }
+    shareInfo: info,
+  };
 });

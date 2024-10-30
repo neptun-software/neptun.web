@@ -18,22 +18,22 @@ export default defineEventHandler(async (event) => {
     utils: {
       neptun_api_server_host: `${url}/api`,
       neptun_github_app_url:
-        'https://github.com/apps/neptun-github-app/installations/new'
+        'https://github.com/apps/neptun-github-app/installations/new',
     },
     auth: {
       neptun_session_cookie: session,
       user: {
         id: userId,
         email: email,
-        oauth: oauth
-      }
+        oauth: oauth,
+      },
     },
     active_chat: {
       chat_id: -1,
       chat_name: `chat-${Date.now()}`,
-      model: defaultAiModelDomain
-    }
-  }
+      model: defaultAiModelDomain,
+    },
+  };
 
   return CLI_CONFIGURATION;
-})
+});

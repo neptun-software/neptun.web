@@ -2,7 +2,7 @@
 import { Menu } from 'lucide-vue-next';
 
 defineProps({
-  layout: String
+  layout: String,
 });
 
 const { loggedIn } = useUserSession();
@@ -14,18 +14,17 @@ const hiddenRoutesIfLoggedIn = hiddenRoutes.concat(['/log-in', '/sign-up']);
 const hiddenRoutesIfLoggedOut = hiddenRoutes.concat([
   '/',
   '/account',
-  '/guide'
+  '/guide',
 ]);
 
 const visibleRoutes = computed(() => {
   if (loggedIn.value) {
     return routes.filter(
-      route => !hiddenRoutesIfLoggedIn.includes(route.path)
+      (route) => !hiddenRoutesIfLoggedIn.includes(route.path)
     );
-  }
-  else {
+  } else {
     return routes.filter(
-      route => !hiddenRoutesIfLoggedOut.includes(route.path)
+      (route) => !hiddenRoutesIfLoggedOut.includes(route.path)
     );
   }
 });
@@ -33,9 +32,9 @@ const visibleRoutes = computed(() => {
 const { width: windowWidth } = useWindowSize();
 
 const sortedRoutes = computed(() => {
-  const homeRoute = visibleRoutes.value.find(route => route.path === '/home');
+  const homeRoute = visibleRoutes.value.find((route) => route.path === '/home');
   const otherRoutes = visibleRoutes.value.filter(
-    route => route.path !== '/home'
+    (route) => route.path !== '/home'
   );
 
   if (homeRoute) {
@@ -47,10 +46,7 @@ const sortedRoutes = computed(() => {
 </script>
 
 <template>
-  <div
-    nuxt-client
-    class="flex justify-center"
-  >
+  <div nuxt-client class="flex justify-center">
     <div v-if="windowWidth <= 700 && layout === 'navigation'">
       <ShadcnDropdownMenu>
         <ShadcnDropdownMenuTrigger><Menu /></ShadcnDropdownMenuTrigger>
@@ -59,10 +55,7 @@ const sortedRoutes = computed(() => {
             v-for="route in visibleRoutes"
             :key="route.path"
           >
-            <NuxtLink
-              :to="route.path"
-              active-class="underline"
-            >
+            <NuxtLink :to="route.path" active-class="underline">
               <p>
                 {{ route.name }}
               </p>
@@ -77,31 +70,21 @@ const sortedRoutes = computed(() => {
       class="flex items-center gap-2"
       :class="{
         navigation: layout === 'navigation',
-        default: layout !== 'navigation'
+        default: layout !== 'navigation',
       }"
     >
-      <li
-        v-for="route in sortedRoutes"
-        :key="route.path"
-      >
+      <li v-for="route in sortedRoutes" :key="route.path">
         <NuxtLink
           v-if="layout === 'navigation' && route.path === '/home'"
           class="font-bold"
           :to="route.path"
         >
           <ShadcnAvatar>
-            <ShadcnAvatarImage
-              src="/favicon.png"
-              alt="Neptun Logo"
-            />
+            <ShadcnAvatarImage src="/favicon.png" alt="Neptun Logo" />
             <ShadcnAvatarFallback>Home</ShadcnAvatarFallback>
           </ShadcnAvatar>
         </NuxtLink>
-        <NuxtLink
-          v-else
-          :to="route.path"
-          active-class="active-link"
-        >
+        <NuxtLink v-else :to="route.path" active-class="active-link">
           {{ route.name }}
         </NuxtLink>
       </li>

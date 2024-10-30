@@ -7,6 +7,6 @@ export default withNuxt({
     'vue/no-v-html': 'off',
     '@typescript-eslint/triple-slash-reference': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/ban-ts-comment': 'off'
-  }
+    '@typescript-eslint/ban-ts-comment': 'off',
+  },
 });

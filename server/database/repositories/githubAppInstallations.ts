@@ -1,9 +1,9 @@
-import { eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm';
 import {
   github_app_installation,
   type ReadUser,
-  type NewGithubAppInstallation
-} from '~/lib/types/database.tables/schema'
+  type NewGithubAppInstallation,
+} from '~/lib/types/database.tables/schema';
 
 export const createGithubAppInstallation = async (
   installationToCreate: NewGithubAppInstallation
@@ -19,12 +19,12 @@ export const createGithubAppInstallation = async (
           err
         );
       return null;
-    })
+    });
 
   if (!createdGithubAppInstallation) return null;
 
   return createdGithubAppInstallation[0];
-}
+};
 
 // User can have multiple, because user can link multiple github organizations.
 export const readAllGithubAppInstallationsOfUser = async (
@@ -38,7 +38,7 @@ export const readAllGithubAppInstallationsOfUser = async (
       github_account_avatar_url:
         github_app_installation.github_account_avatar_url,
       created_at: github_app_installation.created_at,
-      updated_at: github_app_installation.updated_at
+      updated_at: github_app_installation.updated_at,
     })
     .from(github_app_installation)
     .where(eq(github_app_installation.neptun_user_id, userId))
@@ -49,9 +49,9 @@ export const readAllGithubAppInstallationsOfUser = async (
           err
         );
       return null;
-    })
+    });
 
   if (!fetchedGithubAppInstallations) return null;
 
   return fetchedGithubAppInstallations;
-}
+};

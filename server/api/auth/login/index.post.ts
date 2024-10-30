@@ -12,14 +12,14 @@ export default defineEventHandler(async (event) => {
 
     return await replaceUserSession(event, {
       user: session.user,
-      loggedInAt
-    })
+      loggedInAt,
+    });
   }
 
   /* 1. VALIDATE INPUT */
   const result = await readValidatedBody(event, (body) => {
     return UserLogInSchema.safeParse(body);
-  })
+  });
 
   if (LOG_BACKEND) console.info('result', JSON.stringify(result));
   if (!result.success || !result.data)
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
-        data: result.error
+        data: result.error,
       })
     );
   const body = result.data!;
@@ -54,14 +54,14 @@ export default defineEventHandler(async (event) => {
 
   const user = {
     id: userIsValid.id,
-    primary_email: userIsValid.primary_email
-  }
+    primary_email: userIsValid.primary_email,
+  };
 
   const loggedInAt = new Date();
   if (LOG_BACKEND) console.info('setting new session');
 
   return await setUserSession(event, {
     user,
-    loggedInAt
-  })
+    loggedInAt,
+  });
 });

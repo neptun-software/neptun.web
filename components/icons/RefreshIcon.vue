@@ -2,7 +2,7 @@
 import { RefreshCcw } from 'lucide-vue-next';
 
 defineProps<{
-  animationIsActive?: boolean
+  animationIsActive?: boolean;
 }>();
 
 const id = useId();

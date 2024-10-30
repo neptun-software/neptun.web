@@ -11,18 +11,19 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeUserId.statusCode,
         statusMessage: maybeUserId.statusMessage,
-        data: maybeUserId.data
+        data: maybeUserId.data,
       })
     );
   }
   const user_id = maybeUserId.data?.user_id;
 
   /* VALIDATE BODY */
-  const body = await readValidatedBody(event, body =>
+  const body = await readValidatedBody(event, (body) =>
     UserUpdateSchema.safeParse(body)
   );
   if (!body.success || !body.data) {
-    if (LOG_BACKEND) // console.log('body.error', body.error);
+    if (LOG_BACKEND)
+      // console.log('body.error', body.error);
 
       return sendError(
         event,
@@ -30,7 +31,7 @@ export default defineEventHandler(async (event) => {
           statusCode: 400,
           statusMessage: 'Bad Request.',
           message: 'Invalid body(?email, ?password).',
-          data: body.error
+          data: body.error,
         })
       );
   }
@@ -44,7 +45,7 @@ export default defineEventHandler(async (event) => {
         statusCode: 400,
         statusMessage: 'Bad Request.',
         message:
-          'Invalid body(?email, ?password). At least one of email or password is required.'
+          'Invalid body(?email, ?password). At least one of email or password is required.',
       })
     );
   }
@@ -53,9 +54,10 @@ export default defineEventHandler(async (event) => {
 
   const updatedUser = await updateUser(user_id, email, password);
 
-  if (LOG_BACKEND) // console.log('updatedUser', updatedUser);
-
+  if (LOG_BACKEND)
     if (updatedUser) {
+      // console.log('updatedUser', updatedUser);
+
       const loggedInAt = new Date();
       const session = await getUserSession(event);
 
@@ -65,11 +67,11 @@ export default defineEventHandler(async (event) => {
 
       await replaceUserSession(event, {
         user: session.user,
-        loggedInAt
-      })
+        loggedInAt,
+      });
     }
 
   return {
-    user: updatedUser
-  }
+    user: updatedUser,
+  };
 });

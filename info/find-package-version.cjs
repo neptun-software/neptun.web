@@ -21,12 +21,11 @@ exec('pnpm list --depth=1', (error, stdout, stderr) => {
 
   const result = stdout
     .split('\n')
-    .filter(line => line.includes(packageName));
+    .filter((line) => line.includes(packageName));
 
   if (result.length > 0) {
     console.info(result.join('\n'));
-  }
-  else {
+  } else {
     console.info(`Package ${packageName} not found.`);
   }
 });

@@ -1,18 +1,16 @@
 import { HuggingFaceStream, type Message, StreamingTextResponse } from 'ai';
 import { HfInference } from '@huggingface/inference';
-import {
-  experimental_buildLlama2Prompt
-} from 'ai/prompts';
+import { experimental_buildLlama2Prompt } from 'ai/prompts';
 import {
   ALLOWED_AI_MODELS,
   AllowedAiModelNamesEnum,
   defaultAiModel,
   defaultAiModelProvider,
-  POSSIBLE_AI_MODELS
+  POSSIBLE_AI_MODELS,
 } from '~/lib/types/ai.models';
 import {
   validateParamAiModelName,
-  validateQueryChatId
+  validateQueryChatId,
 } from '~/server/utils/validate';
 import type { User } from '#auth-utils';
 import type { Actor } from '~/lib/types/database.tables/schema';
@@ -36,7 +34,7 @@ export default defineLazyEventHandler(async () => {
         createError({
           statusCode: maybeChatId.statusCode,
           statusMessage: maybeChatId.statusMessage,
-          data: maybeChatId.data
+          data: maybeChatId.data,
         })
       );
     }
@@ -50,7 +48,7 @@ export default defineLazyEventHandler(async () => {
         createError({
           statusCode: maybeModelName.statusCode,
           statusMessage: maybeModelName.statusMessage,
-          data: maybeModelName.data
+          data: maybeModelName.data,
         })
       );
     }
@@ -63,23 +61,23 @@ export default defineLazyEventHandler(async () => {
     const body = await readValidatedBody(event, (body) => {
       // complete chat history
       return ChatConversationMessagesToCreateSchema.safeParse(body);
-    })
+    });
     if (!body.success || !body.data) {
       return sendError(
         event,
         createError({
           statusCode: 400,
           statusMessage: 'Bad Request. Invalid body(message | messages).',
-          data: body.error
+          data: body.error,
         })
       );
     }
     const validatedBody = body.data;
     const { messages } = validatedBody;
 
-    const SYSTEM_MESSAGE
-      = 'You have to answer all my questions and provide all information using Markdown syntax. This includes formatting text, adding lists, inserting links, using code blocks, and any other Markdown features that are appropriate for your responses.'
-    if (!messages.some(message => message.content === SYSTEM_MESSAGE)) {
+    const SYSTEM_MESSAGE =
+      'You have to answer all my questions and provide all information using Markdown syntax. This includes formatting text, adding lists, inserting links, using code blocks, and any other Markdown features that are appropriate for your responses.';
+    if (!messages.some((message) => message.content === SYSTEM_MESSAGE)) {
       if (LOG_BACKEND)
         console.info(
           'No system message found. Adding initial system message...'
@@ -88,8 +86,8 @@ export default defineLazyEventHandler(async () => {
       // TODO: freshly add this every time the context is truncated
       messages.unshift({
         role: 'user' as Actor, // ERROR: AI request errored: OpenAssistant does not support system messages.
-        content: SYSTEM_MESSAGE
-      })
+        content: SYSTEM_MESSAGE,
+      });
     }
 
     const userMessage = messages[messages.length - 1]; // { role: 'user', content: 'message' }
@@ -99,16 +97,16 @@ export default defineLazyEventHandler(async () => {
     try {
       // if (LOG_BACKEND) console.info('allowed models:', ALLOWED_AI_MODELS);
       if (
-        !model_name
-        || !model_publisher
-        || !ALLOWED_AI_MODELS.includes(`${model_publisher}/${model_name}`)
+        !model_name ||
+        !model_publisher ||
+        !ALLOWED_AI_MODELS.includes(`${model_publisher}/${model_name}`)
       ) {
         // if (LOG_BACKEND) console.warn(`Invalid model name or publisher: ${model_publisher}/${model_name}. Allowed are '${ALLOWED_AI_MODELS.join(', ')}'`);
         sendError(
           event,
           createError({
             statusCode: 400,
-            statusMessage: 'Invalid model name or publisher'
+            statusMessage: 'Invalid model name or publisher',
           })
         );
       }
@@ -120,18 +118,16 @@ export default defineLazyEventHandler(async () => {
           event,
           createError({
             statusCode: 400,
-            statusMessage: 'Service not available anymore.'
+            statusMessage: 'Service not available anymore.',
           })
         );
 
         // inputs = experimental_buildOpenAssistantPrompt(minimalMessages); // basically convertToCoreMessages from 'ai'
         // if (LOG_BACKEND) console.info('using custom prompt builder for OpenAssistant');
-      }
-      else if (model_name === AllowedAiModelNamesEnum.Mistral) {
+      } else if (model_name === AllowedAiModelNamesEnum.Mistral) {
         inputs = experimental_buildLlama2Prompt(minimalMessages);
         // if (LOG_BACKEND) console.info('using custom prompt builder for Llama2');
-      }
-      else if (model_name === AllowedAiModelNamesEnum.metaLlama) {
+      } else if (model_name === AllowedAiModelNamesEnum.metaLlama) {
         inputs = buildMetaLlama3Prompt(minimalMessages);
         // if (LOG_BACKEND) console.info('using custom prompt builder for metaLlama');
       }
@@ -152,20 +148,19 @@ export default defineLazyEventHandler(async () => {
           // onCompletion, onFinal, onToken and onText is called for each token (word, punctuation)
           const messageContent = getSanitizedMessageContent(messageText);
           await persistAiChatMessage(user.id, chat_id, messageContent, event);
-        }
+        },
       }); // Converts the response into a friendly text-stream
 
       return new StreamingTextResponse(stream); // Respond with the stream
-    }
-    catch (error) {
+    } catch (error) {
       if (LOG_BACKEND) console.error('AI request errored:', error);
       sendError(
         event,
         createError({
           statusCode: 500,
-          statusMessage: 'Internal Server Error'
+          statusMessage: 'Internal Server Error',
         })
       );
     }
   });
-})
+});

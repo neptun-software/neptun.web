@@ -1,11 +1,20 @@
-import { templates, type TemplateData } from "../lib/(templates)/templates";
+import { templates, type TemplateData } from '../lib/(templates)/templates';
 
 export const useTemplates = () => {
-  const database = useState<TemplateData[]>('project-template-list', () => templates);
-  const isLoading = useState<boolean>('project-template-list-is-isLoading', () => false);
+  const database = useState<TemplateData[]>(
+    'project-template-list',
+    () => templates
+  );
+  const isLoading = useState<boolean>(
+    'project-template-list-is-isLoading',
+    () => false
+  );
   const totalItems = computed(() => database.value.length);
 
-  async function fetchTemplateData(page: number, pageSize: number): Promise<TemplateData[]> {
+  async function fetchTemplateData(
+    page: number,
+    pageSize: number
+  ): Promise<TemplateData[]> {
     try {
       const start = (page - 1) * pageSize;
       const end = start + pageSize;
@@ -18,8 +27,12 @@ export const useTemplates = () => {
     }
   }
 
-  async function fetchInfiniteData(page: number, pageSize: number, existingData: Ref<TemplateData[]>) {
-    if (isLoading.value || (existingData.value.length >= database.value.length)) {
+  async function fetchInfiniteData(
+    page: number,
+    pageSize: number,
+    existingData: Ref<TemplateData[]>
+  ) {
+    if (isLoading.value || existingData.value.length >= database.value.length) {
       return false;
     }
 
@@ -36,7 +49,11 @@ export const useTemplates = () => {
     }
   }
 
-  async function fetchPaginatedData(page: number, pageSize: number, targetData: Ref<TemplateData[]>) {
+  async function fetchPaginatedData(
+    page: number,
+    pageSize: number,
+    targetData: Ref<TemplateData[]>
+  ) {
     isLoading.value = true;
     try {
       const newData = await fetchTemplateData(page, pageSize);
@@ -54,4 +71,4 @@ export const useTemplates = () => {
     fetchInfiniteData,
     fetchPaginatedData,
   };
-}
+};

@@ -17,8 +17,8 @@ const cliConfigurationToCopy = computed(() => {
     active_chat: {
       chat_id: selectedAiChatId.value,
       chat_name: selectedAiChatName.value,
-      model: selectedAiChatModel.value
-    }
+      model: selectedAiChatModel.value,
+    },
   };
 });
 
@@ -55,9 +55,7 @@ async function downloadConfiguration() {
             <ShadcnSkeleton class="w-full h-10 my-2 bg-slate-400" />
           </template>
           <template v-if="error">
-            <p class="text-red-500">
-              Failed to fetch CLI configuration.
-            </p>
+            <p class="text-red-500">Failed to fetch CLI configuration.</p>
           </template>
           <span class="absolute flex items-center gap-2 right-2 top-2">
             <ShadcnButton

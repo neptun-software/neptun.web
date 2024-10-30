@@ -10,7 +10,7 @@ export function buildMetaLlama3Prompt(
   messages.forEach((message) => {
     const { role, content } = message;
     prompt += `<|start_header_id|>${role}<|end_header_id|>\n\n${content}\n\n`;
-  })
+  });
 
   prompt += '<|eot_id|>';
   return prompt;
@@ -25,9 +25,10 @@ export async function persistCodeBlocks(
 ) {
   try {
     const codeBlocks = await getCodeBlocksFromMarkdown(markdown);
-    if (LOG_BACKEND) // console.log('codeBlocks', codeBlocks);
-
+    if (LOG_BACKEND)
       if (codeBlocks.length > 0) {
+        // console.log('codeBlocks', codeBlocks);
+
         if (LOG_BACKEND) {
           // console.log(`persisting ${codeBlocks.length} code block(s)...`);
         }
@@ -38,8 +39,8 @@ export async function persistCodeBlocks(
             // .event.$fetch used because it contains the current session
             method: 'POST',
             body: {
-              files: codeBlocks
-            }
+              files: codeBlocks,
+            },
           }
         );
 
@@ -55,8 +56,7 @@ export async function persistCodeBlocks(
 
         return persistedCodeBlocks;
       }
-  }
-  catch (error) {
+  } catch (error) {
     if (LOG_BACKEND) console.error('Persisting code blocks errored:', error);
     return null;
   }
@@ -80,8 +80,8 @@ export async function persistChatMessage(
           method: 'POST',
           body: {
             message: messageText,
-            actor
-          }
+            actor,
+          },
         }
       );
 
@@ -94,15 +94,14 @@ export async function persistChatMessage(
           messageText
         );
 
-      const chatMessage
-        = persistedChatMessage && 'chatMessage' in persistedChatMessage
+      const chatMessage =
+        persistedChatMessage && 'chatMessage' in persistedChatMessage
           ? persistedChatMessage.chatMessage
             ? persistedChatMessage.chatMessage[0]
             : null
           : null;
       return chatMessage;
-    }
-    catch (error) {
+    } catch (error) {
       if (LOG_BACKEND) console.error('Persisting chat message errored:', error);
     }
   }
@@ -129,7 +128,7 @@ export async function persistAiChatMessage(
     neptun_user_id,
     chat_conversation_id,
     id: message_id,
-    message
+    message,
   } = persistedChatMessage;
   const persistedCodeBlocks = await persistCodeBlocks(
     neptun_user_id,
@@ -140,14 +139,14 @@ export async function persistAiChatMessage(
   );
 
   if (
-    persistedCodeBlocks
-    && 'chatFiles' in persistedCodeBlocks
-    && persistedCodeBlocks.chatFiles
+    persistedCodeBlocks &&
+    'chatFiles' in persistedCodeBlocks &&
+    persistedCodeBlocks.chatFiles
   ) {
     return {
       chat_message: persistedChatMessage,
-      code_blocks: persistedCodeBlocks.chatFiles // TODO: find out how to get type, if not clear, what route it is (made it [message_id]/[file_id] instead of /[message_id] and /[file_id] for now)
-    }
+      code_blocks: persistedCodeBlocks.chatFiles, // TODO: find out how to get type, if not clear, what route it is (made it [message_id]/[file_id] instead of /[message_id] and /[file_id] for now)
+    };
   }
 }
 

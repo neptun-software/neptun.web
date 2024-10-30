@@ -1,8 +1,8 @@
-import { eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm';
 import {
   github_app_installation_repository,
-  type NewGithubAppInstallationRepository
-} from '~/lib/types/database.tables/schema'
+  type NewGithubAppInstallationRepository,
+} from '~/lib/types/database.tables/schema';
 
 export const createGithubAppInstallationRepositories = async (
   installationRepositoriesToCreate: NewGithubAppInstallationRepository[]
@@ -18,12 +18,12 @@ export const createGithubAppInstallationRepositories = async (
           err
         );
       return null;
-    })
+    });
 
   if (!createdGithubAppInstallationRepositories) return null;
 
   return createdGithubAppInstallationRepositories;
-}
+};
 
 export const readAllGithubAppInstallationRepositoriesOfInstallation = async (
   installationId: number
@@ -44,9 +44,9 @@ export const readAllGithubAppInstallationRepositoriesOfInstallation = async (
           err
         );
       return null;
-    })
+    });
 
   if (!fetchedGithubAppInstallationRepositories) return null;
 
   return fetchedGithubAppInstallationRepositories;
-}
+};

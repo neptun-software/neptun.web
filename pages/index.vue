@@ -4,8 +4,8 @@ import { Import } from 'lucide-vue-next';
 definePageMeta({
   name: 'Dashboard',
   middleware: ['protected'],
-  alias: dashboardAliases
-})
+  alias: dashboardAliases,
+});
 
 const { headerNavigationElement } = useUiStore();
 
@@ -13,7 +13,7 @@ const headerNavigationHeight = ref(0);
 watch(headerNavigationElement, (newHeaderNavigationElement) => {
   const { height } = useElementSize(newHeaderNavigationElement); // needs access to lifecycle hooks (that is why it is not defined in the store or a composable)
   headerNavigationHeight.value = height.value;
-})
+});
 
 // TODO: fix `[Vue warn]: Hydration node mismatch` on some ShadcnTooltip
 </script>
@@ -26,9 +26,7 @@ watch(headerNavigationElement, (newHeaderNavigationElement) => {
         :style="{ top: headerNavigationHeight + 'px' }"
       >
         <div class="flex items-center gap-2">
-          <h1 class="pl-4 text-xl font-semibold truncate">
-            Chat
-          </h1>
+          <h1 class="pl-4 text-xl font-semibold truncate">Chat</h1>
         </div>
         <div class="flex gap-2 pr-5">
           <ShadcnButton

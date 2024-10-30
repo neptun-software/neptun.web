@@ -4,4 +4,4 @@ export const useSelectedInstallation = () => {
     () => -1
   );
   return selectedInstallationId;
-}
+};

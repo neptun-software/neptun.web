@@ -9,14 +9,14 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeUserId.statusCode,
         statusMessage: maybeUserId.statusMessage,
-        data: maybeUserId.data
+        data: maybeUserId.data,
       })
     );
   }
   const user_id = maybeUserId.data?.user_id;
 
-  const githubAppInstallation
-    = await readAllGithubAppInstallationsOfUser(user_id);
+  const githubAppInstallation =
+    await readAllGithubAppInstallationsOfUser(user_id);
 
   return githubAppInstallation;
-})
+});

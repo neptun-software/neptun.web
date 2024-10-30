@@ -1,32 +1,32 @@
 type PossibleAiModels = {
   [key: string]: {
-    [model: string]: ModelConfiguration
-  }
-}
+    [model: string]: ModelConfiguration;
+  };
+};
 
 type ModelConfiguration = {
-  publisher: string
-  name: string
-  description: string
-  icon: string
-  type: 'instruct' | 'chat'
+  publisher: string;
+  name: string;
+  description: string;
+  icon: string;
+  type: 'instruct' | 'chat';
   configuration: (inputs: string) => {
-    inputs: string
-    model: string
-    max_new_tokens?: number
-    typical_p?: number
-    repetition_penalty?: number
-    truncate?: number
-    return_full_text?: boolean
+    inputs: string;
+    model: string;
+    max_new_tokens?: number;
+    typical_p?: number;
+    repetition_penalty?: number;
+    truncate?: number;
+    return_full_text?: boolean;
     parameters: {
-      max_new_tokens: number
-      typical_p: number
-      repetition_penalty: number
-      truncate: number
-      return_full_text: boolean
-    }
-  }
-}
+      max_new_tokens: number;
+      typical_p: number;
+      repetition_penalty: number;
+      truncate: number;
+      return_full_text: boolean;
+    };
+  };
+};
 
 export const POSSIBLE_AI_MODELS: PossibleAiModels = {
   // TODO: add https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct
@@ -81,13 +81,13 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
             typical_p: 0.2, // higher means, more creative
             repetition_penalty: 1.1, // repetition is less likely because the model receives penalty
             truncate: 8000 - 500, // max_new_tokens of this model is 8000
-            return_full_text: false
-          }
-        }
-      }
-    }
+            return_full_text: false,
+          },
+        };
+      },
+    },
   },
-  'mistralai': {
+  mistralai: {
     /* mistralai/Mistral-7B-v0.3 is too large */
     'Mistral-7B-Instruct-v0.1': {
       publisher: 'mistralai',
@@ -108,18 +108,18 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
             typical_p: 0.2 /* higher means, more creative */,
             repetition_penalty: 1.1 /* repetition is less likely because the model receives penalty */,
             truncate: 8000 - 500 /* context length of this model is 7999 */,
-            return_full_text: false
-          }
-        }
-      }
-    }
-  }
+            return_full_text: false,
+          },
+        };
+      },
+    },
+  },
 } as const;
 
 export const ALLOWED_AI_MODELS = Object.keys(POSSIBLE_AI_MODELS).flatMap(
-  publisher =>
+  (publisher) =>
     Object.keys(POSSIBLE_AI_MODELS[publisher]).map(
-      model => `${publisher}/${model}`
+      (model) => `${publisher}/${model}`
     )
 );
 
@@ -129,30 +129,30 @@ export const defaultAiModelDomain = `${defaultAiModelProvider}/${defaultAiModel}
 export const allowedModelsConst = [
   defaultAiModelDomain,
   'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5',
-  'meta-llama/Meta-Llama-3-8B-Instruct'
+  'meta-llama/Meta-Llama-3-8B-Instruct',
 ] as const;
 
-export type AllowedAiModels = `${(typeof allowedModelsConst)[number]}`
+export type AllowedAiModels = `${(typeof allowedModelsConst)[number]}`;
 export type AllowedAiModelPaths =
-  `/api/ai/huggingface/${(typeof allowedModelsConst)[number]}/chat`
+  `/api/ai/huggingface/${(typeof allowedModelsConst)[number]}/chat`;
 
 export enum AllowedAiModelPublishersEnum {
   OpenAssistant = 'OpenAssistant',
   // eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member
   Mistral = defaultAiModelProvider,
-  metaLlama = 'meta-llama'
+  metaLlama = 'meta-llama',
 }
 
 export enum AllowedAiModelNamesEnum {
   OpenAssistant = 'oasst-sft-4-pythia-12b-epoch-3.5',
   // eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member
   Mistral = defaultAiModel,
-  metaLlama = 'Meta-Llama-3-8B-Instruct'
+  metaLlama = 'Meta-Llama-3-8B-Instruct',
 }
 
 export enum AllowedAiModelsEnum {
   OpenAssistant = 'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5',
   // eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member
   Mistral = defaultAiModelDomain,
-  metaLlama = 'meta-llama/Meta-Llama-3-8B-Instruct'
+  metaLlama = 'meta-llama/Meta-Llama-3-8B-Instruct',
 }

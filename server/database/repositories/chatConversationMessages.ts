@@ -1,10 +1,10 @@
-import { eq, asc } from 'drizzle-orm'
+import { eq, asc } from 'drizzle-orm';
 import {
   chat_conversation_message,
   type ChatConversationMessageToCreate,
   type ReadChatConversation,
-  type ReadChatConversationMessage
-} from '../../../lib/types/database.tables/schema'
+  type ReadChatConversationMessage,
+} from '../../../lib/types/database.tables/schema';
 
 export const createChatConversationMessages = async (
   messages: ChatConversationMessageToCreate[]
@@ -20,12 +20,12 @@ export const createChatConversationMessages = async (
           err
         );
       return null;
-    })
+    });
 
   if (!createdChatConversationMessages) return null;
 
   return createdChatConversationMessages;
-}
+};
 
 export const readChatConversationMessages = async (
   chat_conversation_id: ReadChatConversation['id']
@@ -44,12 +44,12 @@ export const readChatConversationMessages = async (
           err
         );
       return null;
-    })
+    });
 
   if (!chatConversationMessages) return null;
 
   return chatConversationMessages;
-}
+};
 
 export const deleteChatConversationMessage = async (
   id: ReadChatConversationMessage['id']
@@ -65,7 +65,7 @@ export const deleteChatConversationMessage = async (
           err
         );
       return false;
-    })
+    });
 
   return successfullyDeleted;
-}
+};

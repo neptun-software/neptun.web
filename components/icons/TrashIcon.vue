@@ -2,7 +2,7 @@
 import { Trash2 } from 'lucide-vue-next';
 
 defineProps<{
-  animationIsActive?: boolean
+  animationIsActive?: boolean;
 }>();
 
 const id = useId();

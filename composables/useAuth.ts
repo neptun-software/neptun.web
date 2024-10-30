@@ -6,12 +6,11 @@ export const useAuth = () => {
     try {
       const data = await $fetch('/api/auth/login', {
         method: 'POST',
-        body: { email, password }
-      })
+        body: { email, password },
+      });
 
       return { data, error: null };
-    }
-    catch (error) {
+    } catch (error) {
       return { data: null, error };
     }
   };
@@ -20,12 +19,11 @@ export const useAuth = () => {
     try {
       const data = await $fetch('/api/auth/sign-up', {
         method: 'POST',
-        body: { email, password }
-      })
+        body: { email, password },
+      });
 
       return { data, error: null };
-    }
-    catch (error) {
+    } catch (error) {
       return { data: null, error };
     }
   };
@@ -35,8 +33,7 @@ export const useAuth = () => {
       const data = await $fetch('/api/auth/logout', { method: 'POST' });
 
       return { data, error: null };
-    }
-    catch (error) {
+    } catch (error) {
       return { data: null, error };
     }
   };
@@ -44,6 +41,6 @@ export const useAuth = () => {
   return {
     signIn,
     signUp,
-    signOut
-  }
-}
+    signOut,
+  };
+};

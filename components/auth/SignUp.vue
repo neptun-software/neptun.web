@@ -3,7 +3,7 @@ import { Icon } from '@iconify/vue';
 import { toast } from 'vue-sonner';
 import {
   validateEmailInput,
-  validatePasswordInput
+  validatePasswordInput,
 } from '~/lib/types/input.validation';
 
 const { console } = useLogger();
@@ -45,7 +45,7 @@ async function signUp() {
 
   await fetch(); // reloadNuxtApp({ ttl: 0, force: true, persistState: false, path: "/dashboard" });
   navigateTo('/dashboard', {
-    redirectCode: 303
+    redirectCode: 303,
   });
 }
 </script>
@@ -54,9 +54,7 @@ async function signUp() {
   <div>
     <ShadcnCard class="max-w-full mx-2">
       <ShadcnCardHeader>
-        <ShadcnCardTitle class="text-xl">
-          Sign Up
-        </ShadcnCardTitle>
+        <ShadcnCardTitle class="text-xl"> Sign Up </ShadcnCardTitle>
         <ShadcnCardDescription>
           Enter your information to create an account
         </ShadcnCardDescription>
@@ -66,9 +64,7 @@ async function signUp() {
           <div class="grid gap-4">
             <div>
               <div class="grid gap-2 mb-1">
-                <ShadcnLabel for="email">
-                  Email
-                </ShadcnLabel>
+                <ShadcnLabel for="email"> Email </ShadcnLabel>
                 <ShadcnInput
                   id="email"
                   v-model="email"
@@ -80,54 +76,36 @@ async function signUp() {
                 />
               </div>
 
-              <ul
-                v-if="emailErrors?.length > 0"
-                class="pl-5 list-disc"
-              >
+              <ul v-if="emailErrors?.length > 0" class="pl-5 list-disc">
                 <li
                   v-for="(error, index) in emailErrors"
                   :key="index"
                   class="text-sm font-bold text-destructive"
                 >
-                  {{ error }}<br>
+                  {{ error }}<br />
                 </li>
               </ul>
             </div>
             <div>
               <div class="grid gap-2 mb-1">
-                <ShadcnLabel for="password">
-                  Password
-                </ShadcnLabel>
-                <PasswordInput
-                  v-model="password"
-                  :on-enter="signUp"
-                />
+                <ShadcnLabel for="password"> Password </ShadcnLabel>
+                <PasswordInput v-model="password" :on-enter="signUp" />
               </div>
 
-              <ul
-                v-if="passwordErrors?.length > 0"
-                class="pl-5 list-disc"
-              >
+              <ul v-if="passwordErrors?.length > 0" class="pl-5 list-disc">
                 <li
                   v-for="(error, index) in passwordErrors"
                   :key="index"
                   class="text-sm font-bold text-destructive"
                 >
-                  {{ error }}<br>
+                  {{ error }}<br />
                 </li>
               </ul>
             </div>
-            <ShadcnButton
-              type="button"
-              class="w-full"
-              @click="signUp()"
-            >
+            <ShadcnButton type="button" class="w-full" @click="signUp()">
               Create an account
             </ShadcnButton>
-            <ShadcnSeparator
-              label="or Oauth"
-              class="my-2"
-            />
+            <ShadcnSeparator label="or Oauth" class="my-2" />
             <div class="flex flex-col gap-1">
               <ShadcnButton
                 type="button"
@@ -164,12 +142,7 @@ async function signUp() {
           </div>
           <div class="mt-4 text-sm text-center">
             Already have an account?
-            <NuxtLink
-              to="/login"
-              class="underline"
-            >
-              Log In
-            </NuxtLink>
+            <NuxtLink to="/login" class="underline"> Log In </NuxtLink>
           </div>
         </form>
       </ShadcnCardContent>

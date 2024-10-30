@@ -9,16 +9,16 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: maybeInstallationId.statusCode,
         statusMessage: maybeInstallationId.statusMessage,
-        data: maybeInstallationId.data
+        data: maybeInstallationId.data,
       })
     );
   }
   const installation_id = maybeInstallationId.data?.installation_id;
 
-  const githubAppInstallationRepositories
-    = await readAllGithubAppInstallationRepositoriesOfInstallation(
+  const githubAppInstallationRepositories =
+    await readAllGithubAppInstallationRepositoriesOfInstallation(
       installation_id
     );
 
   return githubAppInstallationRepositories;
-})
+});

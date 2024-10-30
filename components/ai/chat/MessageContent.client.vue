@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 defineProps<{
-  content: string
+  content: string;
 }>();
 </script>
 
@@ -11,10 +11,7 @@ defineProps<{
       class="break-words whitespace-pre-wrap"
       :value="content"
     />
-    <div
-      v-else
-      class="break-words whitespace-pre-wrap"
-    >
+    <div v-else class="break-words whitespace-pre-wrap">
       {{ content }}
     </div>
   </div>

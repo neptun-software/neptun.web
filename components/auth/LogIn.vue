@@ -3,7 +3,7 @@ import { Icon } from '@iconify/vue';
 import { toast } from 'vue-sonner';
 import {
   validateEmailInput,
-  validatePasswordInput
+  validatePasswordInput,
 } from '~/lib/types/input.validation';
 
 const { console } = useLogger();
@@ -45,7 +45,7 @@ async function signIn() {
 
   await fetch(); // reloadNuxtApp({ ttl: 0, force: true, persistState: false, path: "/dashboard" });
   navigateTo('/dashboard', {
-    redirectCode: 303
+    redirectCode: 303,
   });
 }
 </script>
@@ -54,9 +54,7 @@ async function signIn() {
   <div>
     <ShadcnCard class="mx-2 max-full">
       <ShadcnCardHeader>
-        <ShadcnCardTitle class="text-2xl">
-          Log In
-        </ShadcnCardTitle>
+        <ShadcnCardTitle class="text-2xl"> Log In </ShadcnCardTitle>
         <ShadcnCardDescription>
           Enter your email below to login to your account
         </ShadcnCardDescription>
@@ -66,9 +64,7 @@ async function signIn() {
           <div class="grid gap-4">
             <div>
               <div class="grid gap-2 mb-1">
-                <ShadcnLabel for="email">
-                  Email
-                </ShadcnLabel>
+                <ShadcnLabel for="email"> Email </ShadcnLabel>
                 <ShadcnInput
                   id="email"
                   v-model="email"
@@ -81,25 +77,20 @@ async function signIn() {
                 />
               </div>
 
-              <ul
-                v-if="emailErrors?.length > 0"
-                class="pl-5 list-disc"
-              >
+              <ul v-if="emailErrors?.length > 0" class="pl-5 list-disc">
                 <li
                   v-for="(error, index) in emailErrors"
                   :key="index"
                   class="text-sm font-bold text-destructive"
                 >
-                  {{ error }}<br>
+                  {{ error }}<br />
                 </li>
               </ul>
             </div>
             <div>
               <div class="grid gap-2 mb-1">
                 <div class="flex items-center">
-                  <ShadcnLabel for="password">
-                    Password
-                  </ShadcnLabel>
+                  <ShadcnLabel for="password"> Password </ShadcnLabel>
                   <NuxtLink
                     to="/new-password"
                     class="inline-block ml-auto text-sm underline"
@@ -107,37 +98,24 @@ async function signIn() {
                     Forgot your password?
                   </NuxtLink>
                 </div>
-                <PasswordInput
-                  v-model="password"
-                  :on-enter="signIn"
-                />
+                <PasswordInput v-model="password" :on-enter="signIn" />
               </div>
 
-              <ul
-                v-if="passwordErrors?.length > 0"
-                class="pl-5 list-disc"
-              >
+              <ul v-if="passwordErrors?.length > 0" class="pl-5 list-disc">
                 <li
                   v-for="(error, index) in passwordErrors"
                   :key="index"
                   class="text-sm font-bold text-destructive"
                 >
-                  {{ error }}<br>
+                  {{ error }}<br />
                 </li>
               </ul>
             </div>
 
-            <ShadcnButton
-              type="button"
-              class="w-full"
-              @click="signIn()"
-            >
+            <ShadcnButton type="button" class="w-full" @click="signIn()">
               Login
             </ShadcnButton>
-            <ShadcnSeparator
-              label="or Oauth"
-              class="my-2"
-            />
+            <ShadcnSeparator label="or Oauth" class="my-2" />
             <div class="flex flex-col gap-1">
               <ShadcnButton
                 type="button"
@@ -174,12 +152,7 @@ async function signIn() {
           </div>
           <div class="mt-4 text-sm text-center">
             Don't have an account?
-            <NuxtLink
-              to="/sign-up"
-              class="underline"
-            >
-              Sign Up
-            </NuxtLink>
+            <NuxtLink to="/sign-up" class="underline"> Sign Up </NuxtLink>
           </div>
         </form>
       </ShadcnCardContent>

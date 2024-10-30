@@ -3,7 +3,7 @@ import { Icon } from '@iconify/vue';
 import {
   ALLOWED_AI_MODELS,
   defaultAiModelDomain,
-  POSSIBLE_AI_MODELS
+  POSSIBLE_AI_MODELS,
 } from '~/lib/types/ai.models';
 
 const { user } = useUserSession();
@@ -24,13 +24,9 @@ watch(
 <template>
   <form class="grid items-start w-full gap-6">
     <fieldset class="grid gap-6 p-4 border rounded-lg">
-      <legend class="px-1 -ml-1 text-sm font-medium">
-        Settings
-      </legend>
+      <legend class="px-1 -ml-1 text-sm font-medium">Settings</legend>
       <div class="grid gap-3">
-        <ShadcnLabel for="model">
-          Model
-        </ShadcnLabel>
+        <ShadcnLabel for="model"> Model </ShadcnLabel>
         <ShadcnSelect
           v-model="selectedAiChat.model"
           :default-value="defaultAiModelDomain"
@@ -97,8 +93,8 @@ watch(
             placeholder="Name of the chat... (optional)"
             @keydown.enter.prevent="
               async () => {
-                selectedAiChat.id
-                  = (await persistChatConversation(
+                selectedAiChat.id =
+                  (await persistChatConversation(
                     user?.id ?? -1,
                     selectedAiChat.name,
                     selectedAiChat.model
@@ -112,8 +108,8 @@ watch(
             variant="secondary"
             @click="
               async () => {
-                selectedAiChat.id
-                  = (await persistChatConversation(
+                selectedAiChat.id =
+                  (await persistChatConversation(
                     user?.id ?? -1,
                     selectedAiChat.name,
                     selectedAiChat.model

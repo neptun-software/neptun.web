@@ -2,7 +2,7 @@ import type { MinimalChat } from '~/lib/types/chat';
 import {
   defaultAiModelDomain,
   type AllowedAiModelPaths,
-  type AllowedAiModels
+  type AllowedAiModels,
 } from '~/lib/types/ai.models';
 import { generateUUID } from '~/lib/utils';
 // const { console } = useLogger();
@@ -22,13 +22,13 @@ export const useSelectedAiChat = () => {
 
   const selectedAiChatApiPath = computed<AllowedAiModelPaths>(() => {
     return `/api/ai/huggingface/${selectedAiChat.value.model}/chat`;
-  })
+  });
   const selectedAiChatIsPlayground = computed(
     () => selectedAiChatId.value === -1
   );
   const selectedAiChatId = computed(() => {
     return selectedAiChat?.value?.id ?? -1;
-  })
+  });
   const selectedAiChatKey = computed(
     () =>
       `${selectedAiChatApiPath.value}?chat_id=${selectedAiChat.value.id}&isPlayground=${selectedAiChatIsPlayground.value}&isRecreated=${aiChatReCreationTrigger.value}`
@@ -41,7 +41,7 @@ export const useSelectedAiChat = () => {
     return {
       id: -1,
       name: createChatName(time),
-      model
+      model,
     } as MinimalChat;
   }
 
@@ -53,7 +53,7 @@ export const useSelectedAiChat = () => {
       model ?? defaultAiModelDomain
     );
     aiChatReCreationTrigger.value = generateUUID();
-  }
+  };
 
   return {
     selectedAiChatKey,
@@ -61,9 +61,9 @@ export const useSelectedAiChat = () => {
     selectedAiChatId,
     selectedAiChatIsPlayground,
     selectedAiChatApiPath,
-    resetSelectedAiChatToDefaults
-  }
-}
+    resetSelectedAiChatToDefaults,
+  };
+};
 
 export const useAiChatPlayground = () => {
   const aiPlaygroundChatName = useState('playground-ai-chat-name', () =>
@@ -77,8 +77,7 @@ export const useAiChatPlayground = () => {
   if (selectedAiChat.value.id !== -1) {
     // set name, depending on selected chat
     aiPlaygroundChatName.value = createChatName(new Date());
-  }
-  else {
+  } else {
     aiPlaygroundChatName.value = selectedAiChat.value.name;
   }
 
@@ -92,9 +91,9 @@ export const useAiChatPlayground = () => {
   return {
     aiPlaygroundChatName,
     aiPlaygroundChatMessages,
-    resetAiPlaygroundChat
-  }
-}
+    resetAiPlaygroundChat,
+  };
+};
 
 export const useChatsSelectedForDeletion = () => {
   const chatsSelectedForDeletion = useState('chats-selected-for-deletion', () =>
@@ -102,4 +101,4 @@ export const useChatsSelectedForDeletion = () => {
   );
 
   return chatsSelectedForDeletion;
-}
+};

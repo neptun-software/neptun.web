@@ -41,8 +41,7 @@ class Dot {
   draw() {
     if (!idle || this.index <= sineDots) {
       gsap.set(this.element, { x: this.x, y: this.y });
-    }
-    else {
+    } else {
       this.angleX += this.angleSpeed;
       this.angleY += this.angleSpeed;
       this.y = this.lockY + Math.sin(this.angleY) * this.range;
@@ -64,7 +63,7 @@ function resetIdleTimer() {
 
 function goInactive() {
   idle = true;
-  dots.forEach(dot => dot.lock());
+  dots.forEach((dot) => dot.lock());
 }
 
 function buildDots() {
@@ -81,7 +80,7 @@ function positionCursor(delta) {
   let y = mouseY.value - width / 2 - scrollY.value;
 
   dots.forEach((dot, index) => {
-    const nextDot = dots[index + 1] || dots[0]
+    const nextDot = dots[index + 1] || dots[0];
     dot.x = x;
     dot.y = y;
     dot.draw(delta);
@@ -117,8 +116,7 @@ onMounted(() => {
       isScrolling.value = scrolling;
       if (scrolling) {
         idle = true; // lock animations while scrolling
-      }
-      else {
+      } else {
         resetIdleTimer(); // resume animations after scrolling stops
       }
     });
@@ -127,44 +125,29 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearTimeout(timeoutID);
-})
+});
 
 watch([mouseX, mouseY, scrollX, scrollY], resetIdleTimer);
 </script>
 
 <template>
   <div>
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      width="800"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="800">
       <defs>
         <filter id="cursor-mask">
-          <feGaussianBlur
-            in="SourceGraphic"
-            stdDeviation="6"
-            result="blur"
-          />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
           <feColorMatrix
             in="blur"
             mode="matrix"
             values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 35 -15"
             result="cursor-mask"
           />
-          <feComposite
-            in="SourceGraphic"
-            in2="cursor-mask"
-            operator="atop"
-          />
+          <feComposite in="SourceGraphic" in2="cursor-mask" operator="atop" />
         </filter>
       </defs>
     </svg>
 
-    <div
-      ref="cursor"
-      class="cursor"
-    />
+    <div ref="cursor" class="cursor" />
     <DevOnly>
       <div class="fixed top-0 left-0 z-50">
         {{ mouseX }}, {{ mouseY }} VS {{ scrollX }}, {{ scrollY }} ({{

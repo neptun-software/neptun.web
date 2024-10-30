@@ -13,7 +13,7 @@ const formSchema = toTypedSchema(
   z.object({
     is_unprotected: z.boolean().default(true).optional(),
     password: z.string().max(128).optional(),
-    email_whitelist: z.array(z.string().min(5).email()).max(10).optional()
+    email_whitelist: z.array(z.string().min(5).email()).max(10).optional(),
   })
 );
 
@@ -21,14 +21,14 @@ const {
   handleSubmit,
   values: formValues,
   setFieldError,
-  setValues
+  setValues,
 } = useForm({
   validationSchema: formSchema,
   initialValues: {
     is_unprotected: true,
     password: '',
-    email_whitelist: []
-  }
+    email_whitelist: [],
+  },
 });
 
 const validateTag = async (event: KeyboardEvent) => {
@@ -41,23 +41,22 @@ const validateTag = async (event: KeyboardEvent) => {
     setValues({ email_whitelist: updatedWhitelist });
     input.value = '';
     setFieldError('email_whitelist', undefined);
-  }
-  else {
+  } else {
     setFieldError('email_whitelist', 'Invalid email address');
   }
 };
 
 const onSubmit = handleSubmit(async (values) => {
   if (
-    !formValues.is_unprotected
-    && (!values.password || values.password?.length === 0)
-    && (formValues.email_whitelist || []).length === 0
+    !formValues.is_unprotected &&
+    (!values.password || values.password?.length === 0) &&
+    (formValues.email_whitelist || []).length === 0
   ) {
     toast.error(
       'Please set a password or add at least one email to the whitelist.',
       {
         description:
-          'Both fields cannot be empty when the chat is not unprotected.'
+          'Both fields cannot be empty when the chat is not unprotected.',
       }
     );
 
@@ -70,7 +69,7 @@ const onSubmit = handleSubmit(async (values) => {
       'Both fields cannot be empty when the chat is not unprotected. Please set a password or add at least one email to the whitelist.'
     );
 
-    return
+    return;
   }
 
   /* toast('You submitted the following values:', {
@@ -91,15 +90,14 @@ const onSubmit = handleSubmit(async (values) => {
       body: {
         is_shared: true,
         is_protected: !values.is_unprotected,
-        hashed_password: values.password
-      }
+        hashed_password: values.password,
+      },
     }
   )
     .then((data) => {
       if (data && data.share) {
         toast.success('Share created!');
-      }
-      else {
+      } else {
         toast.error('Failed to create share!');
       }
 
@@ -107,25 +105,24 @@ const onSubmit = handleSubmit(async (values) => {
     })
     .catch(() => {
       toast.error('Failed to create share!');
-    })
+    });
 
   if (
-    shareCreated
-    && values.email_whitelist
-    && values.email_whitelist.length > 0
+    shareCreated &&
+    values.email_whitelist &&
+    values.email_whitelist.length > 0
   ) {
     await $fetch(
       `/api/users/${user.value?.id}/chats/${selectedAiChatId.value}/shares/${shareCreated.share?.id}/whitelist-entries`,
       {
         method: 'POST',
-        body: values.email_whitelist
+        body: values.email_whitelist,
       }
     )
       .then((data) => {
         if (data && data.shareWhitelistEntries) {
           toast.success('Whitelist entries created!');
-        }
-        else {
+        } else {
           toast.error('Failed to create whitelist entries!');
         }
 
@@ -133,11 +130,11 @@ const onSubmit = handleSubmit(async (values) => {
       })
       .catch(() => {
         toast.error('Failed to create whitelist entries!');
-      })
+      });
   }
 
   refresh();
-})
+});
 
 const { data, status, error, refresh } = useFetch(
   `/api/users/${user.value?.id ?? -1}/chats/${selectedAiChatId.value}/shares`
@@ -148,7 +145,7 @@ const url = computed(() => {
   return `http${IS_DEV ? '' : 's'}://${requestUrl.host}/shared/chats/${
     data.value
   }`;
-})
+});
 </script>
 
 <template>
@@ -173,7 +170,7 @@ const url = computed(() => {
             <ShadcnDialogDescription>
               You can make it public, for everybody who has the link, you could
               also make it password protected and you could whitelist other
-              users.<br>
+              users.<br />
               Others can not edit your chat or send messages, they are just
               viewers.
             </ShadcnDialogDescription>
@@ -215,10 +212,7 @@ const url = computed(() => {
             <template v-if="!formValues.is_unprotected">
               <ShadcnSeparator />
 
-              <ShadcnFormField
-                v-slot="{ value, handleChange }"
-                name="password"
-              >
+              <ShadcnFormField v-slot="{ value, handleChange }" name="password">
                 <ShadcnFormItem>
                   <ShadcnFormLabel>Password</ShadcnFormLabel>
                   <ShadcnFormControl>
@@ -237,10 +231,7 @@ const url = computed(() => {
                 </ShadcnFormItem>
               </ShadcnFormField>
 
-              <ShadcnFormField
-                v-slot="{ value }"
-                name="email_whitelist"
-              >
+              <ShadcnFormField v-slot="{ value }" name="email_whitelist">
                 <ShadcnFormItem>
                   <ShadcnFormLabel>
                     Emails you want to whitelist
@@ -280,17 +271,14 @@ const url = computed(() => {
                 Publish with the configured settings
               </ShadcnButton>
               <ShadcnDialogClose as-child>
-                <ShadcnButton
-                  type="button"
-                  variant="secondary"
-                >
+                <ShadcnButton type="button" variant="secondary">
                   Close
                 </ShadcnButton>
               </ShadcnDialogClose>
             </ShadcnDialogFooter>
           </form>
           <div v-else>
-            You have already published this chat!<br>
+            You have already published this chat!<br />
             <div class="flex items-center gap-2 px-2 py-1 border rounded-sm">
               {{ url }}
               <CopyToClipboard :text="url" />
@@ -300,12 +288,8 @@ const url = computed(() => {
             v-if="error"
             class="flex items-center justify-between gap-2 py-1 pl-2 pr-1 border rounded-sm border-destructive"
           >
-            Failed to check if chat is published.<br>
-            <ShadcnButton
-              type="button"
-              variant="destructive"
-              @click="refresh"
-            >
+            Failed to check if chat is published.<br />
+            <ShadcnButton type="button" variant="destructive" @click="refresh">
               Retry
             </ShadcnButton>
           </div>

@@ -3,7 +3,7 @@
 
 definePageMeta({
   name: 'Home',
-  alias: ['/root']
+  alias: ['/root'],
 });
 
 // defineOgImageComponent('NuxtSeo');
@@ -12,10 +12,7 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
 </script>
 
 <template>
-  <section
-    id="home"
-    class="relative overflow-x-hidden"
-  >
+  <section id="home" class="relative overflow-x-hidden">
     <!-- <PlanetSystem
       :imagePaths="[
         '/assets/icons/docker-icon.svg',
@@ -27,10 +24,7 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
       :imageSizeMin="100"
     /> -->
 
-    <SecondarySection
-      :is-first="true"
-      class="overflow-hidden"
-    >
+    <SecondarySection :is-first="true" class="overflow-hidden">
       <div class="flex flex-col items-center min-h-screen content">
         <Bubbles />
 
@@ -56,17 +50,12 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
         <TypeText
           :type-data="[
             'Hey!\n generate me every file I need to implement CICD.',
-            'docker-compose-files'
+            'docker-compose-files',
           ]"
         >
           <CallToAction>
-            <NuxtLink
-              class="cta-button"
-              to="/sign-up"
-            >
-              <ShadcnButton variant="outline">
-                send
-              </ShadcnButton>
+            <NuxtLink class="cta-button" to="/sign-up">
+              <ShadcnButton variant="outline"> send </ShadcnButton>
             </NuxtLink>
           </CallToAction>
         </TypeText>

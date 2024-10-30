@@ -1,10 +1,10 @@
-import { eq, inArray, desc, asc } from 'drizzle-orm'
+import { eq, inArray, desc, asc } from 'drizzle-orm';
 import {
   chat_conversation,
   type ReadUser,
   type ChatConversationToCreate,
-  type ReadChatConversation
-} from '../../../lib/types/database.tables/schema'
+  type ReadChatConversation,
+} from '../../../lib/types/database.tables/schema';
 
 export async function createChatConversation(
   conversation: ChatConversationToCreate
@@ -17,7 +17,7 @@ export async function createChatConversation(
       if (LOG_BACKEND)
         console.error('Failed to insert chat conversation into database', err);
       return null;
-    })
+    });
 
   if (!createdChatConversation) return null;
 
@@ -44,10 +44,9 @@ export async function readAllChatConversationsOfUser(
       return order.direction === 'asc'
         ? asc(chat_conversation[order.column])
         : desc(chat_conversation[order.column]);
-    })
+    });
     query = query.orderBy(...orderConditions);
-  }
-  else {
+  } else {
     query = query.orderBy(
       desc(chat_conversation.updated_at),
       desc(chat_conversation.name)
@@ -58,7 +57,7 @@ export async function readAllChatConversationsOfUser(
     if (LOG_BACKEND)
       console.error('Failed to fetch chat conversations from database', err);
     return null;
-  })
+  });
 
   if (!fetchedChatConversations) return null;
 
@@ -83,7 +82,7 @@ export async function updateChatConversation(
       if (LOG_BACKEND)
         console.error('Failed to update chat conversation in database', err);
       return null;
-    })
+    });
 
   if (!updatedChatConversation) return null;
 
@@ -99,7 +98,7 @@ export async function deleteChatConversation(id: ReadChatConversation['id']) {
       if (LOG_BACKEND)
         console.error('Failed to delete chat conversation from database', err);
       return false;
-    })
+    });
 
   return successfullyDeleted;
 }
@@ -115,7 +114,7 @@ export async function deleteChatConversations(
       if (LOG_BACKEND)
         console.error('Failed to delete chat conversation from database', err);
       return false;
-    })
+    });
 
   return successfullyDeleted;
 }

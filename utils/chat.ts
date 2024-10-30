@@ -5,4 +5,4 @@ export const getSanitizedMessageContent = (content: string) => {
   ); // needed for Llama3
   const trimmedMessage = filteredMessage.trim();
   return trimmedMessage;
-}
+};

@@ -5,7 +5,7 @@ import { useMouse, useWindowScroll } from '@vueuse/core';
 const props = defineProps({
   targets: {
     type: Array,
-    default: () => ['button', 'h2', '.cta-button']
+    default: () => ['button', 'h2', '.cta-button'],
   },
   circleColor: String,
   circleColorHover: String,
@@ -13,8 +13,8 @@ const props = defineProps({
   dotColorHover: String,
   hoverSize: {
     type: Number,
-    default: 3
-  }
+    default: 3,
+  },
 });
 
 const scale = ref(1);
@@ -34,22 +34,22 @@ const isHovering = computed(() => {
     if (!el) return false;
     const rect = el.getBoundingClientRect();
     return (
-      x.value >= rect.left
-      && x.value <= rect.right
-      && y.value >= rect.top
-      && y.value <= rect.bottom
+      x.value >= rect.left &&
+      x.value <= rect.right &&
+      y.value >= rect.top &&
+      y.value <= rect.bottom
     );
-  })
+  });
 });
 
 const circleStyle = computed(() => ({
   borderColor: isHovering.value ? props.circleColorHover : props.circleColor,
-  transform: `translate(${circlePosX.value}px, ${circlePosY.value}px) scale(${scale.value})`
+  transform: `translate(${circlePosX.value}px, ${circlePosY.value}px) scale(${scale.value})`,
 }));
 
 const dotStyle = computed(() => ({
   backgroundColor: isHovering.value ? props.dotColorHover : props.dotColor,
-  transform: `translate(${dotPosX.value}px, ${dotPosY.value}px)`
+  transform: `translate(${dotPosX.value}px, ${dotPosY.value}px)`,
 }));
 
 const updateCursorPosition = () => {
@@ -77,9 +77,9 @@ const customCursorDot = ref(null);
 
 const updateTargetElements = () => {
   targetElements.value = props.targets
-    .map(selector => document.querySelector(selector))
-    .filter(el => el);
-}
+    .map((selector) => document.querySelector(selector))
+    .filter((el) => el);
+};
 
 onMounted(() => {
   updateTargetElements();
@@ -87,11 +87,11 @@ onMounted(() => {
   watch([x, y], updateCursorPosition);
   watch(() => props.targets, updateTargetElements);
   document.documentElement.style.cursor = 'none';
-})
+});
 
 onUnmounted(() => {
   window.removeEventListener('mousemove', updateCursorPosition);
-})
+});
 </script>
 
 <template>
@@ -101,11 +101,7 @@ onUnmounted(() => {
       class="custom-cursor__circle"
       :style="circleStyle"
     />
-    <div
-      ref="customCursorDot"
-      class="custom-cursor__dot"
-      :style="dotStyle"
-    />
+    <div ref="customCursorDot" class="custom-cursor__dot" :style="dotStyle" />
   </div>
 </template>
 

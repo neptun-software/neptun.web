@@ -2,8 +2,8 @@
 import type { NuxtError } from '#app';
 
 defineProps({
-  error: Object as () => NuxtError
-})
+  error: Object as () => NuxtError,
+});
 
 const handleError = () => clearError({ redirect: '/home' });
 </script>

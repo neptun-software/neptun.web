@@ -7,8 +7,8 @@ import { GripVertical } from 'lucide-vue-next';
 import { possibleOrderByColumns } from '~/lib/types/chat';
 
 interface Filter {
-  column: string
-  direction: 'asc' | 'desc'
+  column: string;
+  direction: 'asc' | 'desc';
 }
 
 const chatsFilters = useChatsFilter();
@@ -30,15 +30,15 @@ const removeAllFilters = () => {
 
 const availableColumns = (currentIndex?: number): string[] => {
   const selectedColumns = filters.value
-    .map(filter => filter.column)
+    .map((filter) => filter.column)
     .filter((_, index) => index !== currentIndex);
-  return columns.filter(column => !selectedColumns.includes(column));
+  return columns.filter((column) => !selectedColumns.includes(column));
 };
 
 const queryString = computed(() => {
   const orderByParts = filters.value
-    .filter(filter => filter.column)
-    .map(filter => `${filter.column}:${filter.direction}`);
+    .filter((filter) => filter.column)
+    .map((filter) => `${filter.column}:${filter.direction}`);
 
   return orderByParts.length > 0 ? `order_by=${orderByParts.join(',')}` : '';
 });
@@ -72,21 +72,10 @@ const applyDrag = (filters: Filter[], dropResult: DropResult): Filter[] => {
 
 <template>
   <fieldset class="grid gap-2 p-4 mt-1 border rounded-lg">
-    <legend class="px-1 -ml-1 text-sm font-medium">
-      Order By Filter
-    </legend>
-    <ShadcnScrollArea
-      v-if="filters.length > 0"
-      class="max-h-32"
-    >
-      <Container
-        class="flex flex-col gap-1"
-        @drop="onDrop"
-      >
-        <Draggable
-          v-for="(filter, index) in filters"
-          :key="index"
-        >
+    <legend class="px-1 -ml-1 text-sm font-medium">Order By Filter</legend>
+    <ShadcnScrollArea v-if="filters.length > 0" class="max-h-32">
+      <Container class="flex flex-col gap-1" @drop="onDrop">
+        <Draggable v-for="(filter, index) in filters" :key="index">
           <div
             class="flex flex-wrap items-center gap-2 p-1 border rounded-md draggable-item bg-background"
           >
@@ -116,9 +105,7 @@ const applyDrag = (filters: Filter[], dropResult: DropResult): Filter[] => {
                 <ShadcnSelectContent>
                   <ShadcnSelectGroup>
                     <ShadcnSelectLabel>Direction</ShadcnSelectLabel>
-                    <ShadcnSelectItem value="asc">
-                      Ascending
-                    </ShadcnSelectItem>
+                    <ShadcnSelectItem value="asc"> Ascending </ShadcnSelectItem>
                     <ShadcnSelectItem value="desc">
                       Descending
                     </ShadcnSelectItem>
@@ -160,9 +147,7 @@ const applyDrag = (filters: Filter[], dropResult: DropResult): Filter[] => {
     </div>
 
     <DevOnly>
-      <p class="break-all">
-        <b>Preview Filter Query:</b> {{ queryString }}
-      </p>
+      <p class="break-all"><b>Preview Filter Query:</b> {{ queryString }}</p>
     </DevOnly>
   </fieldset>
 </template>

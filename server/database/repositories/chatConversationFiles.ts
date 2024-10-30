@@ -1,9 +1,9 @@
-import { eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm';
 import {
   chat_conversation_file,
   type ChatConversationFileToCreate,
-  type ReadChatConversationFile
-} from '~/lib/types/database.tables/schema'
+  type ReadChatConversationFile,
+} from '~/lib/types/database.tables/schema';
 
 export async function createChatConversationFiles(
   files: ChatConversationFileToCreate[]
@@ -19,7 +19,7 @@ export async function createChatConversationFiles(
           err
         );
       return null;
-    })
+    });
 
   if (!createdChatConversationFiles) return null;
 
@@ -42,7 +42,7 @@ export async function readAllChatConversationFilesOfChatConversation(
           err
         );
       return null;
-    })
+    });
 
   if (!chatConversationFiles) return null;
 
