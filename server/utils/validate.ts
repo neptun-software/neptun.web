@@ -2,6 +2,7 @@ import type { H3Event, EventHandlerRequest } from 'h3';
 import type { ZodError } from 'zod';
 import { z } from 'zod';
 import { primaryIdSchema } from '~/lib/types/database.tables/schema';
+import { emailSchema } from '~/lib/types/input.validation';
 import type { User } from '#auth-utils';
 import {
   AllowedAiModelNamesEnum,
@@ -65,8 +66,8 @@ async function validateParams<S, E = S>(
     data,
     success,
   } = secondValidationStep
-    ? secondValidationStep(maybeValidatedParams.data!)
-    : { success: true, data: null, validationErrorMessage: '' };
+      ? secondValidationStep(maybeValidatedParams.data!)
+      : { success: true, data: null, validationErrorMessage: '' };
   if (secondValidationStep) {
     if (!success || !data) {
       return {
@@ -267,6 +268,35 @@ export async function validateParamUserId(
     'Invalid routeParams(user_id).',
     'queryParams(user_id):',
     (user, data) => user.id !== data.user_id // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
+  );
+}
+
+/* VALIDATE ROUTE PARAMS(email) */
+export async function validateParamEmail(
+  event: H3Event<EventHandlerRequest>
+): Promise<ValidationResult<UserEmailType>> {
+  return validateParams<UserEmailType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(
+        event,
+        UserEmailSchema.safeParse
+      );
+
+      event.context.validated.params['email'] = result?.data?.email || null;
+
+      if (result.success) {
+        return {
+          success: true,
+          data: { email: result.data.email },
+        };
+      } else {
+        return result;
+      }
+    },
+    'Successfully validated routeParams(email).',
+    'Invalid routeParams(email).',
+    'queryParams(email):',
   );
 }
 
@@ -492,6 +522,12 @@ export const UserIdSchema = z.object({
 });
 
 type UserIdType = z.infer<typeof UserIdSchema>;
+
+export const UserEmailSchema = z.object({
+  email: emailSchema
+})
+
+type UserEmailType = z.infer<typeof UserEmailSchema>;
 
 export const ChatIdSchema = z.object({
   user_id: primaryIdSchema,

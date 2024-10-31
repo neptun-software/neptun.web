@@ -6,12 +6,66 @@ import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 import { emailSchema, passwordSchema } from '~/lib/types/input.validation';
 
+// defineOgImageComponent('NuxtSeo');
+
 definePageMeta({
   name: 'New Password',
   alias: ['/forgot-password', '/reset-password'],
 });
 
-// defineOgImageComponent('NuxtSeo');
+const validateOtpAndResetPassword = async (
+  email: string,
+  otp: string[],
+  newPassword: string
+) => {
+  try {
+    const response = await $fetch('/auth/otp', {
+      method: 'POST',
+      body: {
+        action: 'validate',
+        email,
+        otp: otp.join(''),
+        new_password: newPassword,
+      },
+    });
+
+    if (response.success) {
+      return true;
+    }
+
+    toast.error(response.message || 'Invalid OTP');
+
+    return false;
+  } catch (error) {
+    console.error('OTP validation error:', error);
+    toast.error('OTP validation failed');
+    return false;
+  }
+};
+
+const sendingOtpEmail = ref(false);
+const sendOtpEmail = async (email: string) => {
+  sendingOtpEmail.value = true;
+
+  try {
+    const response = await $fetch('/auth/otp', {
+      method: 'POST',
+      body: { action: 'create', email },
+    });
+
+    if (response.success) {
+      toast.success('OTP sent to your email');
+      return true;
+    }
+
+    toast.error(response.message || 'Failed to create OTP');
+    return false;
+  } catch (error) {
+    console.error('Error creating OTP:', error);
+    toast.error('Failed to create OTP');
+    return false;
+  }
+};
 
 const stepIndex = ref(1);
 const steps = [
@@ -32,60 +86,68 @@ const steps = [
   },
 ];
 
-const formSchema = [
+const formSchemaArray = [
   z.object({
     email: emailSchema,
   }),
   z.object({
-    /* TODO: make this work. Somehow displays "Required", even if it's a valid input and the input is set
-      .array(z.string().min(1, { message: 'Required' }))
-      .length(5, { message: 'Invalid input' }),
-    */
-    /* otp: z.array(z.string()).superRefine((arr, ctx) => {
-      // Check if the OTP array has exactly 5 elements
-      if (arr.length !== 5) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'OTP must be 5 digits',
-        });
-      }
-      // Check if each element in the OTP array is a non-empty string
-      arr.forEach((value, index) => {
-        if (!value || value.trim() === '') {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Each OTP digit is required',
-            path: [index], // Provide the index for better error handling
-          });
-        }
-      });
-
-      // TODO: validate the OTP
-    }), */
-    otp: z.any(),
+    otp: z
+      .array(z.coerce.string())
+      .length(5, { message: 'Has to be 5 digits. Invalid input!' }),
   }),
   z.object({
     password: passwordSchema,
   }),
 ];
+const schemaForComponent = computed(() =>
+  toTypedSchema(formSchemaArray[stepIndex.value - 1])
+);
+
+const formSchema = z.object({
+  email: emailSchema,
+  otp: z
+    .array(z.coerce.string())
+    .length(5, { message: 'Has to be 5 digits. Invalid input!' }),
+  password: passwordSchema,
+});
 
 const otp = ref(Array(5).fill(''));
 const otpIsValid = ref(false);
-const schema = computed(() => toTypedSchema(formSchema[stepIndex.value - 1]));
-const { isFieldDirty, handleSubmit, setFieldValue, validate } = useForm();
 
-const onSubmit = handleSubmit((values) => {
-  toast('You submitted the following values:', {
+const { isFieldDirty, handleSubmit, setFieldValue, validate, values, errors } =
+  useForm({
+    validationSchema: toTypedSchema(formSchema),
+  });
+
+const submittingNewPassword = ref(false);
+const onSubmit = handleSubmit(async (values) => {
+  submittingNewPassword.value = true;
+
+  /* toast('You submitted the following values:', {
     description: h(
       'pre',
       { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' },
       h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))
     ),
-  });
+  }); */
+
+  const successfullyValidated = await validateOtpAndResetPassword(
+    values.email,
+    values.otp,
+    values.password
+  );
+
+  if (successfullyValidated) {
+    navigateTo('/log-in', {
+      redirectCode: 303,
+    });
+  } else {
+    toast.error('Failed to validate OTP');
+  }
 });
 
-const handleComplete = (/* e: string[] */) => {
-  // console.log('Completed OTP:', e.join(''));
+const handleComplete = (e: string[]) => {
+  console.log('Completed OTP:', e.join(''));
   otpIsValid.value = true;
 };
 
@@ -96,7 +158,7 @@ const handleModelValueUpdate = (arrStr: string[]) => {
     }
   });
 
-  // console.log('Updated model value:', otp.value);
+  console.log('Updated model value:', otp.value);
   setFieldValue('otp', [...otp.value]);
   validate();
 
@@ -104,25 +166,45 @@ const handleModelValueUpdate = (arrStr: string[]) => {
     handleComplete(otp.value);
   }
 };
+
+const isCurrentStepValid = computed(() => {
+  switch (stepIndex.value) {
+    case 1:
+      return values.email && !errors.value.email && !sendingOtpEmail.value;
+    case 2:
+      return values.otp?.length === 5 && !errors.value.otp;
+    case 3:
+      return (
+        values.password &&
+        !errors.value.password &&
+        !submittingNewPassword.value
+      );
+    default:
+      return false;
+  }
+});
+
+const canGoNext = computed(() => {
+  if (stepIndex.value === 2 && !otpIsValid.value) return false;
+  return isCurrentStepValid.value;
+});
 </script>
 
 <template>
-  <!-- TODO: needs email verification -->
   <div class="p-4">
-    <span class="flex justify-center pb-4">(WIP)</span>
     <ShadcnForm
       v-slot="{ meta }"
       keep-values
       class="flex flex-col items-center space-y-6"
       as=""
-      :validation-schema="schema"
+      :validation-schema="schemaForComponent"
     >
       <ShadcnStepper
-        v-slot="{ isNextDisabled, isPrevDisabled, nextStep, prevStep }"
+        v-slot="{ isPrevDisabled, nextStep, prevStep }"
         v-model="stepIndex"
         class="block w-full"
       >
-        <form @submit="onSubmit">
+        <form @submit.prevent>
           <div class="flex w-full gap-2 flex-start">
             <ShadcnStepperItem
               v-for="step in steps"
@@ -184,13 +266,15 @@ const handleModelValueUpdate = (arrStr: string[]) => {
                     :validate-on-blur="!isFieldDirty"
                   >
                     <ShadcnFormItem class="w-fit">
-                      <ShadcnFormLabel> Email</ShadcnFormLabel>
+                      <ShadcnFormLabel> Email </ShadcnFormLabel>
                       <ShadcnFormControl>
                         <ShadcnInput
                           type="email"
                           placeholder="your.name@domain.tld"
                           v-bind="componentField"
-                          @update:model-value="setFieldValue('email', $event)"
+                          @update:model-value="
+                            setFieldValue('email', $event as string)
+                          "
                         />
                       </ShadcnFormControl>
                       <ShadcnFormDescription>
@@ -210,28 +294,30 @@ const handleModelValueUpdate = (arrStr: string[]) => {
                     <ShadcnFormItem>
                       <ShadcnFormLabel>OTP</ShadcnFormLabel>
                       <ShadcnFormControl>
-                        <ShadcnPinInput
-                          id="otp"
-                          v-model="value!"
-                          :name="componentField.name"
-                          placeholder="○"
-                          class="flex items-center gap-2 mt-1"
-                          :otp="true"
-                          type="text"
-                          @update:model-value="handleModelValueUpdate"
-                        >
-                          <ShadcnPinInputGroup>
-                            <ShadcnPinInputInput
-                              v-for="(id, index) in 5"
-                              :key="id"
-                              :index="index"
-                              :value="otp?.[index] ?? ''"
-                            />
-                          </ShadcnPinInputGroup>
-                        </ShadcnPinInput>
+                        <div class="flex items-baseline gap-2">
+                          <ShadcnPinInput
+                            id="otp"
+                            v-model="value!"
+                            :name="componentField.name"
+                            placeholder="○"
+                            class="flex items-center gap-2 mt-1"
+                            :otp="true"
+                            type="text"
+                            @update:model-value="handleModelValueUpdate"
+                          >
+                            <ShadcnPinInputGroup>
+                              <ShadcnPinInputInput
+                                v-for="(id, index) in 5"
+                                :key="id"
+                                :index="index"
+                                :value="otp?.[index] ?? ''"
+                              />
+                            </ShadcnPinInputGroup>
+                          </ShadcnPinInput>
+                        </div>
                       </ShadcnFormControl>
                       <ShadcnFormDescription>
-                        The 6-digit code sent to your email.
+                        The 5-digit code sent to your email.
                       </ShadcnFormDescription>
                       <ShadcnFormMessage />
                     </ShadcnFormItem>
@@ -280,18 +366,20 @@ const handleModelValueUpdate = (arrStr: string[]) => {
                 </ShadcnButton>
                 <div class="flex items-center gap-3">
                   <ShadcnButton
-                    v-if="stepIndex !== 3"
-                    :type="meta.valid ? 'button' : 'submit'"
-                    :disabled="
-                      isNextDisabled || (stepIndex === 2 && !otpIsValid)
-                    "
+                    :disabled="!canGoNext"
+                    type="button"
                     size="sm"
-                    @click="meta.valid && nextStep()"
+                    @click="
+                      stepIndex !== 3
+                        ? stepIndex === 1
+                          ? sendOtpEmail(values.email as string).then(() =>
+                              nextStep()
+                            )
+                          : nextStep()
+                        : onSubmit()
+                    "
                   >
-                    Next
-                  </ShadcnButton>
-                  <ShadcnButton v-if="stepIndex === 3" size="sm" type="submit">
-                    Set new password
+                    {{ stepIndex !== 3 ? 'Next' : 'Set new password' }}
                   </ShadcnButton>
                 </div>
               </div>

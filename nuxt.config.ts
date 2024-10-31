@@ -21,6 +21,7 @@ console.info(`NODE_ENV: ${NODE_ENV}`);
 
 export default defineNuxtConfig({
   modules: [
+    /* 'nuxt-og-image', */
     '@nuxt/eslint',
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
@@ -35,7 +36,6 @@ export default defineNuxtConfig({
     '@nuxtjs/robots',
     'nuxt-monaco-editor',
     '@formkit/auto-animate/nuxt',
-    /* 'nuxt-og-image', */
   ],
 
   components: [
@@ -157,6 +157,7 @@ export default defineNuxtConfig({
     sessionPassword: process.env.NUXT_SESSION_PASSWORD,
     cryptoSecret: process.env.CRYPTO_SECRET,
     databaseConnectionString: process.env.DATABASE_CONNECTION_STRING,
+    temporaryStorageConnectionString: process.env.TEMPORARY_STORAGE_CONNECTION_STRING,
     oauth: {
       github: {
         clientId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID,
@@ -178,14 +179,14 @@ export default defineNuxtConfig({
           NODE_ENV === 'development'
             ? process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY
             : Buffer.from(
-                String(
-                  process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY?.replace(
-                    /\\n/g,
-                    '\n'
-                  ).trim()
-                ),
-                'base64'
-              ).toString('utf-8'),
+              String(
+                process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY?.replace(
+                  /\\n/g,
+                  '\n'
+                ).trim()
+              ),
+              'base64'
+            ).toString('utf-8'),
       },
     },
     /* session persists for 7 days */
@@ -195,6 +196,19 @@ export default defineNuxtConfig({
       cookie: {
         sameSite: 'lax',
       },
+    },
+    mail: {
+      // https://resend.com/docs/send-with-smtp | https://resend.com/docs/send-with-nodemailer-smtp
+      message: {
+        to: 'neptunai.contact@gmail.com',
+      },
+      smtp: {
+        host: "smtp.resend.com",
+        port: 465,
+      },
+      secure: true,
+      username: "resend",
+      password: process.env.RESEND_API_KEY
     },
     public: {
       IS_SERVERLESS: process.env.IS_SERVERLESS,
@@ -241,12 +255,20 @@ export default defineNuxtConfig({
         }
       }, */,
     },
-    /* storage: {
-      redis: {
+    // Production
+    storage: {
+      db: {
         driver: 'redis',
-        url: process.env.KV_CONNECTION_STRING
+        url: process.env.TEMPORARY_STORAGE_CONNECTION_STRING
       }
-    } */
+    },
+    // Development
+    devStorage: {
+      db: {
+        driver: 'fs',
+        base: './data/db'
+      }
+    }
   },
 
   vite: {
