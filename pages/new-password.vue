@@ -192,6 +192,8 @@ const canGoNext = computed(() => {
 
 <template>
   <div class="p-4">
+    <h1 class="pb-6 text-3xl font-bold text-center">New Password</h1>
+
     <ShadcnForm
       v-slot="{ meta }"
       keep-values

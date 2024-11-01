@@ -1,17 +1,6 @@
 import animate from 'tailwindcss-animate';
 import typography from '@tailwindcss/typography';
 
-const typographyShared = {
-  css: {
-    // codeblocks are handled by mdc
-    pre: false,
-    code: false,
-    'pre code': false,
-    'code::before': false,
-    'code::after': false,
-  },
-};
-
 /** @type {import('tailwindcss').Config} */
 export const content = [
   './components/**/*.{js,vue,ts}',
@@ -24,6 +13,18 @@ export const content = [
 export const darkMode = ['class'];
 export const safelist = ['dark'];
 export const prefix = '';
+
+const typographyShared = {
+  css: {
+    // codeblocks are handled by mdc
+    pre: false,
+    code: false,
+    'pre code': false,
+    'code::before': false,
+    'code::after': false,
+  },
+};
+
 export const theme = {
   container: {
     center: true,

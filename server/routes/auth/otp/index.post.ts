@@ -1,9 +1,11 @@
 import nodemailer from 'nodemailer';
 import crypto from "crypto";
+import { render } from '@vue-email/render';
+import Otp from '~/components/emails/otp.vue';
 
 const storage = useStorage('otp');
 
-const sendMail = async ({ to, subject, text }: { to: string; subject: string; text: string }) => {
+const sendMail = async ({ to, subject, html, text }: { to: string; subject: string; html: string, text: string }) => {
     const config = useRuntimeConfig();
     const transporter = nodemailer.createTransport({
         host: config.mail.smtp.host,
@@ -23,6 +25,7 @@ const sendMail = async ({ to, subject, text }: { to: string; subject: string; te
         from: `"Password Reset - NeptunAI" <no-reply@neptunai.jonasfroeller.online>`,
         to,
         subject,
+        html,
         text,
     });
 };
@@ -40,12 +43,32 @@ export default defineEventHandler(async (event) => {
             createdAt: Date.now(),
         }, { ttl: 600 }); // 10 minutes
 
-        // Send OTP email
-        await sendMail({
-            to: email,
-            subject: 'Your Password Reset OTP',
-            text: `Your OTP for password reset is: ${otp}. This code will expire in 10 minutes.`,
+        // Email content
+        const html = await render(Otp, {
+            otp,
+        }, {
+            pretty: true,
         });
+
+        const text = await render(Otp, {
+            otp,
+        }, {
+            pretty: true,
+            plainText: true,
+        });
+
+        // Send OTP email
+        try {
+            /* const response =  */
+            await sendMail({
+                to: email,
+                subject: 'Your Password Reset OTP',
+                html: html,
+                text: text,
+            });
+        } catch (error) {
+            return { success: false, message: 'Something went wrong. Could not send OTP. Please try again.' };
+        }
 
         return { success: true, message: 'Successfully sent OTP.' };
     }
@@ -53,10 +76,14 @@ export default defineEventHandler(async (event) => {
     if (body.action === 'validate') {
         const { email, otp, new_password } = body;
 
-        return await event.$fetch(`/${email}/reset-password`, {
-            method: 'POST',
-            body: { otp, new_password },
-        });
+        try {
+            return await event.$fetch(`/${email}/reset-password`, {
+                method: 'POST',
+                body: { otp, new_password },
+            });
+        } catch (error) {
+            return { success: false, message: 'Something went wrong. Could not validate OTP. Please try again.' };
+        }
     }
 
     return { success: false, message: 'Invalid action.' };

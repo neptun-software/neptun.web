@@ -4,6 +4,8 @@ import type { HTTPMethod } from 'nuxt-security';
 import removeConsole from 'vite-plugin-remove-console';
 import { protectedRoutes } from './utils/pages';
 import { supportedShikiLanguages } from './utils/formatters';
+import vue from '@vitejs/plugin-vue';
+
 // import wasm from "vite-plugin-wasm";
 // import topLevelAwait from "vite-plugin-top-level-await";
 
@@ -241,6 +243,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
 
   nitro: {
+    rollupConfig: {
+      // @ts-ignore: "Type instantiation is excessively deep and possibly infinite."
+      plugins: [vue()]
+    },
     imports: {
       dirs: ['./server/utils'],
     },
