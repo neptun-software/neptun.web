@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-      "title": "Neptun: Nitro Server Routes",
-      "version": "v1"
+    "title": "Neptun: Nitro Server Routes",
+    "version": "v1"
   },
   "servers": [
     {
@@ -591,6 +591,28 @@
         }
       }
     },
+    "/{email}/reset-password": {
+      "post": {
+        "tags": [
+          "App Routes"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/auth/github.app": {
       "get": {
         "tags": [
@@ -618,6 +640,32 @@
       }
     },
     "/auth/google": {
+      "get": {
+        "tags": [
+          "App Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/auth/otp": {
+      "post": {
+        "tags": [
+          "App Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/health": {
       "get": {
         "tags": [
           "App Routes"
