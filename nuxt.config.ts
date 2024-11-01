@@ -159,7 +159,9 @@ export default defineNuxtConfig({
     sessionPassword: process.env.NUXT_SESSION_PASSWORD,
     cryptoSecret: process.env.CRYPTO_SECRET,
     databaseConnectionString: process.env.DATABASE_CONNECTION_STRING,
-    temporaryStorageConnectionString: process.env.TEMPORARY_STORAGE_CONNECTION_STRING,
+    // temporaryStorageConnectionString: process.env.TEMPORARY_STORAGE_CONNECTION_STRING,
+    temporaryStorageConnectionUrl: process.env.TEMPORARY_STORAGE_CONNECTION_URL,
+    temporaryStorageConnectionToken: process.env.TEMPORARY_STORAGE_CONNECTION_TOKEN,
     oauth: {
       github: {
         clientId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID,
@@ -262,19 +264,20 @@ export default defineNuxtConfig({
       }, */,
     },
     // Production
-    storage: {
+    /* storage: {
       db: {
         driver: 'redis',
-        url: process.env.TEMPORARY_STORAGE_CONNECTION_STRING
+        url: process.env.TEMPORARY_STORAGE_CONNECTION_STRING,
+        family: 6 // see https://github.com/redis/ioredis/issues/1576 `?family=6`
       }
-    },
+    }, */
     // Development
-    devStorage: {
+    /* devStorage: {
       db: {
         driver: 'fs',
         base: './data/db'
       }
-    }
+    } */
   },
 
   vite: {

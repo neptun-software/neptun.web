@@ -3,9 +3,6 @@ import crypto from "crypto";
 import { render } from '@vue-email/render';
 import Otp from '~/components/emails/otp.vue';
 
-const storage = useStorage('db');
-const otpNameSpace = "otp";
-
 const sendMail = async ({ to, subject, html, text }: { to: string; subject: string; html: string, text: string }) => {
     const config = useRuntimeConfig();
     const transporter = nodemailer.createTransport({
@@ -32,6 +29,9 @@ const sendMail = async ({ to, subject, html, text }: { to: string; subject: stri
 };
 
 export default defineEventHandler(async (event) => {
+    const storage = useStorage('temporary-storage');
+    const otpNameSpace = "otp";
+
     const body = await readBody(event);
 
     if (body.action === 'create') {

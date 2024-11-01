@@ -1,10 +1,10 @@
 import { validateParamEmail } from "~/server/utils/validate";
 import { readUserUsingPrimaryEmail, updateUser } from "~/server/database/repositories/users";
 
-const storage = useStorage('db');
-const otpNameSpace = "otp";
-
 export default defineEventHandler(async (event) => {
+    const storage = useStorage('temporary-storage');
+    const otpNameSpace = "otp";
+
     const body = await readBody(event);
     const { otp, new_password } = body;
 

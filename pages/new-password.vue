@@ -142,7 +142,9 @@ const onSubmit = handleSubmit(async (values) => {
       redirectCode: 303,
     });
   } else {
-    toast.error('Failed to validate OTP');
+    toast.error('Failed to validate OTP.');
+    submittingNewPassword.value = false;
+    sendingOtpEmail.value = false;
   }
 });
 

@@ -49,6 +49,7 @@
     "typecheck",
     "undici",
     "unref",
+    "unstorage",
     "vaul",
     "vfile",
     "vite",
