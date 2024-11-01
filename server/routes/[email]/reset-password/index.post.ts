@@ -1,7 +1,8 @@
 import { validateParamEmail } from "~/server/utils/validate";
 import { readUserUsingPrimaryEmail, updateUser } from "~/server/database/repositories/users";
 
-const storage = useStorage('otp');
+const storage = useStorage('db');
+const otpNameSpace = "otp";
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
@@ -21,7 +22,7 @@ export default defineEventHandler(async (event) => {
     }
     const email = maybeUserEmail.data?.email;
 
-    const storedOTPData = await storage.getItem<{ otp: string; createdAt: number }>(email);
+    const storedOTPData = await storage.getItem<{ otp: string; createdAt: number }>(`${otpNameSpace}:${email}`);
 
     if (!storedOTPData) {
         return { success: false, message: 'No OTP found. Please request a new OTP.' };
@@ -30,7 +31,7 @@ export default defineEventHandler(async (event) => {
     const isValid = storedOTPData.otp === otp && Date.now() - storedOTPData.createdAt < 600000; // 10 minutes
 
     if (isValid) {
-        await storage.removeItem(email); // Clear OTP after validation
+        await storage.removeItem(`${otpNameSpace}:${email}`); // Clear OTP after validation
 
         const user = await readUserUsingPrimaryEmail(email);
         if (!user) {

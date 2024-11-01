@@ -3,7 +3,8 @@ import crypto from "crypto";
 import { render } from '@vue-email/render';
 import Otp from '~/components/emails/otp.vue';
 
-const storage = useStorage('otp');
+const storage = useStorage('db');
+const otpNameSpace = "otp";
 
 const sendMail = async ({ to, subject, html, text }: { to: string; subject: string; html: string, text: string }) => {
     const config = useRuntimeConfig();
@@ -38,7 +39,7 @@ export default defineEventHandler(async (event) => {
         const otp = generateOTP();
 
         // Store OTP in storage
-        await storage.setItem(email, {
+        await storage.setItem(`${otpNameSpace}:${email}`, {
             otp: otp,
             createdAt: Date.now(),
         }, { ttl: 600 }); // 10 minutes
