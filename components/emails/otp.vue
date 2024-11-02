@@ -17,8 +17,6 @@ import {
 } from '@vue-email/components';
 import { emailTheme } from './tailwind';
 
-// https://vuemail.net/components/font
-
 defineProps({
   otp: String,
 });

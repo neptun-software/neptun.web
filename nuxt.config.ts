@@ -263,6 +263,10 @@ export default defineNuxtConfig({
         }
       }, */,
     },
+
+    // "redis" adapter doesn't work on vercel: see https://nitro.unjs.io/deploy/workers#incompatible-libraries (ioredis is not compatible)
+    // Setup for Vercel: https://nitro.unjs.io/deploy/providers/vercel#vercel-edge-functions
+
     // Production
     /* storage: {
       db: {
