@@ -5,7 +5,8 @@
   "scripts": {
     "build": "nuxt build",
     "app": "export EDITOR=code && nuxt dev",
-    "dev": "set EDITOR=code && nuxt dev --host --https",
+    "dev": "set EDITOR=code && nuxt dev",
+    "devx": "set EDITOR=code && nuxt dev --host --https --ssl-cert ./configurations/development/ssl/server.crt --ssl-key ./configurations/development/ssl/server.key",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
