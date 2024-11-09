@@ -20,7 +20,7 @@ const featureList: FeaturesProps[] = [
 </script>
 
 <template>
-  <section id="features" class="container py-24 sm:py-32">
+  <section id="features" class="py-24 sm:py-32">
     <h2 class="mb-2 text-lg tracking-wider text-center">Features</h2>
 
     <h2 class="mb-4 text-3xl font-bold text-center md:text-4xl">How?</h2>

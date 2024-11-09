@@ -20,24 +20,23 @@ const dynamicText = ref(null);
 const currentText = ref(props.textToLoop[0]);
 let currentIndex = 0;
 
+// Calculate slide height based on dynamic text height
+const slideHeight = ref(0);
+
 const updateText = () => {
   const newIndex = (currentIndex + 1) % props.textToLoop.length;
   const newText = props.textToLoop[newIndex];
 
-  // animate out the old text
   gsap.to(dynamicText.value, {
-    y: -50,
+    y: -slideHeight.value,
     opacity: 0,
     duration: props.duration / 2,
     ease: 'power1.in',
     onComplete: () => {
-      // update the text
       currentText.value = newText;
-
-      // animate in the new text
       gsap.fromTo(
         dynamicText.value,
-        { y: 50, opacity: 0 },
+        { y: slideHeight.value, opacity: 0 },
         { y: 0, opacity: 1, duration: props.duration / 2, ease: 'power1.out' }
       );
     },
@@ -46,7 +45,10 @@ const updateText = () => {
   currentIndex = newIndex;
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick(); // Wait until the text is rendered, then calculate the height
+  slideHeight.value = dynamicText.value.offsetHeight / 4;
+
   const interval = setInterval(updateText, props.duration * 1000);
   onUnmounted(() => clearInterval(interval));
 });
@@ -54,7 +56,9 @@ onMounted(() => {
 
 <template>
   <div class="text-slider">
-    <p class="inline my-8 text-5xl font-extrabold text-center">
+    <p
+      class="inline my-6 text-3xl font-extrabold text-center sm:my-8 lg:my-10 sm:text-4xl lg:text-5xl"
+    >
       {{ text }}
       <span ref="dynamicText" class="dynamic-text">{{ currentText }}</span>
     </p>
@@ -66,8 +70,8 @@ onMounted(() => {
   text-align: center;
   position: relative;
   overflow: hidden;
-  height: auto;
-  padding: 2.5rem 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .dynamic-text {

@@ -26,7 +26,7 @@ const benefitList: BenefitsProps[] = [
 </script>
 
 <template>
-  <section id="benefits" class="container py-24 sm:py-32">
+  <section id="benefits" class="py-24 sm:py-32">
     <div class="grid lg:grid-cols-2 place-items-center lg:gap-24">
       <div>
         <h2 class="text-lg tracking-wider">Benefits</h2>

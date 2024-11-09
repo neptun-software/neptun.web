@@ -3,6 +3,7 @@
     "adoc",
     "antfu",
     "astro",
+    "CICD",
     "clsx",
     "Coep",
     "composables",
@@ -55,6 +56,7 @@
     "vfile",
     "vite",
     "vueuse",
+    "yoyo",
     "yxxx"
   ],
   "css.customData": [".vscode/tailwind.json"]

@@ -8,7 +8,7 @@ definePageMeta({
 
 // defineOgImageComponent('NuxtSeo');
 
-const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
+const features = ['Docker files', 'docker-compose files', 'github-workflows'];
 </script>
 
 <template>
@@ -28,7 +28,7 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
       <div class="flex flex-col items-center min-h-screen content">
         <Bubbles />
 
-        <div class="relative headline">
+        <div v-if="!$device.isApple" class="relative headline">
           <h2
             class="headline-text text-[6rem] sm:text-[8rem] md:text-[10rem] lg:text-[12rem] xl:text-[14rem] 2xl:text-[16rem]"
           >
@@ -40,17 +40,26 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
             Neptun
           </h2>
         </div>
+        <div v-else class="relative headline">
+          <h2
+            class="text-[6rem] sm:text-[8rem] md:text-[10rem] lg:text-[12rem] xl:text-[14rem] 2xl:text-[16rem] mt-4"
+          >
+            Neptun
+          </h2>
+        </div>
 
         <TextInOut
           :text="'Automatically generates your '"
           :text-to-loop="features"
-          :duration="1.5"
+          :duration="1.3"
         />
 
         <TypeText
           :type-data="[
-            'Hey!\n generate me every file I need to implement CICD.',
-            'docker-compose-files',
+            'Dear AI,\nPlease generate me every configuration file I need to deploy this Nuxt project to Digital Ocean.',
+            'Create me a Dockerfile for my Svelte SPA, please!',
+            'Hey!\n generate me every file I need to implement CICD for my Laravel project.',
+            'Generate me a docker-compose.yml file for this Next project!',
           ]"
         >
           <CallToAction>
@@ -62,27 +71,29 @@ const features = ['docker-files', 'docker-compose-files', 'github-workflows'];
       </div>
     </SecondarySection>
 
+    <!-- <SpotlightCards
+      :cards="[
+        {
+          title: 'More time for the actual project!',
+          description:
+            'The more time you spend on the actual project, the better. Am I right?',
+          icon: Timer,
+        },
+        {
+          title: 'Easy entry!',
+          description:
+            'Neptun is a very good starting point, for you to learn how to dockerize your applications.',
+          icon: Lightbulb,
+        },
+      ]"
+    /> -->
+
     <SecondarySection :is-last="true">
       <Preview />
       <Benefits />
-      <!-- <SpotlightCards
-        :cards="[
-          {
-            title: 'More time for the actual project!',
-            description:
-              'The more time you spend on the actual project, the better. Am I right?',
-            icon: Timer,
-          },
-          {
-            title: 'Easy entry!',
-            description:
-              'Neptun is a very good starting point, for you to learn how to dockerize your applications.',
-            icon: Lightbulb,
-          },
-        ]"
-      /> -->
       <Features />
     </SecondarySection>
+
     <!-- <Cursor /> -->
     <!-- <SimpleCursor /> -->
   </section>

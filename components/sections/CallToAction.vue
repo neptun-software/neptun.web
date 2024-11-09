@@ -6,7 +6,6 @@ defineProps<{
   href?: string;
 }>();
 
-const { x: scrollX, y: scrollY } = useWindowScroll(); // needed, so that the button doesn't have a fucking seizure, when you scroll
 const magneticButton = ref<HTMLButtonElement | null>(null);
 const boundingRect = ref<DOMRect | null>(null);
 
@@ -17,10 +16,13 @@ const updateBoundingRect = () => {
 };
 
 const handleMouseMove = (e: MouseEvent) => {
-  if (boundingRect.value && magneticButton.value) {
+  if (magneticButton.value) {
+    // needed, so that the button doesn't have a fucking seizure, if loaded from other page or other scroll position
+    boundingRect.value = magneticButton.value.getBoundingClientRect();
     const rect = boundingRect.value;
-    const mousePosX = e.clientX - rect.left + scrollX.value;
-    const mousePosY = e.clientY - rect.top + scrollY.value;
+
+    const mousePosX = e.clientX - rect.left;
+    const mousePosY = e.clientY - rect.top;
 
     gsap.to(magneticButton.value, {
       x: (mousePosX - rect.width / 2) * 0.4,
