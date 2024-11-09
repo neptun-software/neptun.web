@@ -32,6 +32,7 @@
     "@huggingface/inference": "^2.8.1",
     "@neondatabase/serverless": "^0.10.1",
     "@nuxt/image": "^1.8.1",
+    "@nuxtjs/device": "^3.2.4",
     "@nuxtjs/mdc": "^0.9.2",
     "@nuxtjs/robots": "^4.1.10",
     "@radix-icons/vue": "^1.0.0",

@@ -21,23 +21,10 @@ const corsHandler = {
 const NODE_ENV = process.env.NODE_ENV;
 console.info(`NODE_ENV: ${NODE_ENV}`);
 
+/* 'nuxt-og-image', */
 export default defineNuxtConfig({
   modules: [
-    /* 'nuxt-og-image', */
-    '@nuxt/eslint',
-    '@nuxtjs/tailwindcss',
-    'shadcn-nuxt',
-    '@nuxtjs/color-mode',
-    'nuxt-posthog',
-    'nuxt-auth-utils',
-    '@nuxtjs/mdc',
-    '@nuxt/image',
-    '@vueuse/nuxt',
-    'nuxt-time',
-    'nuxt-security',
-    '@nuxtjs/robots',
-    'nuxt-monaco-editor',
-    '@formkit/auto-animate/nuxt',
+    '@nuxt/eslint', '@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/color-mode', 'nuxt-posthog', 'nuxt-auth-utils', '@nuxtjs/mdc', '@nuxt/image', '@vueuse/nuxt', 'nuxt-time', 'nuxt-security', '@nuxtjs/robots', 'nuxt-monaco-editor', '@formkit/auto-animate/nuxt', '@nuxtjs/device'
   ],
 
   components: [

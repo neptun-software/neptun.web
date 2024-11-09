@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Menu } from 'lucide-vue-next';
 
-defineProps({
+const props = defineProps({
   layout: String,
 });
 
@@ -29,8 +29,6 @@ const visibleRoutes = computed(() => {
   }
 });
 
-const { width: windowWidth } = useWindowSize();
-
 const sortedRoutes = computed(() => {
   const homeRoute = visibleRoutes.value.find((route) => route.path === '/home');
   const otherRoutes = visibleRoutes.value.filter(
@@ -43,39 +41,40 @@ const sortedRoutes = computed(() => {
 
   return otherRoutes;
 });
+
+const isNavigationLayout = computed(() => props.layout === 'navigation');
 </script>
 
 <template>
   <div nuxt-client class="flex justify-center">
-    <div v-if="windowWidth <= 700 && layout === 'navigation'">
+    <!-- Mobile Menu -->
+    <div v-if="isNavigationLayout && $device.isMobile">
       <ShadcnDropdownMenu>
-        <ShadcnDropdownMenuTrigger><Menu /></ShadcnDropdownMenuTrigger>
+        <ShadcnDropdownMenuTrigger class="flex items-center">
+          <Menu />
+        </ShadcnDropdownMenuTrigger>
         <ShadcnDropdownMenuContent class="ml-4">
           <ShadcnDropdownMenuItem
             v-for="route in visibleRoutes"
             :key="route.path"
           >
             <NuxtLink :to="route.path" active-class="underline">
-              <p>
-                {{ route.name }}
-              </p>
+              <p>{{ route.name }}</p>
             </NuxtLink>
           </ShadcnDropdownMenuItem>
         </ShadcnDropdownMenuContent>
       </ShadcnDropdownMenu>
     </div>
 
+    <!-- Desktop Navigation (also displayed in footer on mobile) -->
     <ul
-      v-if="windowWidth > 700 || layout !== 'navigation'"
+      v-else
       class="flex items-center gap-2"
-      :class="{
-        navigation: layout === 'navigation',
-        default: layout !== 'navigation',
-      }"
+      :class="isNavigationLayout ? 'navigation' : 'default'"
     >
       <li v-for="route in sortedRoutes" :key="route.path">
         <NuxtLink
-          v-if="layout === 'navigation' && route.path === '/home'"
+          v-if="isNavigationLayout && route.path === '/home'"
           class="font-bold"
           :to="route.path"
         >
