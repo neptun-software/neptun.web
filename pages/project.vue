@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 definePageMeta({
-  name: 'Guide',
+  name: 'New Project',
+  alias: projectAliases,
   middleware: ['protected'],
 });
 </script>

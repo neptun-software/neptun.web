@@ -3,7 +3,7 @@
 
 definePageMeta({
   name: 'Home',
-  alias: ['/root'],
+  alias: ['/root', '/about'],
 });
 
 // defineOgImageComponent('NuxtSeo');

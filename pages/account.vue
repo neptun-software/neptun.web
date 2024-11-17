@@ -2,6 +2,12 @@
 import { Loader2 } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 
+definePageMeta({
+  name: 'Account',
+  alias: accountAliases,
+  middleware: ['protected'],
+});
+
 const { updateUser, deleteUser } = useUser();
 const { session, clear, fetch } = useUserSession();
 
@@ -46,11 +52,6 @@ const signOut = async () => {
     navigateTo('/home');
   });
 };
-
-definePageMeta({
-  name: 'Account',
-  middleware: ['protected'],
-});
 </script>
 
 <template>
