@@ -28,18 +28,27 @@ watch(headerNavigationElement, (newHeaderNavigationElement) => {
         <div class="flex items-center gap-2">
           <h1 class="pl-4 text-xl font-semibold truncate">Chat</h1>
         </div>
-        <div class="flex gap-2 pr-5">
+
+        <!-- Import Code Repositories From Github To Analyze -->
+        <NuxtLink
+          class="flex gap-2 pr-5"
+          target="_blank"
+          :to="
+            IS_DEV
+              ? 'https://github.com/apps/neptun-github-app-dev'
+              : 'https://github.com/apps/neptun-github-app'
+          "
+          :external="true"
+        >
           <ShadcnButton
             variant="outline"
             size="sm"
             class="ml-auto gap-1.5 text-sm truncate"
-            disabled
           >
             Import Github Repository
             <Import class="size-4" />
-            <!-- Import Code Repository To Analyze -->
           </ShadcnButton>
-        </div>
+        </NuxtLink>
       </header>
       <Dashboard />
     </div>

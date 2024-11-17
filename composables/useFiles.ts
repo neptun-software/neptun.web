@@ -69,11 +69,10 @@ export const useFiles = () => {
       : null;
   });
   const selectedFileVersionMarkdown = computed(() => {
-    return `\`\`\`${selectedFileVersion.value?.language}${
-      selectedFileVersion.value?.title
+    return `\`\`\`${selectedFileVersion.value?.language}${selectedFileVersion.value?.title
         ? `:${selectedFileVersion.value?.title}`
         : ''
-    }\n${selectedFileVersion.value?.text}\n\`\`\``;
+      }\n${selectedFileVersion.value?.text}\n\`\`\``;
   });
   const versionsForSelectedFileType = computed(() => {
     return fetchedFiles.value.filter(
@@ -83,13 +82,12 @@ export const useFiles = () => {
 
   watch(selectedFileVersionId, () => {
     if (selectedFileVersion.value) {
-      fileNameOfFileToDownload.value = `${
-        selectedFileVersion.value?.title
+      fileNameOfFileToDownload.value = `${selectedFileVersion.value?.title
           ? `${selectedFileVersion.value?.title}-`
           : ''
-      }${new Date(
-        selectedFileVersion.value?.updated_at ?? Date.now()
-      ).getTime()}`;
+        }${new Date(
+          selectedFileVersion.value?.updated_at ?? Date.now()
+        ).getTime()}`;
     }
   });
 

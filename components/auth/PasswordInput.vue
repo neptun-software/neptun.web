@@ -32,7 +32,6 @@ const togglePasswordVisibility = () => {
       @input="onInput($event.target.value)"
     />
     <ShadcnButton
-      type="button"
       variant="link"
       size="icon"
       class="absolute top-0 right-0 flex items-center justify-center pr-3"

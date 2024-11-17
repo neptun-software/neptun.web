@@ -68,7 +68,7 @@ function updateInputFileValue() {
 const allowedToGoNext = ref(true);
 const doCreateFilesInGitRepository = ref(false);
 
-function generateConfigurationFiles() {
+async function generateConfigurationFiles() {
   toast.error('Coming Soon...');
 }
 </script>
@@ -210,21 +210,20 @@ function generateConfigurationFiles() {
     <div class="flex items-center gap-3">
       <ShadcnButton
         v-if="stepIndex !== 3"
-        type="button"
         :disabled="!canGoNext"
         size="sm"
         @click="allowedToGoNext && goNext()"
       >
         Next
       </ShadcnButton>
-      <ShadcnButton
+
+      <AsyncButton
         v-if="stepIndex === 3"
         size="sm"
-        type="button"
-        @click="generateConfigurationFiles"
+        :onClickAsync="generateConfigurationFiles"
       >
         Generate Configuration Files
-      </ShadcnButton>
+      </AsyncButton>
     </div>
   </div>
 </template>

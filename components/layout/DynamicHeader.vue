@@ -8,6 +8,13 @@ const props = defineProps<{
 
 const { loggedIn, user, clear } = useUserSession();
 const { headerNavigationElement } = useUiStore(); // don't bind using :ref (VNodeRef and not Element)!!!
+
+function handleSignOut(): (event: MouseEvent) => Promise<void> {
+  return async (_event: MouseEvent) => {
+    await clear();
+    await navigateTo('/home');
+  };
+}
 </script>
 
 <template>
@@ -21,11 +28,11 @@ const { headerNavigationElement } = useUiStore(); // don't bind using :ref (VNod
     >
       <AppLinks layout="navigation" />
       <div class="flex items-center gap-2">
-        <ShadcnButton
+        <AsyncButton
           v-if="loggedIn"
           variant="outline"
           class="truncate"
-          @click="clear().finally(async () => await navigateTo('/home'))"
+          :onClickAsync="handleSignOut()"
         >
           Sign Out
           <span class="hidden ml-1 lg:block"
@@ -34,9 +41,9 @@ const { headerNavigationElement } = useUiStore(); // don't bind using :ref (VNod
               user?.primary_email && user?.primary_email.length > 15
                 ? '...'
                 : ''
-            }}</span
-          >
-        </ShadcnButton>
+            }}
+          </span>
+        </AsyncButton>
         <ThemeToggle />
       </div>
     </nav>

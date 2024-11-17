@@ -3,7 +3,6 @@ import {
   Pen,
   Trash2,
   Search,
-  Loader2,
   Filter,
   FilterX,
   CalendarArrowUp,
@@ -214,18 +213,18 @@ const calculatedChatsListHeight = computed(() => {
               <ShadcnAlertDialogFooter>
                 <ShadcnAlertDialogCancel>Cancel</ShadcnAlertDialogCancel>
                 <ShadcnAlertDialogAction as-child>
-                  <ShadcnButton
-                    :disabled="
-                      fetchedChatsStatus === 'pending' ||
-                      filteredChats.length === 0
-                    "
+                  <AsyncButton
                     :variant="
                       batchDeleteSelectorIsActive ? 'destructive' : 'outline'
                     "
-                    @click="batchDeleteChats"
+                    :is-disabled="
+                      fetchedChatsStatus === 'pending' ||
+                      filteredChats.length === 0
+                    "
+                    :onClickAsync="batchDeleteChats"
                   >
                     Delete<Trash2 class="w-4 h-4 ml-1" />
-                  </ShadcnButton>
+                  </AsyncButton>
                 </ShadcnAlertDialogAction>
               </ShadcnAlertDialogFooter>
             </ShadcnAlertDialogContent>
@@ -259,10 +258,12 @@ const calculatedChatsListHeight = computed(() => {
             <Filter class="w-4 h-4 ml-1" />
           </template>
         </ShadcnButton>
-        <ShadcnButton
-          :disabled="fetchedChatsStatus === 'pending'"
+
+        <AsyncButton
           variant="outline"
-          @click="
+          :hide-loader="true"
+          :is-disabled="fetchedChatsStatus === 'pending'"
+          :onClickAsync="
             async () => {
               refreshAnimationIsActive = true;
               await fetchedChatsRefresh().then(() => {
@@ -274,7 +275,7 @@ const calculatedChatsListHeight = computed(() => {
           <!-- class="[&>*]:hover:animate-spin" -->
           Reload
           <RefreshIcon :animation-is-active="refreshAnimationIsActive" />
-        </ShadcnButton>
+        </AsyncButton>
       </div>
 
       <template v-if="filterVisible">
@@ -301,13 +302,14 @@ const calculatedChatsListHeight = computed(() => {
         </template>
       </fieldset>
 
-      <div
-        v-if="fetchedChatsStatus === 'pending'"
-        class="flex items-center justify-center gap-2 px-3 py-2 my-2 border border-blue-200 rounded-lg bg-background"
+      <InfoBlock
+        showLoader
+        showDots
+        :isVisible="fetchedChatsStatus === 'pending'"
+        class="my-2 mb-0"
       >
-        <Loader2 class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
-        <p class="flex-grow">Loading chats<LoadingDots /></p>
-      </div>
+        Loading chats
+      </InfoBlock>
     </div>
 
     <ShadcnScrollArea :style="{ height: calculatedChatsListHeight }">
@@ -339,12 +341,13 @@ const calculatedChatsListHeight = computed(() => {
                     @keydown.enter="saveEdit(chat.id, chat.name)"
                     @keydown.escape="chatToEdit.id = -1"
                   />
-                  <ShadcnButton
+
+                  <AsyncButton
                     variant="outline"
-                    @click="saveEdit(chat.id, chat.name)"
+                    :onClickAsync="() => saveEdit(chat.id, chat.name)"
                   >
                     Save
-                  </ShadcnButton>
+                  </AsyncButton>
                 </template>
                 <template v-else>
                   <ShadcnButton
@@ -356,6 +359,7 @@ const calculatedChatsListHeight = computed(() => {
                   >
                     {{ chat?.name }}
                   </ShadcnButton>
+
                   <ShadcnButton
                     variant="outline"
                     @click="editChat(chat.id, chat.name)"
@@ -390,12 +394,12 @@ const calculatedChatsListHeight = computed(() => {
                   <ShadcnAlertDialogFooter>
                     <ShadcnAlertDialogCancel>Cancel</ShadcnAlertDialogCancel>
                     <ShadcnAlertDialogAction as-child>
-                      <ShadcnButton
+                      <AsyncButton
                         variant="destructive"
-                        @click="deleteChat(chat?.id)"
+                        :onClickAsync="() => deleteChat(chat?.id)"
                       >
                         Delete<Trash2 class="w-4 h-4 ml-1" />
-                      </ShadcnButton>
+                      </AsyncButton>
                     </ShadcnAlertDialogAction>
                   </ShadcnAlertDialogFooter>
                 </ShadcnAlertDialogContent>

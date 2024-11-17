@@ -371,7 +371,6 @@ const canGoNext = computed(() => {
                 <div class="flex items-center gap-3">
                   <ShadcnButton
                     :disabled="!canGoNext"
-                    type="button"
                     size="sm"
                     @click="
                       stepIndex !== 3

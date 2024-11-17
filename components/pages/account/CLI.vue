@@ -58,17 +58,17 @@ async function downloadConfiguration() {
             <p class="text-red-500">Failed to fetch CLI configuration.</p>
           </template>
           <span class="absolute flex items-center gap-2 right-2 top-2">
-            <ShadcnButton
-              type="button"
+            <AsyncButton
               size="icon"
               variant="ghost"
-              :disabled="textForClipboard === ''"
-              @click="downloadConfiguration"
+              :hide-loader="true"
+              :is-disabled="textForClipboard === ''"
+              :onClickAsync="downloadConfiguration"
             >
               <Download class="size-6" />
-            </ShadcnButton>
+            </AsyncButton>
+
             <ShadcnButton
-              type="button"
               size="icon"
               variant="ghost"
               :disabled="textForClipboard === ''"

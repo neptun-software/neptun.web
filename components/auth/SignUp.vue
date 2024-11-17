@@ -102,19 +102,17 @@ async function signUp() {
                 </li>
               </ul>
             </div>
-            <ShadcnButton type="button" class="w-full" @click="signUp()">
+
+            <AsyncButton class="w-full" :onClickAsync="signUp">
               Create an account
-            </ShadcnButton>
+            </AsyncButton>
+
             <ShadcnSeparator label="or Oauth" class="my-2" />
+
             <div class="flex flex-col gap-1">
-              <ShadcnButton
-                type="button"
-                variant="outline"
-                class="w-full"
-                as-child
-              >
+              <ShadcnButton variant="outline" class="w-full" as-child>
+                <!-- needs to be a instead of NuxtLink, because it is not recognized by the Nuxt router, but does exist -->
                 <a href="/auth/google">
-                  <!-- needs to be a instead of NuxtLink, because it is not recognized by the Nuxt router, but does exist -->
                   Sign in/up with Google
                   <Icon
                     icon="devicon:google"
@@ -122,14 +120,9 @@ async function signUp() {
                   />
                 </a>
               </ShadcnButton>
-              <ShadcnButton
-                type="button"
-                variant="outline"
-                class="w-full"
-                as-child
-              >
+              <ShadcnButton variant="outline" class="w-full" as-child>
+                <!-- needs to be a instead of NuxtLink, because it is not recognized by the Nuxt router, but does exist -->
                 <a href="/auth/github">
-                  <!-- needs to be a instead of NuxtLink, because it is not recognized by the Nuxt router, but does exist -->
                   Sign in/up with GitHub
                   <Icon
                     icon="ant-design:github-filled"

@@ -9,6 +9,26 @@ definePageMeta({
 // defineOgImageComponent('NuxtSeo');
 
 const features = ['Docker files', 'docker-compose files', 'github-workflows'];
+
+/* const successOperation = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return { success: true };
+};
+
+const errorOperation = async () => {
+  await new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Operation failed')), 1000)
+  );
+};
+
+const longOperation = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+  return { success: true };
+};
+
+const handleError = (error: unknown) => {
+  console.error('Operation failed:', error);
+}; */
 </script>
 
 <template>
@@ -93,6 +113,20 @@ const features = ['Docker files', 'docker-compose files', 'github-workflows'];
       <Benefits />
       <Features />
     </SecondarySection>
+
+    <!-- <div class="space-y-4">
+      <AsyncButton :onClickAsync="successOperation" @error="handleError">
+        Success (2s)
+      </AsyncButton>
+
+      <AsyncButton :onClickAsync="errorOperation" @error="handleError">
+        Error (1s)
+      </AsyncButton>
+
+      <AsyncButton :onClickAsync="longOperation" @error="handleError">
+        Long Operation (5s)
+      </AsyncButton>
+    </div> -->
 
     <!-- <Cursor /> -->
     <!-- <SimpleCursor /> -->

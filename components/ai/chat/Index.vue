@@ -7,7 +7,6 @@ import {
   RefreshCcw,
   Trash2,
   Delete,
-  Loader2,
   Mouse,
   Download,
   Settings2,
@@ -213,7 +212,7 @@ async function loadChatMessages(user_id: number, chat_id: number) {
               id: `${String(id)}-${String(Date.now())}`,
               content: message,
               role: actor,
-            }) as Message
+            } as Message)
         );
 
         setChatMessages(messages);
@@ -395,18 +394,19 @@ async function downloadChatMessages(_event = null) {
             </ShadcnScrollArea>
           </ShadcnDialogContent>
         </ShadcnDialog>
-        <ShadcnButton
-          type="button"
+
+        <AsyncButton
           size="icon"
           variant="ghost"
-          :disabled="chatMessages.length === 0"
-          @click="downloadChatMessages"
+          :hide-loader="false"
+          :is-disabled="chatMessages.length === 0"
+          :onClickAsync="() => downloadChatMessages()"
         >
           <Download class="size-6" />
-        </ShadcnButton>
+        </AsyncButton>
+
         <AiChatShareDialog />
         <ShadcnButton
-          type="button"
           size="icon"
           variant="ghost"
           :disabled="chatMessages.length === 0 || chatResponseIsLoading"
@@ -444,23 +444,19 @@ async function downloadChatMessages(_event = null) {
           </div>
         </div>
 
-        <!-- NOTE: v-if is server-side and v-show client-side -->
-        <div
-          v-show="chatResponseIsLoading"
-          class="flex items-center justify-center gap-2 px-3 py-2 mb-2 border border-blue-200 rounded-lg bg-background"
-        >
-          <Loader2 class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
-          <p class="flex-grow">Waiting for response<LoadingDots /></p>
-        </div>
+        <InfoBlock showLoader showDots :isVisible="chatResponseIsLoading">
+          Waiting for response
+        </InfoBlock>
 
         <div
           v-if="chatError"
           class="flex flex-wrap items-center w-full p-4 mt-8 font-black uppercase border-2 rounded-md text-ellipsis border-destructive"
         >
           <p class="flex-grow">Something went wrong!</p>
-          <ShadcnButton variant="outline" @click="reloadLast">
+
+          <AsyncButton variant="outline" :onClickAsync="() => reloadLast()">
             Try again
-          </ShadcnButton>
+          </AsyncButton>
         </div>
       </ShadcnScrollArea>
     </div>
@@ -481,12 +477,7 @@ async function downloadChatMessages(_event = null) {
         <ShadcnTooltipProvider>
           <ShadcnTooltip>
             <ShadcnTooltipTrigger as-child>
-              <ShadcnButton
-                type="button"
-                variant="ghost"
-                size="icon"
-                @click="openFile"
-              >
+              <ShadcnButton variant="ghost" size="icon" @click="openFile">
                 <Paperclip class="size-4" />
                 <span class="sr-only">Attach file</span>
               </ShadcnButton>
@@ -499,7 +490,7 @@ async function downloadChatMessages(_event = null) {
             <ShadcnPopover>
               <ShadcnPopoverTrigger as-child>
                 <ShadcnTooltipTrigger as-child>
-                  <ShadcnButton type="button" variant="ghost" size="icon">
+                  <ShadcnButton variant="ghost" size="icon">
                     <Link class="size-4" />
                     <span class="sr-only">URL context</span>
                   </ShadcnButton>
@@ -520,22 +511,21 @@ async function downloadChatMessages(_event = null) {
                     required
                   />
                 </div>
-                <ShadcnButton
-                  :disabled="urlToFetchHtmlFrom.trim() === ''"
-                  type="button"
+
+                <AsyncButton
                   variant="outline"
                   class="w-full"
-                  @click="async () => await generateMarkdown()"
+                  :is-disabled="urlToFetchHtmlFrom.trim() === ''"
+                  :onClickAsync="async () => await generateMarkdown()"
                 >
                   Add URL for further context
-                </ShadcnButton>
+                </AsyncButton>
               </ShadcnPopoverContent>
             </ShadcnPopover>
           </ShadcnTooltip>
           <ShadcnTooltip v-if="isSpeechRecognitionSupported">
             <ShadcnTooltipTrigger as-child>
               <ShadcnButton
-                type="button"
                 variant="ghost"
                 size="icon"
                 :class="{
@@ -567,7 +557,6 @@ async function downloadChatMessages(_event = null) {
               <ShadcnAlertDialogTrigger as-child>
                 <ShadcnTooltipTrigger as-child>
                   <ShadcnButton
-                    type="button"
                     variant="ghost"
                     size="icon"
                     :disabled="
@@ -602,16 +591,17 @@ async function downloadChatMessages(_event = null) {
           </ShadcnTooltip>
           <ShadcnTooltip>
             <ShadcnTooltipTrigger as-child>
-              <ShadcnButton
-                type="button"
+              <AsyncButton
                 variant="ghost"
                 size="icon"
-                :disabled="chatResponseIsLoading || chatMessages.length === 0"
-                @click="reloadLast"
+                :is-disabled="
+                  chatResponseIsLoading || chatMessages.length === 0
+                "
+                :onClickAsync="() => reloadLast()"
               >
                 <RefreshCcw class="size-4" />
                 <span class="sr-only">Refresh Last Response</span>
-              </ShadcnButton>
+              </AsyncButton>
             </ShadcnTooltipTrigger>
             <ShadcnTooltipContent side="top">
               Refresh (needed if ai is stuck)
@@ -623,7 +613,6 @@ async function downloadChatMessages(_event = null) {
             <ShadcnTooltip>
               <ShadcnTooltipTrigger as-child>
                 <ShadcnButton
-                  type="button"
                   variant="outline"
                   size="icon"
                   class="px-2"

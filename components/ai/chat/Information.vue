@@ -174,16 +174,13 @@ const colorMode = useColorMode();
 
                     <ShadcnDialogFooter>
                       <ShadcnButton
-                        type="button"
                         variant="secondary"
                         @click="downloadFile(fileToCompareTo)"
                       >
                         Download modified file
                       </ShadcnButton>
                       <ShadcnDialogClose as-child>
-                        <ShadcnButton type="button" variant="secondary">
-                          Close
-                        </ShadcnButton>
+                        <ShadcnButton variant="secondary"> Close </ShadcnButton>
                       </ShadcnDialogClose>
                     </ShadcnDialogFooter>
                   </ShadcnDialogContent>

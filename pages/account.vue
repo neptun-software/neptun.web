@@ -41,8 +41,8 @@ const deleteAccount = async () => {
   });
 };
 
-const signOut = () => {
-  clear().then(() => {
+const signOut = async () => {
+  await clear().then(() => {
     navigateTo('/home');
   });
 };
@@ -72,14 +72,14 @@ definePageMeta({
                 :placeholder="session?.user?.primary_email"
                 required
               />
-              <ShadcnButton
+
+              <AsyncButton
                 v-if="loggedIn"
-                type="button"
-                :disabled="!emailIsNew || updatedUser.email?.trim() === ''"
-                @click="updateAccount"
+                :is-disabled="!emailIsNew || updatedUser.email?.trim() === ''"
+                :onClickAsync="updateAccount"
               >
                 Update
-              </ShadcnButton>
+              </AsyncButton>
             </div>
           </div>
           <div>
@@ -102,18 +102,18 @@ definePageMeta({
                 placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
                 required
               />
-              <ShadcnButton
+
+              <AsyncButton
                 v-if="loggedIn"
-                type="button"
-                :disabled="
+                :is-disabled="
                   updatedUser.password?.trim() === '' ||
                   updatedUser.confirmPassword?.trim() === '' ||
                   updatedUser.password !== updatedUser.confirmPassword
                 "
-                @click="updateAccount"
+                :onClickAsync="updateAccount"
               >
                 Update
-              </ShadcnButton>
+              </AsyncButton>
             </div>
           </div>
         </div>
@@ -122,19 +122,14 @@ definePageMeta({
           <b>Debug:</b> {{ session }}
         </DevOnly> -->
         <ShadcnSeparator class="h-1 my-2" />
-        <ShadcnButton
-          v-if="loggedIn"
-          class="mr-1"
-          type="button"
-          @click="signOut"
-        >
+
+        <AsyncButton v-if="loggedIn" class="mr-1" :onClickAsync="signOut">
           Logout
-        </ShadcnButton>
+        </AsyncButton>
+
         <ShadcnAlertDialog v-if="loggedIn">
           <ShadcnAlertDialogTrigger as-child>
-            <ShadcnButton type="button" variant="destructive">
-              Delete
-            </ShadcnButton>
+            <ShadcnButton variant="destructive"> Delete </ShadcnButton>
           </ShadcnAlertDialogTrigger>
           <ShadcnAlertDialogContent>
             <ShadcnAlertDialogHeader>
@@ -149,13 +144,12 @@ definePageMeta({
             <ShadcnAlertDialogFooter>
               <ShadcnAlertDialogCancel>Cancel</ShadcnAlertDialogCancel>
               <ShadcnAlertDialogAction as-child>
-                <ShadcnButton
-                  type="button"
+                <AsyncButton
                   variant="destructive"
-                  @click="deleteAccount"
+                  :onClickAsync="deleteAccount"
                 >
                   Delete
-                </ShadcnButton>
+                </AsyncButton>
               </ShadcnAlertDialogAction>
             </ShadcnAlertDialogFooter>
           </ShadcnAlertDialogContent>
@@ -164,7 +158,7 @@ definePageMeta({
       <template #placeholder>
         <ShadcnButton disabled>
           <Loader2 class="w-4 h-4 mr-2 animate-spin" />
-          Loading Account Data...
+          Loading Account Data!
         </ShadcnButton>
       </template>
     </AuthState>

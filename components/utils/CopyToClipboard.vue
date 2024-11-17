@@ -31,7 +31,7 @@ const {
     <ShadcnButton
       :variant="variant ?? 'link'"
       size="icon"
-      :disabled="!isClipboardSupported || text.trim() === ''"
+      :disabled="!isClipboardSupported || text.trim() === '' || isCopied"
       @click="copyToClipboard(source)"
     >
       <template v-if="isCopied">

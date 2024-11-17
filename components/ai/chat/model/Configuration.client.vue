@@ -102,11 +102,11 @@ watch(
               }
             "
           />
-          <ShadcnButton
-            :disabled="!selectedAiChatIsPlayground"
-            type="button"
+
+          <AsyncButton
             variant="secondary"
-            @click="
+            :is-disabled="!selectedAiChatIsPlayground"
+            :onClickAsync="
               async () => {
                 selectedAiChat.id =
                   (await persistChatConversation(
@@ -118,11 +118,11 @@ watch(
             "
           >
             Persist Chat History
-          </ShadcnButton>
+          </AsyncButton>
         </div>
+
         <ShadcnButton
           :disabled="selectedAiChatIsPlayground"
-          type="button"
           variant="secondary"
           @click="() => resetAiPlaygroundChat()"
         >

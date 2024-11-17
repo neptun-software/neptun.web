@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { Message } from 'ai';
-import { Loader2 } from 'lucide-vue-next';
 import type { FetchError } from 'ofetch';
 import type { AsyncDataRequestStatus } from '#app';
 
@@ -97,7 +96,7 @@ const chatMessages = computed(() => {
           id: `${String(id)}-${String(Date.now())}`,
           content: message,
           role: actor,
-        }) as Message
+        } as Message)
     ) || []
   );
 });
@@ -113,13 +112,9 @@ useHead({
 
 <template>
   <div class="relative p-4">
-    <div
-      v-show="status === 'pending'"
-      class="flex items-center justify-center gap-2 px-3 py-2 mb-2 border border-blue-200 rounded-lg bg-background"
-    >
-      <Loader2 class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
-      <p class="flex-grow">Loading chat share<LoadingDots /></p>
-    </div>
+    <InfoBlock showLoader showDots :isVisible="status === 'pending'">
+      Loading chat share
+    </InfoBlock>
 
     <template v-if="error">
       <p class="text-center">
@@ -141,7 +136,7 @@ useHead({
                 type="password"
                 placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
               />
-              <ShadcnButton @click="execute"> Submit </ShadcnButton>
+              <AsyncButton :onClickAsync="execute"> Submit </AsyncButton>
             </div>
           </template>
           <template v-if="error?.data?.data?.shareInfo?.shareHasWhitelist">
@@ -172,14 +167,13 @@ useHead({
       </ShadcnScrollArea>
     </div>
 
-    <ShadcnButton
-      v-if="status === 'success'"
+    <AsyncButton
       class="sticky mx-auto mt-2 transform -translate-x-1/2 bottom-2 left-1/2"
-      :disabled="chatMessages.length === 0"
-      @click="execute"
+      :onClickAsync="execute"
+      :is-disabled="chatMessages.length === 0"
     >
       Refresh Chat
-    </ShadcnButton>
+    </AsyncButton>
   </div>
 </template>
 

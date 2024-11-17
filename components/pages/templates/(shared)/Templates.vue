@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import type { BundledLanguage } from 'shiki';
 import type { TemplateData } from '~/lib/(templates)/templates';
-import { Loader2 } from 'lucide-vue-next';
-import { downloadTemplateZip } from './functions';
+import { downloadTemplateHandler } from './functions';
 
 defineProps<{
   templates: TemplateData[];
@@ -12,13 +11,9 @@ defineProps<{
 
 <template>
   <div>
-    <div
-      v-if="isLoading"
-      class="flex items-center justify-center gap-2 px-3 py-2 mt-2 border border-blue-200 rounded-lg bg-background"
-    >
-      <Loader2 class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
-      <p class="flex-grow">Loading templates<LoadingDots /></p>
-    </div>
+    <InfoBlock showLoader showDots :isVisible="isLoading" class="mt-0 mb-2">
+      Loading templates
+    </InfoBlock>
 
     <div
       v-if="templates.length > 0"
@@ -33,9 +28,10 @@ defineProps<{
           <h3 class="text-lg font-bold">
             {{ template.name }}
           </h3>
-          <ShadcnButton @click="downloadTemplateZip(template)">
+
+          <AsyncButton :onClickAsync="downloadTemplateHandler(template)">
             download
-          </ShadcnButton>
+          </AsyncButton>
         </div>
 
         <div v-if="template.readme" class="border rounded-md">

@@ -23,13 +23,14 @@ const handleError = () => clearError({ redirect: '/home' });
         <p class="text-4xl font-medium text-center text-slate-200">
           {{ error?.message }}
         </p>
-        <ShadcnButton
+
+        <AsyncButton
           class="max-w-full mt-4 w-fit"
           variant="secondary"
-          @click="handleError"
+          :onClickAsync="handleError"
         >
           Home
-        </ShadcnButton>
+        </AsyncButton>
       </div>
     </div>
   </NuxtLayout>

@@ -46,7 +46,10 @@ const validateTag = async (event: KeyboardEvent) => {
   }
 };
 
+const isSubmitting = ref(false);
 const onSubmit = handleSubmit(async (values) => {
+  isSubmitting.value = true;
+
   if (
     !formValues.is_unprotected &&
     (!values.password || values.password?.length === 0) &&
@@ -68,6 +71,8 @@ const onSubmit = handleSubmit(async (values) => {
       'email_whitelist',
       'Both fields cannot be empty when the chat is not unprotected. Please set a password or add at least one email to the whitelist.'
     );
+
+    isSubmitting.value = false;
 
     return;
   }
@@ -134,6 +139,8 @@ const onSubmit = handleSubmit(async (values) => {
   }
 
   refresh();
+
+  isSubmitting.value = false;
 });
 
 const { data, status, error, refresh } = useFetch(
@@ -154,7 +161,6 @@ const url = computed(() => {
       <ShadcnDialog>
         <ShadcnDialogTrigger as-child>
           <ShadcnButton
-            type="button"
             size="icon"
             variant="ghost"
             :disabled="selectedAiChatIsPlayground"
@@ -267,13 +273,11 @@ const url = computed(() => {
             </template>
 
             <ShadcnDialogFooter class="flex gap-2">
-              <ShadcnButton type="submit">
+              <ShadcnButton type="submit" :disabled="isSubmitting">
                 Publish with the configured settings
               </ShadcnButton>
               <ShadcnDialogClose as-child>
-                <ShadcnButton type="button" variant="secondary">
-                  Close
-                </ShadcnButton>
+                <ShadcnButton variant="secondary"> Close </ShadcnButton>
               </ShadcnDialogClose>
             </ShadcnDialogFooter>
           </form>
@@ -289,9 +293,13 @@ const url = computed(() => {
             class="flex items-center justify-between gap-2 py-1 pl-2 pr-1 border rounded-sm border-destructive"
           >
             Failed to check if chat is published.<br />
-            <ShadcnButton type="button" variant="destructive" @click="refresh">
+
+            <AsyncButton
+              variant="secondary"
+              :onClickAsync="(_event: MouseEvent) => refresh()"
+            >
               Retry
-            </ShadcnButton>
+            </AsyncButton>
           </div>
         </ShadcnDialogContent>
       </ShadcnDialog>
