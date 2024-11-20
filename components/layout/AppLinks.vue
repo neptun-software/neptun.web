@@ -14,7 +14,7 @@ const hiddenRoutesIfLoggedIn = hiddenRoutes.concat(['/log-in', '/sign-up']);
 const hiddenRoutesIfLoggedOut = hiddenRoutes.concat([
   '/',
   '/account',
-  '/guide',
+  '/project',
 ]);
 
 const visibleRoutes = computed(() => {
@@ -69,17 +69,21 @@ const isNavigationLayout = computed(() => props.layout === 'navigation');
     <!-- Desktop Navigation (also displayed in footer on mobile) -->
     <ul
       v-else
-      class="flex items-center gap-2"
+      class="flex flex-wrap items-center justify-center gap-2"
       :class="isNavigationLayout ? 'navigation' : 'default'"
     >
       <li v-for="route in sortedRoutes" :key="route.path">
         <NuxtLink
           v-if="isNavigationLayout && route.path === '/home'"
-          class="font-bold"
+          class="flex items-center font-bold text-nowrap"
           :to="route.path"
         >
-          <ShadcnAvatar>
-            <ShadcnAvatarImage src="/favicon.png" alt="Neptun Logo" />
+          <ShadcnAvatar class="w-14 h-14">
+            <ShadcnAvatarImage
+              class="object-contain"
+              src="/favicon.png"
+              alt="Neptun Logo"
+            />
             <ShadcnAvatarFallback>Home</ShadcnAvatarFallback>
           </ShadcnAvatar>
         </NuxtLink>
