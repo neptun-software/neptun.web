@@ -4,13 +4,10 @@ services:
   website:
     build:
       context: .
-      dockerfile: ./Dockerfile.dev
+      dockerfile: ./Dockerfile.prod
     ports:
       - '42124:42124'
       - '24678:24678'
-    volumes:
-      - .:/src
-      - node_modules:/src/node_modules
   postgres:
     image: postgres:16.4
     restart: unless-stopped
@@ -36,6 +33,4 @@ volumes:
   neptun_postgres_data:
     driver: local
   neptun_redis_data:
-    driver: local
-  node_modules:
     driver: local

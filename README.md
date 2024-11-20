@@ -53,6 +53,22 @@ Email Address []:neptunai.contact@gmail.com
 - SSL needed for mobile, if `--https` is set. (else `ERR_SSL_PROTOCOL_ERROR`).
 - Oauth doesn't work using https in development mode. (causes `ERR_EMPTY_RESPONSE`).
 
+### Docker
+
+```bash
+docker build -t neptun -f ./configurations/development/Dockerfile.dev .
+```
+
+```bash
+docker run --rm -it -p 42124:42124 --env-file .env --name neptun neptun
+```
+
+or
+
+```bash
+docker compose -f ./configurations/production/docker-compose.yml -f ./configurations/development/docker-compose.yml up --build
+```
+
 ## Production
 
 ```bash
@@ -63,4 +79,20 @@ Locally preview production build:
 
 ```bash
 pnpm run preview
+```
+
+### Docker
+
+```bash
+docker build -t neptun -f ./configurations/production/Dockerfile.prod .
+```
+
+```bash
+docker run --rm -it -p 42124:42124 --env-file .env --name neptun neptun
+```
+
+or
+
+```bash
+docker compose up --build
 ```

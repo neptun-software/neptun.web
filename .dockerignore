@@ -1,0 +1,12 @@
+.nuxt
+.output
+.vscode
+
+data
+info
+node_modules
+
+.gitignore
+
+README.md
+configurations
