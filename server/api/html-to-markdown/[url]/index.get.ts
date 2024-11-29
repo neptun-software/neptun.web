@@ -2,7 +2,6 @@ import rehypeParse from 'rehype-parse'; // parse HTML
 import rehypeRemark from 'rehype-remark'; // HTML => Markdown
 import remarkGfm from 'remark-gfm'; // support for GitHub Flavored Markdown
 import remarkStringify from 'remark-stringify'; // stringify Markdown
-import { fetch } from 'undici';
 import { unified } from 'unified'; // HTML and Markdown Utilities
 
 export default defineCachedEventHandler(async (event) => {
