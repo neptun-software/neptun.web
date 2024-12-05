@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 const MIN_LENGTH = 8;
+const MAX_LENGTH = 256;
 const FIELD_VALIDATION = {
   TEST: {
     SPECIAL_CHAR: (value: string) =>
@@ -11,6 +12,7 @@ const FIELD_VALIDATION = {
   },
   MSG: {
     MIN_LEN: `Password must have ${MIN_LENGTH} characters`,
+    MAX_LEN: `Password must have ${MAX_LENGTH} characters or less`,
     SPECIAL_CHAR: 'Password must contain at least one special character',
     LOWERCASE: 'Password must contain at least one lowercase letter',
     UPPERCASE: 'Password must contain at least one uppercase letter',
@@ -23,6 +25,9 @@ export const patterns = z
   .string()
   .min(MIN_LENGTH, {
     message: FIELD_VALIDATION.MSG.MIN_LEN,
+  })
+  .max(MAX_LENGTH, {
+    message: FIELD_VALIDATION.MSG.MAX_LEN,
   })
   .refine(FIELD_VALIDATION.TEST.SPECIAL_CHAR, FIELD_VALIDATION.MSG.SPECIAL_CHAR)
   .refine(FIELD_VALIDATION.TEST.LOWERCASE, FIELD_VALIDATION.MSG.LOWERCASE)
