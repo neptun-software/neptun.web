@@ -25,7 +25,9 @@
     "db:pull": "drizzle-kit introspect --config drizzle.config.ts",
     "db:generate": "drizzle-kit generate --dialect postgresql --schema ./lib/types/database.tables/schema.ts --out=./server/database/migrations",
     "db:migrate": "bun run ./server/utils/migrate.ts",
-    "db:studio": "drizzle-kit studio --config drizzle.config.ts --host 127.0.0.1"
+    "db:studio": "drizzle-kit studio --config drizzle.config.ts --host 127.0.0.1",
+    "db:dump-data": "bun run ./server/utils/backup.ts",
+    "db:dump-schema": "bun run ./server/utils/backup.ts --schema-only"
   },
   "dependencies": {
     "@ai-sdk/vue": "^0.0.58",
