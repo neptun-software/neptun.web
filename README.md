@@ -69,6 +69,38 @@ or
 docker compose -f ./configurations/production/docker-compose.yml -f ./configurations/development/docker-compose.yml up --build
 ```
 
+### Schema
+
+#### Exporting
+
+```bash
+bun run db:dump-schema
+```
+
+#### ERD
+
+[drawio.com](https://www.drawio.com/blog/diagrams-from-code) allows you to import sql, but you have to connect the tables yourself, which is too much work imo.  
+That is why I wrote 3 scripts. One for generating a database schema sql-dump, one to generate a mermaid ERD from that SQL and one to generate a mermaid png-diagram from that ERD.
+
+```bash
+sudo apt-get update
+sudo apt-get install -y postgresql-client-16
+```
+
+```bash
+bun run db:dump-schema
+```
+
+```bash
+bun run db:mermaid
+```
+
+```bash
+bun run db:png
+```
+
+![ERD](backup/schema/2024-12-09T18-48-00-180Z.png)
+
 ## Production
 
 ```bash
