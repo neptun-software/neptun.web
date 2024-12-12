@@ -17,6 +17,19 @@
     }
   ],
   "paths": {
+    "": {
+      "get": {
+        "tags": [
+          "App Routes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/ai/huggingface/{model_publisher}/{model_name}/chat": {
       "get": {
         "tags": [
@@ -780,7 +793,7 @@
         }
       }
     },
-    "/_nitro/openapi.json": {
+    "/_openapi.json": {
       "get": {
         "tags": [
           "Internal"
@@ -793,7 +806,7 @@
         }
       }
     },
-    "/_nitro/scalar": {
+    "/_scalar": {
       "get": {
         "tags": [
           "Internal"
@@ -806,7 +819,7 @@
         }
       }
     },
-    "/_nitro/swagger": {
+    "/_swagger": {
       "get": {
         "tags": [
           "Internal"
