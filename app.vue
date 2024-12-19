@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ConfigProvider } from 'radix-vue';
+import { ConfigProvider } from 'radix-vue'
 
-const router = useRouter();
-const currentRouteName = computed(() => router.currentRoute.value.name);
+const router = useRouter()
+const currentRouteName = computed(() => router.currentRoute.value.name)
 </script>
 
 <template>

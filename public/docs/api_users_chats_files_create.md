@@ -16,18 +16,18 @@ POST
 
 ### Route Parameters
 
-| Parameter   | Type   | Required | Description                              |
-|------------|--------|----------|------------------------------------------|
-| user_id    | string | Yes      | Unique identifier of the user           |
-| chat_id    | number | Yes      | Unique identifier of the chat           |
-| message_id | number | Yes      | Unique identifier of the message        |
+| Parameter  | Type   | Required | Description                      |
+| ---------- | ------ | -------- | -------------------------------- |
+| user_id    | string | Yes      | Unique identifier of the user    |
+| chat_id    | number | Yes      | Unique identifier of the chat    |
+| message_id | number | Yes      | Unique identifier of the message |
 
 ### Headers
 
-| Header         | Value            | Required | Description                          |
-|----------------|------------------|----------|--------------------------------------|
-| Content-Type   | application/json | Yes      | Indicates JSON request body         |
-| Cookie         | neptun-session   | Yes      | Session authentication cookie       |
+| Header       | Value            | Required | Description                   |
+| ------------ | ---------------- | -------- | ----------------------------- |
+| Content-Type | application/json | Yes      | Indicates JSON request body   |
+| Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -39,18 +39,18 @@ The endpoint accepts two types of request bodies:
 
 #### Single File Upload
 
-| Field     | Type   | Required | Description                    |
-|-----------|--------|----------|--------------------------------|
-| text      | string | Yes      | Content of the file           |
-| title     | string | Yes      | Title/name of the file        |
-| language  | string | Yes      | Programming language          |
-| extension | string | Yes      | File extension                |
+| Field     | Type   | Required | Description            |
+| --------- | ------ | -------- | ---------------------- |
+| text      | string | Yes      | Content of the file    |
+| title     | string | Yes      | Title/name of the file |
+| language  | string | Yes      | Programming language   |
+| extension | string | Yes      | File extension         |
 
 #### Multiple Files Upload
 
-| Field | Type           | Required | Description                    |
-|-------|----------------|----------|--------------------------------|
-| files | FileInput[]    | Yes      | Array of file objects         |
+| Field | Type        | Required | Description           |
+| ----- | ----------- | -------- | --------------------- |
+| files | FileInput[] | Yes      | Array of file objects |
 
 Where FileInput contains:
 
@@ -122,41 +122,41 @@ Where FileInput contains:
 
 ```typescript
 interface FileInput {
-  text: string;
-  title: string;
-  language: string;
-  extension: string;
+  text: string
+  title: string
+  language: string
+  extension: string
 }
 
 interface SingleFileRequest {
-  text: string;
-  title: string;
-  language: string;
-  extension: string;
+  text: string
+  title: string
+  language: string
+  extension: string
 }
 
 interface MultipleFilesRequest {
-  files: FileInput[];
+  files: FileInput[]
 }
 
 interface ChatFile {
-  id: number;
-  chat_conversation_id: number;
-  chat_conversation_message_id: number;
-  neptun_user_id: string;
-  title: string;
-  text: string;
-  language: string;
-  extension: string;
-  created_at: string;
+  id: number
+  chat_conversation_id: number
+  chat_conversation_message_id: number
+  neptun_user_id: string
+  title: string
+  text: string
+  language: string
+  extension: string
+  created_at: string
 }
 
 interface SingleFileResponse {
-  chatFile: ChatFile;
+  chatFile: ChatFile
 }
 
 interface MultipleFilesResponse {
-  chatFiles: ChatFile[];
+  chatFiles: ChatFile[]
 }
 ```
 
@@ -237,13 +237,13 @@ curl -X POST \
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Files successfully created                         |
-| 400         | Invalid request body                              |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | Chat, message, or user not found                  |
-| 500         | Server error                                      |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Files successfully created                |
+| 400         | Invalid request body                      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat, message, or user not found          |
+| 500         | Server error                              |
 
 ## Notes
 

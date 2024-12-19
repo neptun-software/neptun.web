@@ -1,17 +1,7 @@
 <script lang="ts" setup>
-import {
-  FlexRender,
-  type ColumnFiltersState,
-  getFilteredRowModel,
-  getCoreRowModel,
-  useVueTable,
-  type ColumnDef,
-  getSortedRowModel,
-  type SortingState,
-} from '@tanstack/vue-table';
-import { toast } from 'vue-sonner';
-import { CaretSortIcon } from '@radix-icons/vue';
-import type { Import } from './imports/types';
+import type { Import } from './imports/types'
+import { NuxtImg } from '#components'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -19,17 +9,27 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { NuxtImg } from '#components';
-import Button from '~/components/ui/button/Button.vue';
-import { Input } from '@/components/ui/input';
-import { valueUpdater } from '~/lib/utils';
+} from '@/components/ui/table'
+import { CaretSortIcon } from '@radix-icons/vue'
+import {
+  type ColumnDef,
+  type ColumnFiltersState,
+  FlexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  type SortingState,
+  useVueTable,
+} from '@tanstack/vue-table'
+import { toast } from 'vue-sonner'
+import Button from '~/components/ui/button/Button.vue'
+import { valueUpdater } from '~/lib/utils'
 
-const { user } = useUserSession();
+const { user } = useUserSession()
 
 const { data, error } = await useFetch(
-  `/api/users/${user.value?.id ?? -1}/installations`
-);
+  `/api/users/${user.value?.id ?? -1}/installations`,
+)
 
 /* const data = ref<Installation[]>([
   {
@@ -52,17 +52,17 @@ const { data, error } = await useFetch(
   },
 ]); */
 
-const sorting = ref<SortingState>([]);
-const columnFilters = ref<ColumnFiltersState>([]);
+const sorting = ref<SortingState>([])
+const columnFilters = ref<ColumnFiltersState>([])
 
-type Installation = {
-  id: number;
-  github_account_name: string;
-  github_account_type: string;
-  github_account_avatar_url: string;
-  created_at: string;
-  updated_at: string;
-};
+interface Installation {
+  id: number
+  github_account_name: string
+  github_account_type: string
+  github_account_avatar_url: string
+  created_at: string
+  updated_at: string
+}
 
 const columns: ColumnDef<Installation>[] = [
   {
@@ -90,8 +90,8 @@ const columns: ColumnDef<Installation>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Account Name', h(CaretSortIcon, { class: 'ml-2 h-4 w-4' })]
-      );
+        () => ['Account Name', h(CaretSortIcon, { class: 'ml-2 h-4 w-4' })],
+      )
     },
     cell: ({ row }) =>
       h('div', { class: 'lowercase' }, row.getValue('github_account_name')),
@@ -121,62 +121,66 @@ const columns: ColumnDef<Installation>[] = [
           size: 'sm',
           onClick: () => {
             toast.error(
-              `Coming Soon... Deleting installation ${row.original.id}...`
-            );
+              `Coming Soon... Deleting installation ${row.original.id}...`,
+            )
           },
         },
-        () => 'Delete'
+        () => 'Delete',
       ),
   },
-];
+]
 
 const table = useVueTable({
   get data() {
-    return (data.value as Installation[]) || [];
+    return (data.value as Installation[]) || []
   },
   columns,
   getCoreRowModel: getCoreRowModel(),
 
   getSortedRowModel: getSortedRowModel(),
-  onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
+  onSortingChange: updaterOrValue => valueUpdater(updaterOrValue, sorting),
 
   onColumnFiltersChange: (updaterOrValue) => {
-    return valueUpdater(updaterOrValue, columnFilters);
+    return valueUpdater(updaterOrValue, columnFilters)
   },
   getFilteredRowModel: getFilteredRowModel(),
   state: {
     get sorting() {
-      return sorting.value;
+      return sorting.value
     },
     get columnFilters() {
-      return columnFilters.value;
+      return columnFilters.value
     },
   },
-});
+})
 
-const selectedInstallationId = useSelectedInstallation();
-const resolvedImports = ref<Import[] | null>(null);
+const selectedInstallationId = useSelectedInstallation()
+const resolvedImports = ref<Import[] | null>(null)
 
 watch(selectedInstallationId, async (newValue) => {
   if (newValue !== -1) {
     try {
       resolvedImports.value = await $fetch<Import[]>(
-        `/api/users/${user.value?.id ?? -1}/installations/${newValue}/imports`
-      );
-    } catch (error) {
-      console.error('Failed to fetch imports:', error);
-      resolvedImports.value = null;
+        `/api/users/${user.value?.id ?? -1}/installations/${newValue}/imports`,
+      )
     }
-  } else {
-    resolvedImports.value = null;
+    catch (error) {
+      console.error('Failed to fetch imports:', error)
+      resolvedImports.value = null
+    }
   }
-});
+  else {
+    resolvedImports.value = null
+  }
+})
 </script>
 
 <template>
   <div class="overflow-hidden">
     <div v-if="error">
-      <p class="text-red-500">Failed to fetch imports.</p>
+      <p class="text-red-500">
+        Failed to fetch imports.
+      </p>
     </div>
     <div v-else>
       <template v-if="selectedInstallationId === -1">

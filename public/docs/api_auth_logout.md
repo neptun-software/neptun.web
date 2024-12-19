@@ -16,9 +16,9 @@ POST
 
 ### Headers
 
-| Header         | Value            | Required | Description                          |
-|----------------|------------------|----------|--------------------------------------|
-| Cookie         | auth_session=xyz | Yes      | Authentication session cookie        |
+| Header | Value            | Required | Description                   |
+| ------ | ---------------- | -------- | ----------------------------- |
+| Cookie | auth_session=xyz | Yes      | Authentication session cookie |
 
 ### Query Parameters
 
@@ -52,7 +52,7 @@ false
 
 ```typescript
 interface LogoutResponse {
-  success: boolean;
+  success: boolean
 }
 ```
 
@@ -108,27 +108,28 @@ async function logout(): Promise<boolean> {
         method: 'POST',
         credentials: 'include', // Important for cookie handling
       }
-    );
+    )
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    return await response.json();
-  } catch (error) {
-    console.error('Logout failed:', error);
-    return false;
+    return await response.json()
+  }
+  catch (error) {
+    console.error('Logout failed:', error)
+    return false
   }
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Request processed successfully                     |
-| 401         | No valid session cookie provided                   |
-| 500         | Server error occurred during session clearing      |
+| Status Code | Description                                   |
+| ----------- | --------------------------------------------- |
+| 200         | Request processed successfully                |
+| 401         | No valid session cookie provided              |
+| 500         | Server error occurred during session clearing |
 
 ## Notes
 

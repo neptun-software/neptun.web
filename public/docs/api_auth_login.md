@@ -16,9 +16,9 @@ POST
 
 ### Headers
 
-| Header        | Value            | Required | Description                    |
-|---------------|------------------|----------|--------------------------------|
-| Content-Type  | application/json | Yes      | Indicates JSON request body    |
+| Header       | Value            | Required | Description                 |
+| ------------ | ---------------- | -------- | --------------------------- |
+| Content-Type | application/json | Yes      | Indicates JSON request body |
 
 ### Query Parameters
 
@@ -26,25 +26,25 @@ No query parameters required.
 
 ### Request Body
 
-| Field    | Type   | Required | Description                          | Constraints                    |
-|----------|--------|----------|--------------------------------------|--------------------------------|
-| email    | string | Yes      | User's email address                | Must be a valid email format   |
-| password | string | Yes      | User's password                     | Non-empty string               |
+| Field    | Type   | Required | Description          | Constraints                  |
+| -------- | ------ | -------- | -------------------- | ---------------------------- |
+| email    | string | Yes      | User's email address | Must be a valid email format |
+| password | string | Yes      | User's password      | Non-empty string             |
 
 #### TypeScript Interface
 
 ```typescript
 interface LoginRequest {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
 interface LoginResponse {
   user: {
-    id: string;
-    primary_email: string;
-  };
-  loggedInAt: string;
+    id: string
+    primary_email: string
+  }
+  loggedInAt: string
 }
 ```
 
@@ -171,20 +171,20 @@ async function login(email: string, password: string): Promise<LoginResponse> {
       }),
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as LoginResponse;
+  return await response.json() as LoginResponse
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Login successful                                   |
-| 400         | Invalid request body                               |
-| 401         | Invalid credentials                                |
+| Status Code | Description          |
+| ----------- | -------------------- |
+| 200         | Login successful     |
+| 400         | Invalid request body |
+| 401         | Invalid credentials  |

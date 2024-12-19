@@ -1,129 +1,132 @@
 <script lang="ts" setup>
+import type { FullyFeaturedChat, MinimalChat } from '~/lib/types/chat'
 import {
-  Pen,
-  Trash2,
-  Search,
-  Filter,
-  FilterX,
+  Bot,
   CalendarArrowUp,
   CalendarClock,
-  Bot,
-} from 'lucide-vue-next';
+  Filter,
+  FilterX,
+  Pen,
+  Search,
+  Trash2,
+} from 'lucide-vue-next'
 import {
-  defaultAiModelDomain,
   type AllowedAiModels,
-} from '~/lib/types/ai.models';
-import type { MinimalChat, FullyFeaturedChat } from '~/lib/types/chat';
+  defaultAiModelDomain,
+} from '~/lib/types/ai.models'
 
 const props = defineProps<{
-  useSmall?: boolean;
-}>();
+  useSmall?: boolean
+}>()
 
 // const { console } = useLogger();
-const { persistChatConversationEdit, persistChatConversationDelete } = useAPI();
-const { user } = useUserSession();
-const { selectedAiChat, resetSelectedAiChatToDefaults } = useSelectedAiChat();
+const { persistChatConversationEdit, persistChatConversationDelete } = useAPI()
+const { user } = useUserSession()
+const { selectedAiChat, resetSelectedAiChatToDefaults } = useSelectedAiChat()
 const chatToEdit = ref<MinimalChat>({
   id: -1,
   name: `chat-${Date.now()}`,
   model: defaultAiModelDomain,
-});
+})
 
 function setSelectedChat(
   id: number,
   name: string,
   model: AllowedAiModels,
-  force = false
+  force = false,
 ) {
   if (selectedAiChat.value.id === id && force === false) {
-    resetSelectedAiChatToDefaults(); // doesn't reset messages
-  } else {
-    selectedAiChat.value.id = id;
-    selectedAiChat.value.name = name;
-    selectedAiChat.value.model = model;
+    resetSelectedAiChatToDefaults() // doesn't reset messages
+  }
+  else {
+    selectedAiChat.value.id = id
+    selectedAiChat.value.name = name
+    selectedAiChat.value.model = model
   }
 }
 
-const editChat = (id: number, name: string) => {
-  chatToEdit.value.id = id;
-  chatToEdit.value.name = name;
-};
+function editChat(id: number, name: string) {
+  chatToEdit.value.id = id
+  chatToEdit.value.name = name
+}
 
-const saveEdit = async (id: number, previousName: string) => {
+async function saveEdit(id: number, previousName: string) {
   if (previousName !== chatToEdit.value.name) {
     const data = await persistChatConversationEdit(
       user?.value?.id ?? -1,
       id,
-      chatToEdit.value?.name
-    );
+      chatToEdit.value?.name,
+    )
 
     if (data?.chat?.name) {
-      const { name: chatName } = data.chat;
+      const { name: chatName } = data.chat
 
       setSelectedChat(
         chatToEdit.value.id,
         chatName,
         chatToEdit.value.model,
-        true
-      );
+        true,
+      )
 
-      chatToEdit.value.id = -1;
-      chatToEdit.value.name = `chat-${Date.now()}`;
+      chatToEdit.value.id = -1
+      chatToEdit.value.name = `chat-${Date.now()}`
     }
 
-    await fetchedChatsRefresh.value();
-  } else {
-    chatToEdit.value.id = -1;
+    await fetchedChatsRefresh.value()
   }
-};
+  else {
+    chatToEdit.value.id = -1
+  }
+}
 
-const chatsSelectedForDeletion = useChatsSelectedForDeletion();
-const deleteChat = async (id: number) => {
-  await persistChatConversationDelete(user?.value?.id ?? -1, id);
+const chatsSelectedForDeletion = useChatsSelectedForDeletion()
+async function deleteChat(id: number) {
+  await persistChatConversationDelete(user?.value?.id ?? -1, id)
 
   if (selectedAiChat.value.id === id) {
-    setSelectedChat(-1, `chat-${Date.now()}`, defaultAiModelDomain);
+    setSelectedChat(-1, `chat-${Date.now()}`, defaultAiModelDomain)
   }
 
-  await fetchedChatsRefresh.value();
-};
+  await fetchedChatsRefresh.value()
+}
 
-const batchDeleteSelectorIsActive = ref(false);
-const batchDeleteChats = async () => {
+const batchDeleteSelectorIsActive = ref(false)
+async function batchDeleteChats() {
   await persistChatConversationDelete(
     user?.value?.id ?? -1,
-    chatsSelectedForDeletion.value
-  );
+    chatsSelectedForDeletion.value,
+  )
 
-  batchDeleteSelectorIsActive.value = false;
-  chatsSelectedForDeletion.value = [];
+  batchDeleteSelectorIsActive.value = false
+  chatsSelectedForDeletion.value = []
 
-  setSelectedChat(-1, `chat-${Date.now()}`, defaultAiModelDomain);
+  setSelectedChat(-1, `chat-${Date.now()}`, defaultAiModelDomain)
 
-  await fetchedChatsRefresh.value();
-};
-const isSelectedForBatchDeletion = (id: number) => {
-  return chatsSelectedForDeletion.value.includes(id);
-};
-const toggleSelectedForBatchDeletion = (id: number) => {
+  await fetchedChatsRefresh.value()
+}
+function isSelectedForBatchDeletion(id: number) {
+  return chatsSelectedForDeletion.value.includes(id)
+}
+function toggleSelectedForBatchDeletion(id: number) {
   if (isSelectedForBatchDeletion(id)) {
     chatsSelectedForDeletion.value = chatsSelectedForDeletion.value.filter(
-      (chatId) => chatId !== id
-    );
-  } else {
-    chatsSelectedForDeletion.value.push(id);
+      chatId => chatId !== id,
+    )
   }
-};
-const toggleAllForBatchDeletion = () => {
+  else {
+    chatsSelectedForDeletion.value.push(id)
+  }
+}
+function toggleAllForBatchDeletion() {
   chatsSelectedForDeletion.value = filteredChats.value.map(
-    (chat: FullyFeaturedChat) => chat.id
-  );
-};
-const unToggleAllForBatchDeletion = () => {
-  chatsSelectedForDeletion.value = [];
-};
+    (chat: FullyFeaturedChat) => chat.id,
+  )
+}
+function unToggleAllForBatchDeletion() {
+  chatsSelectedForDeletion.value = []
+}
 
-const filterVisible = ref(false);
+const filterVisible = ref(false)
 const {
   fetchedChats,
   fetchedChatsStatus,
@@ -134,37 +137,38 @@ const {
 } = useFetchChats(user.value?.id ?? -1);
 
 (async () => {
-  await fetchChats();
-})();
+  await fetchChats()
+})()
 
 watchDebounced(
   fetchChatsUrl,
   async () => {
-    await fetchChats();
+    await fetchChats()
   },
-  { debounce: 300, maxWait: 500 }
-);
+  { debounce: 300, maxWait: 500 },
+)
 
-const searchQuery = ref('');
+const searchQuery = ref('')
 const filteredChats = computed(() => {
-  if (!fetchedChats.value?.chats) return [];
+  if (!fetchedChats.value?.chats)
+    return []
 
   const chats: FullyFeaturedChat[] = fetchedChats.value
-    .chats as FullyFeaturedChat[];
+    .chats as FullyFeaturedChat[]
   return chats.filter((chat: FullyFeaturedChat) =>
-    chat.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
+    chat.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  )
+})
 
-const refreshAnimationIsActive = ref(false);
+const refreshAnimationIsActive = ref(false)
 
-const controlsRef = ref(null);
-const { height: controlsHeight } = useElementSize(controlsRef);
+const controlsRef = ref(null)
+const { height: controlsHeight } = useElementSize(controlsRef)
 const calculatedChatsListHeight = computed(() => {
   return props.useSmall
     ? '100%'
-    : `calc(100% - 0.5rem - ${controlsHeight.value}px)`;
-});
+    : `calc(100% - 0.5rem - ${controlsHeight.value}px)`
+})
 </script>
 
 <template>
@@ -218,10 +222,10 @@ const calculatedChatsListHeight = computed(() => {
                       batchDeleteSelectorIsActive ? 'destructive' : 'outline'
                     "
                     :is-disabled="
-                      fetchedChatsStatus === 'pending' ||
-                      filteredChats.length === 0
+                      fetchedChatsStatus === 'pending'
+                        || filteredChats.length === 0
                     "
-                    :onClickAsync="batchDeleteChats"
+                    :on-click-async="batchDeleteChats"
                   >
                     Delete<Trash2 class="w-4 h-4 ml-1" />
                   </AsyncButton>
@@ -263,7 +267,7 @@ const calculatedChatsListHeight = computed(() => {
           variant="outline"
           :hide-loader="true"
           :is-disabled="fetchedChatsStatus === 'pending'"
-          :onClickAsync="
+          :on-click-async="
             async () => {
               refreshAnimationIsActive = true;
               await fetchedChatsRefresh().then(() => {
@@ -303,9 +307,9 @@ const calculatedChatsListHeight = computed(() => {
       </fieldset>
 
       <InfoBlock
-        showLoader
-        showDots
-        :isVisible="fetchedChatsStatus === 'pending'"
+        show-loader
+        show-dots
+        :is-visible="fetchedChatsStatus === 'pending'"
         class="my-2 mb-0"
       >
         Loading chats
@@ -315,9 +319,9 @@ const calculatedChatsListHeight = computed(() => {
     <ShadcnScrollArea :style="{ height: calculatedChatsListHeight }">
       <div
         v-if="
-          filteredChats &&
-          Array.isArray(filteredChats) &&
-          filteredChats?.length !== 0
+          filteredChats
+            && Array.isArray(filteredChats)
+            && filteredChats?.length !== 0
         "
       >
         <div v-auto-animate class="flex flex-col h-full gap-1">
@@ -344,7 +348,7 @@ const calculatedChatsListHeight = computed(() => {
 
                   <AsyncButton
                     variant="outline"
-                    :onClickAsync="() => saveEdit(chat.id, chat.name)"
+                    :on-click-async="() => saveEdit(chat.id, chat.name)"
                   >
                     Save
                   </AsyncButton>
@@ -396,7 +400,7 @@ const calculatedChatsListHeight = computed(() => {
                     <ShadcnAlertDialogAction as-child>
                       <AsyncButton
                         variant="destructive"
-                        :onClickAsync="() => deleteChat(chat?.id)"
+                        :on-click-async="() => deleteChat(chat?.id)"
                       >
                         Delete<Trash2 class="w-4 h-4 ml-1" />
                       </AsyncButton>
@@ -435,7 +439,7 @@ const calculatedChatsListHeight = computed(() => {
                     minute="numeric"
                   />
                 </div>
-                <br />
+                <br>
                 <div class="flex items-center gap-2">
                   <CalendarClock class="w-5 h-5 text-muted-foreground" />
                   <NuxtTime
@@ -456,8 +460,8 @@ const calculatedChatsListHeight = computed(() => {
       <div v-else class="h-full pt-2 text-center">
         <p
           v-if="
-            Array.isArray(fetchedChats?.chats) &&
-            fetchedChats?.chats?.length === 0
+            Array.isArray(fetchedChats?.chats)
+              && fetchedChats?.chats?.length === 0
           "
         >
           No Chats yet... <DevOnly>({{ fetchedChatsStatus }})</DevOnly>

@@ -1,13 +1,13 @@
-import { eq, inArray, desc, asc } from 'drizzle-orm';
+import { asc, desc, eq, inArray } from 'drizzle-orm'
 import {
   chat_conversation,
-  type ReadUser,
   type ChatConversationToCreate,
   type ReadChatConversation,
-} from '../../../lib/types/database.tables/schema';
+  type ReadUser,
+} from '../../../lib/types/database.tables/schema'
 
 export async function createChatConversation(
-  conversation: ChatConversationToCreate
+  conversation: ChatConversationToCreate,
 ) {
   const createdChatConversation = await db
     .insert(chat_conversation)
@@ -15,13 +15,14 @@ export async function createChatConversation(
     .returning()
     .catch((err) => {
       if (LOG_BACKEND)
-        console.error('Failed to insert chat conversation into database', err);
-      return null;
-    });
+        console.error('Failed to insert chat conversation into database', err)
+      return null
+    })
 
-  if (!createdChatConversation) return null;
+  if (!createdChatConversation)
+    return null
 
-  return createdChatConversation[0];
+  return createdChatConversation[0]
 }
 
 // Options for dynamic query building:
@@ -30,38 +31,40 @@ export async function createChatConversation(
 // 2.5. https://github.com/drizzle-team/drizzle-orm/issues/1644#issuecomment-1893746141
 export async function readAllChatConversationsOfUser(
   user_id: ReadUser['id'],
-  order_by?: string
+  order_by?: string,
 ) {
   let query = db
     .select()
     .from(chat_conversation)
     .where(eq(chat_conversation.neptun_user_id, user_id))
-    .$dynamic();
+    .$dynamic()
 
   if (order_by) {
-    const orders = parseOrderByString(order_by);
+    const orders = parseOrderByString(order_by)
     const orderConditions = orders.map((order) => {
       return order.direction === 'asc'
         ? asc(chat_conversation[order.column])
-        : desc(chat_conversation[order.column]);
-    });
-    query = query.orderBy(...orderConditions);
-  } else {
+        : desc(chat_conversation[order.column])
+    })
+    query = query.orderBy(...orderConditions)
+  }
+  else {
     query = query.orderBy(
       desc(chat_conversation.updated_at),
-      desc(chat_conversation.name)
-    );
+      desc(chat_conversation.name),
+    )
   }
 
   const fetchedChatConversations = await query.catch((err) => {
     if (LOG_BACKEND)
-      console.error('Failed to fetch chat conversations from database', err);
-    return null;
-  });
+      console.error('Failed to fetch chat conversations from database', err)
+    return null
+  })
 
-  if (!fetchedChatConversations) return null;
+  if (!fetchedChatConversations)
+    return null
 
-  return fetchedChatConversations;
+  return fetchedChatConversations
 }
 
 export async function updateChatConversation(
@@ -71,7 +74,7 @@ export async function updateChatConversation(
       ReadChatConversation,
       'id' | 'model' | 'created_at' | 'updated_at' | 'neptun_user_id'
     >
-  >
+  >,
 ) {
   const updatedChatConversation = await db
     .update(chat_conversation)
@@ -80,13 +83,14 @@ export async function updateChatConversation(
     .returning()
     .catch((err) => {
       if (LOG_BACKEND)
-        console.error('Failed to update chat conversation in database', err);
-      return null;
-    });
+        console.error('Failed to update chat conversation in database', err)
+      return null
+    })
 
-  if (!updatedChatConversation) return null;
+  if (!updatedChatConversation)
+    return null
 
-  return updatedChatConversation[0];
+  return updatedChatConversation[0]
 }
 
 export async function deleteChatConversation(id: ReadChatConversation['id']) {
@@ -96,15 +100,15 @@ export async function deleteChatConversation(id: ReadChatConversation['id']) {
     .then(() => true)
     .catch((err) => {
       if (LOG_BACKEND)
-        console.error('Failed to delete chat conversation from database', err);
-      return false;
-    });
+        console.error('Failed to delete chat conversation from database', err)
+      return false
+    })
 
-  return successfullyDeleted;
+  return successfullyDeleted
 }
 
 export async function deleteChatConversations(
-  ids: ReadChatConversation['id'][]
+  ids: ReadChatConversation['id'][],
 ) {
   const successfullyDeleted = await db
     .delete(chat_conversation)
@@ -112,9 +116,9 @@ export async function deleteChatConversations(
     .then(() => true)
     .catch((err) => {
       if (LOG_BACKEND)
-        console.error('Failed to delete chat conversation from database', err);
-      return false;
-    });
+        console.error('Failed to delete chat conversation from database', err)
+      return false
+    })
 
-  return successfullyDeleted;
+  return successfullyDeleted
 }

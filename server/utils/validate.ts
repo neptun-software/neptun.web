@@ -1,56 +1,56 @@
-import type { H3Event, EventHandlerRequest } from 'h3';
-import type { ZodError } from 'zod';
-import { z } from 'zod';
-import { primaryIdSchema } from '~/lib/types/database.tables/schema';
-import { emailSchema } from '~/lib/types/input.validation';
-import type { User } from '#auth-utils';
+import type { User } from '#auth-utils'
+import type { EventHandlerRequest, H3Event } from 'h3'
+import type { ZodError } from 'zod'
+import { z } from 'zod'
 import {
   AllowedAiModelNamesEnum,
   AllowedAiModelPublishersEnum,
-} from '~/lib/types/ai.models';
+} from '~/lib/types/ai.models'
 import {
   type ChatConversationKeys,
   type OrderByDirection,
   possibleOrderByColumns,
   possibleOrderByDirections,
-} from '~/lib/types/chat';
+} from '~/lib/types/chat'
+import { primaryIdSchema } from '~/lib/types/database.tables/schema'
+import { emailSchema } from '~/lib/types/input.validation'
 
 /* EVENT HANDLER */
 
 interface ValidationSuccess<T> {
-  statusCode: 200;
-  statusMessage: string;
-  message: string;
-  data: T;
+  statusCode: 200
+  statusMessage: string
+  message: string
+  data: T
 }
 
 interface ValidationError<T> {
-  statusCode: 400 | 401;
-  statusMessage: string;
-  message: string;
-  data: ZodError<T> | null;
+  statusCode: 400 | 401
+  statusMessage: string
+  message: string
+  data: ZodError<T> | null
 }
 
-type ValidationResult<S, E = S> = ValidationSuccess<S> | ValidationError<E>;
+type ValidationResult<S, E = S> = ValidationSuccess<S> | ValidationError<E>
 
 async function validateParams<S, E = S>(
   event: H3Event<EventHandlerRequest>,
   parseFunction: () => Promise<{
-    success: boolean;
-    data?: S;
-    error?: ZodError<E>;
+    success: boolean
+    data?: S
+    error?: ZodError<E>
   }>,
   validationSuccessMessage: string,
   validationErrorMessage: string,
   logData?: any,
   unauthorizedCheck?: (user: User, data: S) => boolean,
   secondValidationStep?: (data: S) => {
-    validationErrorMessage: string;
-    data: S | null;
-    success: boolean;
-  }
+    validationErrorMessage: string
+    data: S | null
+    success: boolean
+  },
 ): Promise<ValidationResult<S, E>> {
-  const maybeValidatedParams = await parseFunction();
+  const maybeValidatedParams = await parseFunction()
 
   if (!maybeValidatedParams.success) {
     return {
@@ -58,7 +58,7 @@ async function validateParams<S, E = S>(
       statusMessage: 'Bad Request.',
       message: validationErrorMessage,
       data: maybeValidatedParams.error || null,
-    };
+    }
   }
 
   const {
@@ -66,8 +66,8 @@ async function validateParams<S, E = S>(
     data,
     success,
   } = secondValidationStep
-      ? secondValidationStep(maybeValidatedParams.data!)
-      : { success: true, data: null, validationErrorMessage: '' };
+    ? secondValidationStep(maybeValidatedParams.data!)
+    : { success: true, data: null, validationErrorMessage: '' }
   if (secondValidationStep) {
     if (!success || !data) {
       return {
@@ -75,40 +75,44 @@ async function validateParams<S, E = S>(
         statusMessage: 'Bad Request.',
         message: secondValidationErrorMessage,
         data: null,
-      };
+      }
     }
 
     return {
       statusCode: 200,
       statusMessage: 'Successfully validated.',
       message: validationSuccessMessage,
-      data: data,
-    };
+      data,
+    }
   }
 
-  if (LOG_BACKEND) console.info('event.context?.params', event.context?.params);
   if (LOG_BACKEND)
+    console.info('event.context?.params', event.context?.params)
+  if (LOG_BACKEND) {
     console.info(
       'event.context.validated.params',
-      event.context.validated.params
-    );
-  if (LOG_BACKEND)
+      event.context.validated.params,
+    )
+  }
+  if (LOG_BACKEND) {
     console.info(
       'event.context.validated.query',
-      event.context.validated.query
-    );
-  if (logData && LOG_BACKEND) console.info(logData, maybeValidatedParams.data);
+      event.context.validated.query,
+    )
+  }
+  if (logData && LOG_BACKEND)
+    console.info(logData, maybeValidatedParams.data)
 
   if (
-    unauthorizedCheck &&
-    unauthorizedCheck(event.context.user, maybeValidatedParams.data!)
+    unauthorizedCheck
+    && unauthorizedCheck(event.context.user, maybeValidatedParams.data!)
   ) {
     return {
       statusCode: 401,
       statusMessage: 'Unauthorized.',
       message: 'You do not have access to view the information.',
       data: null,
-    };
+    }
   }
 
   return {
@@ -116,71 +120,73 @@ async function validateParams<S, E = S>(
     statusMessage: 'Successfully validated.',
     message: validationSuccessMessage,
     data: maybeValidatedParams.data!,
-  };
+  }
 }
 
 /* VALIDATE QUERY PARAMS */
 /* VALIDATE QUERY PARAMS(chat_id) */
 export async function validateQueryChatId(
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<ChatIdQueryType>> {
   return validateParams<ChatIdQueryType, ChatIdQueryType>(
     event,
     async () => {
       const result = await getValidatedQuery(event, (params) => {
         // @ts-expect-error
-        const chat_id = Number(params?.chat_id);
-        event.context.validated.query['chat_id'] = chat_id;
+        const chat_id = Number(params?.chat_id)
+        event.context.validated.query.chat_id = chat_id
 
-        return ChatIdQuerySchema.safeParse({ chat_id });
-      });
+        return ChatIdQuerySchema.safeParse({ chat_id })
+      })
       if (result.success) {
-        return { success: true, data: { chat_id: result.data.chat_id } };
-      } else {
-        return result;
+        return { success: true, data: { chat_id: result.data.chat_id } }
+      }
+      else {
+        return result
       }
     },
     'Successfully validated queryParams(chat_id).',
     'Invalid queryParams(chat_id).',
-    'queryParams(chat_id):'
-  );
+    'queryParams(chat_id):',
+  )
 }
 
 /* VALIDATE QUERY PARAMS(order_by) */
 export async function validateQueryOrderBy(
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<OrderByQueryType>> {
   return validateParams<OrderByQueryType>(
     event,
     async () => {
       const result = await getValidatedQuery(event, (params) => {
         // @ts-expect-error
-        const order_by = params?.order_by;
-        event.context.validated.query['order_by'] = order_by;
+        const order_by = params?.order_by
+        event.context.validated.query.order_by = order_by
 
-        return OrderByQuerySchema.safeParse({ order_by });
-      });
+        return OrderByQuerySchema.safeParse({ order_by })
+      })
       if (result.success) {
-        return { success: true, data: { order_by: result.data.order_by } };
-      } else {
-        return result;
+        return { success: true, data: { order_by: result.data.order_by } }
+      }
+      else {
+        return result
       }
     },
     `Successfully validated queryParams(order_by=<column(${possibleOrderByColumns}):direction(${possibleOrderByDirections})>).`,
     `Invalid queryParams(order_by=<column(${possibleOrderByColumns}):direction(${possibleOrderByDirections})>).`,
-    'queryParams(order_by):'
-  );
+    'queryParams(order_by):',
+  )
 }
 
 /* VALIDATE ROUTE PARAMS */
 /* VALIDATE ROUTE PARAMS(url) */
 export async function validateParamUrl(
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<{ url: URL }, UrlType>> {
   const maybeValidatedParams = await getValidatedRouterParams(
     event,
-    UrlSchema.safeParse
-  );
+    UrlSchema.safeParse,
+  )
 
   if (!maybeValidatedParams.success) {
     return {
@@ -188,32 +194,35 @@ export async function validateParamUrl(
       statusMessage: 'Bad Request.',
       message: 'Invalid routeParams(url).',
       data: maybeValidatedParams.error,
-    };
+    }
   }
 
-  if (LOG_BACKEND) console.info('url:', maybeValidatedParams.data.url);
-  const decodedUrl = decodeURIComponent(maybeValidatedParams.data.url);
-  if (LOG_BACKEND) console.info('decoded url:', decodedUrl);
+  if (LOG_BACKEND)
+    console.info('url:', maybeValidatedParams.data.url)
+  const decodedUrl = decodeURIComponent(maybeValidatedParams.data.url)
+  if (LOG_BACKEND)
+    console.info('decoded url:', decodedUrl)
 
   try {
-    const url = new URL(decodedUrl);
+    const url = new URL(decodedUrl)
 
     return {
       statusCode: 200,
       statusMessage: 'Successfully validated.',
       message: 'Successfully validated routeParams(user_id).',
       data: {
-        url: url,
+        url,
       },
-    };
-  } catch {
+    }
+  }
+  catch {
     return {
       statusCode: 400,
       statusMessage: 'Bad Request.',
       message:
         'Invalid routeParams(url). URL is not conform to official URL format.',
       data: null,
-    };
+    }
   }
 
   // TODO: improve typing, so that the short-form can be used:
@@ -245,111 +254,114 @@ export async function validateParamUrl(
 
 /* VALIDATE ROUTE PARAMS(user_id) */
 export async function validateParamUserId(
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<UserIdType>> {
   return validateParams<UserIdType>(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
         // @ts-expect-error
-        const user_id = Number(params?.user_id); // => NaN if not a number, not present
-        event.context.validated.params['user_id'] = user_id;
+        const user_id = Number(params?.user_id) // => NaN if not a number, not present
+        event.context.validated.params.user_id = user_id
 
         // check if user_id is a valid user_id
-        return UserIdSchema.safeParse({ user_id });
-      });
+        return UserIdSchema.safeParse({ user_id })
+      })
       if (result.success) {
-        return { success: true, data: { user_id: result.data.user_id } };
-      } else {
-        return result;
+        return { success: true, data: { user_id: result.data.user_id } }
+      }
+      else {
+        return result
       }
     },
     'Successfully validated routeParams(user_id).',
     'Invalid routeParams(user_id).',
     'queryParams(user_id):',
-    (user, data) => user.id !== data.user_id // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
-  );
+    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
+  )
 }
 
 /* VALIDATE ROUTE PARAMS(email) */
 export async function validateParamEmail(
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<UserEmailType>> {
   return validateParams<UserEmailType>(
     event,
     async () => {
       const result = await getValidatedRouterParams(
         event,
-        UserEmailSchema.safeParse
-      );
+        UserEmailSchema.safeParse,
+      )
 
-      event.context.validated.params['email'] = result?.data?.email || null;
+      event.context.validated.params.email = result?.data?.email || null
 
       if (result.success) {
         return {
           success: true,
           data: { email: result.data.email },
-        };
-      } else {
-        return result;
+        }
+      }
+      else {
+        return result
       }
     },
     'Successfully validated routeParams(email).',
     'Invalid routeParams(email).',
     'queryParams(email):',
-  );
+  )
 }
 
 /* VALIDATE ROUTE PARAMS(user_id, chat_id) */
 export async function validateParamChatId(
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<ChatIdType>> {
   return validateParams<ChatIdType>(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
         // @ts-expect-error
-        const user_id = Number(params?.user_id); // => NaN if not a number, not present
+        const user_id = Number(params?.user_id) // => NaN if not a number, not present
         // @ts-expect-error
-        const chat_id = Number(params?.chat_id);
-        event.context.validated.params['user_id'] = user_id;
-        event.context.validated.params['chat_id'] = chat_id;
+        const chat_id = Number(params?.chat_id)
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.chat_id = chat_id
 
-        return ChatIdSchema.safeParse({ user_id, chat_id });
-      });
+        return ChatIdSchema.safeParse({ user_id, chat_id })
+      })
       if (result.success) {
         return {
           success: true,
           data: { user_id: result.data.user_id, chat_id: result.data.chat_id },
-        };
-      } else {
-        return result;
+        }
+      }
+      else {
+        return result
       }
     },
     'Successfully validated routeParams(user_id, chat_id).',
-    `Invalid routeParams(user_id, chat_id). You (user_id=${event.context.validated.params['user_id']}) do not have access to view the user information of routeParams(user_id=${event.context.validated.params['user_id']}, chat_id=${event.context.validated.params['chat_id']}).`,
+    `Invalid routeParams(user_id, chat_id). You (user_id=${event.context.validated.params.user_id}) do not have access to view the user information of routeParams(user_id=${event.context.validated.params.user_id}, chat_id=${event.context.validated.params.chat_id}).`,
     'queryParams(user_id, chat_id):',
-    (user, data) => user.id !== data.user_id // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
-  );
+    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
+  )
 }
 
 /* VALIDATE ROUTE PARAMS(user_id, installation_id) */
 export async function validateParamInstallationId(
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<InstallationIdType>> {
   return validateParams<InstallationIdType>(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
         // @ts-expect-error
-        const user_id = Number(params?.user_id); // => NaN if not a number, not present
+        const user_id = Number(params?.user_id) // => NaN if not a number, not present
         // @ts-expect-error
-        const installation_id = Number(params?.installation_id);
-        event.context.validated.params['user_id'] = user_id;
-        event.context.validated.params['installation_id'] = installation_id;
+        const installation_id = Number(params?.installation_id)
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.installation_id = installation_id
 
-        return InstallationIdSchema.safeParse({ user_id, installation_id });
-      });
+        return InstallationIdSchema.safeParse({ user_id, installation_id })
+      })
       if (result.success) {
         return {
           success: true,
@@ -357,38 +369,39 @@ export async function validateParamInstallationId(
             user_id: result.data.user_id,
             installation_id: result.data.installation_id,
           },
-        };
-      } else {
-        return result;
+        }
+      }
+      else {
+        return result
       }
     },
     'Successfully validated routeParams(user_id, installation_id).',
     'Invalid routeParams(user_id, installation_id).',
     'queryParams(user_id, installation_id):',
-    (user, data) => user.id !== data.user_id // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
-  );
+    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
+  )
 }
 
 /* VALIDATE ROUTE PARAMS(user_id, chat_id, share_id) */
 export async function validateParamShareId(
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<ShareIdType>> {
   return validateParams<ShareIdType>(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
         // @ts-expect-error
-        const user_id = Number(params?.user_id); // => NaN if not a number, not present
+        const user_id = Number(params?.user_id) // => NaN if not a number, not present
         // @ts-expect-error
-        const chat_id = Number(params?.chat_id);
+        const chat_id = Number(params?.chat_id)
         // @ts-expect-error
-        const share_id = Number(params?.share_id);
-        event.context.validated.params['user_id'] = user_id;
-        event.context.validated.params['chat_id'] = chat_id;
-        event.context.validated.params['share_id'] = share_id;
+        const share_id = Number(params?.share_id)
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.chat_id = chat_id
+        event.context.validated.params.share_id = share_id
 
-        return ShareIdSchema.safeParse({ user_id, chat_id, share_id });
-      });
+        return ShareIdSchema.safeParse({ user_id, chat_id, share_id })
+      })
       if (result.success) {
         return {
           success: true,
@@ -397,38 +410,39 @@ export async function validateParamShareId(
             chat_id: result.data.chat_id,
             share_id: result.data.share_id,
           },
-        };
-      } else {
-        return result;
+        }
+      }
+      else {
+        return result
       }
     },
     'Successfully validated routeParams(user_id, chat_id, share_id).',
-    `Invalid routeParams(user_id, chat_id, share_id). You (user_id=${event.context.validated.params['user_id']}) do not have access to view the user information of routeParams(user_id=${event.context.validated.params['user_id']}, chat_id=${event.context.validated.params['chat_id']}, share_id=${event.context.validated.params['share_id']}).`,
+    `Invalid routeParams(user_id, chat_id, share_id). You (user_id=${event.context.validated.params.user_id}) do not have access to view the user information of routeParams(user_id=${event.context.validated.params.user_id}, chat_id=${event.context.validated.params.chat_id}, share_id=${event.context.validated.params.share_id}).`,
     'queryParams(user_id, chat_id, share_id):',
-    (user, data) => user.id !== data.user_id // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
-  );
+    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
+  )
 }
 
 /* VALIDATE ROUTE PARAMS(user_id, chat_id, message_id) */
 export async function validateParamMessageId(
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<ChatMessageIdType>> {
   return validateParams<ChatMessageIdType>(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
         // @ts-expect-error
-        const user_id = Number(params?.user_id); // => NaN if not a number, not present
+        const user_id = Number(params?.user_id) // => NaN if not a number, not present
         // @ts-expect-error
-        const chat_id = Number(params?.chat_id);
+        const chat_id = Number(params?.chat_id)
         // @ts-expect-error
-        const message_id = Number(params?.message_id);
-        event.context.validated.params['user_id'] = user_id;
-        event.context.validated.params['chat_id'] = chat_id;
-        event.context.validated.params['message_id'] = message_id;
+        const message_id = Number(params?.message_id)
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.chat_id = chat_id
+        event.context.validated.params.message_id = message_id
 
-        return ChatMessageIdSchema.safeParse({ user_id, chat_id, message_id });
-      });
+        return ChatMessageIdSchema.safeParse({ user_id, chat_id, message_id })
+      })
       if (result.success) {
         return {
           success: true,
@@ -437,16 +451,17 @@ export async function validateParamMessageId(
             chat_id: result.data.chat_id,
             message_id: result.data.message_id,
           },
-        };
-      } else {
-        return result;
+        }
+      }
+      else {
+        return result
       }
     },
     'Successfully validated routeParams(user_id, chat_id, message_id).',
-    `Invalid routeParams(user_id, chat_id, message_id). You (user_id=${event.context.validated.params['user_id']}) do not have access to view the user information of routeParams(user_id=${event.context.validated.params['user_id']}, chat_id=${event.context.validated.params['chat_id']}).`,
+    `Invalid routeParams(user_id, chat_id, message_id). You (user_id=${event.context.validated.params.user_id}) do not have access to view the user information of routeParams(user_id=${event.context.validated.params.user_id}, chat_id=${event.context.validated.params.chat_id}).`,
     'queryParams(user_id, chat_id, message_id):',
-    (user, data) => user.id !== data.user_id // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
-  );
+    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
+  )
 }
 
 /* VALIDATE ROUTE PARAMS(model_publisher, model_name) */
@@ -454,21 +469,21 @@ export async function validateParamMessageId(
  * User access validation has to be checked before this!!! (user_id is fetched from query params)
  */
 export async function validateParamAiModelName(
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<ModelType>> {
   return validateParams<ModelType>(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
         // @ts-expect-error
-        const model_publisher = params?.model_publisher;
+        const model_publisher = params?.model_publisher
         // @ts-expect-error
-        const model_name = params?.model_name;
-        event.context.validated.params['model_publisher'] = model_publisher;
-        event.context.validated.params['model_name'] = model_name;
+        const model_name = params?.model_name
+        event.context.validated.params.model_publisher = model_publisher
+        event.context.validated.params.model_name = model_name
 
-        return ModelSchema.safeParse({ model_publisher, model_name });
-      });
+        return ModelSchema.safeParse({ model_publisher, model_name })
+      })
       if (result.success) {
         return {
           success: true,
@@ -476,104 +491,106 @@ export async function validateParamAiModelName(
             model_publisher: result.data.model_publisher,
             model_name: result.data.model_name,
           },
-        };
-      } else {
-        return result;
+        }
+      }
+      else {
+        return result
       }
     },
     'Successfully validated routeParams(model_publisher, model_name).',
     `Invalid routeParams(model_publisher, model_name).`,
-    'queryParams(model_publisher, model_name):'
-  );
+    'queryParams(model_publisher, model_name):',
+  )
 }
 
 export async function validateParamUuid(
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<ChatUuidType>> {
   return validateParams<ChatUuidType>(
     event,
     async () => {
       const result = await getValidatedRouterParams(
         event,
-        ChatUuidSchema.safeParse
-      );
+        ChatUuidSchema.safeParse,
+      )
 
-      event.context.validated.params['uuid'] = result?.data?.uuid || null;
+      event.context.validated.params.uuid = result?.data?.uuid || null
 
       if (result.success) {
         return {
           success: true,
           data: { uuid: result.data.uuid },
-        };
-      } else {
-        return result;
+        }
+      }
+      else {
+        return result
       }
     },
     'Successfully validated routeParams(uuid).',
-    `Invalid routeParams(uuid). The resource with uuid=${event.context.validated.params['uuid']} does not exist or you do not have access to it.`,
-    'queryParams(uuid):'
-  );
+    `Invalid routeParams(uuid). The resource with uuid=${event.context.validated.params.uuid} does not exist or you do not have access to it.`,
+    'queryParams(uuid):',
+  )
 }
 
 /* ROUTE PARAMETER SCHEMAs */
 
 export const UserIdSchema = z.object({
   user_id: primaryIdSchema,
-});
-
-type UserIdType = z.infer<typeof UserIdSchema>;
-
-export const UserEmailSchema = z.object({
-  email: emailSchema
 })
 
-type UserEmailType = z.infer<typeof UserEmailSchema>;
+type UserIdType = z.infer<typeof UserIdSchema>
+
+export const UserEmailSchema = z.object({
+  email: emailSchema,
+})
+
+type UserEmailType = z.infer<typeof UserEmailSchema>
 
 export const ChatIdSchema = z.object({
   user_id: primaryIdSchema,
   chat_id: primaryIdSchema,
-});
+})
 
-type ChatIdType = z.infer<typeof ChatIdSchema>;
+type ChatIdType = z.infer<typeof ChatIdSchema>
 
 export const InstallationIdSchema = z.object({
   user_id: primaryIdSchema,
   installation_id: primaryIdSchema,
-});
+})
 
-type InstallationIdType = z.infer<typeof InstallationIdSchema>;
+type InstallationIdType = z.infer<typeof InstallationIdSchema>
 
 export const ShareIdSchema = z.object({
   user_id: primaryIdSchema,
   chat_id: primaryIdSchema,
   share_id: primaryIdSchema,
-});
+})
 
-type ShareIdType = z.infer<typeof ShareIdSchema>;
+type ShareIdType = z.infer<typeof ShareIdSchema>
 
 export const ChatMessageIdSchema = z.object({
   user_id: primaryIdSchema,
   chat_id: primaryIdSchema,
   message_id: primaryIdSchema,
-});
+})
 
-type ChatMessageIdType = z.infer<typeof ChatMessageIdSchema>;
+type ChatMessageIdType = z.infer<typeof ChatMessageIdSchema>
 
 /**
  * **INFO**: Doesn't use the z.url() because it doesn't allow URLs in the format of encodeURIComponent
  */
 export const UrlSchema = z.object({
   url: z.string().trim(),
-});
+})
 
-type UrlType = z.infer<typeof UrlSchema>;
+type UrlType = z.infer<typeof UrlSchema>
 
 export const ModelSchema = z.object({
   model_publisher: z.nativeEnum(AllowedAiModelPublishersEnum),
   model_name: z.nativeEnum(AllowedAiModelNamesEnum),
-});
+})
 
-type ModelType = z.infer<typeof ModelSchema>;
+type ModelType = z.infer<typeof ModelSchema>
 
 /* QUERY SCHEMAs */
 
@@ -582,40 +599,40 @@ type ModelType = z.infer<typeof ModelSchema>;
  */
 export const ChatIdQuerySchema = z.object({
   chat_id: z.number().int(),
-});
+})
 
-type ChatIdQueryType = z.infer<typeof ChatIdQuerySchema>;
+type ChatIdQueryType = z.infer<typeof ChatIdQuerySchema>
 
 const OrderByQuerySchema = z.object({
   order_by: z
     .string()
     .refine(
       (value) => {
-        const parts = value.split(','); // allows multiple order_by values
+        const parts = value.split(',') // allows multiple order_by values
         return parts.every((part) => {
           // allows "column:direction" syntax
-          const [column, direction] = part.split(':');
+          const [column, direction] = part.split(':')
           return (
-            possibleOrderByColumns.includes(column as ChatConversationKeys) &&
-            possibleOrderByDirections.includes(direction as OrderByDirection)
-          );
-        });
+            possibleOrderByColumns.includes(column as ChatConversationKeys)
+            && possibleOrderByDirections.includes(direction as OrderByDirection)
+          )
+        })
       },
       {
         message:
-          "order_by must be a comma-separated list of 'column:direction' pairs, e.g. 'updated_at:desc,created_at:asc'",
-      }
+          'order_by must be a comma-separated list of \'column:direction\' pairs, e.g. \'updated_at:desc,created_at:asc\'',
+      },
     )
     .optional(),
-});
+})
 
-type OrderByQueryType = z.infer<typeof OrderByQuerySchema>;
+type OrderByQueryType = z.infer<typeof OrderByQuerySchema>
 
 export const ChatUuidSchema = z.object({
   uuid: z.string().uuid(),
-});
+})
 
-type ChatUuidType = z.infer<typeof ChatUuidSchema>;
+type ChatUuidType = z.infer<typeof ChatUuidSchema>
 
 /* BODY SCHEMAs */
 

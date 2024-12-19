@@ -1,23 +1,23 @@
 <script lang="ts" setup>
-import { Vue3Lottie } from 'vue3-lottie';
+import { Vue3Lottie } from 'vue3-lottie'
 
 const props = defineProps<{
-  animationIsActive?: boolean;
-  animationLink: string;
-}>();
+  animationIsActive?: boolean
+  animationLink: string
+}>()
 
 // pauseAnimation prop only works 2 times somehow, that is why I have to rerender every time
 const animationKey = computed(() =>
-  props.animationIsActive ? 'active' : 'inactive'
-);
+  props.animationIsActive ? 'active' : 'inactive',
+)
 
-const animationKeyRef = ref(animationKey.value);
+const animationKeyRef = ref(animationKey.value)
 watch(
   () => props.animationIsActive,
   (newVal) => {
-    animationKeyRef.value = newVal ? 'active' : 'inactive';
-  }
-);
+    animationKeyRef.value = newVal ? 'active' : 'inactive'
+  },
+)
 </script>
 
 <template>

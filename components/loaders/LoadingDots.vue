@@ -1,18 +1,18 @@
 <script lang="ts" setup>
-const currentDot = ref(1);
-let interval: NodeJS.Timeout;
+const currentDot = ref(1)
+let interval: NodeJS.Timeout
 
-const updateDots = () => {
-  currentDot.value = (currentDot.value % 3) + 1;
-};
+function updateDots() {
+  currentDot.value = (currentDot.value % 3) + 1
+}
 
 onMounted(() => {
-  interval = setInterval(updateDots, 300);
-});
+  interval = setInterval(updateDots, 300)
+})
 
 onUnmounted(() => {
-  clearInterval(interval);
-});
+  clearInterval(interval)
+})
 </script>
 
 <template>

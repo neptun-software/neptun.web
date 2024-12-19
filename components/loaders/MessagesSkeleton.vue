@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-const isLoading = ref(false);
+const isLoading = ref(false)
 const messages = ref<
-  { heightClass: string; width: number; justifyClass: string }[]
->([]);
+  { heightClass: string, width: number, justifyClass: string }[]
+>([])
 const heights = [
   'h-10',
   'h-11',
@@ -24,37 +24,37 @@ const heights = [
   'h-72',
   'h-80',
   'h-96',
-];
+]
 
-const generateMessages = () => {
-  const amountToGenerate = getRandomInt(2, 8);
+function generateMessages() {
+  const amountToGenerate = getRandomInt(2, 8)
   for (let i = 0; i < amountToGenerate; i++) {
-    const heightClass = getRandomHeight();
-    const width = getRandomWidth();
-    const justifyClass = i % 2 === 0 ? 'justify-end' : 'justify-start';
+    const heightClass = getRandomHeight()
+    const width = getRandomWidth()
+    const justifyClass = i % 2 === 0 ? 'justify-end' : 'justify-start'
 
-    messages.value.push({ heightClass, width, justifyClass });
+    messages.value.push({ heightClass, width, justifyClass })
   }
-};
+}
 
-const getRandomInt = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
+function getRandomInt(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
 
-const getRandomHeight = () => {
-  const randomIndex = Math.floor(Math.random() * heights.length);
-  return heights[randomIndex];
-};
+function getRandomHeight() {
+  const randomIndex = Math.floor(Math.random() * heights.length)
+  return heights[randomIndex]
+}
 
-const getRandomWidth = () => {
-  const minWidth = 100;
-  const maxWidth = 350;
-  return Math.floor(Math.random() * (maxWidth - minWidth + 1)) + minWidth;
-};
+function getRandomWidth() {
+  const minWidth = 100
+  const maxWidth = 350
+  return Math.floor(Math.random() * (maxWidth - minWidth + 1)) + minWidth
+}
 
 onMounted(() => {
-  generateMessages();
-});
+  generateMessages()
+})
 </script>
 
 <template>
@@ -62,12 +62,12 @@ onMounted(() => {
     <div
       v-for="(message, index) in messages"
       :key="index"
-      :class="['flex my-2', message.justifyClass]"
+      class="flex my-2" :class="[message.justifyClass]"
     >
       <ShadcnSkeleton
         class="px-4 py-2 border rounded-lg border-slate-300 max-w-[80%] relative dark:border-border overflow-x-auto break-words whitespace-pre-wrap"
         :class="message.heightClass"
-        :style="{ width: message.width + 'px' }"
+        :style="{ width: `${message.width}px` }"
       />
     </div>
   </div>

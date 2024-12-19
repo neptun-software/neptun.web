@@ -1,8 +1,7 @@
 <script setup>
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-// eslint-disable-next-line vue/require-prop-types
-defineProps(['src', 'icon', 'title', 'description', 'index']);
+defineProps(['src', 'icon', 'title', 'description', 'index'])
 </script>
 
 <template>
@@ -43,8 +42,7 @@ defineProps(['src', 'icon', 'title', 'description', 'index']);
 
             <span
               class="text-5xl font-medium transition-all delay-75 text-muted-foreground/15 group-hover/number:text-muted-foreground/30"
-              >0{{ index + 1 }}</span
-            >
+            >0{{ index + 1 }}</span>
           </div>
 
           <CardTitle class="text-white">

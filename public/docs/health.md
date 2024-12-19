@@ -34,19 +34,19 @@ No request body required.
 
 The endpoint returns a JSON object with the following properties:
 
-| Field     | Type   | Description                                     |
-|-----------|--------|-------------------------------------------------|
-| status    | string | Current health status of the server             |
-| timestamp | string | ISO 8601 formatted timestamp of the response    |
-| uptime    | number | Server uptime in seconds                        |
+| Field     | Type   | Description                                  |
+| --------- | ------ | -------------------------------------------- |
+| status    | string | Current health status of the server          |
+| timestamp | string | ISO 8601 formatted timestamp of the response |
+| uptime    | number | Server uptime in seconds                     |
 
 #### TypeScript Interface
 
 ```typescript
 interface HealthCheckResponse {
-  status: string;
-  timestamp: string;
-  uptime: number;
+  status: string
+  timestamp: string
+  uptime: number
 }
 ```
 
@@ -103,11 +103,11 @@ curl -X GET https://neptun-webui.vercel.app/health
 
 ```typescript
 async function checkHealth(): Promise<HealthCheckResponse> {
-  const response = await fetch('https://neptun-webui.vercel.app/health');
+  const response = await fetch('https://neptun-webui.vercel.app/health')
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
-  return await response.json() as HealthCheckResponse;
+  return await response.json() as HealthCheckResponse
 }
 ```
 

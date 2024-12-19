@@ -1,29 +1,29 @@
 <script lang="ts" setup>
-import { Copy, CopyCheck } from 'lucide-vue-next';
-import type { HTMLAttributes } from 'vue';
-import type { ButtonVariants } from '../ui/button';
+import type { HTMLAttributes } from 'vue'
+import type { ButtonVariants } from '../ui/button'
+import { Copy, CopyCheck } from 'lucide-vue-next'
 
 const props = defineProps<{
-  text: string;
-  mime?: string;
-  class?: HTMLAttributes['class'];
-  variant?: ButtonVariants['variant'];
-}>();
+  text: string
+  mime?: string
+  class?: HTMLAttributes['class']
+  variant?: ButtonVariants['variant']
+}>()
 
 // const mime = 'text/markdown'; // Unknown error (NotAllowedError: Failed to execute 'write' on 'Clipboard': Type text/markdown not supported on write.)
-const mime = props.mime ?? 'text/plain';
+const mime = props.mime ?? 'text/plain'
 const source = computed(() => [
   new ClipboardItem({
     [mime]: new Blob([props.text], { type: mime }),
   }),
-]);
+])
 
 const {
   // content: copiedText,
   copy: copyToClipboard,
   copied: isCopied,
   isSupported: isClipboardSupported,
-} = useClipboardItems({ source });
+} = useClipboardItems({ source })
 </script>
 
 <template>

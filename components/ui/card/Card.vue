@@ -12,7 +12,7 @@ const props = defineProps<{
     :class="
       cn(
         'rounded-xl border bg-card text-card-foreground shadow',
-        props.class
+        props.class,
       )
     "
   >

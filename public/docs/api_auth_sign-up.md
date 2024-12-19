@@ -16,9 +16,9 @@ POST
 
 ### Headers
 
-| Header        | Value            | Required | Description                    |
-|---------------|------------------|----------|--------------------------------|
-| Content-Type  | application/json | Yes      | Indicates JSON request body    |
+| Header       | Value            | Required | Description                 |
+| ------------ | ---------------- | -------- | --------------------------- |
+| Content-Type | application/json | Yes      | Indicates JSON request body |
 
 ### Query Parameters
 
@@ -26,25 +26,25 @@ No query parameters required.
 
 ### Request Body
 
-| Field    | Type   | Required | Description                          | Constraints                    |
-|----------|--------|----------|--------------------------------------|--------------------------------|
-| email    | string | Yes      | User's email address                | Must be a valid email format   |
-| password | string | Yes      | User's password                     | Non-empty string               |
+| Field    | Type   | Required | Description          | Constraints                  |
+| -------- | ------ | -------- | -------------------- | ---------------------------- |
+| email    | string | Yes      | User's email address | Must be a valid email format |
+| password | string | Yes      | User's password      | Non-empty string             |
 
 #### TypeScript Interface
 
 ```typescript
 interface SignUpRequest {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
 interface SignUpResponse {
   user: {
-    id: string;
-    primary_email: string;
-  };
-  loggedInAt: string;
+    id: string
+    primary_email: string
+  }
+  loggedInAt: string
 }
 ```
 
@@ -95,13 +95,13 @@ async function signUp(email: string, password: string): Promise<SignUpResponse> 
       }),
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as SignUpResponse;
+  return await response.json() as SignUpResponse
 }
 ```
 
@@ -139,9 +139,9 @@ async def sign_up(email: str, password: str) -> SignUpResponse:
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | User created and session initiated successfully    |
-| 400         | Invalid request body                               |
-| 409         | User already exists                                |
-| 500         | Internal server error during user creation         |
+| Status Code | Description                                     |
+| ----------- | ----------------------------------------------- |
+| 200         | User created and session initiated successfully |
+| 400         | Invalid request body                            |
+| 409         | User already exists                             |
+| 500         | Internal server error during user creation      |

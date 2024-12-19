@@ -16,15 +16,15 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                    |
-|-----------|--------|----------|--------------------------------|
-| user_id   | string | Yes      | Unique identifier of the user  |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| user_id   | string | Yes      | Unique identifier of the user |
 
 ### Headers
 
-| Header         | Value            | Required | Description                    |
-|----------------|------------------|----------|--------------------------------|
-| Cookie         | neptun-session   | Yes      | Session authentication cookie  |
+| Header | Value          | Required | Description                   |
+| ------ | -------------- | -------- | ----------------------------- |
+| Cookie | neptun-session | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -45,22 +45,22 @@ Returns the CLI configuration object.
 ```typescript
 interface CliConfiguration {
   utils: {
-    neptun_api_server_host: string;
-    neptun_github_app_url: string;
-  };
+    neptun_api_server_host: string
+    neptun_github_app_url: string
+  }
   auth: {
-    neptun_session_cookie: string;
+    neptun_session_cookie: string
     user: {
-      id: string;
-      email: string;
-      oauth: any;
-    };
-  };
+      id: string
+      email: string
+      oauth: any
+    }
+  }
   active_chat: {
-    chat_id: number;
-    chat_name: string;
-    model: string;
-  };
+    chat_id: number
+    chat_name: string
+    model: string
+  }
 }
 ```
 
@@ -158,24 +158,24 @@ async function getCliConfig(userId: string): Promise<CliConfiguration> {
     {
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as CliConfiguration;
+  return await response.json() as CliConfiguration
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Successfully retrieved CLI configuration           |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | User not found                                    |
-| 500         | Server error                                      |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully retrieved CLI configuration  |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | User not found                            |
+| 500         | Server error                              |
 
 ## Notes
 

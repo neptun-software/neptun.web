@@ -1,48 +1,49 @@
 <script setup lang="ts">
-import { Menu } from 'lucide-vue-next';
+import { Menu } from 'lucide-vue-next'
 
 const props = defineProps({
   layout: String,
-});
+})
 
-const { loggedIn } = useUserSession();
-const router = useRouter();
-const routes = router.options.routes;
+const { loggedIn } = useUserSession()
+const router = useRouter()
+const routes = router.options.routes
 
-const hiddenRoutes = ['/new-password', '/shared/chats/:uuid()'];
-const hiddenRoutesIfLoggedIn = hiddenRoutes.concat(['/log-in', '/sign-up']);
+const hiddenRoutes = ['/new-password', '/shared/chats/:uuid()']
+const hiddenRoutesIfLoggedIn = hiddenRoutes.concat(['/log-in', '/sign-up'])
 const hiddenRoutesIfLoggedOut = hiddenRoutes.concat([
   '/',
   '/account',
   '/project',
-]);
+])
 
 const visibleRoutes = computed(() => {
   if (loggedIn.value) {
     return routes.filter(
-      (route) => !hiddenRoutesIfLoggedIn.includes(route.path)
-    );
-  } else {
-    return routes.filter(
-      (route) => !hiddenRoutesIfLoggedOut.includes(route.path)
-    );
+      route => !hiddenRoutesIfLoggedIn.includes(route.path),
+    )
   }
-});
+  else {
+    return routes.filter(
+      route => !hiddenRoutesIfLoggedOut.includes(route.path),
+    )
+  }
+})
 
 const sortedRoutes = computed(() => {
-  const homeRoute = visibleRoutes.value.find((route) => route.path === '/home');
+  const homeRoute = visibleRoutes.value.find(route => route.path === '/home')
   const otherRoutes = visibleRoutes.value.filter(
-    (route) => route.path !== '/home'
-  );
+    route => route.path !== '/home',
+  )
 
   if (homeRoute) {
-    return [homeRoute, ...otherRoutes];
+    return [homeRoute, ...otherRoutes]
   }
 
-  return otherRoutes;
-});
+  return otherRoutes
+})
 
-const isNavigationLayout = computed(() => props.layout === 'navigation');
+const isNavigationLayout = computed(() => props.layout === 'navigation')
 </script>
 
 <template>

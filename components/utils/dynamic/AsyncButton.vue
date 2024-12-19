@@ -1,43 +1,46 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue';
-import { Primitive, type PrimitiveProps } from 'radix-vue';
-import { type ButtonVariants, buttonVariants } from '~/components/ui/button';
-import { cn } from '@/lib/utils';
-import { Loader2 } from 'lucide-vue-next';
+import type { HTMLAttributes } from 'vue'
+import { cn } from '@/lib/utils'
+import { Loader2 } from 'lucide-vue-next'
+import { Primitive, type PrimitiveProps } from 'radix-vue'
+import { type ButtonVariants, buttonVariants } from '~/components/ui/button'
 
 interface Props extends PrimitiveProps {
-  variant?: ButtonVariants['variant'];
-  size?: ButtonVariants['size'];
-  class?: HTMLAttributes['class'];
-  isDisabled?: boolean;
-  hideLoader?: boolean;
-  onClickAsync?: (event: MouseEvent) => Promise<any>;
+  variant?: ButtonVariants['variant']
+  size?: ButtonVariants['size']
+  class?: HTMLAttributes['class']
+  isDisabled?: boolean
+  hideLoader?: boolean
+  onClickAsync?: (event: MouseEvent) => Promise<any>
 }
 
 const props = withDefaults(defineProps<Props>(), {
   as: 'button',
-});
-
-const isLoading = ref(false);
+})
 
 const emit = defineEmits<{
-  error: [error: unknown];
-}>();
+  error: [error: unknown]
+}>()
 
-const handleClick = async (event: MouseEvent) => {
-  if (isLoading.value || !props.onClickAsync) return;
+const isLoading = ref(false)
+
+async function handleClick(event: MouseEvent) {
+  if (isLoading.value || !props.onClickAsync)
+    return
 
   try {
-    isLoading.value = true;
-    await props.onClickAsync(event);
-  } catch (error) {
-    emit('error', error);
-  } finally {
-    isLoading.value = false;
+    isLoading.value = true
+    await props.onClickAsync(event)
   }
-};
+  catch (error) {
+    emit('error', error)
+  }
+  finally {
+    isLoading.value = false
+  }
+}
 
-const displayLoader = !props.hideLoader;
+const displayLoader = !props.hideLoader
 </script>
 
 <template>

@@ -1,78 +1,81 @@
 <script lang="ts" setup>
 /// <reference path="../../../lib/types/vue-dndrop.d.ts" />
 
+import { GripVertical } from 'lucide-vue-next'
 // @ts-expect-error (somehow still not recognized...)
-import { Container, Draggable, type DropResult } from 'vue-dndrop'; // https://amendx.github.io/vue-dndrop/guide/installation.html
-import { GripVertical } from 'lucide-vue-next';
-import { possibleOrderByColumns } from '~/lib/types/chat';
+import { Container, Draggable, type DropResult } from 'vue-dndrop' // https://amendx.github.io/vue-dndrop/guide/installation.html
+import { possibleOrderByColumns } from '~/lib/types/chat'
 
 interface Filter {
-  column: string;
-  direction: 'asc' | 'desc';
+  column: string
+  direction: 'asc' | 'desc'
 }
 
-const chatsFilters = useChatsFilter();
-const columns: string[] = possibleOrderByColumns;
-const filters = ref<Filter[]>([{ column: 'updated_at', direction: 'asc' }]);
+const chatsFilters = useChatsFilter()
+const columns: string[] = possibleOrderByColumns
+const filters = ref<Filter[]>([{ column: 'updated_at', direction: 'asc' }])
 
-const addFilter = () => {
-  const column = availableColumns()[0];
-  filters.value.push({ column, direction: 'desc' });
-};
+function addFilter() {
+  const column = availableColumns()[0]
+  filters.value.push({ column, direction: 'desc' })
+}
 
-const removeFilter = (index: number) => {
-  filters.value.splice(index, 1);
-};
+function removeFilter(index: number) {
+  filters.value.splice(index, 1)
+}
 
-const removeAllFilters = () => {
-  filters.value = [];
-};
+function removeAllFilters() {
+  filters.value = []
+}
 
-const availableColumns = (currentIndex?: number): string[] => {
+function availableColumns(currentIndex?: number): string[] {
   const selectedColumns = filters.value
-    .map((filter) => filter.column)
-    .filter((_, index) => index !== currentIndex);
-  return columns.filter((column) => !selectedColumns.includes(column));
-};
+    .map(filter => filter.column)
+    .filter((_, index) => index !== currentIndex)
+  return columns.filter(column => !selectedColumns.includes(column))
+}
 
 const queryString = computed(() => {
   const orderByParts = filters.value
-    .filter((filter) => filter.column)
-    .map((filter) => `${filter.column}:${filter.direction}`);
+    .filter(filter => filter.column)
+    .map(filter => `${filter.column}:${filter.direction}`)
 
-  return orderByParts.length > 0 ? `order_by=${orderByParts.join(',')}` : '';
-});
+  return orderByParts.length > 0 ? `order_by=${orderByParts.join(',')}` : ''
+})
 
 watch(queryString, (newValue) => {
-  chatsFilters.value = newValue;
-});
+  chatsFilters.value = newValue
+})
 
-const onDrop = (dropResult: DropResult) => {
-  filters.value = applyDrag(filters.value, dropResult);
-};
+function onDrop(dropResult: DropResult) {
+  filters.value = applyDrag(filters.value, dropResult)
+}
 
-const applyDrag = (filters: Filter[], dropResult: DropResult): Filter[] => {
-  const { removedIndex, addedIndex, payload } = dropResult;
-  if (removedIndex === null && addedIndex === null) return filters;
+function applyDrag(filters: Filter[], dropResult: DropResult): Filter[] {
+  const { removedIndex, addedIndex, payload } = dropResult
+  if (removedIndex === null && addedIndex === null)
+    return filters
 
-  const result = [...filters];
-  let itemToAdd = payload;
+  const result = [...filters]
+  let itemToAdd = payload
 
   if (removedIndex !== null) {
-    itemToAdd = result.splice(removedIndex, 1)[0];
+    itemToAdd = result.splice(removedIndex, 1)[0]
   }
 
   if (addedIndex !== null) {
-    result.splice(addedIndex, 0, itemToAdd);
+    result.splice(addedIndex, 0, itemToAdd)
   }
 
-  return result;
-};
+  return result
+}
 </script>
 
 <template>
   <fieldset class="grid gap-2 p-4 mt-1 border rounded-lg">
-    <legend class="px-1 -ml-1 text-sm font-medium">Order By Filter</legend>
+    <legend class="px-1 -ml-1 text-sm font-medium">
+      Order By Filter
+    </legend>
     <ShadcnScrollArea v-if="filters.length > 0" class="max-h-32">
       <Container class="flex flex-col gap-1" @drop="onDrop">
         <Draggable v-for="(filter, index) in filters" :key="index">
@@ -105,7 +108,9 @@ const applyDrag = (filters: Filter[], dropResult: DropResult): Filter[] => {
                 <ShadcnSelectContent>
                   <ShadcnSelectGroup>
                     <ShadcnSelectLabel>Direction</ShadcnSelectLabel>
-                    <ShadcnSelectItem value="asc"> Ascending </ShadcnSelectItem>
+                    <ShadcnSelectItem value="asc">
+                      Ascending
+                    </ShadcnSelectItem>
                     <ShadcnSelectItem value="desc">
                       Descending
                     </ShadcnSelectItem>
@@ -147,7 +152,9 @@ const applyDrag = (filters: Filter[], dropResult: DropResult): Filter[] => {
     </div>
 
     <DevOnly>
-      <p class="break-all"><b>Preview Filter Query:</b> {{ queryString }}</p>
+      <p class="break-all">
+        <b>Preview Filter Query:</b> {{ queryString }}
+      </p>
     </DevOnly>
   </fieldset>
 </template>

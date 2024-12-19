@@ -4,11 +4,11 @@
 definePageMeta({
   name: 'Home',
   alias: ['/root', '/about'],
-});
+})
 
 // defineOgImageComponent('NuxtSeo');
 
-const features = ['Docker files', 'docker-compose files', 'github-workflows'];
+const features = ['Docker files', 'docker-compose files', 'github-workflows']
 
 /* const successOperation = async () => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -69,7 +69,7 @@ const handleError = (error: unknown) => {
         </div>
 
         <TextInOut
-          :text="'Automatically generates your '"
+          text="Automatically generates your "
           :text-to-loop="features"
           :duration="1.3"
         />
@@ -84,7 +84,9 @@ const handleError = (error: unknown) => {
         >
           <CallToAction>
             <NuxtLink class="cta-button" to="/sign-up">
-              <ShadcnButton variant="outline"> send </ShadcnButton>
+              <ShadcnButton variant="outline">
+                send
+              </ShadcnButton>
             </NuxtLink>
           </CallToAction>
         </TypeText>
@@ -185,31 +187,11 @@ const handleError = (error: unknown) => {
 @keyframes animate {
   0%,
   100% {
-    clip-path: polygon(
-      0% 45%,
-      16% 44%,
-      33% 50%,
-      54% 60%,
-      70% 61%,
-      84% 59%,
-      100% 52%,
-      100% 100%,
-      0% 100%
-    );
+    clip-path: polygon(0% 45%, 16% 44%, 33% 50%, 54% 60%, 70% 61%, 84% 59%, 100% 52%, 100% 100%, 0% 100%);
   }
 
   50% {
-    clip-path: polygon(
-      0% 60%,
-      15% 65%,
-      34% 66%,
-      51% 62%,
-      67% 50%,
-      84% 45%,
-      100% 46%,
-      100% 100%,
-      0% 100%
-    );
+    clip-path: polygon(0% 60%, 15% 65%, 34% 66%, 51% 62%, 67% 50%, 84% 45%, 100% 46%, 100% 100%, 0% 100%);
   }
 }
 </style>

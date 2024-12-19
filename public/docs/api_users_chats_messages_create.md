@@ -16,17 +16,17 @@ POST
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                              |
-|-----------|--------|----------|------------------------------------------|
-| user_id   | string | Yes      | Unique identifier of the user           |
-| chat_id   | number | Yes      | Unique identifier of the chat           |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| user_id   | string | Yes      | Unique identifier of the user |
+| chat_id   | number | Yes      | Unique identifier of the chat |
 
 ### Headers
 
-| Header         | Value            | Required | Description                          |
-|----------------|------------------|----------|--------------------------------------|
-| Content-Type   | application/json | Yes      | Indicates JSON request body         |
-| Cookie         | neptun-session   | Yes      | Session authentication cookie       |
+| Header       | Value            | Required | Description                   |
+| ------------ | ---------------- | -------- | ----------------------------- |
+| Content-Type | application/json | Yes      | Indicates JSON request body   |
+| Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -38,16 +38,16 @@ The endpoint accepts two types of request bodies:
 
 #### Single Message
 
-| Field   | Type   | Required | Description                    |
-|---------|--------|----------|--------------------------------|
-| message | string | Yes      | Content of the message        |
-| actor   | string | Yes      | Role of the message sender    |
+| Field   | Type   | Required | Description                |
+| ------- | ------ | -------- | -------------------------- |
+| message | string | Yes      | Content of the message     |
+| actor   | string | Yes      | Role of the message sender |
 
 #### Multiple Messages
 
-| Field    | Type           | Required | Description                    |
-|----------|----------------|----------|--------------------------------|
-| messages | MessageInput[] | Yes      | Array of message objects      |
+| Field    | Type           | Required | Description              |
+| -------- | -------------- | -------- | ------------------------ |
+| messages | MessageInput[] | Yes      | Array of message objects |
 
 Where MessageInput contains:
 
@@ -119,34 +119,34 @@ Where MessageInput contains:
 
 ```typescript
 interface MessageInput {
-  content: string;
-  role: 'user' | 'assistant' | 'system';
+  content: string
+  role: 'user' | 'assistant' | 'system'
 }
 
 interface SingleMessageRequest {
-  message: string;
-  actor: string;
+  message: string
+  actor: string
 }
 
 interface MultipleMessagesRequest {
-  messages: MessageInput[];
+  messages: MessageInput[]
 }
 
 interface ChatMessage {
-  id: number;
-  chat_conversation_id: number;
-  neptun_user_id: string;
-  message: string;
-  actor: string;
-  created_at: string;
+  id: number
+  chat_conversation_id: number
+  neptun_user_id: string
+  message: string
+  actor: string
+  created_at: string
 }
 
 interface SingleMessageResponse {
-  chatMessage: ChatMessage;
+  chatMessage: ChatMessage
 }
 
 interface MultipleMessagesResponse {
-  chatMessages: ChatMessage[];
+  chatMessages: ChatMessage[]
 }
 ```
 
@@ -229,13 +229,13 @@ curl -X POST \
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Messages successfully created                      |
-| 400         | Invalid request body                              |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | Chat or user not found                            |
-| 500         | Server error                                      |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Messages successfully created             |
+| 400         | Invalid request body                      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error                              |
 
 ## Notes
 

@@ -1,17 +1,23 @@
 export interface TemplateData {
-  id: number;
-  name: string;
+  id: number
+  name: string
+  author: string
   code: {
-    fileName: string;
-    code: string;
-  }[];
-  readme: string;
+    fileName: string
+    code: string
+  }[]
+  readme: string
+}
+
+const neptunTemplate = {
+  author: 'NeptunAI',
 }
 
 export const templates: TemplateData[] = [
   {
     id: 1,
     name: 'Full-Stack Website Starter',
+    ...neptunTemplate,
     code: [
       {
         fileName: 'docker-compose.yml',
@@ -1143,6 +1149,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
   {
     id: 2,
     name: 'Postgres Database Starter',
+    ...neptunTemplate,
     code: [
       {
         fileName: 'docker-compose.yml',
@@ -1192,6 +1199,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
   {
     id: 3,
     name: 'Redis (keydb) Database Starter',
+    ...neptunTemplate,
     code: [
       {
         fileName: 'docker-compose.yml',
@@ -2289,4 +2297,4 @@ aof-rewrite-incremental-fsync yes
     ],
     readme: '',
   },
-];
+]

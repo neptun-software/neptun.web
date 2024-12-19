@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-const isInfoHidden = ref(false);
-const { selectedAiChatKey } = useSelectedAiChat();
-const isSmScreen = useMediaQuery('(max-width: 1023px)');
+const isInfoHidden = ref(false)
+const { selectedAiChatKey } = useSelectedAiChat()
+const isSmScreen = useMediaQuery('(max-width: 1023px)')
 </script>
 
 <template>

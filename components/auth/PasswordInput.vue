@@ -1,22 +1,22 @@
 <script lang="ts" setup>
-import { Eye, EyeOff } from 'lucide-vue-next';
+import { Eye, EyeOff } from 'lucide-vue-next'
 
 interface Props {
-  onEnter: () => Promise<any>;
-  modelValue: string; // password
+  onEnter: () => Promise<any>
+  modelValue: string // password
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
-const emit = defineEmits(['update:modelValue']);
-const onInput = (value: string) => {
-  emit('update:modelValue', value);
-};
+const emit = defineEmits(['update:modelValue'])
+function onInput(value: string) {
+  emit('update:modelValue', value)
+}
 
-const passwordIsVisible = ref(false);
-const togglePasswordVisibility = () => {
-  passwordIsVisible.value = !passwordIsVisible.value;
-};
+const passwordIsVisible = ref(false)
+function togglePasswordVisibility() {
+  passwordIsVisible.value = !passwordIsVisible.value
+}
 </script>
 
 <template>

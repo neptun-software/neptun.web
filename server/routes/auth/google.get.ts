@@ -1,4 +1,4 @@
-import { createOauthAccount } from '~/server/database/repositories/oauthAccounts';
+import { createOauthAccount } from '~/server/database/repositories/oauthAccounts'
 
 export default oauthGoogleEventHandler({
   config: {
@@ -6,15 +6,15 @@ export default oauthGoogleEventHandler({
   },
   async onSuccess(event, { user }) {
     // tokens
-    const user_email = user?.email; // maybe add email_verified, picture for icon
-    const user_id = user?.sub; // id_token includes sub and stores other data too, expires tho
+    const user_email = user?.email // maybe add email_verified, picture for icon
+    const user_id = user?.sub // id_token includes sub and stores other data too, expires tho
 
-    const createdOrFetchedUserAndConnectedOauthAccount =
-      await createOauthAccount({
+    const createdOrFetchedUserAndConnectedOauthAccount
+      = await createOauthAccount({
         provider: 'google',
         oauth_user_id: user_id,
         oauth_email: user_email,
-      });
+      })
 
     if (!createdOrFetchedUserAndConnectedOauthAccount) {
       return sendError(
@@ -22,14 +22,17 @@ export default oauthGoogleEventHandler({
         createError({
           statusCode: 500,
           statusMessage: 'Failed to create oauth account',
-        })
-      );
+        }),
+      )
     }
 
     if (createdOrFetchedUserAndConnectedOauthAccount.isNewOauthAccount) {
-      if (LOG_BACKEND) console.info('New oAuth account created!');
-    } else {
-      if (LOG_BACKEND) console.info('Fetched existing oAuth account!');
+      if (LOG_BACKEND)
+        console.info('New oAuth account created!')
+    }
+    else {
+      if (LOG_BACKEND)
+        console.info('Fetched existing oAuth account!')
     }
 
     await setUserSession(event, {
@@ -50,8 +53,8 @@ export default oauthGoogleEventHandler({
         },
       },
       loggedInAt: new Date(),
-    });
+    })
 
-    return sendRedirect(event, '/dashboard');
+    return sendRedirect(event, '/dashboard')
   },
-});
+})

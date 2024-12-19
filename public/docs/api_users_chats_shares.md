@@ -16,16 +16,16 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                              |
-|-----------|--------|----------|------------------------------------------|
-| user_id   | string | Yes      | Unique identifier of the user           |
-| chat_id   | number | Yes      | Unique identifier of the chat           |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| user_id   | string | Yes      | Unique identifier of the user |
+| chat_id   | number | Yes      | Unique identifier of the chat |
 
 ### Headers
 
-| Header         | Value          | Required | Description                    |
-|----------------|----------------|----------|--------------------------------|
-| Cookie         | neptun-session | Yes      | Session authentication cookie  |
+| Header | Value          | Required | Description                   |
+| ------ | -------------- | -------- | ----------------------------- |
+| Cookie | neptun-session | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -69,15 +69,15 @@ null
 
 ```typescript
 interface ChatShareResponse {
-  uuid: string | null;
+  uuid: string | null
 }
 
 interface ChatShareError {
-  statusCode: number;
-  statusMessage: string;
+  statusCode: number
+  statusMessage: string
   data: {
-    message: string;
-  };
+    message: string
+  }
 }
 ```
 
@@ -144,25 +144,25 @@ async function getChatShare(
     {
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  const data = await response.json();
-  return data ? data.uuid : null;
+  const data = await response.json()
+  return data ? data.uuid : null
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Request successful                                |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | Chat or user not found                            |
-| 500         | Server error                                      |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Request successful                        |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error                              |
 
 ## Notes
 

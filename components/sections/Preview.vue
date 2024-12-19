@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import gsap from 'gsap';
+import gsap from 'gsap'
 
-const colorMode = useColorMode();
-const floatingImage = ref<HTMLElement | null>(null);
+const colorMode = useColorMode()
+const floatingImage = ref<HTMLElement | null>(null)
 
-const initializeAnimation = () => {
+function initializeAnimation() {
   gsap.to('.floating-image', {
     y: -10,
     duration: 2,
     ease: 'power1.inOut',
     yoyo: true,
     repeat: -1,
-  });
-};
+  })
+}
 
 watch(floatingImage, (newValue) => {
   if (newValue) {
-    initializeAnimation();
+    initializeAnimation()
   }
-});
+})
 
 onMounted(() => {
   setTimeout(() => {
     if (floatingImage.value) {
-      initializeAnimation();
+      initializeAnimation()
     }
-  }, 100);
-});
+  }, 100)
+})
 </script>
 
 <template>

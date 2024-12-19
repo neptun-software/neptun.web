@@ -1,12 +1,12 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm'
 import {
   neptun_user,
   neptun_user_oauth_account,
   type OauthAccountToCreate,
-} from '../../../lib/types/database.tables/schema';
-import { createEmptyUser } from './users';
+} from '../../../lib/types/database.tables/schema'
+import { createEmptyUser } from './users'
 
-export const createOauthAccount = async (account: OauthAccountToCreate) => {
+export async function createOauthAccount(account: OauthAccountToCreate) {
   /* TODO: if neptun_user_id user exists, link account to user (use neptun_user_id?) */
 
   /* CHECK IF OAUTH ACCOUNT ALREADY EXISTS */
@@ -15,12 +15,12 @@ export const createOauthAccount = async (account: OauthAccountToCreate) => {
     where: and(
       eq(
         neptun_user_oauth_account.provider,
-        account.provider
+        account.provider,
       ) /* check if oauth account with that provider exists for existing user */,
       eq(
         neptun_user_oauth_account.oauth_user_id,
-        encryptColumn(account.oauth_user_id)
-      )
+        encryptColumn(account.oauth_user_id),
+      ),
     ),
     with: {
       neptun_user: {
@@ -30,7 +30,7 @@ export const createOauthAccount = async (account: OauthAccountToCreate) => {
         extras: {
           /* custom fields */
           primary_email: decryptColumn(neptun_user.primary_email).as(
-            'primary_email'
+            'primary_email',
           ),
         },
       },
@@ -40,13 +40,13 @@ export const createOauthAccount = async (account: OauthAccountToCreate) => {
     },
     extras: {
       oauth_user_id: decryptColumn(neptun_user_oauth_account.oauth_user_id).as(
-        'oauth_user_id'
+        'oauth_user_id',
       ),
       oauth_email: decryptColumn(neptun_user_oauth_account.oauth_email).as(
-        'oauth_email'
+        'oauth_email',
       ),
     },
-  });
+  })
 
   if (existingOauthUser) {
     return {
@@ -54,24 +54,25 @@ export const createOauthAccount = async (account: OauthAccountToCreate) => {
       userData: {
         ...existingOauthUser,
       },
-    };
+    }
   }
 
   /* CREATE NEW USER AND OAUTH ACCOUNT, IF IT DOESN'T EXIST INSTEAD */
 
-  const createdUser = await createEmptyUser();
+  const createdUser = await createEmptyUser()
 
-  if (!createdUser) return null;
+  if (!createdUser)
+    return null
 
   const createdOauthAccount = await db
     .insert(neptun_user_oauth_account)
     .values({
       provider: account.provider /* github, google */,
       oauth_user_id: encryptColumn(
-        account.oauth_user_id
+        account.oauth_user_id,
       ) /* id from /auth/github or /auth/google */,
       oauth_email: encryptColumn(
-        account.oauth_email
+        account.oauth_email,
       ) /* email from /auth/github or /auth/google */,
       neptun_user_id: createdUser.id,
     })
@@ -83,11 +84,12 @@ export const createOauthAccount = async (account: OauthAccountToCreate) => {
     })
     .catch((err) => {
       if (LOG_BACKEND)
-        console.error('Failed to insert oauth account into database', err);
-      return null;
-    });
+        console.error('Failed to insert oauth account into database', err)
+      return null
+    })
 
-  if (!createdOauthAccount) return null;
+  if (!createdOauthAccount)
+    return null
 
   /* TODO: set primary_email to Oauth Email */
 
@@ -102,5 +104,5 @@ export const createOauthAccount = async (account: OauthAccountToCreate) => {
         primary_email: createdUser.primary_email,
       },
     },
-  };
-};
+  }
+}

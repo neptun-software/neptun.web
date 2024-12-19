@@ -16,16 +16,16 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                              |
-|-----------|--------|----------|------------------------------------------|
-| user_id   | string | Yes      | Unique identifier of the user           |
-| chat_id   | number | Yes      | Unique identifier of the chat           |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| user_id   | string | Yes      | Unique identifier of the user |
+| chat_id   | number | Yes      | Unique identifier of the chat |
 
 ### Headers
 
-| Header         | Value          | Required | Description                    |
-|----------------|----------------|----------|--------------------------------|
-| Cookie         | neptun-session | Yes      | Session authentication cookie  |
+| Header | Value          | Required | Description                   |
+| ------ | -------------- | -------- | ----------------------------- |
+| Cookie | neptun-session | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -78,32 +78,32 @@ No request body required.
 
 ```typescript
 interface ChatFile {
-  id: number;
-  title: string;
-  text: string;
-  language: string;
-  extension: string;
+  id: number
+  title: string
+  text: string
+  language: string
+  extension: string
 }
 
 interface ChatMessage {
-  id: number;
-  chat_conversation_id: number;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  created_at: string;
-  files?: ChatFile[];
+  id: number
+  chat_conversation_id: number
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  created_at: string
+  files?: ChatFile[]
 }
 
 interface GetChatMessagesResponse {
-  chatMessages: ChatMessage[];
+  chatMessages: ChatMessage[]
 }
 
 interface GetChatMessagesError {
-  statusCode: number;
-  statusMessage: string;
+  statusCode: number
+  statusMessage: string
   data: {
-    message: string;
-  };
+    message: string
+  }
 }
 ```
 
@@ -183,24 +183,24 @@ async function getChatMessages(
     {
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as GetChatMessagesResponse;
+  return await response.json() as GetChatMessagesResponse
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Successfully retrieved chat messages               |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | Chat or user not found                            |
-| 500         | Server error                                      |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully retrieved chat messages      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error                              |
 
 ## Notes
 

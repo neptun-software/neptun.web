@@ -1,5 +1,5 @@
 <script setup>
-import gsap from 'gsap';
+import gsap from 'gsap'
 
 const props = defineProps({
   imagePaths: {
@@ -30,44 +30,44 @@ const props = defineProps({
     type: Number,
     default: 100,
   },
-});
+})
 
-const exclusionRadius = props.exclusionRadius;
-const paddingX = props.paddingX;
-const paddingY = props.paddingY;
-const maxUsagePerImage = props.maxUsagePerImage;
+const exclusionRadius = props.exclusionRadius
+const paddingX = props.paddingX
+const paddingY = props.paddingY
+const maxUsagePerImage = props.maxUsagePerImage
 
-const container = ref(null);
-const stars = ref([]);
+const container = ref(null)
+const stars = ref([])
 
-const initializeStars = () => {
-  const containerWidth = container.value.offsetWidth;
-  const containerHeight = container.value.offsetHeight;
-  const centerX = containerWidth / 2;
-  const centerY = containerHeight / 2;
-  const starImages = [];
+function initializeStars() {
+  const containerWidth = container.value.offsetWidth
+  const containerHeight = container.value.offsetHeight
+  const centerX = containerWidth / 2
+  const centerY = containerHeight / 2
+  const starImages = []
 
   props.imagePaths.forEach((path) => {
     for (let i = 0; i < maxUsagePerImage; i++) {
-      starImages.push(path);
+      starImages.push(path)
     }
-  });
+  })
 
-  const starCount = starImages.length;
+  const starCount = starImages.length
 
   stars.value = Array.from({ length: starCount }, (_, index) => {
-    const size =
-      Math.random() * (props.imageSizeMax - props.imageSizeMin) +
-      props.imageSizeMin;
-    let x, y, distance;
+    const size
+      = Math.random() * (props.imageSizeMax - props.imageSizeMin)
+      + props.imageSizeMin
+    let x, y, distance
 
     do {
-      x = Math.random() * (containerWidth - 2 * paddingX) + paddingX;
-      y = Math.random() * (containerHeight - 2 * paddingY) + paddingY;
-      const dx = x - centerX;
-      const dy = y - centerY;
-      distance = Math.sqrt(dx * dx + dy * dy);
-    } while (distance < exclusionRadius);
+      x = Math.random() * (containerWidth - 2 * paddingX) + paddingX
+      y = Math.random() * (containerHeight - 2 * paddingY) + paddingY
+      const dx = x - centerX
+      const dy = y - centerY
+      distance = Math.sqrt(dx * dx + dy * dy)
+    } while (distance < exclusionRadius)
 
     return {
       src: starImages[index],
@@ -79,36 +79,36 @@ const initializeStars = () => {
         left: `${x}px`,
         transform: `translate(-50%, -50%)`,
       },
-    };
-  });
-};
+    }
+  })
+}
 
-const handleMouseMove = (event) => {
-  const { clientX, clientY } = event;
-  const centerX = window.innerWidth / 2;
-  const centerY = window.innerHeight / 2;
-  const deltaX = clientX - centerX;
-  const deltaY = clientY - centerY;
+function handleMouseMove(event) {
+  const { clientX, clientY } = event
+  const centerX = window.innerWidth / 2
+  const centerY = window.innerHeight / 2
+  const deltaX = clientX - centerX
+  const deltaY = clientY - centerY
   stars.value.forEach((star, index) => {
-    const movement = (index + 1) / stars.value.length;
+    const movement = (index + 1) / stars.value.length
     gsap.to(star.style, {
       transform: `translate(${deltaX * movement * 0.1}px, ${
         deltaY * movement * 0.1
       }px)`,
       duration: 0.3,
       ease: 'power1.out',
-    });
-  });
-};
+    })
+  })
+}
 
 onMounted(() => {
-  initializeStars();
-  window.addEventListener('mousemove', handleMouseMove);
-});
+  initializeStars()
+  window.addEventListener('mousemove', handleMouseMove)
+})
 
 onBeforeUnmount(() => {
-  window.removeEventListener('mousemove', handleMouseMove);
-});
+  window.removeEventListener('mousemove', handleMouseMove)
+})
 </script>
 
 <template>

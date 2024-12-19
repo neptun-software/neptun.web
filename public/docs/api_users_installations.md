@@ -16,15 +16,15 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                              |
-|-----------|--------|----------|------------------------------------------|
-| user_id   | string | Yes      | Unique identifier of the user           |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| user_id   | string | Yes      | Unique identifier of the user |
 
 ### Headers
 
-| Header         | Value          | Required | Description                    |
-|----------------|----------------|----------|--------------------------------|
-| Cookie         | neptun-session | Yes      | Session authentication cookie  |
+| Header | Value          | Required | Description                   |
+| ------ | -------------- | -------- | ----------------------------- |
+| Cookie | neptun-session | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -66,19 +66,19 @@ No request body required.
 
 ```typescript
 interface GithubAppInstallation {
-  id: number;
-  neptun_user_id: string;
-  github_installation_id: string;
-  created_at: string;
-  updated_at: string;
+  id: number
+  neptun_user_id: string
+  github_installation_id: string
+  created_at: string
+  updated_at: string
 }
 
 interface GetInstallationsError {
-  statusCode: number;
-  statusMessage: string;
+  statusCode: number
+  statusMessage: string
   data: {
-    message: string;
-  };
+    message: string
+  }
 }
 ```
 
@@ -140,24 +140,24 @@ async function getGithubInstallations(
     {
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as GithubAppInstallation[];
+  return await response.json() as GithubAppInstallation[]
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Successfully retrieved installations               |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | User not found                                    |
-| 500         | Server error                                      |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully retrieved installations      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | User not found                            |
+| 500         | Server error                              |
 
 ## Notes
 

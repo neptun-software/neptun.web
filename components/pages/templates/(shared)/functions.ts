@@ -1,17 +1,17 @@
-import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
-import type { TemplateData } from '~/lib/(templates)/templates';
+import type { TemplateData } from '~/lib/(templates)/templates'
+import { saveAs } from 'file-saver'
+import JSZip from 'jszip'
 
 export async function downloadTemplateZip(template: TemplateData) {
-  const zip = new JSZip();
+  const zip = new JSZip()
 
   template.code.forEach((codeFile) => {
-    zip.file(codeFile.fileName, codeFile.code.trim());
-  });
+    zip.file(codeFile.fileName, codeFile.code.trim())
+  })
 
   await zip.generateAsync({ type: 'blob' }).then((content) => {
-    saveAs(content, `${template.name.replaceAll(' ', '-')}-template.zip`);
-  });
+    saveAs(content, `${template.name.replaceAll(' ', '-')}-template.zip`)
+  })
 }
 
 /**
@@ -22,7 +22,7 @@ export async function downloadTemplateZip(template: TemplateData) {
  */
 export function downloadTemplateHandler(template: TemplateData): (event: MouseEvent) => Promise<void> {
   return async (event: MouseEvent) => {
-    event.preventDefault();
-    await downloadTemplateZip(template);
-  };
+    event.preventDefault()
+    await downloadTemplateZip(template)
+  }
 }

@@ -1,35 +1,35 @@
 <script setup lang="ts">
+import { type Message, useChat } from '@ai-sdk/vue' // NOTE: can only be called in setup scripts ("Could not get current instance, check to make sure that `useSwrv` is declared in the top level of the setup function.")
 import {
-  Mic,
-  Paperclip,
-  Link,
   CornerDownLeft,
-  RefreshCcw,
-  Trash2,
   Delete,
-  Mouse,
   Download,
-  Settings2,
+  Link,
   MessageCircleReply,
-} from 'lucide-vue-next';
-import { useChat, type Message } from '@ai-sdk/vue'; // NOTE: can only be called in setup scripts ("Could not get current instance, check to make sure that `useSwrv` is declared in the top level of the setup function.")
-import { toast } from 'vue-sonner';
-import { generateUUID } from '~/lib/utils';
-import { AllowedAiModelsEnum } from '~/lib/types/ai.models';
+  Mic,
+  Mouse,
+  Paperclip,
+  RefreshCcw,
+  Settings2,
+  Trash2,
+} from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
+import { AllowedAiModelsEnum } from '~/lib/types/ai.models'
+import { generateUUID } from '~/lib/utils'
 
-const { console } = useLogger();
+const { console } = useLogger()
 
-const { loadFiles } = useFetchFiles();
-const { user } = useUserSession();
+const { loadFiles } = useFetchFiles()
+const { user } = useUserSession()
 const {
   aiPlaygroundChatMessages: currentAiChatPlaygroundMessagesBackup,
   resetAiPlaygroundChat,
-} = useAiChatPlayground();
-const { generateMarkdownFromUrl } = useAPI();
+} = useAiChatPlayground()
+const { generateMarkdownFromUrl } = useAPI()
 
 /* CHAT AI */
-const { selectedAiChat, selectedAiChatIsPlayground, selectedAiChatKey } =
-  useSelectedAiChat();
+const { selectedAiChat, selectedAiChatIsPlayground, selectedAiChatKey }
+  = useSelectedAiChat()
 const {
   messages: chatMessages,
   input: currentChatMessage,
@@ -43,17 +43,17 @@ const {
   id: String(selectedAiChat.value.id),
   api: selectedAiChatKey.value,
   keepLastMessageOnError: true,
-});
+})
 
 watch(chatError, () => {
   if (chatError.value) {
-    toast.error(`Chat error!`);
+    toast.error(`Chat error!`)
   }
-});
+})
 
 // INFO: Listening to chatMessages would be way more inefficient, since that would cause the callback function to be called on every token, the AI answers.
-const waitForValidRef = (condition: Ref<boolean | undefined>) => {
-  let unwatch: (() => void) | null = null;
+function waitForValidRef(condition: Ref<boolean | undefined>) {
+  let unwatch: (() => void) | null = null
 
   const promise = new Promise<void>((resolve, reject) => {
     try {
@@ -61,67 +61,68 @@ const waitForValidRef = (condition: Ref<boolean | undefined>) => {
         condition,
         (newValue) => {
           if (!newValue) {
-            console.info(`Resolved value ${newValue}...`);
-            resolve();
+            console.info(`Resolved value ${newValue}...`)
+            resolve()
           }
         },
-        { immediate: true }
-      );
-    } catch (error) {
-      console.info('Failed to resolve value!');
-      reject(error);
+        { immediate: true },
+      )
     }
-  });
+    catch (error) {
+      console.info('Failed to resolve value!')
+      reject(error)
+    }
+  })
 
   promise.finally(() => {
     if (unwatch) {
-      console.info('Removing watcher...');
-      unwatch();
+      console.info('Removing watcher...')
+      unwatch()
     }
-  });
+  })
 
-  return promise;
-};
+  return promise
+}
 
-const chatMessagesKey = ref<string>(generateUUID());
+const chatMessagesKey = ref<string>(generateUUID())
 watch(
   () => chatMessages.value.length,
   async () => {
-    const aiIsDoneResponding = waitForValidRef(chatResponseIsLoading);
+    const aiIsDoneResponding = waitForValidRef(chatResponseIsLoading)
 
     if (
-      chatMessages.value[chatMessages.value.length - 1]?.role === 'assistant' &&
-      !isLoading.value // !isLoading.value needed, so that it only shows the toast, if the messages are actually new, and not onMounted (onLoaded)
+      chatMessages.value[chatMessages.value.length - 1]?.role === 'assistant'
+      && !isLoading.value // !isLoading.value needed, so that it only shows the toast, if the messages are actually new, and not onMounted (onLoaded)
     ) {
       toast.promise(aiIsDoneResponding, {
         loading: 'Fetching AI response...',
         success: (_data: any) => 'AI response fetched!',
         error: (_data: any) => 'Failed to fetch AI response!',
-      });
+      })
     }
 
-    await aiIsDoneResponding;
-    chatMessagesKey.value = generateUUID();
+    await aiIsDoneResponding
+    chatMessagesKey.value = generateUUID()
     if (selectedAiChat.value.id !== -1) {
-      await loadFiles(user.value?.id ?? -1, selectedAiChat.value.id);
+      await loadFiles(user.value?.id ?? -1, selectedAiChat.value.id)
     }
 
     // Sanitize Llama3 messages (cannot be done in backend)
     if (selectedAiChat.value.model === AllowedAiModelsEnum.metaLlama) {
-      chatMessages.value = chatMessages.value.map((message) => ({
+      chatMessages.value = chatMessages.value.map(message => ({
         ...message,
         content: getSanitizedMessageContent(message.content),
-      }));
+      }))
     }
 
-    console.info('Setting chat history messages backup...');
+    console.info('Setting chat history messages backup...')
     if (selectedAiChatIsPlayground.value && chatMessages.value.length > 0) {
-      currentAiChatPlaygroundMessagesBackup.value = chatMessages.value;
+      currentAiChatPlaygroundMessagesBackup.value = chatMessages.value
     }
 
-    scrollToBottom();
-  }
-);
+    scrollToBottom()
+  },
+)
 
 /* SPEECH RECOGNITION */
 const {
@@ -135,28 +136,29 @@ const {
   lang: 'en-US',
   interimResults: true,
   continuous: true,
-});
+})
 
 watch(speechRecognitionError, async () => {
   if (speechRecognitionError.value?.error === 'not-allowed') {
     toast.error(
-      'Speech recognition was disabled for this page!\nPlease allow it, to use the feature!'
-    );
-  } else {
-    toast.error(
-      `Speech recognition error! (${speechRecognitionError.value?.error})`
-    );
+      'Speech recognition was disabled for this page!\nPlease allow it, to use the feature!',
+    )
   }
-});
+  else {
+    toast.error(
+      `Speech recognition error! (${speechRecognitionError.value?.error})`,
+    )
+  }
+})
 
 if (isSpeechRecognitionSupported.value && IS_CLIENT) {
   watch(speechRecognitionResult, () => {
-    currentChatMessage.value = speechRecognitionResult.value;
-  });
+    currentChatMessage.value = speechRecognitionResult.value
+  })
 }
 
 /* CONVERT HTML TO MARKDOWN */
-const urlToFetchHtmlFrom = ref('');
+const urlToFetchHtmlFrom = ref('')
 
 /* FILE UPLOAD */
 const {
@@ -166,28 +168,28 @@ const {
 } = useFileDialog({
   accept: 'text/plain',
   /* directory: true, */ // TODO: allow importing of file structure
-});
+})
 
 onChange(async (uploadedFiles) => {
   if (uploadedFiles) {
     for (const file of uploadedFiles) {
       if (file.type !== 'text/plain') {
-        toast.error('File type not supported!');
-        resetFile();
-        return;
+        toast.error('File type not supported!')
+        resetFile()
+        return
       }
-      appendFileUploadToInput(file.type, file.name, await file.text());
+      appendFileUploadToInput(file.type, file.name, await file.text())
     }
 
-    resetFile();
+    resetFile()
   }
-});
+})
 
 function appendFileUploadToInput(type: string, name: string, text: string) {
-  console.info('Appending file upload to input...');
+  console.info('Appending file upload to input...')
 
-  const prettierFileContent = `\`\`\`${type}:${name}\n${text}\n\`\`\``;
-  currentChatMessage.value = prettierFileContent + currentChatMessage.value;
+  const prettierFileContent = `\`\`\`${type}:${name}\n${text}\n\`\`\``
+  currentChatMessage.value = prettierFileContent + currentChatMessage.value
 }
 
 // Load data
@@ -195,119 +197,122 @@ async function loadChatMessages(user_id: number, chat_id: number) {
   if (user_id !== -1) {
     if (chat_id === -1) {
       // load playground, if no chat is selected
-      chatMessages.value = currentAiChatPlaygroundMessagesBackup.value;
-      return;
+      chatMessages.value = currentAiChatPlaygroundMessagesBackup.value
+      return
     }
 
     try {
       const data = await $fetch(
-        `/api/users/${user_id}/chats/${chat_id}/messages`
-      );
+        `/api/users/${user_id}/chats/${chat_id}/messages`,
+      )
 
       if (data?.chatMessages && data.chatMessages.length > 0) {
-        const chatMessages = data.chatMessages;
+        const chatMessages = data.chatMessages
         const messages = chatMessages.map(
           ({ id, message, actor }) =>
             ({
               id: `${String(id)}-${String(Date.now())}`,
               content: message,
               role: actor,
-            } as Message)
-        );
+            } as Message),
+        )
 
-        setChatMessages(messages);
+        setChatMessages(messages)
       }
-    } catch {
-      console.error('Failed to load chat messages!');
+    }
+    catch {
+      console.error('Failed to load chat messages!')
     }
   }
 }
 
-const isLoading = ref(true);
+const isLoading = ref(true)
 onMounted(async () => {
   await loadChatMessages(user.value?.id ?? -1, selectedAiChat.value.id).then(
     () => {
-      isLoading.value = false;
+      isLoading.value = false
       // currentChatMessageHistoryClear();
-    }
-  );
-});
+    },
+  )
+})
 
 // scroll to bottom
-const $scrollArea = ref();
-const $actualScrollArea = ref<HTMLElement | null>(null);
+const $scrollArea = ref()
+const $actualScrollArea = ref<HTMLElement | null>(null)
 onMounted(() => {
   $actualScrollArea.value = $scrollArea.value.$el.querySelector(
-    '[data-radix-scroll-area-viewport]'
-  ) as HTMLElement;
-});
+    '[data-radix-scroll-area-viewport]',
+  ) as HTMLElement
+})
 
-const scrollToBottom = () => {
+function scrollToBottom() {
   if ($actualScrollArea.value) {
     $actualScrollArea.value.scrollTo({
       top: $actualScrollArea.value.scrollHeight,
       behavior: 'smooth',
-    });
+    })
   }
-};
+}
 
 // TODO: find a actual solution for this
 watchOnce(isLoading, () => {
   setTimeout(() => {
     if ($actualScrollArea.value) {
-      scrollToBottom();
+      scrollToBottom()
     }
-  }, 500);
-});
+  }, 500)
+})
 
 async function generateMarkdown() {
   const updatedCurrentChatMessage = await generateMarkdownFromUrl(
     urlToFetchHtmlFrom.value,
-    currentChatMessage.value
-  );
+    currentChatMessage.value,
+  )
 
   if (updatedCurrentChatMessage) {
-    currentChatMessage.value = updatedCurrentChatMessage;
+    currentChatMessage.value = updatedCurrentChatMessage
   }
 }
 
 // Send Message on CTRL + ENTER && allow message history
-let historyIndex = -1;
+let historyIndex = -1
 function handleInputFieldKeyboardEvents(event: KeyboardEvent) {
   if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
-    submitMessage();
+    submitMessage()
   }
 
   if ((event.ctrlKey || event.metaKey) && event.key === 'ArrowUp') {
     // currentChatMessageRedo();
     if (historyIndex < currentChatMessageHistory.value.length - 1) {
-      historyIndex++;
-      currentChatMessage.value =
-        currentChatMessageHistory.value[historyIndex].snapshot;
+      historyIndex++
+      currentChatMessage.value
+        = currentChatMessageHistory.value[historyIndex].snapshot
     }
   }
 
   if ((event.ctrlKey || event.metaKey) && event.key === 'ArrowDown') {
     // currentChatMessageUndo();
     if (historyIndex > 0) {
-      historyIndex--;
-      currentChatMessage.value =
-        currentChatMessageHistory.value[historyIndex].snapshot;
-    } else if (historyIndex === 0) {
-      currentChatMessage.value = '';
-      historyIndex = -1;
+      historyIndex--
+      currentChatMessage.value
+        = currentChatMessageHistory.value[historyIndex].snapshot
+    }
+    else if (historyIndex === 0) {
+      currentChatMessage.value = ''
+      historyIndex = -1
     }
   }
 }
 
 function submitMessage() {
-  if (currentChatMessage.value.trim() === '') return;
-  globalChatMessage.value = currentChatMessage.value;
-  currentChatMessageCommit();
-  handleChatMessageSubmit();
+  if (currentChatMessage.value.trim() === '')
+    return
+  globalChatMessage.value = currentChatMessage.value
+  currentChatMessageCommit()
+  handleChatMessageSubmit()
 }
 
-const globalChatMessage = useState('global-chat-message', () => '');
+const globalChatMessage = useState('global-chat-message', () => '')
 
 const {
   history: currentChatMessageHistory,
@@ -317,22 +322,22 @@ const {
   // clear: currentChatMessageHistoryClear,
 } = useManualRefHistory(globalChatMessage, {
   capacity: 3,
-});
+})
 
 async function reloadLast() {
   await deleteLast()
     .then(async () => {
       await reloadLastChatMessage()
         .then(() => {
-          toast.success('Chat message reloaded!');
+          toast.success('Chat message reloaded!')
         })
         .catch(() => {
-          toast.error('Failed to reload chat message!');
-        });
+          toast.error('Failed to reload chat message!')
+        })
     })
     .catch(() => {
-      toast.error('Failed to reload chat message!');
-    });
+      toast.error('Failed to reload chat message!')
+    })
 }
 
 async function deleteLast() {
@@ -342,18 +347,18 @@ async function deleteLast() {
     }/messages/last`,
     {
       method: 'DELETE',
-    }
+    },
   )
     .then(async () => {
-      toast.success('Chat message deleted!');
+      toast.success('Chat message deleted!')
     })
     .catch(() => {
-      toast.error('Failed to delete chat message!');
-    });
+      toast.error('Failed to delete chat message!')
+    })
 }
 
 async function downloadChatMessages(_event = null) {
-  await downloadAsFile(chatMessages.value, 'chat-messages');
+  await downloadAsFile(chatMessages.value, 'chat-messages')
 }
 </script>
 
@@ -400,7 +405,7 @@ async function downloadChatMessages(_event = null) {
           variant="ghost"
           :hide-loader="false"
           :is-disabled="chatMessages.length === 0"
-          :onClickAsync="() => downloadChatMessages()"
+          :on-click-async="() => downloadChatMessages()"
         >
           <Download class="size-6" />
         </AsyncButton>
@@ -444,7 +449,7 @@ async function downloadChatMessages(_event = null) {
           </div>
         </div>
 
-        <InfoBlock showLoader showDots :isVisible="chatResponseIsLoading">
+        <InfoBlock show-loader show-dots :is-visible="chatResponseIsLoading">
           Waiting for response
         </InfoBlock>
 
@@ -452,9 +457,11 @@ async function downloadChatMessages(_event = null) {
           v-if="chatError"
           class="flex flex-wrap items-center w-full p-4 mt-8 font-black uppercase border-2 rounded-md text-ellipsis border-destructive"
         >
-          <p class="flex-grow">Something went wrong!</p>
+          <p class="flex-grow">
+            Something went wrong!
+          </p>
 
-          <AsyncButton variant="outline" :onClickAsync="() => reloadLast()">
+          <AsyncButton variant="outline" :on-click-async="() => reloadLast()">
             Try again
           </AsyncButton>
         </div>
@@ -465,7 +472,9 @@ async function downloadChatMessages(_event = null) {
       class="relative flex-shrink-0 overflow-hidden border rounded-lg bg-background focus-within:ring-1 focus-within:ring-ring"
       @submit.prevent="submitMessage"
     >
-      <ShadcnLabel for="message" class="sr-only"> Message </ShadcnLabel>
+      <ShadcnLabel for="message" class="sr-only">
+        Message
+      </ShadcnLabel>
       <ShadcnTextarea
         id="message"
         v-model="currentChatMessage"
@@ -501,7 +510,9 @@ async function downloadChatMessages(_event = null) {
               </ShadcnPopoverTrigger>
               <ShadcnPopoverContent>
                 <div class="grid gap-2 mb-1">
-                  <ShadcnLabel for="url"> URL </ShadcnLabel>
+                  <ShadcnLabel for="url">
+                    URL
+                  </ShadcnLabel>
                   <ShadcnInput
                     id="url"
                     v-model="urlToFetchHtmlFrom"
@@ -516,7 +527,7 @@ async function downloadChatMessages(_event = null) {
                   variant="outline"
                   class="w-full"
                   :is-disabled="urlToFetchHtmlFrom.trim() === ''"
-                  :onClickAsync="async () => await generateMarkdown()"
+                  :on-click-async="async () => await generateMarkdown()"
                 >
                   Add URL for further context
                 </AsyncButton>
@@ -537,7 +548,8 @@ async function downloadChatMessages(_event = null) {
                     if (isListeningToSpeech) {
                       console.info('stopping listening');
                       stopSpeechRecognition();
-                    } else {
+                    }
+                    else {
                       console.info('starting listening');
                       startSpeechRecognition();
                     }
@@ -560,16 +572,18 @@ async function downloadChatMessages(_event = null) {
                     variant="ghost"
                     size="icon"
                     :disabled="
-                      chatResponseIsLoading ||
-                      chatMessages.length === 0 ||
-                      !selectedAiChatIsPlayground
+                      chatResponseIsLoading
+                        || chatMessages.length === 0
+                        || !selectedAiChatIsPlayground
                     "
                   >
                     <Trash2 class="size-4" />
                     <span class="sr-only">Clear Chat</span>
                   </ShadcnButton>
                 </ShadcnTooltipTrigger>
-                <ShadcnTooltipContent side="top"> Clear </ShadcnTooltipContent>
+                <ShadcnTooltipContent side="top">
+                  Clear
+                </ShadcnTooltipContent>
               </ShadcnAlertDialogTrigger>
               <ShadcnAlertDialogContent>
                 <ShadcnAlertDialogHeader>
@@ -597,7 +611,7 @@ async function downloadChatMessages(_event = null) {
                 :is-disabled="
                   chatResponseIsLoading || chatMessages.length === 0
                 "
-                :onClickAsync="() => reloadLast()"
+                :on-click-async="() => reloadLast()"
               >
                 <RefreshCcw class="size-4" />
                 <span class="sr-only">Refresh Last Response</span>

@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import type { TemplateData } from '~/lib/(templates)/templates';
+import type { TemplateData } from '~/lib/(templates)/templates'
 
-const { totalItems, isLoading, fetchInfiniteData } = useTemplates();
-const data = ref<TemplateData[]>([]);
-const pageSize = ref(2);
-const page = ref(1);
+const { totalItems, isLoading, fetchInfiniteData } = useTemplates()
+const data = ref<TemplateData[]>([])
+const pageSize = ref(2)
+const page = ref(1)
 
 async function loadMore() {
-  const hasMoreData = await fetchInfiniteData(page.value, pageSize.value, data);
+  const hasMoreData = await fetchInfiniteData(page.value, pageSize.value, data)
   if (hasMoreData) {
-    page.value += 1;
+    page.value += 1
   }
 }
 
 useInfiniteScroll(document, loadMore, {
   distance: 100,
-});
+})
 </script>
 
 <template>
-  <Templates :templates="data" :isLoading="isLoading"></Templates>
+  <Templates :templates="data" :is-loading="isLoading" />
 
   <div
     v-if="!isLoading && data.length > 0 && data.length === totalItems"

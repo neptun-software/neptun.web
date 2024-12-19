@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 defineProps<{
-  isFirst?: boolean;
-  isLast?: boolean;
-}>();
+  isFirst?: boolean
+  isLast?: boolean
+}>()
 </script>
 
 <template>

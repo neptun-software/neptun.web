@@ -16,16 +16,16 @@ GET
 
 ### Route Parameters
 
-| Parameter       | Type   | Required | Description                                    |
-|----------------|--------|----------|------------------------------------------------|
-| user_id        | string | Yes      | Unique identifier of the user                 |
-| installation_id| number | Yes      | Unique identifier of the GitHub App installation|
+| Parameter       | Type   | Required | Description                                      |
+| --------------- | ------ | -------- | ------------------------------------------------ |
+| user_id         | string | Yes      | Unique identifier of the user                    |
+| installation_id | number | Yes      | Unique identifier of the GitHub App installation |
 
 ### Headers
 
-| Header         | Value          | Required | Description                    |
-|----------------|----------------|----------|--------------------------------|
-| Cookie         | neptun-session | Yes      | Session authentication cookie  |
+| Header | Value          | Required | Description                   |
+| ------ | -------------- | -------- | ----------------------------- |
+| Cookie | neptun-session | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -69,21 +69,21 @@ No request body required.
 
 ```typescript
 interface GithubRepository {
-  id: number;
-  github_app_installation_id: number;
-  repository_name: string;
-  repository_owner: string;
-  repository_url: string;
-  created_at: string;
-  updated_at: string;
+  id: number
+  github_app_installation_id: number
+  repository_name: string
+  repository_owner: string
+  repository_url: string
+  created_at: string
+  updated_at: string
 }
 
 interface GetImportsError {
-  statusCode: number;
-  statusMessage: string;
+  statusCode: number
+  statusMessage: string
   data: {
-    message: string;
-  };
+    message: string
+  }
 }
 ```
 
@@ -149,24 +149,24 @@ async function getInstallationImports(
     {
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as GithubRepository[];
+  return await response.json() as GithubRepository[]
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Successfully retrieved imported repositories       |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | Installation or user not found                    |
-| 500         | Server error                                      |
+| Status Code | Description                                  |
+| ----------- | -------------------------------------------- |
+| 200         | Successfully retrieved imported repositories |
+| 401         | Unauthorized (invalid or missing session)    |
+| 404         | Installation or user not found               |
+| 500         | Server error                                 |
 
 ## Notes
 

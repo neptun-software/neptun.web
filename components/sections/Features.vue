@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { FunctionalComponent } from 'vue';
-import { Book } from 'lucide-vue-next';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { FunctionalComponent } from 'vue'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Book } from 'lucide-vue-next'
 
 interface FeaturesProps {
-  icon: FunctionalComponent;
-  title: string;
-  description: string;
+  icon: FunctionalComponent
+  title: string
+  description: string
 }
 
 const featureList: FeaturesProps[] = [
@@ -16,14 +16,18 @@ const featureList: FeaturesProps[] = [
     description:
       'Every code snipped generated can be compared to previous versions and exported easily, the most popular languages are highlighted and even you can write markdown, to communicate with the AI!',
   },
-];
+]
 </script>
 
 <template>
   <section id="features" class="py-24 sm:py-32">
-    <h2 class="mb-2 text-lg tracking-wider text-center">Features</h2>
+    <h2 class="mb-2 text-lg tracking-wider text-center">
+      Features
+    </h2>
 
-    <h2 class="mb-4 text-3xl font-bold text-center md:text-4xl">How?</h2>
+    <h2 class="mb-4 text-3xl font-bold text-center md:text-4xl">
+      How?
+    </h2>
 
     <h3 class="mx-auto mb-8 text-xl text-center md:w-1/2 text-muted-foreground">
       We try to make it as easy as possible for new developers, to get started

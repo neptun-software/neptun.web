@@ -16,42 +16,42 @@ POST
 
 ### Route Parameters
 
-| Parameter        | Type   | Required | Description                          |
-|-----------------|--------|----------|--------------------------------------|
-| model_publisher | string | Yes      | The publisher of the AI model        |
-| model_name      | string | Yes      | The name of the AI model            |
+| Parameter       | Type   | Required | Description                   |
+| --------------- | ------ | -------- | ----------------------------- |
+| model_publisher | string | Yes      | The publisher of the AI model |
+| model_name      | string | Yes      | The name of the AI model      |
 
 ### Query Parameters
 
-| Parameter | Type   | Required | Description                    |
-|-----------|--------|----------|--------------------------------|
-| chat_id   | string | Yes      | Unique identifier of the chat  |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| chat_id   | string | Yes      | Unique identifier of the chat |
 
 ### Headers
 
-| Header         | Value            | Required | Description                    |
-|----------------|------------------|----------|--------------------------------|
-| Content-Type   | application/json | Yes      | Indicates JSON request body    |
-| Authorization  | Bearer {token}   | Yes      | JWT authentication token      |
+| Header        | Value            | Required | Description                 |
+| ------------- | ---------------- | -------- | --------------------------- |
+| Content-Type  | application/json | Yes      | Indicates JSON request body |
+| Authorization | Bearer {token}   | Yes      | JWT authentication token    |
 
 ### Request Body
 
 The request body should contain the chat messages array.
 
-| Field    | Type     | Required | Description                                |
-|----------|----------|----------|--------------------------------------------|
-| messages | Message[] | Yes      | Array of chat messages                    |
+| Field    | Type      | Required | Description            |
+| -------- | --------- | -------- | ---------------------- |
+| messages | Message[] | Yes      | Array of chat messages |
 
 #### TypeScript Interface
 
 ```typescript
 interface Message {
-  role: 'user' | 'assistant';
-  content: string;
+  role: 'user' | 'assistant'
+  content: string
 }
 
 interface ChatRequest {
-  messages: Message[];
+  messages: Message[]
 }
 ```
 
@@ -77,10 +77,10 @@ The response is a streaming text response containing the AI model's reply.
 
 #### Response Headers
 
-| Header              | Value                        | Description                    |
-|--------------------|------------------------------|--------------------------------|
-| Content-Type       | text/event-stream            | Indicates streaming response   |
-| Transfer-Encoding  | chunked                      | Indicates chunked transfer     |
+| Header            | Value             | Description                  |
+| ----------------- | ----------------- | ---------------------------- |
+| Content-Type      | text/event-stream | Indicates streaming response |
+| Transfer-Encoding | chunked           | Indicates chunked transfer   |
 
 ### Error Responses
 
@@ -147,7 +147,7 @@ async def stream_chat_completion(
             timeout=None
         )
         response.raise_for_status()
-        
+
         async for chunk in response.aiter_bytes():
             print(chunk.decode(), end="", flush=True)
 ```
@@ -185,21 +185,23 @@ async function streamChatCompletion(
       },
       body: JSON.stringify({ messages }),
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  const reader = response.body?.getReader();
-  if (!reader) return;
+  const reader = response.body?.getReader()
+  if (!reader)
+    return
 
   while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    
+    const { done, value } = await reader.read()
+    if (done)
+      break
+
     // Process the streaming response chunks
-    console.log(new TextDecoder().decode(value));
+    console.log(new TextDecoder().decode(value))
   }
 }
 ```

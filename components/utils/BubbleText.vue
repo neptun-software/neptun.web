@@ -3,165 +3,169 @@
 
 const props = defineProps({
   text: String,
-});
+})
 
-const colorMode = useColorMode();
+const colorMode = useColorMode()
 const colors = computed(() => {
   return colorMode.preference === 'dark'
     ? ['#00FFFF', '#1E90FF', '#00BFFF', '#00CED1', '#00B2FF']
-    : ['#0e7490', '#083344', '#042f2e', '#082f49', '#60a5fa'];
-});
+    : ['#0e7490', '#083344', '#042f2e', '#082f49', '#60a5fa']
+})
 
-const { x, y } = useMouse();
-const { pressed } = useMousePressed(); // touch and click
-const { width, height } = useWindowSize();
-const mouse = ref<Mouse>({ x: 0, y: 0 });
-const radius = ref<number>(1);
-const canvas = ref<HTMLCanvasElement | null>(null);
-const particles: Particle[] = [];
-const isLoaded = ref(false);
+const { x, y } = useMouse()
+const { pressed } = useMousePressed() // touch and click
+const { width, height } = useWindowSize()
+const mouse = ref<Mouse>({ x: 0, y: 0 })
+const radius = ref<number>(1)
+const canvas = ref<HTMLCanvasElement | null>(null)
+const particles: Particle[] = []
+const isLoaded = ref(false)
 
 watch(colors, () => {
-  initScene();
-});
+  initScene()
+})
 
 watch(x, (newX) => {
-  mouse.value.x = newX;
-});
+  mouse.value.x = newX
+})
 
 watch(y, (newY) => {
-  mouse.value.y = newY;
-});
+  mouse.value.y = newY
+})
 
 watch(pressed, () => {
-  radius.value = radius.value === 5 ? 1 : radius.value + 1;
-});
+  radius.value = radius.value === 5 ? 1 : radius.value + 1
+})
 
 watch(width, () => {
-  initScene();
-});
+  initScene()
+})
 
 watch(height, () => {
-  initScene();
-});
+  initScene()
+})
 
 interface Mouse {
-  x: number;
-  y: number;
+  x: number
+  y: number
 }
 
 class Particle {
-  x: number;
-  y: number;
-  dest: { x: number; y: number };
-  r: number;
-  vx: number;
-  vy: number;
-  accX: number;
-  accY: number;
-  friction: number;
-  color: string;
+  x: number
+  y: number
+  dest: { x: number, y: number }
+  r: number
+  vx: number
+  vy: number
+  accX: number
+  accY: number
+  friction: number
+  color: string
 
   constructor(x: number, y: number, colors: string[]) {
-    this.x = Math.random() * window.innerWidth;
-    this.y = Math.random() * window.innerHeight;
-    this.dest = { x, y };
-    this.r = Math.random() * 5 + 2;
-    this.vx = (Math.random() - 0.5) * 20;
-    this.vy = (Math.random() - 0.5) * 20;
-    this.accX = 0;
-    this.accY = 0;
-    this.friction = Math.random() * 0.05 + 0.94;
-    this.color = colors[Math.floor(Math.random() * colors.length)];
+    this.x = Math.random() * window.innerWidth
+    this.y = Math.random() * window.innerHeight
+    this.dest = { x, y }
+    this.r = Math.random() * 5 + 2
+    this.vx = (Math.random() - 0.5) * 20
+    this.vy = (Math.random() - 0.5) * 20
+    this.accX = 0
+    this.accY = 0
+    this.friction = Math.random() * 0.05 + 0.94
+    this.color = colors[Math.floor(Math.random() * colors.length)]
   }
 
   render(ctx: CanvasRenderingContext2D, mouse: Mouse, radius: number) {
-    this.accX = (this.dest.x - this.x) / 300;
-    this.accY = (this.dest.y - this.y) / 300;
-    this.vx += this.accX;
-    this.vy += this.accY;
-    this.vx *= this.friction;
-    this.vy *= this.friction;
-    this.x += this.vx;
-    this.y += this.vy;
+    this.accX = (this.dest.x - this.x) / 300
+    this.accY = (this.dest.y - this.y) / 300
+    this.vx += this.accX
+    this.vy += this.accY
+    this.vx *= this.friction
+    this.vy *= this.friction
+    this.x += this.vx
+    this.y += this.vy
 
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillStyle = this.color
+    ctx.beginPath()
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2)
+    ctx.fill()
 
-    const a = this.x - mouse.x;
-    const b = this.y - mouse.y;
-    const distance = Math.sqrt(a * a + b * b);
+    const a = this.x - mouse.x
+    const b = this.y - mouse.y
+    const distance = Math.sqrt(a * a + b * b)
 
     // multiplier for the interaction radius
-    const multiplier = 15;
+    const multiplier = 15
     if (distance < radius * multiplier) {
       // force calculation
-      const force = (radius * multiplier - distance) / (radius * multiplier);
+      const force = (radius * multiplier - distance) / (radius * multiplier)
 
       // divisor for impact strength
-      this.accX = ((this.x - mouse.x) * force) / 10;
-      this.accY = ((this.y - mouse.y) * force) / 10;
+      this.accX = ((this.x - mouse.x) * force) / 10
+      this.accY = ((this.y - mouse.y) * force) / 10
 
-      this.vx += this.accX;
-      this.vy += this.accY;
+      this.vx += this.accX
+      this.vy += this.accY
     }
   }
 }
 
-const initScene = () => {
-  if (!canvas.value) return;
+function initScene() {
+  if (!canvas.value)
+    return
 
-  const ctx = canvas.value.getContext('2d', { willReadFrequently: true });
-  if (!ctx) return;
+  const ctx = canvas.value.getContext('2d', { willReadFrequently: true })
+  if (!ctx)
+    return
 
-  const ww = (canvas.value.width = window.innerWidth);
-  const wh = (canvas.value.height = window.innerHeight);
+  const ww = (canvas.value.width = window.innerWidth)
+  const wh = (canvas.value.height = window.innerHeight)
 
-  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
-  ctx.font = `bold ${ww / 4}px sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle'; // align text vertically in the middle
-  ctx.fillText(props.text || 'Neptun', ww / 2, wh / 2);
+  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
+  ctx.font = `bold ${ww / 4}px sans-serif`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle' // align text vertically in the middle
+  ctx.fillText(props.text || 'Neptun', ww / 2, wh / 2)
 
-  const data = ctx.getImageData(0, 0, ww, wh).data;
-  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
-  ctx.globalCompositeOperation = 'screen';
+  const data = ctx.getImageData(0, 0, ww, wh).data
+  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
+  ctx.globalCompositeOperation = 'screen'
 
-  particles.length = 0;
+  particles.length = 0
   for (let i = 0; i < ww; i += Math.round(ww / 150)) {
     for (let j = 0; j < wh; j += Math.round(ww / 150)) {
       if (data[(i + j * ww) * 4 + 3] > 150) {
-        particles.push(new Particle(i, j, colors.value));
+        particles.push(new Particle(i, j, colors.value))
       }
     }
   }
-};
+}
 
-const render = () => {
-  if (!canvas.value) return;
+function render() {
+  if (!canvas.value)
+    return
 
-  const ctx = canvas.value.getContext('2d');
-  if (!ctx) return;
+  const ctx = canvas.value.getContext('2d')
+  if (!ctx)
+    return
 
-  requestAnimationFrame(render);
-  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
-  particles.forEach((particle) =>
-    particle.render(ctx, mouse.value, radius.value)
-  );
+  requestAnimationFrame(render)
+  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
+  particles.forEach(particle =>
+    particle.render(ctx, mouse.value, radius.value),
+  )
 
-  isLoaded.value = true;
-};
+  isLoaded.value = true
+}
 
 onMounted(() => {
   if (isDesktop.value) {
-    initScene();
-    requestAnimationFrame(render);
+    initScene()
+    requestAnimationFrame(render)
   }
-});
+})
 
-const isDesktop = useMediaQuery('(min-width: 1024px)');
+const isDesktop = useMediaQuery('(min-width: 1024px)')
 </script>
 
 <template>

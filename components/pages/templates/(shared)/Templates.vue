@@ -1,17 +1,17 @@
 <script lang="ts" setup>
-import type { BundledLanguage } from 'shiki';
-import type { TemplateData } from '~/lib/(templates)/templates';
-import { downloadTemplateHandler } from './functions';
+import type { BundledLanguage } from 'shiki'
+import type { TemplateData } from '~/lib/(templates)/templates'
+import { downloadTemplateHandler } from './functions'
 
 defineProps<{
-  templates: TemplateData[];
-  isLoading: boolean;
-}>();
+  templates: TemplateData[]
+  isLoading: boolean
+}>()
 </script>
 
 <template>
   <div>
-    <InfoBlock showLoader showDots :isVisible="isLoading" class="mt-0 mb-2">
+    <InfoBlock show-loader show-dots :is-visible="isLoading" class="mt-0 mb-2">
       Loading templates
     </InfoBlock>
 
@@ -29,7 +29,7 @@ defineProps<{
             {{ template.name }}
           </h3>
 
-          <AsyncButton :onClickAsync="downloadTemplateHandler(template)">
+          <AsyncButton :on-click-async="downloadTemplateHandler(template)">
             download
           </AsyncButton>
         </div>
@@ -66,7 +66,7 @@ defineProps<{
                     supportedShikiLanguages.includes(
                       c.fileName.split('.')[
                         c.fileName.split('.').length - 1
-                      ] as BundledLanguage
+                      ] as BundledLanguage,
                     )
                       ? c.fileName.split('.')[c.fileName.split('.').length - 1]
                       : 'text'

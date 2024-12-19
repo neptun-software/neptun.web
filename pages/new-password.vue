@@ -1,23 +1,19 @@
 <script setup lang="ts">
-import { CheckIcon, CircleIcon, DotIcon } from '@radix-icons/vue';
-import { toast } from 'vue-sonner';
-import { useForm } from 'vee-validate';
-import { toTypedSchema } from '@vee-validate/zod';
-import * as z from 'zod';
-import { emailSchema, passwordSchema } from '~/lib/types/input.validation';
+import { CheckIcon, CircleIcon, DotIcon } from '@radix-icons/vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import { toast } from 'vue-sonner'
+import * as z from 'zod'
+import { emailSchema, passwordSchema } from '~/lib/types/input.validation'
 
 // defineOgImageComponent('NuxtSeo');
 
 definePageMeta({
   name: 'New Password',
   alias: ['/forgot-password', '/reset-password'],
-});
+})
 
-const validateOtpAndResetPassword = async (
-  email: string,
-  otp: string[],
-  newPassword: string
-) => {
+async function validateOtpAndResetPassword(email: string, otp: string[], newPassword: string) {
   try {
     const response = await $fetch('/auth/otp', {
       method: 'POST',
@@ -27,47 +23,49 @@ const validateOtpAndResetPassword = async (
         otp: otp.join(''),
         new_password: newPassword,
       },
-    });
+    })
 
     if (response.success) {
-      return true;
+      return true
     }
 
-    toast.error(response.message || 'Invalid OTP');
+    toast.error(response.message || 'Invalid OTP')
 
-    return false;
-  } catch (error) {
-    console.error('OTP validation error:', error);
-    toast.error('OTP validation failed');
-    return false;
+    return false
   }
-};
+  catch (error) {
+    console.error('OTP validation error:', error)
+    toast.error('OTP validation failed')
+    return false
+  }
+}
 
-const sendingOtpEmail = ref(false);
-const sendOtpEmail = async (email: string) => {
-  sendingOtpEmail.value = true;
+const sendingOtpEmail = ref(false)
+async function sendOtpEmail(email: string) {
+  sendingOtpEmail.value = true
 
   try {
     const response = await $fetch('/auth/otp', {
       method: 'POST',
       body: { action: 'create', email },
-    });
+    })
 
     if (response.success) {
-      toast.success('OTP sent to your email');
-      return true;
+      toast.success('OTP sent to your email')
+      return true
     }
 
-    toast.error(response.message || 'Failed to create OTP');
-    return false;
-  } catch (error) {
-    console.error('Error creating OTP:', error);
-    toast.error('Failed to create OTP');
-    return false;
+    toast.error(response.message || 'Failed to create OTP')
+    return false
   }
-};
+  catch (error) {
+    console.error('Error creating OTP:', error)
+    toast.error('Failed to create OTP')
+    return false
+  }
+}
 
-const stepIndex = ref(1);
+const stepIndex = ref(1)
 const steps = [
   {
     step: 1,
@@ -84,7 +82,7 @@ const steps = [
     title: 'New Password',
     description: 'Enter your new password',
   },
-];
+]
 
 const formSchemaArray = [
   z.object({
@@ -98,10 +96,10 @@ const formSchemaArray = [
   z.object({
     password: passwordSchema,
   }),
-];
+]
 const schemaForComponent = computed(() =>
-  toTypedSchema(formSchemaArray[stepIndex.value - 1])
-);
+  toTypedSchema(formSchemaArray[stepIndex.value - 1]),
+)
 
 const formSchema = z.object({
   email: emailSchema,
@@ -109,19 +107,19 @@ const formSchema = z.object({
     .array(z.coerce.string())
     .length(5, { message: 'Has to be 5 digits. Invalid input!' }),
   password: passwordSchema,
-});
+})
 
-const otp = ref(Array(5).fill(''));
-const otpIsValid = ref(false);
+const otp = ref(Array.from({ length: 5 }).fill(''))
+const otpIsValid = ref(false)
 
-const { isFieldDirty, handleSubmit, setFieldValue, validate, values, errors } =
-  useForm({
+const { isFieldDirty, handleSubmit, setFieldValue, validate, values, errors }
+  = useForm({
     validationSchema: toTypedSchema(formSchema),
-  });
+  })
 
-const submittingNewPassword = ref(false);
+const submittingNewPassword = ref(false)
 const onSubmit = handleSubmit(async (values) => {
-  submittingNewPassword.value = true;
+  submittingNewPassword.value = true
 
   /* toast('You submitted the following values:', {
     description: h(
@@ -134,67 +132,71 @@ const onSubmit = handleSubmit(async (values) => {
   const successfullyValidated = await validateOtpAndResetPassword(
     values.email,
     values.otp,
-    values.password
-  );
+    values.password,
+  )
 
   if (successfullyValidated) {
     navigateTo('/log-in', {
       redirectCode: 303,
-    });
-  } else {
-    toast.error('Failed to validate OTP.');
-    submittingNewPassword.value = false;
-    sendingOtpEmail.value = false;
+    })
   }
-});
+  else {
+    toast.error('Failed to validate OTP.')
+    submittingNewPassword.value = false
+    sendingOtpEmail.value = false
+  }
+})
 
-const handleComplete = (e: string[]) => {
-  console.log('Completed OTP:', e.join(''));
-  otpIsValid.value = true;
-};
+function handleComplete(e: string[]) {
+  console.log('Completed OTP:', e.join(''))
+  otpIsValid.value = true
+}
 
-const handleModelValueUpdate = (arrStr: string[]) => {
+function handleModelValueUpdate(arrStr: string[]) {
   arrStr.forEach((val, index) => {
     if (otp.value[index] !== val) {
-      otp.value[index] = val;
+      otp.value[index] = val
     }
-  });
+  })
 
-  console.log('Updated model value:', otp.value);
-  setFieldValue('otp', [...otp.value]);
-  validate();
+  console.log('Updated model value:', otp.value)
+  setFieldValue('otp', [...otp.value])
+  validate()
 
   if (otp.value.length === 5 && !otp.value.includes('')) {
-    handleComplete(otp.value);
+    handleComplete(otp.value)
   }
-};
+}
 
 const isCurrentStepValid = computed(() => {
   switch (stepIndex.value) {
     case 1:
-      return values.email && !errors.value.email && !sendingOtpEmail.value;
+      return values.email && !errors.value.email && !sendingOtpEmail.value
     case 2:
-      return values.otp?.length === 5 && !errors.value.otp;
+      return values.otp?.length === 5 && !errors.value.otp
     case 3:
       return (
-        values.password &&
-        !errors.value.password &&
-        !submittingNewPassword.value
-      );
+        values.password
+        && !errors.value.password
+        && !submittingNewPassword.value
+      )
     default:
-      return false;
+      return false
   }
-});
+})
 
 const canGoNext = computed(() => {
-  if (stepIndex.value === 2 && !otpIsValid.value) return false;
-  return isCurrentStepValid.value;
-});
+  if (stepIndex.value === 2 && !otpIsValid.value)
+    return false
+  return isCurrentStepValid.value
+})
 </script>
 
 <template>
   <div class="p-4">
-    <h1 class="pb-6 text-3xl font-bold text-center">New Password</h1>
+    <h1 class="pb-6 text-3xl font-bold text-center">
+      New Password
+    </h1>
 
     <ShadcnForm
       v-slot="{ meta }"
@@ -232,8 +234,8 @@ const canGoNext = computed(() => {
                   size="icon"
                   class="z-10 rounded-full shrink-0"
                   :class="[
-                    state === 'active' &&
-                      'ring-2 ring-ring ring-offset-2 ring-offset-background',
+                    state === 'active'
+                      && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                   ]"
                   :disabled="state !== 'completed' && !meta.valid"
                 >
@@ -376,8 +378,8 @@ const canGoNext = computed(() => {
                       stepIndex !== 3
                         ? stepIndex === 1
                           ? sendOtpEmail(values.email as string).then(() =>
-                              nextStep()
-                            )
+                            nextStep(),
+                          )
                           : nextStep()
                         : onSubmit()
                     "

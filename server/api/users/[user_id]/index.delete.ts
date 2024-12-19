@@ -1,9 +1,9 @@
-import { deleteUser } from '~/server/database/repositories/users';
+import { deleteUser } from '~/server/database/repositories/users'
 
 // Delete user
 export default defineEventHandler(async (event) => {
   /* VALIDATE PARAMS */
-  const maybeUserId = await validateParamUserId(event);
+  const maybeUserId = await validateParamUserId(event)
   if (maybeUserId.statusCode !== 200) {
     return sendError(
       event,
@@ -11,15 +11,15 @@ export default defineEventHandler(async (event) => {
         statusCode: maybeUserId.statusCode,
         statusMessage: maybeUserId.statusMessage,
         data: maybeUserId.data,
-      })
-    );
+      }),
+    )
   }
-  const user_id = maybeUserId.data?.user_id;
+  const user_id = maybeUserId.data?.user_id
 
-  const deletionSuccessful = await deleteUser(user_id);
+  const deletionSuccessful = await deleteUser(user_id)
   if (deletionSuccessful) {
-    await clearUserSession(event);
+    await clearUserSession(event)
   }
 
-  return deletionSuccessful;
-});
+  return deletionSuccessful
+})

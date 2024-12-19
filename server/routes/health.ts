@@ -3,7 +3,7 @@ export default defineEventHandler(async () => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-  };
+  }
 
-  return healthCheck;
-});
+  return healthCheck
+})

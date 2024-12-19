@@ -16,16 +16,16 @@ DELETE
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                              |
-|-----------|--------|----------|------------------------------------------|
-| user_id   | string | Yes      | Unique identifier of the user           |
-| chat_id   | number | Yes      | Unique identifier of the chat           |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| user_id   | string | Yes      | Unique identifier of the user |
+| chat_id   | number | Yes      | Unique identifier of the chat |
 
 ### Headers
 
-| Header         | Value          | Required | Description                    |
-|----------------|----------------|----------|--------------------------------|
-| Cookie         | neptun-session | Yes      | Session authentication cookie  |
+| Header | Value          | Required | Description                   |
+| ------ | -------------- | -------- | ----------------------------- |
+| Cookie | neptun-session | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -83,24 +83,24 @@ No request body required.
 
 ```typescript
 interface ChatMessage {
-  id: number;
-  chat_conversation_id: number;
-  actor: 'user' | 'assistant' | 'system';
-  message: string;
-  created_at: string;
+  id: number
+  chat_conversation_id: number
+  actor: 'user' | 'assistant' | 'system'
+  message: string
+  created_at: string
 }
 
 interface DeleteLastMessagesResponse {
-  maybeAssistantMessageToDelete?: ChatMessage;
-  maybeUserMessageToDelete?: ChatMessage;
-  deletedSuccessfully?: number[];
-  failedToDelete?: number[];
+  maybeAssistantMessageToDelete?: ChatMessage
+  maybeUserMessageToDelete?: ChatMessage
+  deletedSuccessfully?: number[]
+  failedToDelete?: number[]
 }
 
 interface DeleteLastMessagesError {
-  statusCode: number;
-  statusMessage: string;
-  data: string;
+  statusCode: number
+  statusMessage: string
+  data: string
 }
 ```
 
@@ -171,25 +171,25 @@ async function deleteLastMessages(
       method: 'DELETE',
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as DeleteLastMessagesResponse;
+  return await response.json() as DeleteLastMessagesResponse
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Messages successfully deleted                      |
-| 400         | No messages found in chat                         |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | Chat or user not found                            |
-| 500         | Server error                                      |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Messages successfully deleted             |
+| 400         | No messages found in chat                 |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error                              |
 
 ## Notes
 

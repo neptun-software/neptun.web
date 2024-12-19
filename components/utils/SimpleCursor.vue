@@ -1,6 +1,6 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import { useMouse, useWindowScroll } from '@vueuse/core';
+import { useMouse, useWindowScroll } from '@vueuse/core'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 const props = defineProps({
   targets: {
@@ -15,83 +15,85 @@ const props = defineProps({
     type: Number,
     default: 3,
   },
-});
+})
 
-const scale = ref(1);
-const circlePosX = ref(0);
-const circlePosY = ref(0);
-const dotPosX = ref(0);
-const dotPosY = ref(0);
+const scale = ref(1)
+const circlePosX = ref(0)
+const circlePosY = ref(0)
+const dotPosX = ref(0)
+const dotPosY = ref(0)
 
-const { x, y } = useMouse();
-const { x: scrollX, y: scrollY } = useWindowScroll();
+const { x, y } = useMouse()
+const { x: scrollX, y: scrollY } = useWindowScroll()
 
-const targetElements = ref([]);
+const targetElements = ref([])
 const isHovering = computed(() => {
-  if (targetElements.value.length === 0) return false;
+  if (targetElements.value.length === 0)
+    return false
 
   return targetElements.value.some((el) => {
-    if (!el) return false;
-    const rect = el.getBoundingClientRect();
+    if (!el)
+      return false
+    const rect = el.getBoundingClientRect()
     return (
-      x.value >= rect.left &&
-      x.value <= rect.right &&
-      y.value >= rect.top &&
-      y.value <= rect.bottom
-    );
-  });
-});
+      x.value >= rect.left
+      && x.value <= rect.right
+      && y.value >= rect.top
+      && y.value <= rect.bottom
+    )
+  })
+})
 
 const circleStyle = computed(() => ({
   borderColor: isHovering.value ? props.circleColorHover : props.circleColor,
   transform: `translate(${circlePosX.value}px, ${circlePosY.value}px) scale(${scale.value})`,
-}));
+}))
 
 const dotStyle = computed(() => ({
   backgroundColor: isHovering.value ? props.dotColorHover : props.dotColor,
   transform: `translate(${dotPosX.value}px, ${dotPosY.value}px)`,
-}));
+}))
 
-const updateCursorPosition = () => {
-  const circle = customCursorCircle.value;
-  const dot = customCursorDot.value;
+function updateCursorPosition() {
+  const circle = customCursorCircle.value
+  const dot = customCursorDot.value
 
   if (circle && dot && x.value != null && y.value != null) {
-    circlePosX.value = x.value - circle.clientWidth / 2;
-    circlePosY.value = y.value - circle.clientHeight / 2;
-    dotPosX.value = x.value - dot.clientWidth / 2;
-    dotPosY.value = y.value - dot.clientHeight / 2;
+    circlePosX.value = x.value - circle.clientWidth / 2
+    circlePosY.value = y.value - circle.clientHeight / 2
+    dotPosX.value = x.value - dot.clientWidth / 2
+    dotPosY.value = y.value - dot.clientHeight / 2
 
     // adjust for scroll offsets
-    circlePosX.value -= scrollX.value;
-    circlePosY.value -= scrollY.value;
-    dotPosX.value -= scrollX.value;
-    dotPosY.value -= scrollY.value;
+    circlePosX.value -= scrollX.value
+    circlePosY.value -= scrollY.value
+    dotPosX.value -= scrollX.value
+    dotPosY.value -= scrollY.value
 
-    scale.value = isHovering.value ? props.hoverSize : 1;
+    scale.value = isHovering.value ? props.hoverSize : 1
   }
-};
+}
 
-const customCursorCircle = ref(null);
-const customCursorDot = ref(null);
+const customCursorCircle = ref(null)
+const customCursorDot = ref(null)
 
-const updateTargetElements = () => {
+function updateTargetElements() {
   targetElements.value = props.targets
-    .map((selector) => document.querySelector(selector))
-    .filter((el) => el);
-};
+    .map(selector => document.querySelector(selector))
+    .filter(el => el)
+}
 
 onMounted(() => {
-  updateTargetElements();
-  window.addEventListener('mousemove', updateCursorPosition);
-  watch([x, y], updateCursorPosition);
-  watch(() => props.targets, updateTargetElements);
-  document.documentElement.style.cursor = 'none';
-});
+  updateTargetElements()
+  window.addEventListener('mousemove', updateCursorPosition)
+  watch([x, y], updateCursorPosition)
+  watch(() => props.targets, updateTargetElements)
+  document.documentElement.style.cursor = 'none'
+})
 
 onUnmounted(() => {
-  window.removeEventListener('mousemove', updateCursorPosition);
-});
+  window.removeEventListener('mousemove', updateCursorPosition)
+})
 </script>
 
 <template>

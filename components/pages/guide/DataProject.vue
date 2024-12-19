@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Check, Circle, Dot } from 'lucide-vue-next';
-import { get, set, useDropZone } from '@vueuse/core';
-import { toast } from 'vue-sonner';
+import { get, set, useDropZone } from '@vueuse/core'
+import { Check, Circle, Dot } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
-const stepIndex = ref(1);
+const stepIndex = ref(1)
 const steps = [
   {
     step: 1,
@@ -18,58 +18,58 @@ const steps = [
   {
     step: 3,
     title: 'Done!',
-    description: "That's it. You can now use the configurations.",
+    description: 'That\'s it. You can now use the configurations.',
   },
-];
+]
 
-const canGoNext = computed(() => stepIndex.value < steps.length);
-const canGoBack = computed(() => stepIndex.value > 1);
+const canGoNext = computed(() => stepIndex.value < steps.length)
+const canGoBack = computed(() => stepIndex.value > 1)
 function goNext() {
   if (get(canGoNext)) {
-    set(stepIndex, stepIndex.value + 1);
+    set(stepIndex, stepIndex.value + 1)
   }
 }
 function goBack() {
   if (get(canGoBack)) {
-    set(stepIndex, stepIndex.value - 1);
+    set(stepIndex, stepIndex.value - 1)
   }
 }
 
-const files = ref<File[]>([]);
-const dropZoneRef = ref<HTMLDivElement>();
+const files = ref<File[]>([])
+const dropZoneRef = ref<HTMLDivElement>()
 const { isOverDropZone } = useDropZone(dropZoneRef, {
   onDrop,
-});
+})
 
 function onDrop(droppedFiles: File[] | null) {
   if (droppedFiles) {
-    files.value = [...files.value, ...droppedFiles];
-    updateInputFileValue();
+    files.value = [...files.value, ...droppedFiles]
+    updateInputFileValue()
   }
 }
 
 function onFileInput(event: Event) {
-  const input = event.target as HTMLInputElement;
+  const input = event.target as HTMLInputElement
   if (input.files) {
-    files.value = [...files.value, ...Array.from(input.files)];
-    updateInputFileValue();
+    files.value = [...files.value, ...Array.from(input.files)]
+    updateInputFileValue()
   }
 }
 
-const inputFileRef = ref<HTMLInputElement | null>(null);
+const inputFileRef = ref<HTMLInputElement | null>(null)
 function updateInputFileValue() {
   if (inputFileRef.value) {
-    const dataTransfer = new DataTransfer();
-    files.value.forEach((file) => dataTransfer.items.add(file));
-    inputFileRef.value.files = dataTransfer.files;
+    const dataTransfer = new DataTransfer()
+    files.value.forEach(file => dataTransfer.items.add(file))
+    inputFileRef.value.files = dataTransfer.files
   }
 }
 
-const allowedToGoNext = ref(true);
-const doCreateFilesInGitRepository = ref(false);
+const allowedToGoNext = ref(true)
+const doCreateFilesInGitRepository = ref(false)
 
 async function generateConfigurationFiles() {
-  toast.error('Coming Soon...');
+  toast.error('Coming Soon...')
 }
 </script>
 
@@ -95,8 +95,8 @@ async function generateConfigurationFiles() {
           size="icon"
           class="z-10 rounded-full shrink-0"
           :class="[
-            state === 'active' &&
-              'ring-2 ring-ring ring-offset-2 ring-offset-background',
+            state === 'active'
+              && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
           ]"
           :disabled="state !== 'completed' && !allowedToGoNext"
         >
@@ -128,8 +128,12 @@ async function generateConfigurationFiles() {
       <p>Import Data</p>
       <ShadcnTabs default-value="local" class="w-full">
         <ShadcnTabsList class="flex justify-start flex-grow">
-          <ShadcnTabsTrigger value="local"> Local </ShadcnTabsTrigger>
-          <ShadcnTabsTrigger value="github"> Github </ShadcnTabsTrigger>
+          <ShadcnTabsTrigger value="local">
+            Local
+          </ShadcnTabsTrigger>
+          <ShadcnTabsTrigger value="github">
+            Github
+          </ShadcnTabsTrigger>
         </ShadcnTabsList>
         <ShadcnTabsContent value="local">
           <div class="flex flex-col gap-2 p-4 border rounded-md">
@@ -156,7 +160,9 @@ async function generateConfigurationFiles() {
                   <p>Type: {{ file.type || 'Unknown' }}</p>
                   <p>Last modified: {{ file.lastModified }}</p>
                 </div>
-                <p v-if="files.length === 0">No files uploaded yet...</p>
+                <p v-if="files.length === 0">
+                  No files uploaded yet...
+                </p>
               </ShadcnScrollArea>
             </div>
           </div>
@@ -170,8 +176,9 @@ async function generateConfigurationFiles() {
                 target="_blank"
                 :external="true"
                 to="https://github.com/neptun-software/neptun.github.app"
-                >here</NuxtLink
               >
+                here
+              </NuxtLink>
               for more information.
             </p>
           </div>
@@ -220,7 +227,7 @@ async function generateConfigurationFiles() {
       <AsyncButton
         v-if="stepIndex === 3"
         size="sm"
-        :onClickAsync="generateConfigurationFiles"
+        :on-click-async="generateConfigurationFiles"
       >
         Generate Configuration Files
       </AsyncButton>

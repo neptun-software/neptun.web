@@ -16,18 +16,18 @@ POST
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                              |
-|-----------|--------|----------|------------------------------------------|
-| user_id   | string | Yes      | Unique identifier of the user           |
-| chat_id   | number | Yes      | Unique identifier of the chat           |
-| share_id  | number | Yes      | Unique identifier of the share          |
+| Parameter | Type   | Required | Description                    |
+| --------- | ------ | -------- | ------------------------------ |
+| user_id   | string | Yes      | Unique identifier of the user  |
+| chat_id   | number | Yes      | Unique identifier of the chat  |
+| share_id  | number | Yes      | Unique identifier of the share |
 
 ### Headers
 
-| Header         | Value            | Required | Description                          |
-|----------------|------------------|----------|--------------------------------------|
-| Content-Type   | application/json | Yes      | Indicates JSON request body         |
-| Cookie         | neptun-session   | Yes      | Session authentication cookie       |
+| Header       | Value            | Required | Description                   |
+| ------------ | ---------------- | -------- | ----------------------------- |
+| Content-Type | application/json | Yes      | Indicates JSON request body   |
+| Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -35,9 +35,9 @@ No query parameters required.
 
 ### Request Body
 
-| Field   | Type     | Required | Description                                |
-|---------|----------|----------|--------------------------------------------|
-| emails  | string[] | Yes      | Array of email addresses to whitelist     |
+| Field  | Type     | Required | Description                           |
+| ------ | -------- | -------- | ------------------------------------- |
+| emails | string[] | Yes      | Array of email addresses to whitelist |
 
 ## Response Format
 
@@ -83,29 +83,29 @@ No query parameters required.
 
 ```typescript
 interface CreateWhitelistRequest {
-  emails: string[];
+  emails: string[]
 }
 
 interface WhitelistEntry {
-  id: number;
-  chat_conversation_share_id: number;
-  whitelisted_neptun_user_id: string;
-  created_at: string;
+  id: number
+  chat_conversation_share_id: number
+  whitelisted_neptun_user_id: string
+  created_at: string
 }
 
 interface CreateWhitelistResponse {
-  shareWhitelistEntries: WhitelistEntry[];
+  shareWhitelistEntries: WhitelistEntry[]
 }
 
 interface CreateWhitelistError {
-  statusCode: number;
-  statusMessage: string;
+  statusCode: number
+  statusMessage: string
   data: {
     issues: Array<{
-      code: string;
-      message: string;
-    }>;
-  };
+      code: string
+      message: string
+    }>
+  }
 }
 ```
 
@@ -182,25 +182,25 @@ async function createWhitelistEntries(
       body: JSON.stringify({ emails }),
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as CreateWhitelistResponse;
+  return await response.json() as CreateWhitelistResponse
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Whitelist entries successfully created             |
-| 400         | Invalid request body                              |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | Share, chat, or user not found                    |
-| 500         | Server error                                      |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Whitelist entries successfully created    |
+| 400         | Invalid request body                      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Share, chat, or user not found            |
+| 500         | Server error                              |
 
 ## Notes
 
@@ -209,4 +209,4 @@ async function createWhitelistEntries(
 - Non-existent email addresses are silently ignored
 - Only registered users' email addresses can be whitelisted
 - Multiple entries can be created in a single request
-- Duplicate emails are handled gracefully
+- Duplicate emails are handled gracefully

@@ -16,16 +16,16 @@ DELETE
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                              |
-|-----------|--------|----------|------------------------------------------|
+| Parameter | Type   | Required | Description                             |
+| --------- | ------ | -------- | --------------------------------------- |
 | user_id   | string | Yes      | Unique identifier of the user           |
 | chat_id   | number | Yes      | Unique identifier of the chat to delete |
 
 ### Headers
 
-| Header         | Value          | Required | Description                    |
-|----------------|----------------|----------|--------------------------------|
-| Cookie         | neptun-session | Yes      | Session authentication cookie  |
+| Header | Value          | Required | Description                   |
+| ------ | -------------- | -------- | ----------------------------- |
+| Cookie | neptun-session | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -61,15 +61,15 @@ true
 
 ```typescript
 interface DeleteChatResponse {
-  success: boolean;
+  success: boolean
 }
 
 interface DeleteChatError {
-  statusCode: number;
-  statusMessage: string;
+  statusCode: number
+  statusMessage: string
   data: {
-    message: string;
-  };
+    message: string
+  }
 }
 ```
 
@@ -136,24 +136,24 @@ async function deleteChat(
       method: 'DELETE',
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json();
+  return await response.json()
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Chat successfully deleted                          |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | Chat or user not found                            |
-| 500         | Server error during deletion                      |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Chat successfully deleted                 |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error during deletion              |
 
 ## Notes
 

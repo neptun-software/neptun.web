@@ -16,9 +16,9 @@ POST
 
 ### Headers
 
-| Header        | Value            | Required | Description                    |
-|---------------|------------------|----------|--------------------------------|
-| Content-Type  | application/json | Yes      | Indicates JSON request body    |
+| Header       | Value            | Required | Description                 |
+| ------------ | ---------------- | -------- | --------------------------- |
+| Content-Type | application/json | Yes      | Indicates JSON request body |
 
 ### Query Parameters
 
@@ -30,38 +30,38 @@ The request body varies based on the `action` field:
 
 #### For OTP Creation
 
-| Field   | Type   | Required | Description                                |
-|---------|---------|----------|--------------------------------------------|
-| action  | string  | Yes      | Must be "create"                          |
-| email   | string  | Yes      | Email address to receive the OTP          |
+| Field  | Type   | Required | Description                      |
+| ------ | ------ | -------- | -------------------------------- |
+| action | string | Yes      | Must be "create"                 |
+| email  | string | Yes      | Email address to receive the OTP |
 
 #### For OTP Validation
 
-| Field        | Type   | Required | Description                           |
-|--------------|---------|----------|---------------------------------------|
-| action       | string  | Yes      | Must be "validate"                   |
-| email        | string  | Yes      | Email address associated with OTP    |
-| otp          | string  | Yes      | 5-digit OTP received via email       |
-| new_password | string  | Yes      | New password to set after validation |
+| Field        | Type   | Required | Description                          |
+| ------------ | ------ | -------- | ------------------------------------ |
+| action       | string | Yes      | Must be "validate"                   |
+| email        | string | Yes      | Email address associated with OTP    |
+| otp          | string | Yes      | 5-digit OTP received via email       |
+| new_password | string | Yes      | New password to set after validation |
 
 #### TypeScript Interface
 
 ```typescript
 interface OTPCreateRequest {
-  action: 'create';
-  email: string;
+  action: 'create'
+  email: string
 }
 
 interface OTPValidateRequest {
-  action: 'validate';
-  email: string;
-  otp: string;
-  new_password: string;
+  action: 'validate'
+  email: string
+  otp: string
+  new_password: string
 }
 
 interface OTPResponse {
-  success: boolean;
-  message: string;
+  success: boolean
+  message: string
 }
 ```
 
@@ -215,13 +215,13 @@ async function requestOTP(email: string): Promise<OTPResponse> {
       action: 'create',
       email,
     }),
-  });
-  
+  })
+
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
-  
-  return await response.json() as OTPResponse;
+
+  return await response.json() as OTPResponse
 }
 
 async function validateOTP(
@@ -240,12 +240,12 @@ async function validateOTP(
       otp,
       new_password: newPassword,
     }),
-  });
-  
+  })
+
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
-  
-  return await response.json() as OTPResponse;
+
+  return await response.json() as OTPResponse
 }
 ```

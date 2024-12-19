@@ -1,4 +1,4 @@
-export const localStorageBaseKey = '@neptunai-tool';
-export const localStorageTopicKey = (topic: string) => {
-  return `${localStorageBaseKey}/${topic}`;
-};
+export const localStorageBaseKey = '@neptunai-tool'
+export function localStorageTopicKey(topic: string) {
+  return `${localStorageBaseKey}/${topic}`
+}

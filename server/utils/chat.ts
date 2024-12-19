@@ -1,19 +1,19 @@
-import type { Message } from 'ai';
-import type { H3Event, EventHandlerRequest } from 'h3';
-import { getCodeBlocksFromMarkdown } from '~/utils/parse';
+import type { Message } from 'ai'
+import type { EventHandlerRequest, H3Event } from 'h3'
+import { getCodeBlocksFromMarkdown } from '~/utils/parse'
 
 export function buildMetaLlama3Prompt(
-  messages: Pick<Message, 'content' | 'role'>[]
+  messages: Pick<Message, 'content' | 'role'>[],
 ) {
-  let prompt = '<|begin_of_text|>\n';
+  let prompt = '<|begin_of_text|>\n'
 
   messages.forEach((message) => {
-    const { role, content } = message;
-    prompt += `<|start_header_id|>${role}<|end_header_id|>\n\n${content}\n\n`;
-  });
+    const { role, content } = message
+    prompt += `<|start_header_id|>${role}<|end_header_id|>\n\n${content}\n\n`
+  })
 
-  prompt += '<|eot_id|>';
-  return prompt;
+  prompt += '<|eot_id|>'
+  return prompt
 }
 
 export async function persistCodeBlocks(
@@ -21,11 +21,11 @@ export async function persistCodeBlocks(
   chat_id: number,
   message_id: number,
   markdown: string,
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ) {
   try {
-    const codeBlocks = await getCodeBlocksFromMarkdown(markdown);
-    if (LOG_BACKEND)
+    const codeBlocks = await getCodeBlocksFromMarkdown(markdown)
+    if (LOG_BACKEND) {
       if (codeBlocks.length > 0) {
         // console.log('codeBlocks', codeBlocks);
 
@@ -41,8 +41,8 @@ export async function persistCodeBlocks(
             body: {
               files: codeBlocks,
             },
-          }
-        );
+          },
+        )
 
         if (LOG_BACKEND) {
           console.info(
@@ -50,18 +50,21 @@ export async function persistCodeBlocks(
             persistedCodeBlocks,
             user_id,
             chat_id,
-            message_id
-          );
+            message_id,
+          )
         }
 
-        return persistedCodeBlocks;
+        return persistedCodeBlocks
       }
-  } catch (error) {
-    if (LOG_BACKEND) console.error('Persisting code blocks errored:', error);
-    return null;
+    }
+  }
+  catch (error) {
+    if (LOG_BACKEND)
+      console.error('Persisting code blocks errored:', error)
+    return null
   }
 
-  return null;
+  return null
 }
 
 export async function persistChatMessage(
@@ -69,7 +72,7 @@ export async function persistChatMessage(
   chat_id: number,
   messageText: string,
   actor: 'user' | 'assistant' = 'user',
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ) {
   if (chat_id >= 1) {
     try {
@@ -82,71 +85,75 @@ export async function persistChatMessage(
             message: messageText,
             actor,
           },
-        }
-      );
+        },
+      )
 
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.info(
           'persistChatMessage:',
           persistedChatMessage,
           user_id,
           chat_id,
-          messageText
-        );
+          messageText,
+        )
+      }
 
-      const chatMessage =
-        persistedChatMessage && 'chatMessage' in persistedChatMessage
+      const chatMessage
+        = persistedChatMessage && 'chatMessage' in persistedChatMessage
           ? persistedChatMessage.chatMessage
             ? persistedChatMessage.chatMessage[0]
             : null
-          : null;
-      return chatMessage;
-    } catch (error) {
-      if (LOG_BACKEND) console.error('Persisting chat message errored:', error);
+          : null
+      return chatMessage
+    }
+    catch (error) {
+      if (LOG_BACKEND)
+        console.error('Persisting chat message errored:', error)
     }
   }
 
-  return null;
+  return null
 }
 
 export async function persistAiChatMessage(
   user_id: number,
   chat_id: number,
   messageText: string,
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ) {
   const persistedChatMessage = await persistChatMessage(
     user_id,
     chat_id,
     messageText,
     'assistant',
-    event
-  );
+    event,
+  )
 
-  if (!persistedChatMessage) return persistedChatMessage;
+  if (!persistedChatMessage)
+    return persistedChatMessage
   const {
     neptun_user_id,
     chat_conversation_id,
     id: message_id,
     message,
-  } = persistedChatMessage;
+  } = persistedChatMessage
   const persistedCodeBlocks = await persistCodeBlocks(
     neptun_user_id,
     chat_conversation_id,
     message_id,
     message,
-    event
-  );
+    event,
+  )
 
   if (
-    persistedCodeBlocks &&
-    'chatFiles' in persistedCodeBlocks &&
-    persistedCodeBlocks.chatFiles
+    persistedCodeBlocks
+    && 'chatFiles' in persistedCodeBlocks
+    && persistedCodeBlocks.chatFiles
   ) {
     return {
       chat_message: persistedChatMessage,
       code_blocks: persistedCodeBlocks.chatFiles, // TODO: find out how to get type, if not clear, what route it is (made it [message_id]/[file_id] instead of /[message_id] and /[file_id] for now)
-    };
+    }
   }
 }
 
@@ -154,7 +161,7 @@ export async function persistUserChatMessage(
   user_id: number,
   chat_id: number,
   messageText: string,
-  event: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>,
 ) {
-  await persistChatMessage(user_id, chat_id, messageText, 'user', event);
+  await persistChatMessage(user_id, chat_id, messageText, 'user', event)
 }

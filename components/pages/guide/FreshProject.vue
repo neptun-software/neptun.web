@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Check, Circle, Dot } from 'lucide-vue-next';
-import { toTypedSchema } from '@vee-validate/zod';
-import { get, set } from '@vueuse/core';
-import { toast } from 'vue-sonner';
-import * as z from 'zod';
+import { toTypedSchema } from '@vee-validate/zod'
+import { get, set } from '@vueuse/core'
+import { Check, Circle, Dot } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
+import * as z from 'zod'
 
 const formSchema = [
   z.object({
@@ -32,9 +32,9 @@ const formSchema = [
       z.literal('elixir'),
     ]),
   }),
-];
+]
 
-const stepIndex = ref(1);
+const stepIndex = ref(1)
 const steps = [
   {
     step: 1,
@@ -49,20 +49,20 @@ const steps = [
   {
     step: 3,
     title: 'Done!',
-    description: "That's it. You can now start coding.",
+    description: 'That\'s it. You can now start coding.',
   },
-];
+]
 
-const canGoNext = computed(() => stepIndex.value < steps.length);
-const canGoBack = computed(() => stepIndex.value > 1);
+const canGoNext = computed(() => stepIndex.value < steps.length)
+const canGoBack = computed(() => stepIndex.value > 1)
 function goNext() {
   if (get(canGoNext)) {
-    set(stepIndex, stepIndex.value + 1);
+    set(stepIndex, stepIndex.value + 1)
   }
 }
 function goBack() {
   if (get(canGoBack)) {
-    set(stepIndex, stepIndex.value - 1);
+    set(stepIndex, stepIndex.value - 1)
   }
 }
 
@@ -74,12 +74,12 @@ function onSubmit(values: any) {
         class:
           'mt-2 w-fit max-w-full overflow-x-auto rounded-md bg-slate-950 p-2',
       },
-      h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))
+      h('code', { class: 'text-white' }, JSON.stringify(values, null, 2)),
     ),
-  });
+  })
 }
 
-const doCreateGitRepository = ref(false);
+const doCreateGitRepository = ref(false)
 </script>
 
 <template>
@@ -124,8 +124,8 @@ const doCreateGitRepository = ref(false);
               size="icon"
               class="z-10 rounded-full shrink-0"
               :class="[
-                state === 'active' &&
-                  'ring-2 ring-ring ring-offset-2 ring-offset-background',
+                state === 'active'
+                  && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
               ]"
               :disabled="state !== 'completed' && !meta.valid"
             >
@@ -209,13 +209,27 @@ const doCreateGitRepository = ref(false);
                     <ShadcnSelectItem value="javascript">
                       Javascript
                     </ShadcnSelectItem>
-                    <ShadcnSelectItem value="php"> PHP </ShadcnSelectItem>
-                    <ShadcnSelectItem value="go"> Go </ShadcnSelectItem>
-                    <ShadcnSelectItem value="python"> Python </ShadcnSelectItem>
-                    <ShadcnSelectItem value="java"> Java </ShadcnSelectItem>
-                    <ShadcnSelectItem value="kotlin"> Kotlin </ShadcnSelectItem>
-                    <ShadcnSelectItem value="ruby"> Ruby </ShadcnSelectItem>
-                    <ShadcnSelectItem value="elixir"> Elixir </ShadcnSelectItem>
+                    <ShadcnSelectItem value="php">
+                      PHP
+                    </ShadcnSelectItem>
+                    <ShadcnSelectItem value="go">
+                      Go
+                    </ShadcnSelectItem>
+                    <ShadcnSelectItem value="python">
+                      Python
+                    </ShadcnSelectItem>
+                    <ShadcnSelectItem value="java">
+                      Java
+                    </ShadcnSelectItem>
+                    <ShadcnSelectItem value="kotlin">
+                      Kotlin
+                    </ShadcnSelectItem>
+                    <ShadcnSelectItem value="ruby">
+                      Ruby
+                    </ShadcnSelectItem>
+                    <ShadcnSelectItem value="elixir">
+                      Elixir
+                    </ShadcnSelectItem>
                   </ShadcnSelectGroup>
                 </ShadcnSelectContent>
               </ShadcnSelect>

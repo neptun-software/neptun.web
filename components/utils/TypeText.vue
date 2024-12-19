@@ -8,75 +8,77 @@ const props = defineProps({
     type: Number,
     default: 2000,
   },
-});
+})
 
 class TxtType {
-  el: HTMLElement;
-  toRotate: string[];
-  period: number;
-  txt: string;
-  loopNum: number;
-  isDeleting: boolean;
-  timeoutId: number | null;
+  el: HTMLElement
+  toRotate: string[]
+  period: number
+  txt: string
+  loopNum: number
+  isDeleting: boolean
+  timeoutId: number | null
 
   constructor(el: HTMLElement, toRotate: string[], period: number) {
-    this.el = el;
-    this.toRotate = toRotate;
-    this.period = period || 2000;
-    this.txt = '';
-    this.loopNum = 0;
-    this.isDeleting = false;
-    this.timeoutId = null;
-    this.tick();
+    this.el = el
+    this.toRotate = toRotate
+    this.period = period || 2000
+    this.txt = ''
+    this.loopNum = 0
+    this.isDeleting = false
+    this.timeoutId = null
+    this.tick()
   }
 
   tick() {
-    const i = this.loopNum % this.toRotate.length;
-    const fullTxt = this.toRotate[i];
+    const i = this.loopNum % this.toRotate.length
+    const fullTxt = this.toRotate[i]
 
     if (this.isDeleting) {
-      this.txt = fullTxt.substring(0, this.txt.length - 1);
-    } else {
-      this.txt = fullTxt.substring(0, this.txt.length + 1);
+      this.txt = fullTxt.substring(0, this.txt.length - 1)
+    }
+    else {
+      this.txt = fullTxt.substring(0, this.txt.length + 1)
     }
 
     this.el.innerHTML = `<span class="wrap">${this.txt.replace(
       /\n/g,
-      '<br>'
-    )}</span>`;
+      '<br>',
+    )}</span>`
 
-    let delta = 200 - Math.random() * 100;
+    let delta = 200 - Math.random() * 100
     if (this.isDeleting) {
-      delta /= 2;
+      delta /= 2
     }
 
     if (!this.isDeleting && this.txt === fullTxt) {
-      delta = this.period;
-      this.isDeleting = true;
-    } else if (this.isDeleting && this.txt === '') {
-      this.isDeleting = false;
-      this.loopNum++;
-      delta = 500;
+      delta = this.period
+      this.isDeleting = true
+    }
+    else if (this.isDeleting && this.txt === '') {
+      this.isDeleting = false
+      this.loopNum++
+      delta = 500
     }
 
-    this.timeoutId = window.setTimeout(() => this.tick(), delta);
+    this.timeoutId = window.setTimeout(() => this.tick(), delta)
   }
 
   stop() {
     if (this.timeoutId) {
-      clearTimeout(this.timeoutId);
+      clearTimeout(this.timeoutId)
     }
   }
 }
 
 onMounted(() => {
-  const elements = document.getElementsByClassName('typewrite');
+  const elements = document.getElementsByClassName('typewrite')
   for (let i = 0; i < elements.length; i++) {
     if (props.typeData) {
-      new TxtType(elements[i] as HTMLElement, props.typeData, props.period);
+      new TxtType(elements[i] as HTMLElement, props.typeData, props.period)
     }
   }
-});
+})
 </script>
 
 <template>

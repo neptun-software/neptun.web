@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 defineProps<{
-  isDisabled: boolean;
-  includeDiff?: boolean;
-}>();
+  isDisabled: boolean
+  includeDiff?: boolean
+}>()
 
 const {
   versionsForSelectedFileType,
@@ -11,7 +11,7 @@ const {
   versionsForSelectedFileTypeComparison,
   selectedComparisonFileVersionId,
   selectedComparisonFileVersionDate,
-} = useFiles();
+} = useFiles()
 </script>
 
 <template>

@@ -1,5 +1,5 @@
-export const useChatsFilter = () => {
+export function useChatsFilter() {
   // ?order_by=updated_at:desc,name:desc,model:desc
-  const chatsFilter = useState('chats-filter', () => ref(''));
-  return chatsFilter;
-};
+  const chatsFilter = useState('chats-filter', () => ref(''))
+  return chatsFilter
+}

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { Check, ChevronsUpDown, Loader2, Diff } from 'lucide-vue-next';
-import { cn } from '~/lib/utils';
+import { Check, ChevronsUpDown, Diff, Loader2 } from 'lucide-vue-next'
+import { cn } from '~/lib/utils'
 
-const { user } = useUserSession();
-const { selectedAiChat, selectedAiChatIsPlayground } = useSelectedAiChat();
-const { loadFiles, fetchedFiles } = useFetchFiles();
+const { user } = useUserSession()
+const { selectedAiChat, selectedAiChatIsPlayground } = useSelectedAiChat()
+const { loadFiles, fetchedFiles } = useFetchFiles()
 const {
   filetypeSearchIsOpen,
   filetypeSearchSelectedValue,
@@ -15,16 +15,16 @@ const {
   fileNameOfFileToDownload,
   fileToCompareTo,
   versionsForSelectedFileType,
-} = useFiles();
+} = useFiles()
 
-const isLoading = ref(true);
+const isLoading = ref(true)
 onMounted(async () => {
   await loadFiles(user.value?.id ?? -1, selectedAiChat.value.id).then(() => {
-    isLoading.value = false;
-  });
-});
+    isLoading.value = false
+  })
+})
 
-const colorMode = useColorMode();
+const colorMode = useColorMode()
 </script>
 
 <template>
@@ -33,7 +33,9 @@ const colorMode = useColorMode();
   >
     <AiChatModelConfiguration />
     <fieldset class="flex flex-col w-full h-full gap-6 p-4 border rounded-lg">
-      <legend class="px-1 -ml-1 text-sm font-medium">Code Blocks</legend>
+      <legend class="px-1 -ml-1 text-sm font-medium">
+        Code Blocks
+      </legend>
       <div
         v-if="!selectedAiChatIsPlayground && fetchedFiles.length > 0"
         class="flex flex-wrap gap-3"
@@ -51,8 +53,8 @@ const colorMode = useColorMode();
                 {{
                   filetypeSearchSelectedValue
                     ? filetypeSearchSelectableValues.find(
-                        (option) => option.value === filetypeSearchSelectedValue
-                      )?.label
+                      (option) => option.value === filetypeSearchSelectedValue,
+                    )?.label
                     : 'Select filetype...'
                 }}
                 <ChevronsUpDown class="w-3 h-3 ml-2 opacity-50 shrink-0" />
@@ -87,7 +89,7 @@ const colorMode = useColorMode();
                             'ml-auto h-4 w-4',
                             filetypeSearchSelectedValue === option.value
                               ? 'opacity-100'
-                              : 'opacity-0'
+                              : 'opacity-0',
                           )
                         "
                       />
@@ -148,9 +150,7 @@ const colorMode = useColorMode();
                   </ShadcnDialogTrigger>
                   <ShadcnDialogContent>
                     <ShadcnDialogHeader>
-                      <ShadcnDialogTitle
-                        >Difference between versions</ShadcnDialogTitle
-                      >
+                      <ShadcnDialogTitle>Difference between versions</ShadcnDialogTitle>
                       <ShadcnDialogDescription>
                         Select a version to see the difference.
                       </ShadcnDialogDescription>
@@ -203,9 +203,13 @@ const colorMode = useColorMode();
           v-if="selectedFileVersion?.text"
           class="flex flex-col w-full h-full gap-6 p-4 border rounded-lg"
         >
-          <legend class="px-1 -ml-1 text-sm font-medium">Options</legend>
+          <legend class="px-1 -ml-1 text-sm font-medium">
+            Options
+          </legend>
           <div>
-            <ShadcnLabel for="file-name"> File Name </ShadcnLabel>
+            <ShadcnLabel for="file-name">
+              File Name
+            </ShadcnLabel>
             <div class="flex flex-col">
               <ShadcnInput id="file-name" v-model="fileNameOfFileToDownload" />
               <ShadcnButton

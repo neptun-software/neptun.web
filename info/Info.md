@@ -4,8 +4,8 @@ I don't have time to learn it properly, and it seems like more work to me than c
 
 ## Pinia be like
 
-Generally put every small store in `composables`.  
-If the store is big enough, put it in `stores`.  
+Generally put every small store in `composables`.
+If the store is big enough, put it in `stores`.
 Also put the store in `stores` if it only stores UI state, just so that it can be found easier and not be used server-side mistakenly.
 
 **Useful**:
@@ -27,7 +27,7 @@ const useExampleStore = defineStore('example', () => {
 ```
 
 ```ts:composables/useExample.ts
-const useExample = () => {
+function useExample() {
   const store = useExampleStore()
   const refs = storeToRefs(store)
 

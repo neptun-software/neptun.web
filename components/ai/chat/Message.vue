@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import type { Message } from '@ai-sdk/vue';
+import type { Message } from '@ai-sdk/vue'
 
 defineProps<{
-  message: Message;
-}>();
+  message: Message
+}>()
 </script>
 
 <template>

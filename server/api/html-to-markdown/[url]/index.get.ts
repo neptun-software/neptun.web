@@ -1,12 +1,12 @@
-import rehypeParse from 'rehype-parse'; // parse HTML
-import rehypeRemark from 'rehype-remark'; // HTML => Markdown
-import remarkGfm from 'remark-gfm'; // support for GitHub Flavored Markdown
-import remarkStringify from 'remark-stringify'; // stringify Markdown
-import { unified } from 'unified'; // HTML and Markdown Utilities
+import rehypeParse from 'rehype-parse' // parse HTML
+import rehypeRemark from 'rehype-remark' // HTML => Markdown
+import remarkGfm from 'remark-gfm' // support for GitHub Flavored Markdown
+import remarkStringify from 'remark-stringify' // stringify Markdown
+import { unified } from 'unified' // HTML and Markdown Utilities
 
 export default defineCachedEventHandler(async (event) => {
   /* VALIDATE PARAMS */
-  const maybeUrl = await validateParamUrl(event);
+  const maybeUrl = await validateParamUrl(event)
   if (maybeUrl.statusCode !== 200) {
     return sendError(
       event,
@@ -14,17 +14,17 @@ export default defineCachedEventHandler(async (event) => {
         statusCode: maybeUrl.statusCode,
         statusMessage: maybeUrl.statusMessage,
         data: maybeUrl.data,
-      })
-    );
+      }),
+    )
   }
-  const url = maybeUrl.data.url;
+  const url = maybeUrl.data.url
 
   const markdown = await fetch(url)
     .then((res) => {
-      return res.text();
+      return res.text()
     })
     .then(async (html) => {
-      let markdown;
+      let markdown
 
       try {
         const file = await unified()
@@ -32,30 +32,34 @@ export default defineCachedEventHandler(async (event) => {
           .use(rehypeRemark)
           .use(remarkGfm)
           .use(remarkStringify)
-          .process(html);
+          .process(html)
 
-        markdown = String(file);
-      } catch (error: any) {
-        if (LOG_BACKEND) console.error('Failed to parse HTML:', error?.message);
-        markdown = `Failed to parse HTML: ${error?.message}`;
+        markdown = String(file)
+      }
+      catch (error: any) {
+        if (LOG_BACKEND)
+          console.error('Failed to parse HTML:', error?.message)
+        markdown = `Failed to parse HTML: ${error?.message}`
       }
 
-      return markdown;
+      return markdown
     })
     .catch((err) => {
-      if (LOG_BACKEND) console.error(err);
-      return 'FAILED';
-    });
+      if (LOG_BACKEND)
+        console.error(err)
+      return 'FAILED'
+    })
 
-  if (markdown === 'FAILED')
+  if (markdown === 'FAILED') {
     return sendError(
       event,
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
         data: markdown,
-      })
-    );
+      }),
+    )
+  }
 
-  return markdown;
-});
+  return markdown
+})

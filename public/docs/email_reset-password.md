@@ -16,15 +16,15 @@ POST
 
 ### Headers
 
-| Header        | Value            | Required | Description                    |
-|---------------|------------------|----------|--------------------------------|
-| Content-Type  | application/json | Yes      | Indicates JSON request body    |
+| Header       | Value            | Required | Description                 |
+| ------------ | ---------------- | -------- | --------------------------- |
+| Content-Type | application/json | Yes      | Indicates JSON request body |
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                          |
-|-----------|--------|----------|--------------------------------------|
-| email     | string | Yes      | The email address of the user       |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| email     | string | Yes      | The email address of the user |
 
 ### Query Parameters
 
@@ -33,21 +33,21 @@ No query parameters required.
 ### Request Body
 
 | Field        | Type   | Required | Description                          |
-|--------------|--------|----------|--------------------------------------|
+| ------------ | ------ | -------- | ------------------------------------ |
 | otp          | string | Yes      | One-time password received via email |
-| new_password | string | Yes      | New password for the account        |
+| new_password | string | Yes      | New password for the account         |
 
 #### TypeScript Interface
 
 ```typescript
 interface ResetPasswordRequest {
-  otp: string;
-  new_password: string;
+  otp: string
+  new_password: string
 }
 
 interface ResetPasswordResponse {
-  success: boolean;
-  message: string;
+  success: boolean
+  message: string
 }
 ```
 
@@ -160,12 +160,12 @@ async function resetPassword(
         new_password: newPassword,
       }),
     }
-  );
-  
+  )
+
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
-  
-  return await response.json() as ResetPasswordResponse;
+
+  return await response.json() as ResetPasswordResponse
 }
 ```

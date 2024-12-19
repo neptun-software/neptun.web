@@ -1,26 +1,26 @@
-import { relations } from 'drizzle-orm/relations';
+import { relations } from 'drizzle-orm/relations'
 import {
-  neptun_user,
-  chat_conversation_message,
   chat_conversation,
-  neptun_user_oauth_account,
   chat_conversation_file,
-  github_app_installation,
-  github_app_installation_repository,
+  chat_conversation_message,
   chat_conversation_share,
   chat_conversation_share_whitelist_entry,
-} from './schema';
+  github_app_installation,
+  github_app_installation_repository,
+  neptun_user,
+  neptun_user_oauth_account,
+} from './schema'
 
 export const neptun_userRelations = relations(neptun_user, ({ many }) => ({
   neptun_user_oauth_accounts: many(neptun_user_oauth_account),
   github_app_installations: many(github_app_installation),
   chat_conversations: many(chat_conversation),
   chat_conversation_share_whitelists: many(
-    chat_conversation_share_whitelist_entry
+    chat_conversation_share_whitelist_entry,
   ),
   chat_conversation_messages: many(chat_conversation_message),
   chat_conversation_files: many(chat_conversation_file),
-}));
+}))
 
 export const neptun_user_oauth_accountRelations = relations(
   neptun_user_oauth_account,
@@ -29,8 +29,8 @@ export const neptun_user_oauth_accountRelations = relations(
       fields: [neptun_user_oauth_account.neptun_user_id],
       references: [neptun_user.id],
     }),
-  })
-);
+  }),
+)
 
 export const github_app_installationRelations = relations(
   github_app_installation,
@@ -40,10 +40,10 @@ export const github_app_installationRelations = relations(
       references: [neptun_user.id],
     }),
     github_app_installation_repositories: many(
-      github_app_installation_repository
+      github_app_installation_repository,
     ),
-  })
-);
+  }),
+)
 
 export const github_app_installation_repositoryRelations = relations(
   github_app_installation_repository,
@@ -52,8 +52,8 @@ export const github_app_installation_repositoryRelations = relations(
       fields: [github_app_installation_repository.github_app_installation_id],
       references: [github_app_installation.id],
     }),
-  })
-);
+  }),
+)
 
 export const chat_conversationRelations = relations(
   chat_conversation,
@@ -65,8 +65,8 @@ export const chat_conversationRelations = relations(
       fields: [chat_conversation.neptun_user_id],
       references: [neptun_user.id],
     }),
-  })
-);
+  }),
+)
 
 export const chat_conversation_shareRelations = relations(
   chat_conversation_share,
@@ -76,10 +76,10 @@ export const chat_conversation_shareRelations = relations(
       references: [chat_conversation.id],
     }),
     chat_conversation_shares_whitelisted: many(
-      chat_conversation_share_whitelist_entry
+      chat_conversation_share_whitelist_entry,
     ),
-  })
-);
+  }),
+)
 
 export const chat_conversation_share_whitelistRelations = relations(
   chat_conversation_share_whitelist_entry,
@@ -96,8 +96,8 @@ export const chat_conversation_share_whitelistRelations = relations(
       ],
       references: [chat_conversation_share.id],
     }),
-  })
-);
+  }),
+)
 
 export const chat_conversation_messageRelations = relations(
   chat_conversation_message,
@@ -111,8 +111,8 @@ export const chat_conversation_messageRelations = relations(
       references: [chat_conversation.id],
     }),
     chat_conversation_files: many(chat_conversation_file),
-  })
-);
+  }),
+)
 
 export const chat_conversation_fileRelations = relations(
   chat_conversation_file,
@@ -129,5 +129,5 @@ export const chat_conversation_fileRelations = relations(
       fields: [chat_conversation_file.chat_conversation_message_id],
       references: [chat_conversation_message.id],
     }),
-  })
-);
+  }),
+)

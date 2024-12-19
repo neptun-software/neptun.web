@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import {
-  Preview,
-  Html,
-  Head,
-  Tailwind,
+  CodeInline,
   Container,
+  Font,
+  Head,
+  Heading,
+  Hr,
+  Html,
+  Img,
+  Link,
+  Preview,
   Row,
   Section,
-  Heading,
+  Tailwind,
   Text,
-  CodeInline,
-  Hr,
-  Link,
-  Img,
-  Font,
-} from '@vue-email/components';
-import { emailTheme } from './tailwind';
+} from '@vue-email/components'
+import { emailTheme } from './tailwind'
 
 defineProps({
   otp: String,
-});
+})
 </script>
 
 <template>
@@ -27,7 +27,7 @@ defineProps({
   <Html lang="en" dir="ltr" style="background-color: #020817; color: #f8fafc">
     <Head>
       <title>Password Reset OTP - NeptunAI</title>
-      <meta name="description" content="You have requested a password reset." />
+      <meta name="description" content="You have requested a password reset.">
       <Font
         font-family="Roboto"
         fallback-font-family="Verdana"

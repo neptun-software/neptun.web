@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import type { TemplateData } from '~/lib/(templates)/templates';
+import type { TemplateData } from '~/lib/(templates)/templates'
 
-const { totalItems, isLoading, fetchPaginatedData } = useTemplates();
-const templates = ref<TemplateData[]>([]);
-const pageSize = ref(2);
-const page = ref(1);
+const { totalItems, isLoading, fetchPaginatedData } = useTemplates()
+const templates = ref<TemplateData[]>([])
+const pageSize = ref(2)
+const page = ref(1)
 
-fetchPaginatedData(page.value, pageSize.value, templates);
+fetchPaginatedData(page.value, pageSize.value, templates)
 
-const { currentPage, pageCount, isFirstPage, isLastPage, prev, next } =
-  useOffsetPagination({
+const { currentPage, pageCount, isFirstPage, isLastPage, prev, next }
+  = useOffsetPagination({
     total: totalItems.value,
-    page: page,
+    page,
     pageSize,
     onPageChange: ({ currentPage, currentPageSize }) => {
-      fetchPaginatedData(currentPage, currentPageSize, templates);
+      fetchPaginatedData(currentPage, currentPageSize, templates)
     },
     onPageSizeChange: ({ currentPage, currentPageSize }) => {
-      fetchPaginatedData(currentPage, currentPageSize, templates);
+      fetchPaginatedData(currentPage, currentPageSize, templates)
     },
-  });
+  })
 </script>
 
 <template>
@@ -42,7 +42,9 @@ const { currentPage, pageCount, isFirstPage, isLastPage, prev, next } =
   </DevOnly> -->
 
     <div class="flex gap-1 mb-2">
-      <ShadcnButton :disabled="isFirstPage" @click="prev"> prev </ShadcnButton>
+      <ShadcnButton :disabled="isFirstPage" @click="prev">
+        prev
+      </ShadcnButton>
       <ShadcnButton
         v-for="(item, index) in pageCount"
         :key="index"
@@ -51,10 +53,12 @@ const { currentPage, pageCount, isFirstPage, isLastPage, prev, next } =
       >
         {{ item }}
       </ShadcnButton>
-      <ShadcnButton :disabled="isLastPage" @click="next"> next </ShadcnButton>
+      <ShadcnButton :disabled="isLastPage" @click="next">
+        next
+      </ShadcnButton>
     </div>
 
-    <Templates :templates="templates" :isLoading="isLoading"></Templates>
+    <Templates :templates="templates" :is-loading="isLoading" />
   </div>
 </template>
 

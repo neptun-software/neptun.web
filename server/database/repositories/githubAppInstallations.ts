@@ -1,35 +1,33 @@
-import { eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm'
 import {
   github_app_installation,
-  type ReadUser,
   type NewGithubAppInstallation,
-} from '~/lib/types/database.tables/schema';
+  type ReadUser,
+} from '~/lib/types/database.tables/schema'
 
-export const createGithubAppInstallation = async (
-  installationToCreate: NewGithubAppInstallation
-) => {
+export async function createGithubAppInstallation(installationToCreate: NewGithubAppInstallation) {
   const createdGithubAppInstallation = await db
     .insert(github_app_installation)
     .values(installationToCreate)
     .returning()
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error(
           'Failed to create github app installation in database',
-          err
-        );
-      return null;
-    });
+          err,
+        )
+      }
+      return null
+    })
 
-  if (!createdGithubAppInstallation) return null;
+  if (!createdGithubAppInstallation)
+    return null
 
-  return createdGithubAppInstallation[0];
-};
+  return createdGithubAppInstallation[0]
+}
 
 // User can have multiple, because user can link multiple github organizations.
-export const readAllGithubAppInstallationsOfUser = async (
-  userId: ReadUser['id']
-) => {
+export async function readAllGithubAppInstallationsOfUser(userId: ReadUser['id']) {
   const fetchedGithubAppInstallations = await db
     .select({
       id: github_app_installation.id,
@@ -43,15 +41,17 @@ export const readAllGithubAppInstallationsOfUser = async (
     .from(github_app_installation)
     .where(eq(github_app_installation.neptun_user_id, userId))
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error(
           'Failed to fetch github app installations from database',
-          err
-        );
-      return null;
-    });
+          err,
+        )
+      }
+      return null
+    })
 
-  if (!fetchedGithubAppInstallations) return null;
+  if (!fetchedGithubAppInstallations)
+    return null
 
-  return fetchedGithubAppInstallations;
-};
+  return fetchedGithubAppInstallations
+}

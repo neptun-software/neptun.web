@@ -1,17 +1,6 @@
 <script lang="ts" setup>
-import {
-  FlexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  useVueTable,
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
-} from '@tanstack/vue-table';
-import { toast } from 'vue-sonner';
-import { CaretSortIcon } from '@radix-icons/vue';
-import type { Import } from './types';
+import type { Import } from './types'
+import { NuxtLink } from '#components'
 import {
   Table,
   TableBody,
@@ -19,17 +8,28 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { NuxtLink } from '#components';
-import { Button } from '~/components/ui/button';
-import { valueUpdater } from '~/lib/utils';
+} from '@/components/ui/table'
+import { CaretSortIcon } from '@radix-icons/vue'
+import {
+  type ColumnDef,
+  type ColumnFiltersState,
+  FlexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  type SortingState,
+  useVueTable,
+} from '@tanstack/vue-table'
+import { toast } from 'vue-sonner'
+import { Button } from '~/components/ui/button'
+import { valueUpdater } from '~/lib/utils'
 
 const props = defineProps<{
-  imports: Import[];
-}>();
+  imports: Import[]
+}>()
 
-const sorting = ref<SortingState>([]);
-const columnFilters = ref<ColumnFiltersState>([]);
+const sorting = ref<SortingState>([])
+const columnFilters = ref<ColumnFiltersState>([])
 
 const columns: ColumnDef<Import>[] = [
   {
@@ -41,8 +41,8 @@ const columns: ColumnDef<Import>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Repository Name', h(CaretSortIcon, { class: 'ml-2 h-4 w-4' })]
-      );
+        () => ['Repository Name', h(CaretSortIcon, { class: 'ml-2 h-4 w-4' })],
+      )
     },
     cell: ({ row }) => row.getValue('github_repository_name'),
   },
@@ -70,7 +70,7 @@ const columns: ColumnDef<Import>[] = [
     accessorKey: 'github_repository_url',
     header: 'Repository URL',
     cell: ({ row }) => {
-      const websiteUrl = row.getValue('github_repository_url');
+      const websiteUrl = row.getValue('github_repository_url')
       return h(
         NuxtLink,
         {
@@ -78,15 +78,15 @@ const columns: ColumnDef<Import>[] = [
           target: websiteUrl ? '_blank' : undefined,
           external: true,
         },
-        () => websiteUrl || 'N/A'
-      );
+        () => websiteUrl || 'N/A',
+      )
     },
   },
   {
     accessorKey: 'github_repository_website_url',
     header: 'Website URL',
     cell: ({ row }) => {
-      const websiteUrl = row.getValue('github_repository_website_url');
+      const websiteUrl = row.getValue('github_repository_website_url')
       return h(
         NuxtLink,
         {
@@ -94,8 +94,8 @@ const columns: ColumnDef<Import>[] = [
           target: websiteUrl ? '_blank' : undefined,
           external: true,
         },
-        () => websiteUrl || 'N/A'
-      );
+        () => websiteUrl || 'N/A',
+      )
     },
   },
   {
@@ -133,40 +133,40 @@ const columns: ColumnDef<Import>[] = [
           size: 'sm',
           onClick: () => {
             toast.error(
-              `Coming Soon... Refreshing repository ${row.original.github_repository_id}...`
-            );
+              `Coming Soon... Refreshing repository ${row.original.github_repository_id}...`,
+            )
           },
         },
-        () => 'Refresh'
+        () => 'Refresh',
       ),
   },
-];
+]
 
 const table = useVueTable({
   get data() {
-    return (props.imports as Import[]) || [];
+    return (props.imports as Import[]) || []
   },
   columns,
   getCoreRowModel: getCoreRowModel(),
 
   getSortedRowModel: getSortedRowModel(),
-  onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
+  onSortingChange: updaterOrValue => valueUpdater(updaterOrValue, sorting),
 
   onColumnFiltersChange: (updaterOrValue) => {
-    return valueUpdater(updaterOrValue, columnFilters);
+    return valueUpdater(updaterOrValue, columnFilters)
   },
   getFilteredRowModel: getFilteredRowModel(),
   state: {
     get sorting() {
-      return sorting.value;
+      return sorting.value
     },
     get columnFilters() {
-      return columnFilters.value;
+      return columnFilters.value
     },
   },
-});
+})
 
-const selectedInstallationId = useSelectedInstallation();
+const selectedInstallationId = useSelectedInstallation()
 </script>
 
 <template>

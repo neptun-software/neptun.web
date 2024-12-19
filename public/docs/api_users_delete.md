@@ -16,15 +16,15 @@ DELETE
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                    |
-|-----------|--------|----------|--------------------------------|
-| user_id   | string | Yes      | Unique identifier of the user  |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| user_id   | string | Yes      | Unique identifier of the user |
 
 ### Headers
 
-| Header         | Value            | Required | Description                    |
-|----------------|------------------|----------|--------------------------------|
-| Cookie         | neptun-session   | Yes      | Session authentication cookie  |
+| Header | Value          | Required | Description                   |
+| ------ | -------------- | -------- | ----------------------------- |
+| Cookie | neptun-session | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -74,15 +74,15 @@ true
 
 ```typescript
 interface DeleteUserResponse {
-  success: boolean;
+  success: boolean
 }
 
 interface DeleteUserError {
-  statusCode: number;
-  statusMessage: string;
+  statusCode: number
+  statusMessage: string
   data: {
-    message: string;
-  };
+    message: string
+  }
 }
 ```
 
@@ -142,25 +142,25 @@ async function deleteUser(userId: string): Promise<boolean> {
       method: 'DELETE',
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json();
+  return await response.json()
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | User successfully deleted                          |
-| 400         | Invalid user ID format                            |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | User not found                                    |
-| 500         | Server error during deletion                      |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | User successfully deleted                 |
+| 400         | Invalid user ID format                    |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | User not found                            |
+| 500         | Server error during deletion              |
 
 ## Notes
 

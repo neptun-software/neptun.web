@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { Share } from 'lucide-vue-next';
-import { useForm } from 'vee-validate';
-import { toTypedSchema } from '@vee-validate/zod';
-import { toast } from 'vue-sonner';
-import * as z from 'zod';
+import { toTypedSchema } from '@vee-validate/zod'
+import { Share } from 'lucide-vue-next'
+import { useForm } from 'vee-validate'
+import { toast } from 'vue-sonner'
+import * as z from 'zod'
 
-const { selectedAiChatId, selectedAiChatIsPlayground } = useSelectedAiChat();
-const { user } = useUserSession();
+const { selectedAiChatId, selectedAiChatIsPlayground } = useSelectedAiChat()
+const { user } = useUserSession()
 // const { console } = useLogger();
 
 const formSchema = toTypedSchema(
@@ -14,8 +14,8 @@ const formSchema = toTypedSchema(
     is_unprotected: z.boolean().default(true).optional(),
     password: z.string().max(128).optional(),
     email_whitelist: z.array(z.string().min(5).email()).max(10).optional(),
-  })
-);
+  }),
+)
 
 const {
   handleSubmit,
@@ -29,52 +29,53 @@ const {
     password: '',
     email_whitelist: [],
   },
-});
+})
 
-const validateTag = async (event: KeyboardEvent) => {
+async function validateTag(event: KeyboardEvent) {
   // await validateField('email_whitelist')
-  const input = event.target as HTMLInputElement;
-  const email = input.value.trim();
+  const input = event.target as HTMLInputElement
+  const email = input.value.trim()
 
   if (email && z.string().email().safeParse(email).success) {
-    const updatedWhitelist = [...(formValues.email_whitelist || []), email];
-    setValues({ email_whitelist: updatedWhitelist });
-    input.value = '';
-    setFieldError('email_whitelist', undefined);
-  } else {
-    setFieldError('email_whitelist', 'Invalid email address');
+    const updatedWhitelist = [...(formValues.email_whitelist || []), email]
+    setValues({ email_whitelist: updatedWhitelist })
+    input.value = ''
+    setFieldError('email_whitelist', undefined)
   }
-};
+  else {
+    setFieldError('email_whitelist', 'Invalid email address')
+  }
+}
 
-const isSubmitting = ref(false);
+const isSubmitting = ref(false)
 const onSubmit = handleSubmit(async (values) => {
-  isSubmitting.value = true;
+  isSubmitting.value = true
 
   if (
-    !formValues.is_unprotected &&
-    (!values.password || values.password?.length === 0) &&
-    (formValues.email_whitelist || []).length === 0
+    !formValues.is_unprotected
+    && (!values.password || values.password?.length === 0)
+    && (formValues.email_whitelist || []).length === 0
   ) {
     toast.error(
       'Please set a password or add at least one email to the whitelist.',
       {
         description:
           'Both fields cannot be empty when the chat is not unprotected.',
-      }
-    );
+      },
+    )
 
     setFieldError(
       'password',
-      'Both fields cannot be empty when the chat is not unprotected. Please set a password or add at least one email to the whitelist.'
-    );
+      'Both fields cannot be empty when the chat is not unprotected. Please set a password or add at least one email to the whitelist.',
+    )
     setFieldError(
       'email_whitelist',
-      'Both fields cannot be empty when the chat is not unprotected. Please set a password or add at least one email to the whitelist.'
-    );
+      'Both fields cannot be empty when the chat is not unprotected. Please set a password or add at least one email to the whitelist.',
+    )
 
-    isSubmitting.value = false;
+    isSubmitting.value = false
 
-    return;
+    return
   }
 
   /* toast('You submitted the following values:', {
@@ -97,62 +98,64 @@ const onSubmit = handleSubmit(async (values) => {
         is_protected: !values.is_unprotected,
         hashed_password: values.password,
       },
-    }
+    },
   )
     .then((data) => {
       if (data && data.share) {
-        toast.success('Share created!');
-      } else {
-        toast.error('Failed to create share!');
+        toast.success('Share created!')
+      }
+      else {
+        toast.error('Failed to create share!')
       }
 
-      return data;
+      return data
     })
     .catch(() => {
-      toast.error('Failed to create share!');
-    });
+      toast.error('Failed to create share!')
+    })
 
   if (
-    shareCreated &&
-    values.email_whitelist &&
-    values.email_whitelist.length > 0
+    shareCreated
+    && values.email_whitelist
+    && values.email_whitelist.length > 0
   ) {
     await $fetch(
       `/api/users/${user.value?.id}/chats/${selectedAiChatId.value}/shares/${shareCreated.share?.id}/whitelist-entries`,
       {
         method: 'POST',
         body: values.email_whitelist,
-      }
+      },
     )
       .then((data) => {
         if (data && data.shareWhitelistEntries) {
-          toast.success('Whitelist entries created!');
-        } else {
-          toast.error('Failed to create whitelist entries!');
+          toast.success('Whitelist entries created!')
+        }
+        else {
+          toast.error('Failed to create whitelist entries!')
         }
 
-        return data;
+        return data
       })
       .catch(() => {
-        toast.error('Failed to create whitelist entries!');
-      });
+        toast.error('Failed to create whitelist entries!')
+      })
   }
 
-  refresh();
+  refresh()
 
-  isSubmitting.value = false;
-});
+  isSubmitting.value = false
+})
 
 const { data, status, error, refresh } = useFetch(
-  `/api/users/${user.value?.id ?? -1}/chats/${selectedAiChatId.value}/shares`
-);
+  `/api/users/${user.value?.id ?? -1}/chats/${selectedAiChatId.value}/shares`,
+)
 
-const requestUrl = useRequestURL();
+const requestUrl = useRequestURL()
 const url = computed(() => {
   return `http${IS_DEV ? '' : 's'}://${requestUrl.host}/shared/chats/${
     data.value
-  }`;
-});
+  }`
+})
 </script>
 
 <template>
@@ -176,7 +179,7 @@ const url = computed(() => {
             <ShadcnDialogDescription>
               You can make it public, for everybody who has the link, you could
               also make it password protected and you could whitelist other
-              users.<br />
+              users.<br>
               Others can not edit your chat or send messages, they are just
               viewers.
             </ShadcnDialogDescription>
@@ -277,12 +280,14 @@ const url = computed(() => {
                 Publish with the configured settings
               </ShadcnButton>
               <ShadcnDialogClose as-child>
-                <ShadcnButton variant="secondary"> Close </ShadcnButton>
+                <ShadcnButton variant="secondary">
+                  Close
+                </ShadcnButton>
               </ShadcnDialogClose>
             </ShadcnDialogFooter>
           </form>
           <div v-else>
-            You have already published this chat!<br />
+            You have already published this chat!<br>
             <div class="flex items-center gap-2 px-2 py-1 border rounded-sm">
               {{ url }}
               <CopyToClipboard :text="url" />
@@ -292,11 +297,11 @@ const url = computed(() => {
             v-if="error"
             class="flex items-center justify-between gap-2 py-1 pl-2 pr-1 border rounded-sm border-destructive"
           >
-            Failed to check if chat is published.<br />
+            Failed to check if chat is published.<br>
 
             <AsyncButton
               variant="secondary"
-              :onClickAsync="(_event: MouseEvent) => refresh()"
+              :on-click-async="(_event: MouseEvent) => refresh()"
             >
               Retry
             </AsyncButton>

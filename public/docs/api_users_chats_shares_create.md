@@ -16,17 +16,17 @@ POST
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                              |
-|-----------|--------|----------|------------------------------------------|
-| user_id   | string | Yes      | Unique identifier of the user           |
-| chat_id   | number | Yes      | Unique identifier of the chat           |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| user_id   | string | Yes      | Unique identifier of the user |
+| chat_id   | number | Yes      | Unique identifier of the chat |
 
 ### Headers
 
-| Header         | Value            | Required | Description                          |
-|----------------|------------------|----------|--------------------------------------|
-| Content-Type   | application/json | Yes      | Indicates JSON request body         |
-| Cookie         | neptun-session   | Yes      | Session authentication cookie       |
+| Header       | Value            | Required | Description                   |
+| ------------ | ---------------- | -------- | ----------------------------- |
+| Content-Type | application/json | Yes      | Indicates JSON request body   |
+| Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -34,11 +34,11 @@ No query parameters required.
 
 ### Request Body
 
-| Field           | Type    | Required | Default | Description                         |
-|-----------------|---------|----------|---------|-------------------------------------|
-| is_shared      | boolean | No       | true    | Whether the chat is shared         |
-| is_protected   | boolean | No       | false   | Whether password protection is enabled |
-| hashed_password | string  | No       | null    | Hashed password for protected shares |
+| Field           | Type    | Required | Default | Description                            |
+| --------------- | ------- | -------- | ------- | -------------------------------------- |
+| is_shared       | boolean | No       | true    | Whether the chat is shared             |
+| is_protected    | boolean | No       | false   | Whether password protection is enabled |
+| hashed_password | string  | No       | null    | Hashed password for protected shares   |
 
 ## Response Format
 
@@ -79,34 +79,34 @@ No query parameters required.
 
 ```typescript
 interface CreateShareRequest {
-  is_shared?: boolean;
-  is_protected?: boolean;
-  hashed_password?: string | null;
+  is_shared?: boolean
+  is_protected?: boolean
+  hashed_password?: string | null
 }
 
 interface ChatShare {
-  id: number;
-  chat_conversation_id: number;
-  uuid: string;
-  is_shared: boolean;
-  is_protected: boolean;
-  hashed_password: string | null;
-  created_at: string;
+  id: number
+  chat_conversation_id: number
+  uuid: string
+  is_shared: boolean
+  is_protected: boolean
+  hashed_password: string | null
+  created_at: string
 }
 
 interface CreateShareResponse {
-  share: ChatShare;
+  share: ChatShare
 }
 
 interface CreateShareError {
-  statusCode: number;
-  statusMessage: string;
+  statusCode: number
+  statusMessage: string
   data: {
     issues: Array<{
-      code: string;
-      message: string;
-    }>;
-  };
+      code: string
+      message: string
+    }>
+  }
 }
 ```
 
@@ -188,25 +188,25 @@ async function createChatShare(
       body: JSON.stringify(shareRequest),
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as CreateShareResponse;
+  return await response.json() as CreateShareResponse
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Share successfully created                         |
-| 400         | Invalid request body                              |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | Chat or user not found                            |
-| 500         | Server error during share creation                |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Share successfully created                |
+| 400         | Invalid request body                      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error during share creation        |
 
 ## Notes
 

@@ -1,5 +1,5 @@
 <script setup>
-import gsap from 'gsap';
+import gsap from 'gsap'
 
 const props = defineProps({
   text: {
@@ -14,18 +14,18 @@ const props = defineProps({
     type: Number,
     default: 2,
   },
-});
+})
 
-const dynamicText = ref(null);
-const currentText = ref(props.textToLoop[0]);
-let currentIndex = 0;
+const dynamicText = ref(null)
+const currentText = ref(props.textToLoop[0])
+let currentIndex = 0
 
 // Calculate slide height based on dynamic text height
-const slideHeight = ref(0);
+const slideHeight = ref(0)
 
-const updateText = () => {
-  const newIndex = (currentIndex + 1) % props.textToLoop.length;
-  const newText = props.textToLoop[newIndex];
+function updateText() {
+  const newIndex = (currentIndex + 1) % props.textToLoop.length
+  const newText = props.textToLoop[newIndex]
 
   gsap.to(dynamicText.value, {
     y: -slideHeight.value,
@@ -33,25 +33,25 @@ const updateText = () => {
     duration: props.duration / 2,
     ease: 'power1.in',
     onComplete: () => {
-      currentText.value = newText;
+      currentText.value = newText
       gsap.fromTo(
         dynamicText.value,
         { y: slideHeight.value, opacity: 0 },
-        { y: 0, opacity: 1, duration: props.duration / 2, ease: 'power1.out' }
-      );
+        { y: 0, opacity: 1, duration: props.duration / 2, ease: 'power1.out' },
+      )
     },
-  });
+  })
 
-  currentIndex = newIndex;
-};
+  currentIndex = newIndex
+}
 
 onMounted(async () => {
-  await nextTick(); // Wait until the text is rendered, then calculate the height
-  slideHeight.value = dynamicText.value.offsetHeight / 4;
+  await nextTick() // Wait until the text is rendered, then calculate the height
+  slideHeight.value = dynamicText.value.offsetHeight / 4
 
-  const interval = setInterval(updateText, props.duration * 1000);
-  onUnmounted(() => clearInterval(interval));
-});
+  const interval = setInterval(updateText, props.duration * 1000)
+  onUnmounted(() => clearInterval(interval))
+})
 </script>
 
 <template>

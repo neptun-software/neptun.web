@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { NuxtError } from '#app';
+import type { NuxtError } from '#app'
 
 defineProps({
   error: Object as () => NuxtError,
-});
+})
 
-const handleError = () => clearError({ redirect: '/home' });
+const handleError = () => clearError({ redirect: '/home' })
 </script>
 
 <template>
@@ -27,7 +27,7 @@ const handleError = () => clearError({ redirect: '/home' });
         <AsyncButton
           class="max-w-full mt-4 w-fit"
           variant="secondary"
-          :onClickAsync="handleError"
+          :on-click-async="handleError"
         >
           Home
         </AsyncButton>

@@ -16,16 +16,16 @@ PATCH
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                    |
-|-----------|--------|----------|--------------------------------|
-| user_id   | string | Yes      | Unique identifier of the user  |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| user_id   | string | Yes      | Unique identifier of the user |
 
 ### Headers
 
-| Header         | Value            | Required | Description                          |
-|----------------|------------------|----------|--------------------------------------|
-| Content-Type   | application/json | Yes      | Indicates JSON request body         |
-| Cookie         | neptun-session   | Yes      | Session authentication cookie       |
+| Header       | Value            | Required | Description                   |
+| ------------ | ---------------- | -------- | ----------------------------- |
+| Content-Type | application/json | Yes      | Indicates JSON request body   |
+| Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -35,10 +35,10 @@ No query parameters required.
 
 At least one of the following fields must be provided:
 
-| Field    | Type   | Required | Description                          | Constraints        |
-|----------|--------|----------|--------------------------------------|-------------------|
-| email    | string | No       | New email address for the user      | Valid email format |
-| password | string | No       | New password for the user           | Non-empty string  |
+| Field    | Type   | Required | Description                    | Constraints        |
+| -------- | ------ | -------- | ------------------------------ | ------------------ |
+| email    | string | No       | New email address for the user | Valid email format |
+| password | string | No       | New password for the user      | Non-empty string   |
 
 ## Response Format
 
@@ -78,28 +78,28 @@ At least one of the following fields must be provided:
 
 ```typescript
 interface UpdateUserRequest {
-  email?: string;
-  password?: string;
+  email?: string
+  password?: string
 }
 
 interface UpdateUserResponse {
   user: {
-    id: string;
-    primary_email: string;
-  };
+    id: string
+    primary_email: string
+  }
 }
 
 interface UpdateUserError {
-  statusCode: number;
-  statusMessage: string;
-  message: string;
+  statusCode: number
+  statusMessage: string
+  message: string
   data?: {
     issues: Array<{
-      code: string;
-      validation: string;
-      message: string;
-    }>;
-  };
+      code: string
+      validation: string
+      message: string
+    }>
+  }
 }
 ```
 
@@ -182,8 +182,8 @@ curl -X PATCH \
 async function updateUser(
   userId: string,
   updates: {
-    email?: string;
-    password?: string;
+    email?: string
+    password?: string
   }
 ): Promise<UpdateUserResponse> {
   const response = await fetch(
@@ -196,25 +196,25 @@ async function updateUser(
       body: JSON.stringify(updates),
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as UpdateUserResponse;
+  return await response.json() as UpdateUserResponse
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | User successfully updated                          |
-| 400         | Invalid request body or missing required fields    |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | User not found                                    |
-| 500         | Server error during update                        |
+| Status Code | Description                                     |
+| ----------- | ----------------------------------------------- |
+| 200         | User successfully updated                       |
+| 400         | Invalid request body or missing required fields |
+| 401         | Unauthorized (invalid or missing session)       |
+| 404         | User not found                                  |
+| 500         | Server error during update                      |
 
 ## Notes
 

@@ -18,37 +18,37 @@ This endpoint manages chat conversations for a specific user, supporting creatio
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                    |
-|-----------|--------|----------|--------------------------------|
-| user_id   | string | Yes      | Unique identifier of the user  |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| user_id   | string | Yes      | Unique identifier of the user |
 
 ### Headers
 
-| Header         | Value            | Required | Description                          |
-|----------------|------------------|----------|--------------------------------------|
-| Content-Type   | application/json | Yes*     | Required for POST and DELETE methods |
-| Cookie         | neptun-session   | Yes      | Session authentication cookie        |
+| Header       | Value            | Required | Description                          |
+| ------------ | ---------------- | -------- | ------------------------------------ |
+| Content-Type | application/json | Yes\*    | Required for POST and DELETE methods |
+| Cookie       | neptun-session   | Yes      | Session authentication cookie        |
 
 ### Query Parameters
 
-| Parameter | Type   | Required | Description                                     |
-|-----------|--------|----------|-------------------------------------------------|
+| Parameter | Type   | Required | Description                                    |
+| --------- | ------ | -------- | ---------------------------------------------- |
 | order_by  | string | No       | Sort order for chats (e.g., "created_at:desc") |
 
 ### Request Body
 
 #### POST Method
 
-| Field  | Type   | Required | Description                    | Constraints        |
-|--------|--------|----------|--------------------------------|-------------------|
-| model  | string | Yes      | AI model for the chat         | Non-empty string  |
-| name   | string | Yes      | Name of the chat conversation | Non-empty string  |
+| Field | Type   | Required | Description                   | Constraints      |
+| ----- | ------ | -------- | ----------------------------- | ---------------- |
+| model | string | Yes      | AI model for the chat         | Non-empty string |
+| name  | string | Yes      | Name of the chat conversation | Non-empty string |
 
 #### DELETE Method
 
-| Field     | Type     | Required | Description                          |
-|-----------|----------|----------|--------------------------------------|
-| chat_ids  | number[] | Yes      | Array of chat IDs to delete         |
+| Field    | Type     | Required | Description                 |
+| -------- | -------- | -------- | --------------------------- |
+| chat_ids | number[] | Yes      | Array of chat IDs to delete |
 
 ## Response Format
 
@@ -111,28 +111,28 @@ true
 
 ```typescript
 interface ChatConversation {
-  id: number;
-  neptun_user_id: string;
-  model: string;
-  name: string;
-  created_at: string;
+  id: number
+  neptun_user_id: string
+  model: string
+  name: string
+  created_at: string
 }
 
 interface CreateChatRequest {
-  model: string;
-  name: string;
+  model: string
+  name: string
 }
 
 interface DeleteChatsRequest {
-  chat_ids: number[];
+  chat_ids: number[]
 }
 
 interface GetChatsResponse {
-  chats: ChatConversation[];
+  chats: ChatConversation[]
 }
 
 interface CreateChatResponse {
-  chat: ChatConversation;
+  chat: ChatConversation
 }
 ```
 
@@ -223,13 +223,13 @@ async def delete_chats(
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Request successful                                |
-| 400         | Invalid request body or parameters                |
-| 401         | Unauthorized (invalid or missing session)         |
-| 404         | User not found                                   |
-| 500         | Server error                                     |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Request successful                        |
+| 400         | Invalid request body or parameters        |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | User not found                            |
+| 500         | Server error                              |
 
 ## Notes
 

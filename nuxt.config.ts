@@ -1,71 +1,85 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-import type { HTTPMethod } from 'nuxt-security';
-import removeConsole from 'vite-plugin-remove-console';
-import vue from '@vitejs/plugin-vue';
-import { protectedRoutes } from './utils/pages';
-import { supportedShikiLanguages } from './utils/formatters';
+import type { HTTPMethod } from 'nuxt-security'
+import vue from '@vitejs/plugin-vue'
+import removeConsole from 'vite-plugin-remove-console'
+import { supportedShikiLanguages } from './utils/formatters'
+import { protectedRoutes } from './utils/pages'
 
 // import wasm from "vite-plugin-wasm";
 // import topLevelAwait from "vite-plugin-top-level-await";
 
-const productionURL = 'https://neptun-webui.vercel.app';
+const productionURL = 'https://neptun-webui.vercel.app'
 const corsHandler = {
   origin: '*',
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'] as HTTPMethod[],
   preflight: {
-    statusCode: 204
-  }
-};
+    statusCode: 204,
+  },
+}
 
-const NODE_ENV = process.env.NODE_ENV;
-console.info(`NODE_ENV: ${NODE_ENV}`);
+const NODE_ENV = process.env.NODE_ENV
+console.info(`NODE_ENV: ${NODE_ENV}`)
 
 /* 'nuxt-og-image', */
 export default defineNuxtConfig({
   modules: [
-    '@nuxt/eslint', '@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/color-mode', 'nuxt-posthog', 'nuxt-auth-utils', '@nuxtjs/mdc', '@nuxt/image', '@vueuse/nuxt', 'nuxt-time', 'nuxt-security', '@nuxtjs/robots', 'nuxt-monaco-editor', '@formkit/auto-animate/nuxt', '@nuxtjs/device'
+    '@nuxt/eslint',
+    '@nuxtjs/tailwindcss',
+    'shadcn-nuxt',
+    '@nuxtjs/color-mode',
+    'nuxt-posthog',
+    'nuxt-auth-utils',
+    '@nuxtjs/mdc',
+    '@nuxt/image',
+    '@vueuse/nuxt',
+    'nuxt-time',
+    'nuxt-security',
+    '@nuxtjs/robots',
+    'nuxt-monaco-editor',
+    '@formkit/auto-animate/nuxt',
+    '@nuxtjs/device',
   ],
 
   components: [
     {
       path: '~/components',
-      pathPrefix: false // disables components/base/Button.vue => <BaseButton /> for auto imports
+      pathPrefix: false, // disables components/base/Button.vue => <BaseButton /> for auto imports
     },
     // prefix needed, because pathPrefix: true doesn't work, when files are called `Index.vue` (the keyword index is thrown away completely, also for the component name)
     {
       path: '~/components/ai/chat',
-      prefix: 'AiChat'
+      prefix: 'AiChat',
     },
     {
       path: '~/components/ai/chats',
-      prefix: 'AiChats'
-    }
+      prefix: 'AiChats',
+    },
   ],
   devtools: {
     enabled: false,
     componentInspector: false, // https://github.com/nuxt/devtools/issues/722
     timeline: {
-      enabled: false
+      enabled: false,
     },
     vscode: {
-      reuseExistingServer: true
-    }
+      reuseExistingServer: true,
+    },
   },
 
   app: {
     head: {
       htmlAttrs: { lang: 'en' },
-      meta: [{ name: 'description', content: '%s - Nuxt Chat App' }]
+      meta: [{ name: 'description', content: '%s - Nuxt Chat App' }],
     },
     pageTransition: {
       name: 'page',
-      mode: 'out-in' // default
+      mode: 'out-in', // default
     },
     layoutTransition: {
       name: 'layout',
-      mode: 'out-in' // default
-    }
+      mode: 'out-in', // default
+    },
   },
 
   /* vite: {
@@ -98,8 +112,8 @@ export default defineNuxtConfig({
 
   router: {
     options: {
-      scrollBehaviorType: 'smooth'
-    }
+      scrollBehaviorType: 'smooth',
+    },
   },
 
   /* vue: {
@@ -108,15 +122,15 @@ export default defineNuxtConfig({
   }, */
 
   site: {
-    url: productionURL
+    url: productionURL,
   },
   colorMode: {
-    classSuffix: ''
+    classSuffix: '',
   },
 
   mdc: {
     remarkPlugins: {
-      'remark-flexible-code-titles': {}
+      'remark-flexible-code-titles': {},
     },
     /* rehypePlugins: {
       options: {
@@ -130,10 +144,10 @@ export default defineNuxtConfig({
       highlighter: 'shiki',
       theme: {
         dark: 'github-dark',
-        default: 'github-light'
+        default: 'github-light',
       },
-      langs: supportedShikiLanguages
-    }
+      langs: supportedShikiLanguages,
+    },
   },
 
   runtimeConfig: {
@@ -141,7 +155,7 @@ export default defineNuxtConfig({
     posthog: {
       apiKey: process.env.POSTHOG_API_KEY,
       apiHost: process.env.POSTHOG_API_HOST,
-      isActive: process.env.POSTHOG_ACTIVE
+      isActive: process.env.POSTHOG_ACTIVE,
     },
     sessionPassword: process.env.NUXT_SESSION_PASSWORD,
     cryptoSecret: process.env.CRYPTO_SECRET,
@@ -152,12 +166,12 @@ export default defineNuxtConfig({
     oauth: {
       github: {
         clientId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID,
-        clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET
+        clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET,
       },
       google: {
         clientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
-        clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET
-      }
+        clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
+      },
     },
     github: {
       app: {
@@ -170,86 +184,86 @@ export default defineNuxtConfig({
           NODE_ENV === 'development'
             ? process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY
             : Buffer.from(
-              String(
-                process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY?.replace(
-                  /\\n/g,
-                  '\n'
-                ).trim()
-              ),
-              'base64'
-            ).toString('utf-8')
-      }
+                String(
+                  process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY?.replace(
+                    /\\n/g,
+                    '\n',
+                  ).trim(),
+                ),
+                'base64',
+              ).toString('utf-8'),
+      },
     },
     /* session persists for 7 days */
     session: {
       name: 'neptun-session',
       password: process.env.NUXT_SESSION_PASSWORD,
       cookie: {
-        sameSite: 'lax'
-      }
+        sameSite: 'lax',
+      },
     },
     mail: {
       // https://resend.com/docs/send-with-smtp | https://resend.com/docs/send-with-nodemailer-smtp
       message: {
-        to: 'neptunai.contact@gmail.com'
+        to: 'neptunai.contact@gmail.com',
       },
       smtp: {
         host: 'smtp.resend.com',
-        port: 465
+        port: 465,
       },
       secure: true,
       username: 'resend',
-      password: process.env.RESEND_API_KEY
+      password: process.env.RESEND_API_KEY,
     },
     public: {
       IS_SERVERLESS: process.env.IS_SERVERLESS,
       LOG_SQL_QUERIES: process.env.LOG_SQL_QUERIES,
-      LOG_BACKEND: process.env.LOG_BACKEND
-    }
+      LOG_BACKEND: process.env.LOG_BACKEND,
+    },
   },
 
   build: {
     // https://github.com/nuxt-modules/og-image/issues/249#issuecomment-2324007569
-    transpile: ['gsap', 'shiki']
+    transpile: ['gsap', 'shiki'],
   },
 
   routeRules: {
     '/api/**': {
       security: {
-        corsHandler
-      }
+        corsHandler,
+      },
     },
     '/auth/**': {
       security: {
-        corsHandler
-      }
-    }
+        corsHandler,
+      },
+    },
   },
 
   devServer: {
-    port: 42124
+    port: 42124,
   },
   compatibilityDate: '2024-04-03',
 
   nitro: {
     rollupConfig: {
       // @ts-ignore: "Type instantiation is excessively deep and possibly infinite."
-      plugins: [vue()]
+      plugins: [vue()],
     },
     imports: {
-      dirs: ['./server/utils']
+      dirs: ['./server/utils'],
     },
     experimental: {
       // Scalar support is currently available in nightly channel. (https://nitro.unjs.io/config#experimental, https://nuxt.com/modules/scalar)
       openAPI:
-        true /* { // enables /_scalar, /_swagger and /_openapi.json (currently only in dev mode)
+        true, /* { // enables /_scalar, /_swagger and /_openapi.json (currently only in dev mode)
         meta: {
           title: 'Nuxai API Documentation',
           description: 'Chat with different AI models using this REST-API.',
           version: '0.0.0',
         }
       }, */
-    }
+    },
 
     // "redis" adapter doesn't work on vercel: see https://nitro.unjs.io/deploy/workers#incompatible-libraries (ioredis is not compatible)
     // Setup for Vercel: https://nitro.unjs.io/deploy/providers/vercel#vercel-edge-functions
@@ -277,29 +291,27 @@ export default defineNuxtConfig({
     css: {
       preprocessorOptions: {
         sass: {
-          api: 'modern-compiler'
-        }
-      }
-    }
+          api: 'modern-compiler',
+        },
+      },
+    },
   },
 
   typescript: {
-    typeCheck: false // unable to fix typeerror. see https://github.com/atinux/nuxt-auth-utils/issues/191
+    typeCheck: false, // unable to fix typeerror. see https://github.com/atinux/nuxt-auth-utils/issues/191
   },
   postcss: {
     plugins: {
       tailwindcss: {},
-      autoprefixer: {}
-    }
+      autoprefixer: {},
+    },
   },
 
   eslint: {
+    checker: true,
     config: {
-      stylistic: {
-        quotes: 'single',
-        commaDangle: 'never'
-      }
-    }
+      standalone: false,
+    },
   },
 
   posthog: {
@@ -309,7 +321,7 @@ export default defineNuxtConfig({
     capturePageViews: true,
     disabled:
       process.env.POSTHOG_ACTIVE
-      === 'false' /* process.dev (deprecated), import.meta.dev (unusable in config file) (https://nuxt.com/docs/api/advanced/import-meta#runtime-app-properties) */
+      === 'false', /* process.dev (deprecated), import.meta.dev (unusable in config file) (https://nuxt.com/docs/api/advanced/import-meta#runtime-app-properties) */
   },
 
   robots: {
@@ -317,7 +329,7 @@ export default defineNuxtConfig({
     metaTag: true,
     blockNonSeoBots: true,
     allow: ['/home', '/templates', '/sign-up', '/sign-in'],
-    disallow: protectedRoutes.filter(route => !(route === '/')) // replace with https://nuxtseo.com/robots/guides/route-rules#inline-route-rules in the future
+    disallow: protectedRoutes.filter(route => !(route === '/')), // replace with https://nuxtseo.com/robots/guides/route-rules#inline-route-rules in the future
   },
 
   // Posthog adds an inline script, which causes `Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE.NotSameOriginAfterDefaultedToSameOriginByCoep`, using the recommended security configuration.
@@ -333,10 +345,10 @@ export default defineNuxtConfig({
           'http://localhost:42124',
           'https://avatars.githubusercontent.com',
           'https://eu.i.posthog.com',
-          productionURL
-        ]
-      }
-    }
+          productionURL,
+        ],
+      },
+    },
   },
 
   shadcn: {
@@ -348,6 +360,6 @@ export default defineNuxtConfig({
      * Directory that the component lives in.
      * @default "./components/ui"
      */
-    componentDir: './components/ui'
-  }
-});
+    componentDir: './components/ui',
+  },
+})

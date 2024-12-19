@@ -16,17 +16,17 @@ PATCH
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                              |
-|-----------|--------|----------|------------------------------------------|
+| Parameter | Type   | Required | Description                             |
+| --------- | ------ | -------- | --------------------------------------- |
 | user_id   | string | Yes      | Unique identifier of the user           |
 | chat_id   | number | Yes      | Unique identifier of the chat to update |
 
 ### Headers
 
-| Header         | Value            | Required | Description                          |
-|----------------|------------------|----------|--------------------------------------|
-| Content-Type   | application/json | Yes      | Indicates JSON request body         |
-| Cookie         | neptun-session   | Yes      | Session authentication cookie       |
+| Header       | Value            | Required | Description                   |
+| ------------ | ---------------- | -------- | ----------------------------- |
+| Content-Type | application/json | Yes      | Indicates JSON request body   |
+| Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -34,8 +34,8 @@ No query parameters required.
 
 ### Request Body
 
-| Field | Type   | Required | Description           | Constraints       |
-|-------|--------|----------|-----------------------|------------------|
+| Field | Type   | Required | Description           | Constraints      |
+| ----- | ------ | -------- | --------------------- | ---------------- |
 | name  | string | Yes      | New name for the chat | Non-empty string |
 
 ## Response Format
@@ -75,19 +75,19 @@ No query parameters required.
 
 ```typescript
 interface UpdateChatRequest {
-  name: string;
+  name: string
 }
 
 interface ChatConversation {
-  id: number;
-  neptun_user_id: string;
-  name: string;
-  model: string;
-  created_at: string;
+  id: number
+  neptun_user_id: string
+  name: string
+  model: string
+  created_at: string
 }
 
 interface UpdateChatResponse {
-  chat: ChatConversation;
+  chat: ChatConversation
 }
 ```
 
@@ -177,25 +177,25 @@ async function updateChat(
       body: JSON.stringify({ name }),
       credentials: 'include', // Important for cookie handling
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as UpdateChatResponse;
+  return await response.json() as UpdateChatResponse
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Chat successfully updated                          |
-| 400         | Invalid request body                               |
-| 401         | Unauthorized (invalid or missing session)          |
-| 404         | Chat or user not found                            |
-| 500         | Server error during update                        |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Chat successfully updated                 |
+| 400         | Invalid request body                      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error during update                |
 
 ## Notes
 

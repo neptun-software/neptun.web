@@ -2,20 +2,20 @@ import {
   readChatConversationShareMessages,
   readShareInfo,
   sharePasswordIsValid,
-} from '~/server/database/repositories/chatConversationShares';
-import { readAllChatConversationShareWhitelistEntries } from '~/server/database/repositories/chatConversationShareWhitelists';
+} from '~/server/database/repositories/chatConversationShares'
+import { readAllChatConversationShareWhitelistEntries } from '~/server/database/repositories/chatConversationShareWhitelists'
 
 async function userIsAuthorizedToViewChat(
   share_id: string,
-  { username, password }: { username: string; password: string }
+  { username, password }: { username: string, password: string },
 ) {
-  return username === '' && (await sharePasswordIsValid(share_id, password));
+  return username === '' && (await sharePasswordIsValid(share_id, password))
 }
 
 // Read all messages of a shared chat conversation
 // Basic Auth is just base64 encoded, but we use ssl, so it should be fine, because the resource is not that important
 export default defineCachedEventHandler(async (event) => {
-  const maybeUuid = await validateParamUuid(event);
+  const maybeUuid = await validateParamUuid(event)
   if (maybeUuid.statusCode !== 200) {
     return sendError(
       event,
@@ -23,17 +23,17 @@ export default defineCachedEventHandler(async (event) => {
         statusCode: maybeUuid.statusCode,
         statusMessage: maybeUuid.statusMessage,
         data: maybeUuid.data,
-      })
-    );
+      }),
+    )
   }
-  const uuid = maybeUuid.data?.uuid;
+  const uuid = maybeUuid.data?.uuid
 
-  const fetchedChatConversationShareWhitelistEntries =
-    await readAllChatConversationShareWhitelistEntries(uuid);
-  const shareHasWhitelist =
-    fetchedChatConversationShareWhitelistEntries.length > 0;
+  const fetchedChatConversationShareWhitelistEntries
+    = await readAllChatConversationShareWhitelistEntries(uuid)
+  const shareHasWhitelist
+    = fetchedChatConversationShareWhitelistEntries.length > 0
 
-  const info = await readShareInfo(uuid);
+  const info = await readShareInfo(uuid)
   if (!info.shareExists) {
     return sendError(
       event,
@@ -47,18 +47,18 @@ export default defineCachedEventHandler(async (event) => {
             shareHasWhitelist,
           },
         },
-      })
-    );
+      }),
+    )
   }
 
   if (info.shareIsPrivate && info.shareHasPassword) {
-    const authHeader = event.node.req.headers['authorization'];
+    const authHeader = event.node.req.headers.authorization
     if (!authHeader || !authHeader.startsWith('Basic ')) {
       setResponseHeader(
         event,
         'WWW-Authenticate',
-        'Basic realm="neptun.shared.chat"'
-      );
+        'Basic realm="neptun.shared.chat"',
+      )
       return sendError(
         event,
         createError({
@@ -71,14 +71,12 @@ export default defineCachedEventHandler(async (event) => {
               shareHasWhitelist,
             },
           },
-        })
-      );
+        }),
+      )
     }
 
-    const base64Credentials = authHeader.split(' ')[1];
-    const [username, password] = Buffer.from(base64Credentials, 'base64')
-      .toString()
-      .split(':');
+    const base64Credentials = authHeader.split(' ')[1]
+    const [username, password] = require('node:buffer').Buffer.from(base64Credentials, 'base64').toString().split(':')
     if (
       !(await userIsAuthorizedToViewChat(uuid, {
         username,
@@ -97,20 +95,20 @@ export default defineCachedEventHandler(async (event) => {
               shareHasWhitelist,
             },
           },
-        })
-      );
+        }),
+      )
     }
   }
 
   // TODO: check for oAuth emails too
   if (fetchedChatConversationShareWhitelistEntries.length !== 0) {
-    const session = await requireUserSession(event);
-    const user = session.user;
-    const email = user.primary_email;
+    const session = await requireUserSession(event)
+    const user = session.user
+    const email = user.primary_email
 
     if (
       !fetchedChatConversationShareWhitelistEntries
-        .map((entry) => entry.neptun_user_id.primary_email)
+        .map(entry => entry.neptun_user_id.primary_email)
         .includes(email)
     ) {
       return sendError(
@@ -125,15 +123,15 @@ export default defineCachedEventHandler(async (event) => {
               shareHasWhitelist,
             },
           },
-        })
-      );
+        }),
+      )
     }
   }
 
-  const fetchedChatMessages = await readChatConversationShareMessages(uuid);
+  const fetchedChatMessages = await readChatConversationShareMessages(uuid)
 
   return {
     chatMessages: fetchedChatMessages,
     shareInfo: info,
-  };
-});
+  }
+})

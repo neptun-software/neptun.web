@@ -16,9 +16,9 @@ HEAD
 
 ### Headers
 
-| Header         | Value            | Required | Description                          |
-|----------------|------------------|----------|--------------------------------------|
-| Cookie         | auth_session=xyz | Yes      | Authentication session cookie        |
+| Header | Value            | Required | Description                   |
+| ------ | ---------------- | -------- | ----------------------------- |
+| Cookie | auth_session=xyz | Yes      | Authentication session cookie |
 
 ### Query Parameters
 
@@ -40,9 +40,9 @@ The endpoint returns no response body, only a status code indicating a valid ses
 
 #### Response Headers
 
-| Header          | Value | Description                    |
-|-----------------|-------|--------------------------------|
-| Content-Length  | 0     | Indicates empty response body  |
+| Header         | Value | Description                   |
+| -------------- | ----- | ----------------------------- |
+| Content-Length | 0     | Indicates empty response body |
 
 ### Error Responses
 
@@ -91,17 +91,18 @@ async function checkAuthSession(): Promise<boolean> {
         method: 'HEAD',
         credentials: 'include' // Includes cookies in the request
       }
-    );
-    return response.ok;
-  } catch (error) {
-    return false;
+    )
+    return response.ok
+  }
+  catch (error) {
+    return false
   }
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Session is valid                                   |
-| 401         | Session is invalid or missing                      |
+| Status Code | Description                   |
+| ----------- | ----------------------------- |
+| 200         | Session is valid              |
+| 401         | Session is invalid or missing |

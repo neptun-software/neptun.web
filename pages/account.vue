@@ -1,68 +1,75 @@
 <script setup lang="ts">
-import { Loader2 } from 'lucide-vue-next';
-import { toast } from 'vue-sonner';
+import { Loader2 } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
 definePageMeta({
   name: 'Account',
   alias: accountAliases,
   middleware: ['protected'],
-});
+})
 
-const { updateUser, deleteUser } = useUser();
-const { session, clear, fetch } = useUserSession();
+const { updateUser, deleteUser } = useUser()
+const { session, clear, fetch } = useUserSession()
 
 const emailIsNew = computed(() => {
-  if (!session.value.user || !session.value.user?.primary_email) return false;
-  return session.value.user?.primary_email !== updatedUser.value?.email;
-});
+  if (!session.value.user || !session.value.user?.primary_email)
+    return false
+  return session.value.user?.primary_email !== updatedUser.value?.email
+})
 const updatedUser = ref<{
-  email: string;
-  password: string;
-  confirmPassword: string;
+  email: string
+  password: string
+  confirmPassword: string
 }>({
   email: session?.value.user?.primary_email ?? '',
   password: '',
   confirmPassword: '',
-});
-const updateAccount = async () => {
-  if (!session.value.user || !session.value.user?.id) return;
+})
+async function updateAccount() {
+  if (!session.value.user || !session.value.user?.id)
+    return
   const update = await updateUser(session.value.user?.id, {
     ...updatedUser.value,
   }).then(async (data) => {
-    await fetch();
-    return data;
-  });
+    await fetch()
+    return data
+  })
 
   if (update.error) {
-    toast.error(String(update.error));
+    toast.error(String(update.error))
   }
-};
+}
 
-const deleteAccount = async () => {
-  if (!session.value.user || !session.value.user?.id) return;
+async function deleteAccount() {
+  if (!session.value.user || !session.value.user?.id)
+    return
   await deleteUser(session.value.user?.id).then(() => {
     clear().then(() => {
-      navigateTo('/home');
-    });
-  });
-};
+      navigateTo('/home')
+    })
+  })
+}
 
-const signOut = async () => {
+async function signOut() {
   await clear().then(() => {
-    navigateTo('/home');
-  });
-};
+    navigateTo('/home')
+  })
+}
 </script>
 
 <template>
   <div class="mx-8 max-w-[calc(100vw-4rem-30px)] overflow-hidden">
-    <h1 class="text-3xl font-bold">Account</h1>
+    <h1 class="text-3xl font-bold">
+      Account
+    </h1>
     <ShadcnSeparator class="h-1 my-2" />
     <AuthState>
       <template #default="{ loggedIn }">
         <div class="flex flex-wrap gap-2 lg:gap-8">
           <div>
-            <ShadcnLabel for="email"> Email </ShadcnLabel>
+            <ShadcnLabel for="email">
+              Email
+            </ShadcnLabel>
             <div class="flex gap-2">
               <ShadcnInput
                 id="email"
@@ -77,14 +84,16 @@ const signOut = async () => {
               <AsyncButton
                 v-if="loggedIn"
                 :is-disabled="!emailIsNew || updatedUser.email?.trim() === ''"
-                :onClickAsync="updateAccount"
+                :on-click-async="updateAccount"
               >
                 Update
               </AsyncButton>
             </div>
           </div>
           <div>
-            <ShadcnLabel for="password"> Password </ShadcnLabel>
+            <ShadcnLabel for="password">
+              Password
+            </ShadcnLabel>
             <div class="flex gap-2">
               <!-- &bull; -->
               <ShadcnInput
@@ -107,11 +116,11 @@ const signOut = async () => {
               <AsyncButton
                 v-if="loggedIn"
                 :is-disabled="
-                  updatedUser.password?.trim() === '' ||
-                  updatedUser.confirmPassword?.trim() === '' ||
-                  updatedUser.password !== updatedUser.confirmPassword
+                  updatedUser.password?.trim() === ''
+                    || updatedUser.confirmPassword?.trim() === ''
+                    || updatedUser.password !== updatedUser.confirmPassword
                 "
-                :onClickAsync="updateAccount"
+                :on-click-async="updateAccount"
               >
                 Update
               </AsyncButton>
@@ -124,13 +133,15 @@ const signOut = async () => {
         </DevOnly> -->
         <ShadcnSeparator class="h-1 my-2" />
 
-        <AsyncButton v-if="loggedIn" class="mr-1" :onClickAsync="signOut">
+        <AsyncButton v-if="loggedIn" class="mr-1" :on-click-async="signOut">
           Logout
         </AsyncButton>
 
         <ShadcnAlertDialog v-if="loggedIn">
           <ShadcnAlertDialogTrigger as-child>
-            <ShadcnButton variant="destructive"> Delete </ShadcnButton>
+            <ShadcnButton variant="destructive">
+              Delete
+            </ShadcnButton>
           </ShadcnAlertDialogTrigger>
           <ShadcnAlertDialogContent>
             <ShadcnAlertDialogHeader>
@@ -147,7 +158,7 @@ const signOut = async () => {
               <ShadcnAlertDialogAction as-child>
                 <AsyncButton
                   variant="destructive"
-                  :onClickAsync="deleteAccount"
+                  :on-click-async="deleteAccount"
                 >
                   Delete
                 </AsyncButton>
@@ -167,14 +178,18 @@ const signOut = async () => {
     <ShadcnSeparator class="h-1 my-2" />
 
     <AccountSection>
-      <template #header> CLI Configuration </template>
+      <template #header>
+        CLI Configuration
+      </template>
       <template #content>
         <CLI />
       </template>
     </AccountSection>
 
     <AccountSection>
-      <template #header> Neptun (Github) App Installations </template>
+      <template #header>
+        Neptun (Github) App Installations
+      </template>
       <template #content>
         <Installations />
       </template>

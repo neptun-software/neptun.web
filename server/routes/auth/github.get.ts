@@ -1,4 +1,4 @@
-import { createOauthAccount } from '~/server/database/repositories/oauthAccounts';
+import { createOauthAccount } from '~/server/database/repositories/oauthAccounts'
 
 export default oauthGitHubEventHandler({
   config: {
@@ -6,15 +6,15 @@ export default oauthGitHubEventHandler({
   },
   async onSuccess(event, { user }) {
     // tokens
-    const user_email = user?.email; // maybe add login (for username), gravatar_id or avatar_url for icon, name, location (for i18n)
-    const user_id = String(user?.id);
+    const user_email = user?.email // maybe add login (for username), gravatar_id or avatar_url for icon, name, location (for i18n)
+    const user_id = String(user?.id)
 
-    const createdOrFetchedUserAndConnectedOauthAccount =
-      await createOauthAccount({
+    const createdOrFetchedUserAndConnectedOauthAccount
+      = await createOauthAccount({
         provider: 'github',
         oauth_user_id: user_id,
         oauth_email: user_email,
-      });
+      })
 
     if (!createdOrFetchedUserAndConnectedOauthAccount) {
       return sendError(
@@ -22,14 +22,17 @@ export default oauthGitHubEventHandler({
         createError({
           statusCode: 500,
           statusMessage: 'Failed to create oauth account',
-        })
-      );
+        }),
+      )
     }
 
     if (createdOrFetchedUserAndConnectedOauthAccount.isNewOauthAccount) {
-      if (LOG_BACKEND) console.info('New oAuth account created!');
-    } else {
-      if (LOG_BACKEND) console.info('Fetched existing oAuth account!');
+      if (LOG_BACKEND)
+        console.info('New oAuth account created!')
+    }
+    else {
+      if (LOG_BACKEND)
+        console.info('Fetched existing oAuth account!')
     }
 
     await setUserSession(event, {
@@ -50,8 +53,8 @@ export default oauthGitHubEventHandler({
         },
       },
       loggedInAt: new Date(),
-    });
+    })
 
-    return sendRedirect(event, '/dashboard');
+    return sendRedirect(event, '/dashboard')
   },
-});
+})

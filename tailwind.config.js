@@ -1,5 +1,5 @@
-import animate from 'tailwindcss-animate';
-import typography from '@tailwindcss/typography';
+import typography from '@tailwindcss/typography'
+import animate from 'tailwindcss-animate'
 
 /** @type {import('tailwindcss').Config} */
 export const content = [
@@ -9,21 +9,21 @@ export const content = [
   './plugins/**/*.{js,ts}',
   './app.vue',
   './error.vue',
-];
-export const darkMode = ['class'];
-export const safelist = ['dark'];
-export const prefix = '';
+]
+export const darkMode = ['class']
+export const safelist = ['dark']
+export const prefix = ''
 
 const typographyShared = {
   css: {
     // codeblocks are handled by mdc
-    pre: false,
-    code: false,
+    'pre': false,
+    'code': false,
     'pre code': false,
     'code::before': false,
     'code::after': false,
   },
-};
+}
 
 export const theme = {
   container: {
@@ -35,11 +35,11 @@ export const theme = {
   },
   extend: {
     typography: {
-      DEFAULT: typographyShared,
-      sm: typographyShared,
-      md: typographyShared,
-      lg: typographyShared,
-      xl: typographyShared,
+      'DEFAULT': typographyShared,
+      'sm': typographyShared,
+      'md': typographyShared,
+      'lg': typographyShared,
+      'xl': typographyShared,
       '2xl': typographyShared,
     },
     colors: {
@@ -108,6 +108,6 @@ export const theme = {
       'collapsible-up': 'collapsible-up 0.2s ease-in-out',
     },
   },
-};
+}
 
-export const plugins = [animate, typography];
+export const plugins = [animate, typography]

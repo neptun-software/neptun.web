@@ -1,15 +1,34 @@
+<script setup>
+const props = defineProps({
+  tabs: {
+    type: Array,
+    required: true,
+  },
+})
+
+const tabs = props.tabs
+const selectedTab = ref(tabs[0])
+
+const gliderStyle = computed(() => {
+  const index = tabs.indexOf(selectedTab.value)
+  return {
+    transform: `translateX(${index * 100}%)`,
+  }
+})
+</script>
+
 <template>
   <div class="sliding-tabs-container">
     <div class="tabs">
       <div v-for="tabName in tabs" :key="tabName" class="tab-item">
         <input
-          :id="'radio-' + tabName"
+          :id="`radio-${tabName}`"
           v-model="selectedTab"
           type="radio"
           name="tabs"
           :value="tabName"
-        />
-        <label class="tab" :for="'radio-' + tabName">
+        >
+        <label class="tab" :for="`radio-${tabName}`">
           {{ tabName.replace(/_/g, ' ') }}
         </label>
       </div>
@@ -20,25 +39,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-const props = defineProps({
-  tabs: {
-    type: Array,
-    required: true,
-  },
-});
-
-const tabs = props.tabs;
-const selectedTab = ref(tabs[0]);
-
-const gliderStyle = computed(() => {
-  const index = tabs.indexOf(selectedTab.value);
-  return {
-    transform: `translateX(${index * 100}%)`,
-  };
-});
-</script>
 
 <style lang="scss" scoped>
 $primary-color: hsl(var(--primary-foreground));

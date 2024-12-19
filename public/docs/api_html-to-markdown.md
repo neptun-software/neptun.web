@@ -16,9 +16,9 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                                           |
-|-----------|--------|----------|-------------------------------------------------------|
-| url       | string | Yes      | URL-encoded path to the HTML content to be converted  |
+| Parameter | Type   | Required | Description                                          |
+| --------- | ------ | -------- | ---------------------------------------------------- |
+| url       | string | Yes      | URL-encoded path to the HTML content to be converted |
 
 ### Headers
 
@@ -69,13 +69,13 @@ When the URL is invalid or the HTML content cannot be parsed:
 
 ```typescript
 interface HtmlToMarkdownResponse {
-  markdown: string;
+  markdown: string
 }
 
 interface HtmlToMarkdownError {
-  statusCode: number;
-  statusMessage: string;
-  data: string;
+  statusCode: number
+  statusMessage: string
+  data: string
 }
 ```
 
@@ -125,27 +125,27 @@ curl -X GET "https://neptun-webui.vercel.app/api/html-to-markdown/https%3A%2F%2F
 
 ```typescript
 async function convertHtmlToMarkdown(url: string): Promise<string> {
-  const encodedUrl = encodeURIComponent(url);
+  const encodedUrl = encodeURIComponent(url)
   const response = await fetch(
     `https://neptun-webui.vercel.app/api/html-to-markdown/${encodedUrl}`
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.text();
+  return await response.text()
 }
 ```
 
 ### Response Status Codes
 
-| Status Code | Description                                        |
-|-------------|----------------------------------------------------|
-| 200         | Successfully converted HTML to Markdown            |
-| 400         | Invalid URL or HTML parsing failed                |
-| 404         | URL not found                                     |
-| 500         | Server error during conversion                    |
+| Status Code | Description                             |
+| ----------- | --------------------------------------- |
+| 200         | Successfully converted HTML to Markdown |
+| 400         | Invalid URL or HTML parsing failed      |
+| 404         | URL not found                           |
+| 500         | Server error during conversion          |
 
 ## Notes
 

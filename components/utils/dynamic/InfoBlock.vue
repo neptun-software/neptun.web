@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import { Loader2 } from 'lucide-vue-next';
-import type { HTMLAttributes } from 'vue';
-import { cn } from '@/lib/utils';
+import type { HTMLAttributes } from 'vue'
+import { cn } from '@/lib/utils'
+import { Loader2 } from 'lucide-vue-next'
 
 // TODO: add variants: success, error, info...
 const props = defineProps<{
-  isVisible?: boolean;
-  showLoader?: boolean;
-  showDots?: boolean;
-  class?: HTMLAttributes['class'];
-}>();
+  isVisible?: boolean
+  showLoader?: boolean
+  showDots?: boolean
+  class?: HTMLAttributes['class']
+}>()
 </script>
 
 <template>
@@ -19,12 +19,14 @@ const props = defineProps<{
     :class="
       cn(
         'flex items-center justify-center gap-2 px-3 py-2 mb-2 border border-blue-200 rounded-lg bg-background',
-        props.class
+        props.class,
       )
     "
   >
     <Loader2 class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
-    <p class="flex-grow"><slot></slot><LoadingDots /></p>
+    <p class="flex-grow">
+      <slot /><LoadingDots />
+    </p>
   </div>
 </template>
 

@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-import { Download } from 'lucide-vue-next';
+import { Download } from 'lucide-vue-next'
 
-const { selectedAiChat } = useSelectedAiChat();
-const { user } = useUserSession();
+const { selectedAiChat } = useSelectedAiChat()
+const { user } = useUserSession()
 
 const { data, error } = await useFetch(
-  `/api/users/${user.value?.id ?? -1}/cli`
-);
+  `/api/users/${user.value?.id ?? -1}/cli`,
+)
 
-const selectedAiChatId = computed(() => selectedAiChat.value.id);
-const selectedAiChatName = computed(() => selectedAiChat.value.name);
-const selectedAiChatModel = computed(() => selectedAiChat.value.model);
+const selectedAiChatId = computed(() => selectedAiChat.value.id)
+const selectedAiChatName = computed(() => selectedAiChat.value.name)
+const selectedAiChatModel = computed(() => selectedAiChat.value.model)
 const cliConfigurationToCopy = computed(() => {
   return {
     ...data.value,
@@ -19,23 +19,23 @@ const cliConfigurationToCopy = computed(() => {
       chat_name: selectedAiChatName.value,
       model: selectedAiChatModel.value,
     },
-  };
-});
+  }
+})
 
 const cliConfigurationMarkdown = computed(() => {
   return `\`\`\`json\n${JSON.stringify(
     cliConfigurationToCopy.value,
     null,
-    2
-  )}\n\`\`\``;
-});
+    2,
+  )}\n\`\`\``
+})
 
 const textForClipboard = computed(() => {
-  return JSON.stringify(cliConfigurationToCopy.value, null, 2);
-});
+  return JSON.stringify(cliConfigurationToCopy.value, null, 2)
+})
 
 async function downloadConfiguration() {
-  await downloadAsFile(cliConfigurationToCopy.value, 'neptun-config');
+  await downloadAsFile(cliConfigurationToCopy.value, 'neptun-config')
 }
 </script>
 
@@ -55,7 +55,9 @@ async function downloadConfiguration() {
             <ShadcnSkeleton class="w-full h-10 my-2 bg-slate-400" />
           </template>
           <template v-if="error">
-            <p class="text-red-500">Failed to fetch CLI configuration.</p>
+            <p class="text-red-500">
+              Failed to fetch CLI configuration.
+            </p>
           </template>
           <span class="absolute flex items-center gap-2 right-2 top-2">
             <AsyncButton
@@ -63,7 +65,7 @@ async function downloadConfiguration() {
               variant="ghost"
               :hide-loader="true"
               :is-disabled="textForClipboard === ''"
-              :onClickAsync="downloadConfiguration"
+              :on-click-async="downloadConfiguration"
             >
               <Download class="size-6" />
             </AsyncButton>

@@ -1,32 +1,36 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue';
+import { Icon } from '@iconify/vue'
 import {
   ALLOWED_AI_MODELS,
   defaultAiModelDomain,
   POSSIBLE_AI_MODELS,
-} from '~/lib/types/ai.models';
+} from '~/lib/types/ai.models'
 
-const { user } = useUserSession();
-const { selectedAiChat, selectedAiChatIsPlayground } = useSelectedAiChat();
-const { resetAiPlaygroundChat } = useAiChatPlayground();
-const { persistChatConversation } = useAPI();
+const { user } = useUserSession()
+const { selectedAiChat, selectedAiChatIsPlayground } = useSelectedAiChat()
+const { resetAiPlaygroundChat } = useAiChatPlayground()
+const { persistChatConversation } = useAPI()
 
 watch(
   () => selectedAiChat.value.model,
   (newModel) => {
     if (newModel) {
-      resetAiPlaygroundChat(newModel);
+      resetAiPlaygroundChat(newModel)
     }
-  }
-);
+  },
+)
 </script>
 
 <template>
   <form class="grid items-start w-full gap-6">
     <fieldset class="grid gap-6 p-4 border rounded-lg">
-      <legend class="px-1 -ml-1 text-sm font-medium">Settings</legend>
+      <legend class="px-1 -ml-1 text-sm font-medium">
+        Settings
+      </legend>
       <div class="grid gap-3">
-        <ShadcnLabel for="model"> Model </ShadcnLabel>
+        <ShadcnLabel for="model">
+          Model
+        </ShadcnLabel>
         <ShadcnSelect
           v-model="selectedAiChat.model"
           :default-value="defaultAiModelDomain"
@@ -49,7 +53,7 @@ watch(
                   :icon="
                     POSSIBLE_AI_MODELS[model.split('/')[0]][
                       model.split('/')[1]
-                    ]['icon']
+                    ].icon
                   "
                   :ssr="true"
                   width="20"
@@ -60,13 +64,13 @@ watch(
                     {{
                       POSSIBLE_AI_MODELS[model.split('/')[0]][
                         model.split('/')[1]
-                      ]['publisher']
+                      ].publisher
                     }}
                     <span class="font-medium text-foreground">
                       {{
                         POSSIBLE_AI_MODELS[model.split('/')[0]][
                           model.split('/')[1]
-                        ]['name']
+                        ].name
                       }}
                     </span>
                   </p>
@@ -76,7 +80,7 @@ watch(
                     v-html="
                       POSSIBLE_AI_MODELS[model.split('/')[0]][
                         model.split('/')[1]
-                      ]['description']
+                      ].description
                     "
                   />
                 </div>
@@ -93,11 +97,11 @@ watch(
             placeholder="Name of the chat... (optional)"
             @keydown.enter.prevent="
               async () => {
-                selectedAiChat.id =
-                  (await persistChatConversation(
+                selectedAiChat.id
+                  = (await persistChatConversation(
                     user?.id ?? -1,
                     selectedAiChat.name,
-                    selectedAiChat.model
+                    selectedAiChat.model,
                   )) || -1;
               }
             "
@@ -106,13 +110,13 @@ watch(
           <AsyncButton
             variant="secondary"
             :is-disabled="!selectedAiChatIsPlayground"
-            :onClickAsync="
+            :on-click-async="
               async () => {
-                selectedAiChat.id =
-                  (await persistChatConversation(
+                selectedAiChat.id
+                  = (await persistChatConversation(
                     user?.id ?? -1,
                     selectedAiChat.name,
-                    selectedAiChat.model
+                    selectedAiChat.model,
                   )) || -1;
               }
             "

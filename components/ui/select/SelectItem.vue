@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { type HTMLAttributes, computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { CheckIcon } from '@radix-icons/vue'
 import {
   SelectItem,
   SelectItemIndicator,
   type SelectItemProps,
   SelectItemText,
-  useForwardProps
+  useForwardProps,
 } from 'radix-vue'
-import { CheckIcon } from '@radix-icons/vue'
-import { cn } from '@/lib/utils'
+import { computed, type HTMLAttributes } from 'vue'
 
 const props = defineProps<SelectItemProps & { class?: HTMLAttributes['class'] }>()
 
@@ -16,7 +16,7 @@ const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props
 
   return delegated
-});
+})
 
 const forwardedProps = useForwardProps(delegatedProps)
 </script>
@@ -27,7 +27,7 @@ const forwardedProps = useForwardProps(delegatedProps)
     :class="
       cn(
         'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-        props.class
+        props.class,
       )
     "
   >
