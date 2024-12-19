@@ -36,8 +36,7 @@ class TxtType {
 
     if (this.isDeleting) {
       this.txt = fullTxt.substring(0, this.txt.length - 1)
-    }
-    else {
+    } else {
       this.txt = fullTxt.substring(0, this.txt.length + 1)
     }
 
@@ -54,8 +53,7 @@ class TxtType {
     if (!this.isDeleting && this.txt === fullTxt) {
       delta = this.period
       this.isDeleting = true
-    }
-    else if (this.isDeleting && this.txt === '') {
+    } else if (this.isDeleting && this.txt === '') {
       this.isDeleting = false
       this.loopNum++
       delta = 500
@@ -71,21 +69,27 @@ class TxtType {
   }
 }
 
+const typeInstances: TxtType[] = []
+
 onMounted(() => {
   const elements = document.getElementsByClassName('typewrite')
   for (let i = 0; i < elements.length; i++) {
     if (props.typeData) {
-      new TxtType(elements[i] as HTMLElement, props.typeData, props.period)
+      typeInstances.push(new TxtType(elements[i] as HTMLElement, props.typeData, props.period))
     }
   }
+})
+
+onUnmounted(() => {
+  typeInstances.forEach(instance => instance.stop())
 })
 </script>
 
 <template>
-  <div class="flex flex-col items-center max-w-full my-6">
+  <div class="flex flex-col items-center my-6 max-w-full">
     <div>
       <p
-        class="max-w-full px-4 py-2 mb-1 rounded-md min-w-72 lg:max-w-96 bg-secondary min-h-24"
+        class="px-4 py-2 mb-1 max-w-full rounded-md min-w-72 lg:max-w-96 bg-secondary min-h-24"
       >
         <a href="" class="typewrite">
           <span class="wrap" />

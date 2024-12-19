@@ -33,14 +33,14 @@ interface ShareInfo {
 }
 
 function convertStringsToDates(data: any) {
-  if (typeof data !== 'object' || data === null)
+  if (typeof data !== 'object' || data === null) {
     return data
+  }
 
   for (const key in data) {
-    if (typeof data[key] === 'string' && !isNaN(Date.parse(data[key]))) {
+    if (typeof data[key] === 'string' && !Number.isNaN(Date.parse(data[key]))) {
       data[key] = new Date(data[key])
-    }
-    else if (typeof data[key] === 'object') {
+    } else if (typeof data[key] === 'object') {
       convertStringsToDates(data[key])
     }
   }
@@ -70,8 +70,7 @@ function useFetchResource<T>(url: string) {
       data.value = convertStringsToDates(response)
       status.value = 'success'
       error.value = null
-    }
-    catch (e: any) {
+    } catch (e: any) {
       error.value = e
       status.value = 'error'
     }
@@ -134,7 +133,7 @@ useHead({
 
           <template v-if="error?.data?.data?.shareInfo?.shareHasPassword">
             Please enter the password to view it: <br>
-            <div class="flex justify-center gap-1 my-2">
+            <div class="flex gap-1 justify-center my-2">
               <ShadcnInput
                 v-model="password"
                 class="w-fit"
@@ -175,7 +174,7 @@ useHead({
     </div>
 
     <AsyncButton
-      class="sticky mx-auto mt-2 transform -translate-x-1/2 bottom-2 left-1/2"
+      class="sticky bottom-2 left-1/2 mx-auto mt-2 transform -translate-x-1/2"
       :on-click-async="execute"
       :is-disabled="chatMessages.length === 0"
     >

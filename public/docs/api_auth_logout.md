@@ -115,8 +115,7 @@ async function logout(): Promise<boolean> {
     }
 
     return await response.json()
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Logout failed:', error)
     return false
   }

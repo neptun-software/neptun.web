@@ -33,8 +33,9 @@ export default defineEventHandler(async (event) => {
   const validatedBody = body.data
   const { name } = validatedBody
 
-  if (LOG_BACKEND)
+  if (LOG_BACKEND) {
     console.info('Renaming chat to', validatedBody.name)
+  }
 
   /* UPDATE CHAT CONVERSATION */
 

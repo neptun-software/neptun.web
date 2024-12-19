@@ -20,13 +20,13 @@ export const databaseMap = {
 
 export const db = IS_SERVERLESS
   ? neonDrizzle(new NeonPostgres(connectionString), {
-      schema: databaseMap,
-      logger: LOG_SQL_QUERIES,
-    })
+    schema: databaseMap,
+    logger: LOG_SQL_QUERIES,
+  })
   : drizzle(postgres(connectionString), {
-      schema: databaseMap,
-      logger: LOG_SQL_QUERIES,
-    })
+    schema: databaseMap,
+    logger: LOG_SQL_QUERIES,
+  })
 
 export function encryptColumn(value: any) {
   return sql<string>`encode(encrypt(${value}, ${ENCRYPTION_SECRET}, 'aes'), 'hex')`

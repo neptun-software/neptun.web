@@ -24,6 +24,10 @@ let currentIndex = 0
 const slideHeight = ref(0)
 
 function updateText() {
+  if (!dynamicText.value) {
+    return // Early return if ref is not available
+  }
+
   const newIndex = (currentIndex + 1) % props.textToLoop.length
   const newText = props.textToLoop[newIndex]
 
@@ -33,6 +37,9 @@ function updateText() {
     duration: props.duration / 2,
     ease: 'power1.in',
     onComplete: () => {
+      if (!dynamicText.value) {
+        return // Check again in callback
+      }
       currentText.value = newText
       gsap.fromTo(
         dynamicText.value,
@@ -46,11 +53,12 @@ function updateText() {
 }
 
 onMounted(async () => {
-  await nextTick() // Wait until the text is rendered, then calculate the height
-  slideHeight.value = dynamicText.value.offsetHeight / 4
-
-  const interval = setInterval(updateText, props.duration * 1000)
-  onUnmounted(() => clearInterval(interval))
+  await nextTick() // Wait until the text is rendered
+  if (dynamicText.value) {
+    slideHeight.value = dynamicText.value.offsetHeight / 4
+    const interval = setInterval(updateText, props.duration * 1000)
+    onUnmounted(() => clearInterval(interval))
+  }
 })
 </script>
 

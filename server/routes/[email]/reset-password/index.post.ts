@@ -5,8 +5,9 @@ export default defineEventHandler(async (event) => {
   const storage = useStorage('temporary-storage')
   const otpNameSpace = 'otp'
 
+  // TODO: parse safely
   const body = await readBody(event)
-  const { otp, new_password } = body
+  const { otp, new_password }: { otp: string, new_password: string } = body
 
   /* VALIDATE PARAMS */
   const maybeUserEmail = await validateParamEmail(event)

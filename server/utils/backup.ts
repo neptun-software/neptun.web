@@ -33,12 +33,17 @@ async function backupDatabase() {
       }
       console.log(`${isSchemaOnly ? 'Schema' : 'Data'}-Backup was successful: ${filepath}`)
     })
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Backup-Process failed:', error)
   }
 }
 
-(async () => {
-  await backupDatabase()
+void (async () => {
+  try {
+    await backupDatabase()
+    process.exit(0)
+  } catch (error) {
+    console.error('Backup process failed:', error)
+    process.exit(1)
+  }
 })()

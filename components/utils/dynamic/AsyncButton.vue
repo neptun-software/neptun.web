@@ -25,17 +25,16 @@ const emit = defineEmits<{
 const isLoading = ref(false)
 
 async function handleClick(event: MouseEvent) {
-  if (isLoading.value || !props.onClickAsync)
+  if (isLoading.value || !props.onClickAsync) {
     return
+  }
 
   try {
     isLoading.value = true
     await props.onClickAsync(event)
-  }
-  catch (error) {
+  } catch (error) {
     emit('error', error)
-  }
-  finally {
+  } finally {
     isLoading.value = false
   }
 }

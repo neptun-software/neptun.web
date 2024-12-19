@@ -21,8 +21,7 @@ export function useTemplates() {
 
       const actualEnd = Math.min(end, database.value.length)
       return database.value.slice(start, actualEnd)
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error fetching template data:', error)
       return []
     }
@@ -45,8 +44,7 @@ export function useTemplates() {
         return true
       }
       return false
-    }
-    finally {
+    } finally {
       isLoading.value = false
     }
   }
@@ -60,8 +58,7 @@ export function useTemplates() {
     try {
       const newData = await fetchTemplateData(page, pageSize)
       targetData.value = newData
-    }
-    finally {
+    } finally {
       isLoading.value = false
     }
   }

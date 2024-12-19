@@ -48,8 +48,9 @@ export default defineEventHandler(async (event) => {
     const { model, name } = validatedBody
 
     /* 3.1 CREATE NEW CHAT(model, name) */
-    if (LOG_BACKEND)
-      console.info(`creating new chat (${validatedBody})...`)
+    if (LOG_BACKEND) {
+      console.info(`creating new chat (${JSON.stringify(validatedBody)})...`)
+    }
 
     const chatToCreate: ChatConversationToCreate = {
       neptun_user_id: user_id,
@@ -62,8 +63,7 @@ export default defineEventHandler(async (event) => {
     return {
       chat: createdChatConversation,
     }
-  }
-  else if (method === 'DELETE') {
+  } else if (method === 'DELETE') {
     /* 3.2 DELETE ALL CHATS / A LIST OF CHAT IDs */
     const body = await readValidatedBody(event, body =>
       ChatConversationsToDelete.safeParse(body))
@@ -80,10 +80,9 @@ export default defineEventHandler(async (event) => {
     const validatedBody = body.data
     const { chat_ids } = validatedBody
 
-    return await deleteChatConversations(chat_ids)
+    return deleteChatConversations(chat_ids)
     // return null; // => No Content
-  }
-  else {
+  } else {
     /* 3.3 READ ALL CHATS */
     const maybeOrderBy = await validateQueryOrderBy(event)
     if (maybeOrderBy.statusCode !== 200) {

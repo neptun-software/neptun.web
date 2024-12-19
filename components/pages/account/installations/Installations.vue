@@ -163,13 +163,11 @@ watch(selectedInstallationId, async (newValue) => {
       resolvedImports.value = await $fetch<Import[]>(
         `/api/users/${user.value?.id ?? -1}/installations/${newValue}/imports`,
       )
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to fetch imports:', error)
       resolvedImports.value = null
     }
-  }
-  else {
+  } else {
     resolvedImports.value = null
   }
 })

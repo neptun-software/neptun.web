@@ -18,6 +18,7 @@ import { AllowedAiModelsEnum } from '~/lib/types/ai.models'
 import { generateUUID } from '~/lib/utils'
 
 const { console } = useLogger()
+const isLoading = ref(true)
 
 const { loadFiles } = useFetchFiles()
 const { user } = useUserSession()
@@ -67,8 +68,7 @@ function waitForValidRef(condition: Ref<boolean | undefined>) {
         },
         { immediate: true },
       )
-    }
-    catch (error) {
+    } catch (error) {
       console.info('Failed to resolve value!')
       reject(error)
     }
@@ -143,8 +143,7 @@ watch(speechRecognitionError, async () => {
     toast.error(
       'Speech recognition was disabled for this page!\nPlease allow it, to use the feature!',
     )
-  }
-  else {
+  } else {
     toast.error(
       `Speech recognition error! (${speechRecognitionError.value?.error})`,
     )
@@ -219,14 +218,24 @@ async function loadChatMessages(user_id: number, chat_id: number) {
 
         setChatMessages(messages)
       }
-    }
-    catch {
+    } catch {
       console.error('Failed to load chat messages!')
     }
   }
 }
 
-const isLoading = ref(true)
+const globalChatMessage = useState('global-chat-message', () => '')
+
+const {
+  history: currentChatMessageHistory,
+  commit: currentChatMessageCommit,
+  // undo: currentChatMessageUndo,
+  // redo: currentChatMessageRedo,
+  // clear: currentChatMessageHistoryClear,
+} = useManualRefHistory(globalChatMessage, {
+  capacity: 3,
+})
+
 onMounted(async () => {
   await loadChatMessages(user.value?.id ?? -1, selectedAiChat.value.id).then(
     () => {
@@ -282,22 +291,17 @@ function handleInputFieldKeyboardEvents(event: KeyboardEvent) {
   }
 
   if ((event.ctrlKey || event.metaKey) && event.key === 'ArrowUp') {
-    // currentChatMessageRedo();
     if (historyIndex < currentChatMessageHistory.value.length - 1) {
       historyIndex++
-      currentChatMessage.value
-        = currentChatMessageHistory.value[historyIndex].snapshot
+      currentChatMessage.value = currentChatMessageHistory.value[historyIndex].snapshot
     }
   }
 
   if ((event.ctrlKey || event.metaKey) && event.key === 'ArrowDown') {
-    // currentChatMessageUndo();
     if (historyIndex > 0) {
       historyIndex--
-      currentChatMessage.value
-        = currentChatMessageHistory.value[historyIndex].snapshot
-    }
-    else if (historyIndex === 0) {
+      currentChatMessage.value = currentChatMessageHistory.value[historyIndex].snapshot
+    } else if (historyIndex === 0) {
       currentChatMessage.value = ''
       historyIndex = -1
     }
@@ -305,24 +309,13 @@ function handleInputFieldKeyboardEvents(event: KeyboardEvent) {
 }
 
 function submitMessage() {
-  if (currentChatMessage.value.trim() === '')
+  if (currentChatMessage.value.trim() === '') {
     return
+  }
   globalChatMessage.value = currentChatMessage.value
   currentChatMessageCommit()
   handleChatMessageSubmit()
 }
-
-const globalChatMessage = useState('global-chat-message', () => '')
-
-const {
-  history: currentChatMessageHistory,
-  commit: currentChatMessageCommit,
-  // undo: currentChatMessageUndo,
-  // redo: currentChatMessageRedo,
-  // clear: currentChatMessageHistoryClear,
-} = useManualRefHistory(globalChatMessage, {
-  capacity: 3,
-})
 
 async function reloadLast() {
   await deleteLast()

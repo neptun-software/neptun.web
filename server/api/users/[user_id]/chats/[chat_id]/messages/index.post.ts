@@ -51,8 +51,7 @@ export default defineEventHandler(async (event) => {
     return {
       chatMessage: createdMessage,
     }
-  }
-  else if (validatedBody && 'messages' in validatedBody) {
+  } else if (validatedBody && 'messages' in validatedBody) {
     const messages = validatedBody.messages.map(({ content, role }) => ({
       message: content,
       actor: role,

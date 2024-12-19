@@ -53,8 +53,9 @@ function onDrop(dropResult: DropResult) {
 
 function applyDrag(filters: Filter[], dropResult: DropResult): Filter[] {
   const { removedIndex, addedIndex, payload } = dropResult
-  if (removedIndex === null && addedIndex === null)
+  if (removedIndex === null && addedIndex === null) {
     return filters
+  }
 
   const result = [...filters]
   let itemToAdd = payload

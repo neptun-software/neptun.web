@@ -10,8 +10,7 @@ export function useAuth() {
       })
 
       return { data, error: null }
-    }
-    catch (error) {
+    } catch (error) {
       return { data: null, error }
     }
   }
@@ -24,8 +23,7 @@ export function useAuth() {
       })
 
       return { data, error: null }
-    }
-    catch (error) {
+    } catch (error) {
       return { data: null, error }
     }
   }
@@ -35,8 +33,7 @@ export function useAuth() {
       const data = await $fetch('/api/auth/logout', { method: 'POST' })
 
       return { data, error: null }
-    }
-    catch (error) {
+    } catch (error) {
       return { data: null, error }
     }
   }

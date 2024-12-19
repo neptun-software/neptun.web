@@ -15,21 +15,25 @@ const tables = [
 ]
 async function seedDatabase() {
   const instance = db
-  if (!instance)
+  if (!instance) {
     return
+  }
 
-  if (IS_DEV)
+  if (IS_DEV) {
     console.info('Deleting tables...')
+  }
   for (let i = 0; i < tables.length; i++) {
     await instance
       .delete(tables[i])
       .then(() => {
-        if (IS_DEV)
+        if (IS_DEV) {
           console.info(`Deleted table ${tables[i].id.table._.name}...`)
+        }
       })
       .catch((e) => {
-        if (IS_DEV)
+        if (IS_DEV) {
           console.error('Failed to delete table. Cause:', e)
+        }
         throw createError({
           statusCode: 500,
           statusMessage: 'Internal Server Error',
@@ -38,19 +42,22 @@ async function seedDatabase() {
       })
   }
 
-  if (IS_DEV)
+  if (IS_DEV) {
     console.info('Seeding database...')
+  }
 
   await instance
     .insert(neptun_user)
     .values([]) // TODO
     .then(() => {
-      if (IS_DEV)
+      if (IS_DEV) {
         console.info('Seeded database...')
+      }
     })
     .catch((e) => {
-      if (IS_DEV)
+      if (IS_DEV) {
         console.error('Failed to seed database:', e)
+      }
       throw createError({
         statusCode: 500,
         statusMessage: 'Internal Server Error',
@@ -59,9 +66,14 @@ async function seedDatabase() {
     })
 }
 
-export default seedDatabase;
+export default seedDatabase
 
-(async () => {
-  // for package.json script
-  await seedDatabase()
+void (async () => {
+  try {
+    await seedDatabase()
+    process.exit(0)
+  } catch (error) {
+    console.error('Failed to seed database:', error)
+    process.exit(1)
+  }
 })()

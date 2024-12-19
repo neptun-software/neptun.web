@@ -23,7 +23,7 @@ const useExampleStore = defineStore('example', () => {
     getSomething,
     setSomething,
   }
-}
+})
 ```
 
 ```ts:composables/useExample.ts

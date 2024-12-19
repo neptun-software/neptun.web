@@ -137,21 +137,21 @@ export type AllowedAiModelPaths =
 
 export enum AllowedAiModelPublishersEnum {
   OpenAssistant = 'OpenAssistant',
-  // eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member
+  // eslint-disable-next-line ts/prefer-literal-enum-member
   Mistral = defaultAiModelProvider,
   metaLlama = 'meta-llama',
 }
 
 export enum AllowedAiModelNamesEnum {
   OpenAssistant = 'oasst-sft-4-pythia-12b-epoch-3.5',
-  // eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member
+  // eslint-disable-next-line ts/prefer-literal-enum-member
   Mistral = defaultAiModel,
   metaLlama = 'Meta-Llama-3-8B-Instruct',
 }
 
 export enum AllowedAiModelsEnum {
   OpenAssistant = 'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5',
-  // eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member
+  // eslint-disable-next-line ts/prefer-literal-enum-member
   Mistral = defaultAiModelDomain,
   metaLlama = 'meta-llama/Meta-Llama-3-8B-Instruct',
 }

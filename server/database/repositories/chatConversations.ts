@@ -14,13 +14,15 @@ export async function createChatConversation(
     .values(conversation)
     .returning()
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to insert chat conversation into database', err)
+      }
       return null
     })
 
-  if (!createdChatConversation)
+  if (!createdChatConversation) {
     return null
+  }
 
   return createdChatConversation[0]
 }
@@ -47,8 +49,7 @@ export async function readAllChatConversationsOfUser(
         : desc(chat_conversation[order.column])
     })
     query = query.orderBy(...orderConditions)
-  }
-  else {
+  } else {
     query = query.orderBy(
       desc(chat_conversation.updated_at),
       desc(chat_conversation.name),
@@ -56,13 +57,15 @@ export async function readAllChatConversationsOfUser(
   }
 
   const fetchedChatConversations = await query.catch((err) => {
-    if (LOG_BACKEND)
+    if (LOG_BACKEND) {
       console.error('Failed to fetch chat conversations from database', err)
+    }
     return null
   })
 
-  if (!fetchedChatConversations)
+  if (!fetchedChatConversations) {
     return null
+  }
 
   return fetchedChatConversations
 }
@@ -82,13 +85,15 @@ export async function updateChatConversation(
     .where(eq(chat_conversation.id, id))
     .returning()
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to update chat conversation in database', err)
+      }
       return null
     })
 
-  if (!updatedChatConversation)
+  if (!updatedChatConversation) {
     return null
+  }
 
   return updatedChatConversation[0]
 }
@@ -99,8 +104,9 @@ export async function deleteChatConversation(id: ReadChatConversation['id']) {
     .where(eq(chat_conversation.id, id))
     .then(() => true)
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to delete chat conversation from database', err)
+      }
       return false
     })
 
@@ -115,8 +121,9 @@ export async function deleteChatConversations(
     .where(inArray(chat_conversation.id, ids))
     .then(() => true)
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to delete chat conversation from database', err)
+      }
       return false
     })
 

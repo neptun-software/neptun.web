@@ -39,14 +39,15 @@ async function convertToPng() {
       -b transparent \
       --scale ${config.scale}`
 
-    exec(command, async (error) => {
+    exec(command, (error) => {
       // Delete the config file
-      try {
-        await unlink(configFile)
-      }
-      catch (unlinkError) {
-        console.error('Failed to delete config file:', unlinkError)
-      }
+      void (async () => {
+        try {
+          await unlink(configFile)
+        } catch (unlinkError) {
+          console.error('Failed to delete config file:', unlinkError)
+        }
+      })()
 
       if (error) {
         console.error('PNG-Conversion failed:', error)
@@ -54,12 +55,17 @@ async function convertToPng() {
       }
       console.log(`PNG-File created: ${outputFile}`)
     })
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Conversion failed:', error)
   }
 }
 
-(async () => {
-  await convertToPng()
+void (async () => {
+  try {
+    await convertToPng()
+    process.exit(0)
+  } catch (error) {
+    console.error('Conversion failed:', error)
+    process.exit(1)
+  }
 })()

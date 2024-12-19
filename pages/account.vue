@@ -11,11 +11,6 @@ definePageMeta({
 const { updateUser, deleteUser } = useUser()
 const { session, clear, fetch } = useUserSession()
 
-const emailIsNew = computed(() => {
-  if (!session.value.user || !session.value.user?.primary_email)
-    return false
-  return session.value.user?.primary_email !== updatedUser.value?.email
-})
 const updatedUser = ref<{
   email: string
   password: string
@@ -25,9 +20,18 @@ const updatedUser = ref<{
   password: '',
   confirmPassword: '',
 })
+
+const emailIsNew = computed(() => {
+  if (!session.value.user || !session.value.user?.primary_email) {
+    return false
+  }
+  return session.value.user?.primary_email !== updatedUser.value?.email
+})
+
 async function updateAccount() {
-  if (!session.value.user || !session.value.user?.id)
+  if (!session.value.user || !session.value.user?.id) {
     return
+  }
   const update = await updateUser(session.value.user?.id, {
     ...updatedUser.value,
   }).then(async (data) => {
@@ -41,8 +45,9 @@ async function updateAccount() {
 }
 
 async function deleteAccount() {
-  if (!session.value.user || !session.value.user?.id)
+  if (!session.value.user || !session.value.user?.id) {
     return
+  }
   await deleteUser(session.value.user?.id).then(() => {
     clear().then(() => {
       navigateTo('/home')
@@ -62,7 +67,7 @@ async function signOut() {
     <h1 class="text-3xl font-bold">
       Account
     </h1>
-    <ShadcnSeparator class="h-1 my-2" />
+    <ShadcnSeparator class="my-2 h-1" />
     <AuthState>
       <template #default="{ loggedIn }">
         <div class="flex flex-wrap gap-2 lg:gap-8">
@@ -128,10 +133,10 @@ async function signOut() {
           </div>
         </div>
         <!-- <DevOnly>
-          <ShadcnSeparator class="h-1 my-2" />
+          <ShadcnSeparator class="my-2 h-1" />
           <b>Debug:</b> {{ session }}
         </DevOnly> -->
-        <ShadcnSeparator class="h-1 my-2" />
+        <ShadcnSeparator class="my-2 h-1" />
 
         <AsyncButton v-if="loggedIn" class="mr-1" :on-click-async="signOut">
           Logout
@@ -169,13 +174,13 @@ async function signOut() {
       </template>
       <template #placeholder>
         <ShadcnButton disabled>
-          <Loader2 class="w-4 h-4 mr-2 animate-spin" />
+          <Loader2 class="mr-2 w-4 h-4 animate-spin" />
           Loading Account Data!
         </ShadcnButton>
       </template>
     </AuthState>
 
-    <ShadcnSeparator class="h-1 my-2" />
+    <ShadcnSeparator class="my-2 h-1" />
 
     <AccountSection>
       <template #header>

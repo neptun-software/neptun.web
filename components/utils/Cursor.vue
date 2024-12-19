@@ -41,8 +41,7 @@ class Dot {
   draw() {
     if (!idle || this.index <= sineDots) {
       gsap.set(this.element, { x: this.x, y: this.y })
-    }
-    else {
+    } else {
       this.angleX += this.angleSpeed
       this.angleY += this.angleSpeed
       this.y = this.lockY + Math.sin(this.angleY) * this.range
@@ -75,8 +74,9 @@ function buildDots() {
 }
 
 function positionCursor(delta) {
-  if (isScrolling.value)
-    return // skip animation while scrolling
+  if (isScrolling.value) {
+    return
+  } // skip animation while scrolling
 
   let x = mouseX.value - width / 2 - scrollX.value
   let y = mouseY.value - width / 2 - scrollY.value
@@ -118,8 +118,7 @@ onMounted(() => {
       isScrolling.value = scrolling
       if (scrolling) {
         idle = true // lock animations while scrolling
-      }
-      else {
+      } else {
         resetIdleTimer() // resume animations after scrolling stops
       }
     })

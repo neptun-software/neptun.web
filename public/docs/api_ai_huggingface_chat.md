@@ -192,13 +192,15 @@ async function streamChatCompletion(
   }
 
   const reader = response.body?.getReader()
-  if (!reader)
+  if (!reader) {
     return
+  }
 
   while (true) {
     const { done, value } = await reader.read()
-    if (done)
+    if (done) {
       break
+    }
 
     // Process the streaming response chunks
     console.log(new TextDecoder().decode(value))

@@ -57,10 +57,10 @@ export async function persistCodeBlocks(
         return persistedCodeBlocks
       }
     }
-  }
-  catch (error) {
-    if (LOG_BACKEND)
+  } catch (error) {
+    if (LOG_BACKEND) {
       console.error('Persisting code blocks errored:', error)
+    }
     return null
   }
 
@@ -105,10 +105,10 @@ export async function persistChatMessage(
             : null
           : null
       return chatMessage
-    }
-    catch (error) {
-      if (LOG_BACKEND)
+    } catch (error) {
+      if (LOG_BACKEND) {
         console.error('Persisting chat message errored:', error)
+      }
     }
   }
 
@@ -129,8 +129,9 @@ export async function persistAiChatMessage(
     event,
   )
 
-  if (!persistedChatMessage)
+  if (!persistedChatMessage) {
     return persistedChatMessage
+  }
   const {
     neptun_user_id,
     chat_conversation_id,

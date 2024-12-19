@@ -19,8 +19,9 @@ export async function createGithubAppInstallationRepositories(installationReposi
       return null
     })
 
-  if (!createdGithubAppInstallationRepositories)
+  if (!createdGithubAppInstallationRepositories) {
     return null
+  }
 
   return createdGithubAppInstallationRepositories
 }
@@ -45,8 +46,9 @@ export async function readAllGithubAppInstallationRepositoriesOfInstallation(ins
       return null
     })
 
-  if (!fetchedGithubAppInstallationRepositories)
+  if (!fetchedGithubAppInstallationRepositories) {
     return null
+  }
 
   return fetchedGithubAppInstallationRepositories
 }

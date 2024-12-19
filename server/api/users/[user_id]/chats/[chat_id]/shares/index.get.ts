@@ -16,5 +16,5 @@ export default defineEventHandler(async (event) => {
   }
   const chat_id = maybeChatId.data?.chat_id
 
-  return await readShareUuid(chat_id)
+  return readShareUuid(chat_id)
 })

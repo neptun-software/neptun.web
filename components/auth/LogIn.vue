@@ -12,8 +12,8 @@ const auth = useAuth()
 const { fetch } = useUserSession()
 const email = ref('')
 const password = ref('')
-const emailErrors = ref([])
-const passwordErrors = ref([])
+const emailErrors = ref<string[]>([])
+const passwordErrors = ref<string[]>([])
 
 watch(email, (newEmail) => {
   emailErrors.value = validateEmailInput(newEmail)

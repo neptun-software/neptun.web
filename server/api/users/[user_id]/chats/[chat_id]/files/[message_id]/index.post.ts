@@ -64,8 +64,7 @@ export default defineEventHandler(async (event) => {
     return {
       chatFile: createdFile,
     }
-  }
-  else if (validatedBody && 'files' in validatedBody) {
+  } else if (validatedBody && 'files' in validatedBody) {
     const files = validatedBody.files.map(
       ({ text, title, language, extension }) => ({
         text,

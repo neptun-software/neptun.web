@@ -20,7 +20,7 @@ export default defineCachedEventHandler(async (event) => {
   const url = maybeUrl.data.url
 
   const markdown = await fetch(url)
-    .then((res) => {
+    .then(async (res) => {
       return res.text()
     })
     .then(async (html) => {
@@ -35,18 +35,23 @@ export default defineCachedEventHandler(async (event) => {
           .process(html)
 
         markdown = String(file)
-      }
-      catch (error: any) {
-        if (LOG_BACKEND)
-          console.error('Failed to parse HTML:', error?.message)
-        markdown = `Failed to parse HTML: ${error?.message}`
+      } catch (error) {
+        const errorMessage = error instanceof Error
+          ? error.message
+          : 'Unknown Error'
+
+        if (LOG_BACKEND) {
+          console.error('Failed to parse HTML:', errorMessage)
+        }
+        markdown = `Failed to parse HTML: ${errorMessage}`
       }
 
       return markdown
     })
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error(err)
+      }
       return 'FAILED'
     })
 

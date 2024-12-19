@@ -43,8 +43,7 @@ export default defineEventHandler(async (event) => {
     return {
       share: createdChatConversationShare,
     }
-  }
-  catch (error) {
+  } catch (error) {
     return sendError(
       event,
       createError({

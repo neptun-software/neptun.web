@@ -28,13 +28,15 @@ export async function validateUserCredentials(email: ReadUser['primary_email'], 
     )
     .limit(1)
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to fetch user from database:', err)
+      }
       return null
     })
 
-  if (!fetchedUser)
+  if (!fetchedUser) {
     return null
+  }
 
   return fetchedUser[0]
 }
@@ -55,13 +57,15 @@ export async function createUser(user: UserToCreate) {
       ) /* decode(${neptun_user.primary_email}, 'hex') instead of ('\x' || ${neptun_user.primary_email}) instead of concat('\x', ${neptun_user.primary_email}) */,
     })
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to insert user into database', err)
+      }
       return null
     })
 
-  if (!createdUser)
+  if (!createdUser) {
     return null
+  }
   return createdUser[0]
 }
 
@@ -81,13 +85,15 @@ export async function createEmptyUser() {
       primary_email: decryptColumn(neptun_user.primary_email),
     })
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to insert user into database', err)
+      }
       return null
     })
 
-  if (!createdUser)
+  if (!createdUser) {
     return null
+  }
   return createdUser[0]
 }
 
@@ -101,13 +107,15 @@ export async function readUserUsingPrimaryEmail(email: ReadUser['primary_email']
     .from(neptun_user)
     .where(like(neptun_user.primary_email, encryptColumn(email)))
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to fetch user from database', err)
+      }
       return null
     })
 
-  if (!fetchedUser)
+  if (!fetchedUser) {
     return null
+  }
 
   return fetchedUser[0] // [][0] => undefined :)
 }
@@ -144,13 +152,15 @@ export async function readUserIdsOfPrimaryEmails(emails: ReadUser['primary_email
       sql`neptun_user.primary_email IN (${sql.join(encryptedEmails, sql`, `)})`,
     ) // because inArray is not typed correctly
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to fetch users from database', err)
+      }
       return null
     })
 
-  if (!fetchedUsers)
+  if (!fetchedUsers) {
     return null
+  }
 
   return fetchedUsers
 }
@@ -174,8 +184,9 @@ export async function readUserUsingGithubOauthId(github_oauth_id: ReadOauthAccou
     },
   })
 
-  if (!fetchedUser)
+  if (!fetchedUser) {
     return null
+  }
 
   return fetchedUser.neptun_user
 }
@@ -184,8 +195,9 @@ export async function updateUser(id: ReadUser['id'], primary_email: ReadUser['pr
   /* TODO: check for old password, before allowing update, only allow email, if verified via email code */
 
   const updated_primary_email = () => {
-    if (!primary_email)
+    if (!primary_email) {
       return null
+    }
 
     return {
       primary_email: encryptColumn(primary_email),
@@ -193,8 +205,9 @@ export async function updateUser(id: ReadUser['id'], primary_email: ReadUser['pr
   }
 
   const updated_password = () => {
-    if (!password)
+    if (!password) {
       return null
+    }
 
     return {
       hashed_password: encryptSecret(password),
@@ -216,25 +229,28 @@ export async function updateUser(id: ReadUser['id'], primary_email: ReadUser['pr
       primary_email: decryptColumn(neptun_user.primary_email),
     })
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to update user in database', err)
+      }
       return null
     })
 
-  if (!updatedUser)
+  if (!updatedUser) {
     return null
+  }
 
   return updatedUser[0]
 }
 
 export async function deleteUser(id: ReadUser['id']) {
-  return await db
+  return db
     .delete(neptun_user)
     .where(eq(neptun_user.id, id))
     .then(() => true)
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to delete user from database', err)
+      }
       return false
     })
 }

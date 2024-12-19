@@ -37,13 +37,32 @@ function setSelectedChat(
 ) {
   if (selectedAiChat.value.id === id && force === false) {
     resetSelectedAiChatToDefaults() // doesn't reset messages
-  }
-  else {
+  } else {
     selectedAiChat.value.id = id
     selectedAiChat.value.name = name
     selectedAiChat.value.model = model
   }
 }
+
+const filterVisible = ref(false)
+const searchQuery = ref('')
+const {
+  fetchedChats,
+  fetchedChatsStatus,
+  fetchedChatsError,
+  fetchedChatsRefresh,
+} = useFetchChats(user.value?.id ?? -1)
+
+const filteredChats = computed(() => {
+  if (!fetchedChats.value?.chats) {
+    return []
+  }
+
+  const chats: FullyFeaturedChat[] = fetchedChats.value.chats as FullyFeaturedChat[]
+  return chats.filter((chat: FullyFeaturedChat) =>
+    chat.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  )
+})
 
 function editChat(id: number, name: string) {
   chatToEdit.value.id = id
@@ -73,8 +92,7 @@ async function saveEdit(id: number, previousName: string) {
     }
 
     await fetchedChatsRefresh.value()
-  }
-  else {
+  } else {
     chatToEdit.value.id = -1
   }
 }
@@ -112,8 +130,7 @@ function toggleSelectedForBatchDeletion(id: number) {
     chatsSelectedForDeletion.value = chatsSelectedForDeletion.value.filter(
       chatId => chatId !== id,
     )
-  }
-  else {
+  } else {
     chatsSelectedForDeletion.value.push(id)
   }
 }
@@ -125,40 +142,6 @@ function toggleAllForBatchDeletion() {
 function unToggleAllForBatchDeletion() {
   chatsSelectedForDeletion.value = []
 }
-
-const filterVisible = ref(false)
-const {
-  fetchedChats,
-  fetchedChatsStatus,
-  fetchedChatsError,
-  fetchedChatsRefresh,
-  fetchChats,
-  fetchChatsUrl,
-} = useFetchChats(user.value?.id ?? -1);
-
-(async () => {
-  await fetchChats()
-})()
-
-watchDebounced(
-  fetchChatsUrl,
-  async () => {
-    await fetchChats()
-  },
-  { debounce: 300, maxWait: 500 },
-)
-
-const searchQuery = ref('')
-const filteredChats = computed(() => {
-  if (!fetchedChats.value?.chats)
-    return []
-
-  const chats: FullyFeaturedChat[] = fetchedChats.value
-    .chats as FullyFeaturedChat[]
-  return chats.filter((chat: FullyFeaturedChat) =>
-    chat.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
-  )
-})
 
 const refreshAnimationIsActive = ref(false)
 

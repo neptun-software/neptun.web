@@ -61,8 +61,9 @@ export async function createOauthAccount(account: OauthAccountToCreate) {
 
   const createdUser = await createEmptyUser()
 
-  if (!createdUser)
+  if (!createdUser) {
     return null
+  }
 
   const createdOauthAccount = await db
     .insert(neptun_user_oauth_account)
@@ -83,13 +84,15 @@ export async function createOauthAccount(account: OauthAccountToCreate) {
       oauth_email: decryptColumn(neptun_user_oauth_account.oauth_email),
     })
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to insert oauth account into database', err)
+      }
       return null
     })
 
-  if (!createdOauthAccount)
+  if (!createdOauthAccount) {
     return null
+  }
 
   /* TODO: set primary_email to Oauth Email */
 

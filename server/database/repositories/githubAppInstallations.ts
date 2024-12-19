@@ -20,8 +20,9 @@ export async function createGithubAppInstallation(installationToCreate: NewGithu
       return null
     })
 
-  if (!createdGithubAppInstallation)
+  if (!createdGithubAppInstallation) {
     return null
+  }
 
   return createdGithubAppInstallation[0]
 }
@@ -50,8 +51,9 @@ export async function readAllGithubAppInstallationsOfUser(userId: ReadUser['id']
       return null
     })
 
-  if (!fetchedGithubAppInstallations)
+  if (!fetchedGithubAppInstallations) {
     return null
+  }
 
   return fetchedGithubAppInstallations
 }

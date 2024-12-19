@@ -5,8 +5,9 @@ export default oauthGitHubEventHandler({
     emailRequired: true,
   },
   async onSuccess(event, { user }) {
-    // tokens
+    // eslint-disable-next-line ts/no-unsafe-member-access
     const user_email = user?.email // maybe add login (for username), gravatar_id or avatar_url for icon, name, location (for i18n)
+    // eslint-disable-next-line ts/no-unsafe-member-access
     const user_id = String(user?.id)
 
     const createdOrFetchedUserAndConnectedOauthAccount
@@ -27,12 +28,13 @@ export default oauthGitHubEventHandler({
     }
 
     if (createdOrFetchedUserAndConnectedOauthAccount.isNewOauthAccount) {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.info('New oAuth account created!')
-    }
-    else {
-      if (LOG_BACKEND)
+      }
+    } else {
+      if (LOG_BACKEND) {
         console.info('Fetched existing oAuth account!')
+      }
     }
 
     await setUserSession(event, {

@@ -38,19 +38,21 @@ export const UserSignUpSchema = z
 // FORM UTILITY FUNCTIONS
 
 function validateInput(input: string, schema: z.ZodString | z.ZodEffects<any>) {
-  if (input.length === 0)
+  if (input.length === 0) {
     return []
+  }
 
   const validationResult = schema.safeParse(input)
 
-  if (validationResult.success)
+  if (validationResult.success) {
     return []
+  }
 
   const errorMessages = validationResult.error.issues.map(
-    (issue: any) => issue.message,
+    (issue: z.ZodIssue) => issue.message,
   )
 
-  return errorMessages as never[]
+  return errorMessages
 }
 
 export function validateEmailInput(email: string) {

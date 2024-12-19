@@ -93,8 +93,7 @@ async function checkAuthSession(): Promise<boolean> {
       }
     )
     return response.ok
-  }
-  catch (error) {
+  } catch (error) {
     return false
   }
 }

@@ -21,8 +21,9 @@ export async function createChatConversationMessages(messages: ChatConversationM
       return null
     })
 
-  if (!createdChatConversationMessages)
+  if (!createdChatConversationMessages) {
     return null
+  }
 
   return createdChatConversationMessages
 }
@@ -45,8 +46,9 @@ export async function readChatConversationMessages(chat_conversation_id: ReadCha
       return null
     })
 
-  if (!chatConversationMessages)
+  if (!chatConversationMessages) {
     return null
+  }
 
   return chatConversationMessages
 }

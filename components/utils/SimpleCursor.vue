@@ -22,18 +22,22 @@ const circlePosX = ref(0)
 const circlePosY = ref(0)
 const dotPosX = ref(0)
 const dotPosY = ref(0)
+const customCursorCircle = ref(null)
+const customCursorDot = ref(null)
 
 const { x, y } = useMouse()
 const { x: scrollX, y: scrollY } = useWindowScroll()
 
 const targetElements = ref([])
 const isHovering = computed(() => {
-  if (targetElements.value.length === 0)
+  if (targetElements.value.length === 0) {
     return false
+  }
 
   return targetElements.value.some((el) => {
-    if (!el)
+    if (!el) {
       return false
+    }
     const rect = el.getBoundingClientRect()
     return (
       x.value >= rect.left
@@ -73,9 +77,6 @@ function updateCursorPosition() {
     scale.value = isHovering.value ? props.hoverSize : 1
   }
 }
-
-const customCursorCircle = ref(null)
-const customCursorDot = ref(null)
 
 function updateTargetElements() {
   targetElements.value = props.targets

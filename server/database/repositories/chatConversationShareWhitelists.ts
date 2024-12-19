@@ -22,8 +22,9 @@ export async function createChatConversationShareWhitelistEntries(data: ChatConv
       return null
     })
 
-  if (!createdChatConversationShareWhitelistEntry)
+  if (!createdChatConversationShareWhitelistEntry) {
     return null
+  }
 
   return createdChatConversationShareWhitelistEntry
 }

@@ -1,4 +1,3 @@
-import type { User } from '#auth-utils'
 import type { Actor } from '~/lib/types/database.tables/schema'
 import { HfInference } from '@huggingface/inference'
 import { HuggingFaceStream, type Message, StreamingTextResponse } from 'ai'
@@ -24,7 +23,7 @@ export default defineLazyEventHandler(async () => {
   return defineEventHandler(async (event) => {
     /* 0. VALIDATE METHOD */
     assertMethod(event, ['POST'])
-    const user = event.context.user as User
+    const user = event.context.user
 
     /* VALIDATE QUERY */
     const maybeChatId = await validateQueryChatId(event)
@@ -55,8 +54,9 @@ export default defineLazyEventHandler(async () => {
     const model_name = maybeModelName.data?.model_name
     const model_publisher = maybeModelName.data?.model_publisher
 
-    if (LOG_BACKEND)
+    if (LOG_BACKEND) {
       console.info(`Fetching model: ${model_publisher}/${model_name}...`)
+    }
 
     const body = await readValidatedBody(event, (body) => {
       // complete chat history
@@ -125,12 +125,10 @@ export default defineLazyEventHandler(async () => {
 
         // inputs = experimental_buildOpenAssistantPrompt(minimalMessages); // basically convertToCoreMessages from 'ai'
         // if (LOG_BACKEND) console.info('using custom prompt builder for OpenAssistant');
-      }
-      else if (model_name === AllowedAiModelNamesEnum.Mistral) {
+      } else if (model_name === AllowedAiModelNamesEnum.Mistral) {
         inputs = experimental_buildLlama2Prompt(minimalMessages)
         // if (LOG_BACKEND) console.info('using custom prompt builder for Llama2');
-      }
-      else if (model_name === AllowedAiModelNamesEnum.metaLlama) {
+      } else if (model_name === AllowedAiModelNamesEnum.metaLlama) {
         inputs = buildMetaLlama3Prompt(minimalMessages)
         // if (LOG_BACKEND) console.info('using custom prompt builder for metaLlama');
       }
@@ -155,10 +153,10 @@ export default defineLazyEventHandler(async () => {
       }) // Converts the response into a friendly text-stream
 
       return new StreamingTextResponse(stream) // Respond with the stream
-    }
-    catch (error) {
-      if (LOG_BACKEND)
+    } catch (error) {
+      if (LOG_BACKEND) {
         console.error('AI request errored:', error)
+      }
       sendError(
         event,
         createError({

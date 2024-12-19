@@ -76,7 +76,9 @@ export default defineCachedEventHandler(async (event) => {
     }
 
     const base64Credentials = authHeader.split(' ')[1]
-    const [username, password] = require('node:buffer').Buffer.from(base64Credentials, 'base64').toString().split(':')
+    const [username, password] = Buffer.from(base64Credentials, 'base64')
+      .toString()
+      .split(':')
     if (
       !(await userIsAuthorizedToViewChat(uuid, {
         username,

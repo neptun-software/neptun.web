@@ -32,8 +32,7 @@ async function validateOtpAndResetPassword(email: string, otp: string[], newPass
     toast.error(response.message || 'Invalid OTP')
 
     return false
-  }
-  catch (error) {
+  } catch (error) {
     console.error('OTP validation error:', error)
     toast.error('OTP validation failed')
     return false
@@ -57,8 +56,7 @@ async function sendOtpEmail(email: string) {
 
     toast.error(response.message || 'Failed to create OTP')
     return false
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Error creating OTP:', error)
     toast.error('Failed to create OTP')
     return false
@@ -139,8 +137,7 @@ const onSubmit = handleSubmit(async (values) => {
     navigateTo('/log-in', {
       redirectCode: 303,
     })
-  }
-  else {
+  } else {
     toast.error('Failed to validate OTP.')
     submittingNewPassword.value = false
     sendingOtpEmail.value = false
@@ -186,8 +183,9 @@ const isCurrentStepValid = computed(() => {
 })
 
 const canGoNext = computed(() => {
-  if (stepIndex.value === 2 && !otpIsValid.value)
+  if (stepIndex.value === 2 && !otpIsValid.value) {
     return false
+  }
   return isCurrentStepValid.value
 })
 </script>

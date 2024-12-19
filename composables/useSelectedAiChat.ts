@@ -19,15 +19,18 @@ export function useSelectedAiChat() {
   const selectedAiChat = useState('selected-ai-chat', () =>
     reactive<MinimalChat>(selectedAiChatDefaults(new Date())))
 
-  const selectedAiChatApiPath = computed<AllowedAiModelPaths>(() => {
-    return `/api/ai/huggingface/${selectedAiChat.value.model}/chat`
-  })
-  const selectedAiChatIsPlayground = computed(
-    () => selectedAiChatId.value === -1,
-  )
   const selectedAiChatId = computed(() => {
     return selectedAiChat?.value?.id ?? -1
   })
+
+  const selectedAiChatIsPlayground = computed(
+    () => selectedAiChatId.value === -1,
+  )
+
+  const selectedAiChatApiPath = computed<AllowedAiModelPaths>(() => {
+    return `/api/ai/huggingface/${selectedAiChat.value.model}/chat`
+  })
+
   const selectedAiChatKey = computed(
     () =>
       `${selectedAiChatApiPath.value}?chat_id=${selectedAiChat.value.id}&isPlayground=${selectedAiChatIsPlayground.value}&isRecreated=${aiChatReCreationTrigger.value}`,
@@ -74,8 +77,7 @@ export function useAiChatPlayground() {
   if (selectedAiChat.value.id !== -1) {
     // set name, depending on selected chat
     aiPlaygroundChatName.value = createChatName(new Date())
-  }
-  else {
+  } else {
     aiPlaygroundChatName.value = selectedAiChat.value.name
   }
 

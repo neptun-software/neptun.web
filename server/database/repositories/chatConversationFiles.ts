@@ -22,8 +22,9 @@ export async function createChatConversationFiles(
       return null
     })
 
-  if (!createdChatConversationFiles)
+  if (!createdChatConversationFiles) {
     return null
+  }
 
   return createdChatConversationFiles
 }
@@ -47,8 +48,9 @@ export async function readAllChatConversationFilesOfChatConversation(
       return null
     })
 
-  if (!chatConversationFiles)
+  if (!chatConversationFiles) {
     return null
+  }
 
   return chatConversationFiles
 }

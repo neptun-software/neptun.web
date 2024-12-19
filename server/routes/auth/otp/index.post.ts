@@ -28,11 +28,25 @@ async function sendMail({ to, subject, html, text }: { to: string, subject: stri
   })
 }
 
+interface OtpCreateBody {
+  action: 'create'
+  email: string
+}
+
+interface OtpValidateBody {
+  action: 'validate'
+  email: string
+  otp: string
+  new_password: string
+}
+
+type OtpRequestBody = OtpCreateBody | OtpValidateBody
+
 export default defineEventHandler(async (event) => {
   const storage = useStorage('temporary-storage')
   const otpNameSpace = 'otp'
 
-  const body = await readBody(event)
+  const body = await readBody<OtpRequestBody>(event)
 
   if (body.action === 'create') {
     const { email } = body
@@ -67,8 +81,7 @@ export default defineEventHandler(async (event) => {
         html,
         text,
       })
-    }
-    catch (_error) {
+    } catch {
       return { success: false, message: 'Something went wrong. Could not send OTP. Please try again.' }
     }
 
@@ -83,8 +96,7 @@ export default defineEventHandler(async (event) => {
         method: 'POST',
         body: { otp, new_password },
       })
-    }
-    catch (_error) {
+    } catch {
       return { success: false, message: 'Something went wrong. Could not validate OTP. Please try again.' }
     }
   }

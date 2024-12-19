@@ -22,8 +22,9 @@ export default defineEventHandler(async (event) => {
   const { installation_id } = query
 
   if (!installation_id) {
-    if (LOG_BACKEND)
+    if (LOG_BACKEND) {
       console.info('Missing installation_id.')
+    }
     return sendError(
       event,
       createError({
@@ -35,8 +36,9 @@ export default defineEventHandler(async (event) => {
   }
 
   if (Number.isNaN(installation_id)) {
-    if (LOG_BACKEND)
+    if (LOG_BACKEND) {
       console.info('Invalid installation_id. Must be a number.')
+    }
     return sendError(
       event,
       createError({
@@ -269,9 +271,8 @@ export default defineEventHandler(async (event) => {
               )
             }
 
-            return sendRedirect(event, `/home`)
-          }
-          catch (error) {
+            return await sendRedirect(event, `/home`)
+          } catch (error) {
             if (LOG_BACKEND) {
               console.info(
                 'Failed to create github app installation repositories in database.',
@@ -290,8 +291,7 @@ export default defineEventHandler(async (event) => {
               }),
             )
           }
-        }
-        catch (error) {
+        } catch (error) {
           if (LOG_BACKEND) {
             console.info(
               'Failed to create github app installation repositories in database.',
@@ -310,8 +310,7 @@ export default defineEventHandler(async (event) => {
             }),
           )
         }
-      }
-      catch (error) {
+      } catch (error) {
         if (LOG_BACKEND) {
           console.info(
             'Failed to find user. You have to install the app, with a Github Account, that you registered an account on neptun!',
@@ -331,8 +330,7 @@ export default defineEventHandler(async (event) => {
           }),
         )
       }
-    }
-    catch (error) {
+    } catch (error) {
       if (LOG_BACKEND) {
         console.info(
           'Invalid installation_id. The installation is not found or the user does not have access to it.',
@@ -352,8 +350,7 @@ export default defineEventHandler(async (event) => {
         }),
       )
     }
-  }
-  catch (error) {
+  } catch (error) {
     if (LOG_BACKEND) {
       console.info(
         'Invalid installation_id. The installation doesn\'t belong to any Github App.',

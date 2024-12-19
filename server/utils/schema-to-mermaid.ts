@@ -17,7 +17,7 @@ async function convertToMermaid() {
 
     const sqlContent = await readFile(path.join(schemaDir, latestSql), 'utf-8')
 
-    const tableRegex = /CREATE TABLE ([^(]+)\s*\(([\s\S]*?)\);/g
+    const tableRegex = /CREATE TABLE ([^(\s]+)\s*\(([\s\S]*?)\);/g
     let mermaid = 'erDiagram\n'
 
     const relationships = new Set()
@@ -29,8 +29,9 @@ async function convertToMermaid() {
       mermaid += `    ${tableName} {\n`
 
       for (const col of columns) {
-        if (col.startsWith('CONSTRAINT') || col.startsWith('PRIMARY KEY'))
+        if (col.startsWith('CONSTRAINT') || col.startsWith('PRIMARY KEY')) {
           continue
+        }
 
         const [colName, ...colType] = col.split(' ')
         const cleanedType = colType.join(' ')
@@ -74,12 +75,17 @@ async function convertToMermaid() {
     await writeFile(path.join(schemaDir, mermaidFile), mermaid)
 
     console.log(`Mermaid-File created: ${mermaidFile}`)
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Conversion to Mermaid failed:', error)
   }
 }
 
-(async () => {
-  await convertToMermaid()
+void (async () => {
+  try {
+    await convertToMermaid()
+    process.exit(0)
+  } catch (error) {
+    console.error('Failed to convert schema to mermaid:', error)
+    process.exit(1)
+  }
 })()

@@ -25,8 +25,7 @@ exec('pnpm list --depth=1', (error, stdout, stderr) => {
 
   if (result.length > 0) {
     console.info(result.join('\n'))
-  }
-  else {
+  } else {
     console.info(`Package ${packageName} not found.`)
   }
 })

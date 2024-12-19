@@ -5,8 +5,9 @@ export default oauthGoogleEventHandler({
     scope: ['email'],
   },
   async onSuccess(event, { user }) {
-    // tokens
+    // eslint-disable-next-line ts/no-unsafe-member-access
     const user_email = user?.email // maybe add email_verified, picture for icon
+    // eslint-disable-next-line ts/no-unsafe-member-access
     const user_id = user?.sub // id_token includes sub and stores other data too, expires tho
 
     const createdOrFetchedUserAndConnectedOauthAccount
@@ -27,12 +28,13 @@ export default oauthGoogleEventHandler({
     }
 
     if (createdOrFetchedUserAndConnectedOauthAccount.isNewOauthAccount) {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.info('New oAuth account created!')
-    }
-    else {
-      if (LOG_BACKEND)
+      }
+    } else {
+      if (LOG_BACKEND) {
         console.info('Fetched existing oAuth account!')
+      }
     }
 
     await setUserSession(event, {

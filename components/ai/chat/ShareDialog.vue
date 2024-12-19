@@ -41,11 +41,14 @@ async function validateTag(event: KeyboardEvent) {
     setValues({ email_whitelist: updatedWhitelist })
     input.value = ''
     setFieldError('email_whitelist', undefined)
-  }
-  else {
+  } else {
     setFieldError('email_whitelist', 'Invalid email address')
   }
 }
+
+const { data, status, error, refresh } = useFetch(
+  `/api/users/${user.value?.id ?? -1}/chats/${selectedAiChatId.value}/shares`,
+)
 
 const isSubmitting = ref(false)
 const onSubmit = handleSubmit(async (values) => {
@@ -103,8 +106,7 @@ const onSubmit = handleSubmit(async (values) => {
     .then((data) => {
       if (data && data.share) {
         toast.success('Share created!')
-      }
-      else {
+      } else {
         toast.error('Failed to create share!')
       }
 
@@ -129,8 +131,7 @@ const onSubmit = handleSubmit(async (values) => {
       .then((data) => {
         if (data && data.shareWhitelistEntries) {
           toast.success('Whitelist entries created!')
-        }
-        else {
+        } else {
           toast.error('Failed to create whitelist entries!')
         }
 
@@ -145,10 +146,6 @@ const onSubmit = handleSubmit(async (values) => {
 
   isSubmitting.value = false
 })
-
-const { data, status, error, refresh } = useFetch(
-  `/api/users/${user.value?.id ?? -1}/chats/${selectedAiChatId.value}/shares`,
-)
 
 const requestUrl = useRequestURL()
 const url = computed(() => {
@@ -196,7 +193,7 @@ const url = computed(() => {
               name="is_unprotected"
             >
               <ShadcnFormItem
-                class="flex flex-row items-start p-4 space-y-0 border rounded-md gap-x-3"
+                class="flex flex-row gap-x-3 items-start p-4 space-y-0 rounded-md border"
               >
                 <ShadcnFormControl>
                   <ShadcnCheckbox
@@ -288,14 +285,14 @@ const url = computed(() => {
           </form>
           <div v-else>
             You have already published this chat!<br>
-            <div class="flex items-center gap-2 px-2 py-1 border rounded-sm">
+            <div class="flex gap-2 items-center px-2 py-1 rounded-sm border">
               {{ url }}
               <CopyToClipboard :text="url" />
             </div>
           </div>
           <div
             v-if="error"
-            class="flex items-center justify-between gap-2 py-1 pl-2 pr-1 border rounded-sm border-destructive"
+            class="flex gap-2 justify-between items-center py-1 pr-1 pl-2 rounded-sm border border-destructive"
           >
             Failed to check if chat is published.<br>
 

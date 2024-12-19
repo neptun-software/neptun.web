@@ -25,8 +25,9 @@ export async function createChatConversationShare(share: ChatConversationShareTo
       return null
     })
 
-  if (!createdChatConversationShare)
+  if (!createdChatConversationShare) {
     return null
+  }
 
   return createdChatConversationShare[0]
 }
@@ -40,8 +41,9 @@ export async function readShareUuid(chat_id: ReadChatConversation['id']) {
       return data[0]?.share_uuid ?? null
     })
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to fetch share from database', err)
+      }
       return null
     })
 
@@ -68,8 +70,9 @@ export async function readShareInfo(id: ReadChatConversationShare['share_uuid'])
       }
     })
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to fetch share from database', err)
+      }
       return {
         shareExists: false,
         shareIsActive: false,
@@ -141,8 +144,9 @@ export async function sharePasswordIsValid(id: ReadChatConversationShare['share_
     )
     .then(data => data.length > 0)
     .catch((err) => {
-      if (LOG_BACKEND)
+      if (LOG_BACKEND) {
         console.error('Failed to fetch share from database', err)
+      }
       return false
     })
 
@@ -165,8 +169,9 @@ export async function updateChatConversationShare(id: ReadChatConversationShare[
       return null
     })
 
-  if (!updatedChatConversationShare)
+  if (!updatedChatConversationShare) {
     return null
+  }
 
   return updatedChatConversationShare[0]
 }

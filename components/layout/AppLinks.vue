@@ -22,8 +22,7 @@ const visibleRoutes = computed(() => {
     return routes.filter(
       route => !hiddenRoutesIfLoggedIn.includes(route.path),
     )
-  }
-  else {
+  } else {
     return routes.filter(
       route => !hiddenRoutesIfLoggedOut.includes(route.path),
     )

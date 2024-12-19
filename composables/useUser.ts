@@ -14,8 +14,7 @@ export function useUser() {
       })
 
       return { data, error: null }
-    }
-    catch (error) {
+    } catch (error) {
       return { data: null, error }
     }
   }
@@ -27,8 +26,7 @@ export function useUser() {
       })
 
       return { data, error: null }
-    }
-    catch (error) {
+    } catch (error) {
       return { data: null, error }
     }
   }

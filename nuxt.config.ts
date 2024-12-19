@@ -184,14 +184,14 @@ export default defineNuxtConfig({
           NODE_ENV === 'development'
             ? process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY
             : Buffer.from(
-                String(
-                  process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY?.replace(
-                    /\\n/g,
-                    '\n',
-                  ).trim(),
-                ),
-                'base64',
-              ).toString('utf-8'),
+              String(
+                process.env.NEPTUN_GITHUB_APP_PRIVATE_KEY?.replace(
+                  /\\n/g,
+                  '\n',
+                ).trim(),
+              ),
+              'base64',
+            ).toString('utf-8'),
       },
     },
     /* session persists for 7 days */

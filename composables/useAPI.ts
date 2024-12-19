@@ -15,9 +15,9 @@ const { console } = useLogger()
 /* import type { UseFetchOptions } from '#app'; */
 
 // TODO: improve => return _data, isLoading etc. too.
-interface FetchResponse<T> extends Response {
+/* interface FetchResponse<T> extends Response {
   _data?: T
-}
+} */
 
 export function useAPI() {
   const handleFetch = async <T>(
@@ -48,8 +48,7 @@ export function useAPI() {
             // THIS IS CALLED EVERY TIME, ALSO IF RESPONSE IS NOT OK!
             console.log('Response data:', response._data)
             resolve(response._data as T)
-          }
-          else {
+          } else {
             const error = new Error(
               `Response not ok or no data: ${response.statusText}`,
             )
@@ -72,7 +71,7 @@ export function useAPI() {
     if (toastMessages) {
       toast.promise(fetchPromise, {
         ...toastMessages,
-        error: (error) => {
+        error: (error: any) => {
           console.error('Toast error:', error)
           return toastMessages.error(error)
         },
@@ -86,13 +85,14 @@ export function useAPI() {
     url: string,
     currentChatMessage: string,
   ): Promise<string | undefined> => {
-    if (url.trim() === '')
+    if (url.trim() === '') {
       return
+    }
 
     try {
+      // eslint-disable-next-line no-new
       new URL(url)
-    }
-    catch {
+    } catch {
       toast.error('Invalid URL!')
       return
     }
@@ -115,83 +115,9 @@ export function useAPI() {
         toastMessages,
       )
       return currentChatMessage + markdownOfUrl
-    }
-    catch {
+    } catch {
       return currentChatMessage
     }
-  }
-
-  const persistChatConversation = async (
-    user_id: number,
-    name: string,
-    model: string,
-  ) => {
-    const url = `/api/users/${user_id}/chats`
-    const options = {
-      method: 'POST' as HTTPMethod,
-      body: { model, name },
-      lazy: true,
-      pick: ['chat'] as 'chat'[],
-    }
-
-    const toastMessages = {
-      loading: 'Persisting chat history...',
-      success: (_data: unknown) => 'Chat history persisted!',
-      error: (_data: unknown) => 'Failed to persist chat history!',
-    }
-
-    try {
-      const response = await handleFetch<{ chat: FullyFeaturedChat }>(
-        url,
-        options,
-        toastMessages,
-      )
-
-      await persistChatConversationMessagesOfPlayground(
-        user_id,
-        response.chat.id,
-      )
-
-      return response.chat.id
-    }
-    catch {
-      console.error('Failed to persist chat history!')
-    }
-  }
-
-  async function persistCodeBlocks(
-    user_id: number,
-    chat_id: number,
-    message_id: number,
-    markdown: string,
-  ) {
-    try {
-      const codeBlocks = await getCodeBlocksFromMarkdown(markdown)
-
-      if (codeBlocks.length > 0) {
-        try {
-          const persistedCodeBlocks = await $fetch(
-            `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
-            {
-              method: 'POST',
-              body: {
-                files: codeBlocks,
-              },
-            },
-          )
-
-          return persistedCodeBlocks
-        }
-        catch {
-          console.error('Failed to persist code blocks!')
-        }
-      }
-    }
-    catch {
-      console.error('Failed to parse code blocks!')
-    }
-
-    return null
   }
 
   const persistChatConversationMessagesOfPlayground = async (
@@ -236,19 +162,87 @@ export function useAPI() {
                 message.id,
                 message.message,
               )
-            }
-            catch {
+            } catch {
               console.error('Failed to persist code blocks!')
             }
           }
         }
-      }
-      catch {
+      } catch {
         console.error('Failed to persist chat messages!')
       }
 
       messagesRef.value = []
     }
+  }
+
+  const persistChatConversation = async (
+    user_id: number,
+    name: string,
+    model: string,
+  ) => {
+    const url = `/api/users/${user_id}/chats`
+    const options = {
+      method: 'POST' as HTTPMethod,
+      body: { model, name },
+      lazy: true,
+      pick: ['chat'] as 'chat'[],
+    }
+
+    const toastMessages = {
+      loading: 'Persisting chat history...',
+      success: (_data: unknown) => 'Chat history persisted!',
+      error: (_data: unknown) => 'Failed to persist chat history!',
+    }
+
+    try {
+      const response = await handleFetch<{ chat: FullyFeaturedChat }>(
+        url,
+        options,
+        toastMessages,
+      )
+
+      await persistChatConversationMessagesOfPlayground(
+        user_id,
+        response.chat.id,
+      )
+
+      return response.chat.id
+    } catch {
+      console.error('Failed to persist chat history!')
+    }
+  }
+
+  async function persistCodeBlocks(
+    user_id: number,
+    chat_id: number,
+    message_id: number,
+    markdown: string,
+  ) {
+    try {
+      const codeBlocks = await getCodeBlocksFromMarkdown(markdown)
+
+      if (codeBlocks.length > 0) {
+        try {
+          const persistedCodeBlocks = await $fetch(
+            `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
+            {
+              method: 'POST',
+              body: {
+                files: codeBlocks,
+              },
+            },
+          )
+
+          return persistedCodeBlocks
+        } catch {
+          console.error('Failed to persist code blocks!')
+        }
+      }
+    } catch {
+      console.error('Failed to parse code blocks!')
+    }
+
+    return null
   }
 
   const persistChatConversationEdit = async (
@@ -275,8 +269,7 @@ export function useAPI() {
         options,
         toastMessages,
       )
-    }
-    catch {
+    } catch {
       console.error('Failed to rename chat!')
     }
   }
@@ -300,8 +293,7 @@ export function useAPI() {
 
       try {
         await handleFetch(url, options, toastMessages)
-      }
-      catch {
+      } catch {
         console.error('Failed to delete chat!')
       }
 
@@ -323,8 +315,7 @@ export function useAPI() {
 
     try {
       await handleFetch(url, options, toastMessages)
-    }
-    catch {
+    } catch {
       console.error('Failed to delete chats!')
     }
   }
@@ -354,30 +345,28 @@ export function useFetchChats(user_id: number) {
   // biome-ignore lint/suspicious/noExplicitAny: Can be any.
   const fetchedChatsRefresh = useState<
     (opts?: AsyncDataOptions<any, any>) => Promise<void>
-  >('fetched-chats-refresh', () => () => Promise.resolve()) // any should be AsyncDataExecuteOptions, but I can not find the type
+  >('fetched-chats-refresh', () => async () => Promise.resolve()) // any should be AsyncDataExecuteOptions, but I can not find the type
 
   const chatsFilters = useChatsFilter()
   const fetchChatsUrl = computed(() => {
     return `/api/users/${user_id}/chats?${chatsFilters.value}`
   })
 
-  const fetchChats = async () => {
-    const { data, status, error, refresh } = await useFetch(
-      fetchChatsUrl.value,
-      {
-        method: 'GET' as HTTPMethod,
-        lazy: true,
-        pick: ['chats'] as never[],
-      },
-    )
+  const { data, status, error, refresh } = useFetch(fetchChatsUrl, {
+    method: 'GET',
+    immediate: true,
+    watch: [fetchChatsUrl],
+    transform: (response) => {
+      return response as { chats: FullyFeaturedChat[] }
+    },
+  })
 
-    watch(status, () => {
-      fetchedChats.value = data.value as { chats: FullyFeaturedChat[] } | null
-      fetchedChatsStatus.value = status.value
-      fetchedChatsError.value = error.value
-      fetchedChatsRefresh.value = refresh
-    })
-  }
+  watchEffect(() => {
+    fetchedChats.value = data.value
+    fetchedChatsStatus.value = status.value
+    fetchedChatsError.value = error.value
+    fetchedChatsRefresh.value = refresh
+  })
 
   return {
     fetchChatsUrl,
@@ -385,7 +374,6 @@ export function useFetchChats(user_id: number) {
     fetchedChatsStatus,
     fetchedChatsError,
     fetchedChatsRefresh,
-    fetchChats,
   }
 }
 
@@ -410,8 +398,7 @@ export function useFetchFiles() {
           const chatFiles = _data.chatFiles
           fetchedFiles.value = (chatFiles as ReadChatConversationFile[]) ?? []
         }
-      }
-      catch {
+      } catch {
         console.error('Failed to fetch files!')
       }
     }

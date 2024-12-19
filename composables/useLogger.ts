@@ -10,8 +10,7 @@ export function useLogger() {
 
   if (!LOG_FRONTEND) {
     consola.pauseLogs()
-  }
-  else {
+  } else {
     consola.resumeLogs()
   }
 

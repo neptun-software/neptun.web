@@ -15,17 +15,19 @@ async function migrateDatabase() {
       schema: databaseMap,
     })
 
-    return await neonMigrate(drizzleClient, {
+    return neonMigrate(drizzleClient, {
       migrationsFolder: 'server/database/migrations',
     })
       .then(() => {
-        if (IS_DEV)
+        if (IS_DEV) {
           console.info('Migrated database...')
+        }
         return true
       })
       .catch((e) => {
-        if (IS_DEV)
+        if (IS_DEV) {
           console.error('Failed to migrate database:', e)
+        }
         /* throw createError({
           statusCode: 500,
           statusMessage: 'Internal Server Error',
@@ -33,10 +35,11 @@ async function migrateDatabase() {
           fatal: true,
         }); */
       })
-      .finally(async () => {
-        if (IS_DEV)
+      .finally(() => {
+        if (IS_DEV) {
           console.info('Closing database connection...')
-        await migrationClient.end()
+        }
+        void migrationClient.end()
       })
   }
 
@@ -46,34 +49,37 @@ async function migrateDatabase() {
     schema: databaseMap,
   })
 
-  return await migrate(drizzleClient, {
+  return migrate(drizzleClient, {
     migrationsFolder: 'server/database/migrations',
   })
     .then(() => {
-      if (IS_DEV)
+      if (IS_DEV) {
         console.info('Migrated database...')
+      }
       return true
     })
     .catch((e) => {
-      if (IS_DEV)
+      if (IS_DEV) {
         console.error('Failed to migrate database:', e)
-      /* throw createError({
-        statusCode: 500,
-        statusMessage: 'Internal Server Error',
-        message: 'Failed to migrate database',
-        fatal: true,
-      }); */
+      }
+      return false
     })
-    .finally(async () => {
-      if (IS_DEV)
+    .finally(() => {
+      if (IS_DEV) {
         console.info('Closing database connection...')
-      await migrationClient.end()
+      }
+      void migrationClient.end()
     })
 }
 
-export default migrateDatabase;
+export default migrateDatabase
 
-(async () => {
-  // for package.json script
-  await migrateDatabase()
+void (async () => {
+  try {
+    await migrateDatabase()
+    process.exit(0)
+  } catch (error) {
+    console.error('Failed to migrate database:', error)
+    process.exit(1)
+  }
 })()

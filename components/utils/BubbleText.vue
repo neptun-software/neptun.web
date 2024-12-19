@@ -111,12 +111,14 @@ class Particle {
 }
 
 function initScene() {
-  if (!canvas.value)
+  if (!canvas.value) {
     return
+  }
 
   const ctx = canvas.value.getContext('2d', { willReadFrequently: true })
-  if (!ctx)
+  if (!ctx) {
     return
+  }
 
   const ww = (canvas.value.width = window.innerWidth)
   const wh = (canvas.value.height = window.innerHeight)
@@ -142,12 +144,14 @@ function initScene() {
 }
 
 function render() {
-  if (!canvas.value)
+  if (!canvas.value) {
     return
+  }
 
   const ctx = canvas.value.getContext('2d')
-  if (!ctx)
+  if (!ctx) {
     return
+  }
 
   requestAnimationFrame(render)
   ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
@@ -158,18 +162,18 @@ function render() {
   isLoaded.value = true
 }
 
+const isDesktop = useMediaQuery('(min-width: 1024px)')
+
 onMounted(() => {
   if (isDesktop.value) {
     initScene()
     requestAnimationFrame(render)
   }
 })
-
-const isDesktop = useMediaQuery('(min-width: 1024px)')
 </script>
 
 <template>
-  <div class="h-full overflow-hidden bg-slate-950">
+  <div class="overflow-hidden h-full bg-slate-950">
     <canvas id="scene" ref="canvas" class="z-10" />
     <div class="absolute left-0 w-full bg-cyan-600">
       <div>
@@ -217,7 +221,7 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
       </div>
     </div>
     <div
-      class="absolute top-0 left-0 flex items-center justify-center w-full h-full text-slate-200"
+      class="flex absolute top-0 left-0 justify-center items-center w-full h-full text-slate-200"
     >
       <slot v-if="!isLoaded" />
     </div>

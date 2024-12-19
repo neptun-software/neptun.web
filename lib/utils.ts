@@ -12,6 +12,7 @@ export function valueUpdater<T extends Updater<any>>(
 ) {
   ref.value
     = typeof updaterOrValue === 'function'
+      // eslint-disable-next-line ts/no-unsafe-call
       ? updaterOrValue(ref.value)
       : updaterOrValue
 }
