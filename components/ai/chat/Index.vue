@@ -361,9 +361,9 @@ async function downloadChatMessages(_event = null) {
 const messagesWithStreaming = computed(() => {
   return chatMessages.value.map((message) => {
     const sanitizedContent = getSanitizedMessageContent(message.content)
-    
-    if (message.role === 'assistant' 
-        && message === chatMessages.value[chatMessages.value.length - 1]) {
+
+    if (message.role === 'assistant'
+      && message === chatMessages.value[chatMessages.value.length - 1]) {
       return {
         ...message,
         content: sanitizedContent,
@@ -372,7 +372,7 @@ const messagesWithStreaming = computed(() => {
     }
     return {
       ...message,
-      content: sanitizedContent
+      content: sanitizedContent,
     }
   })
 })

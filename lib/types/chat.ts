@@ -3,7 +3,7 @@ import type { AllowedAiModels } from './ai.models'
 import type { ReadChatConversation } from './database.tables/schema'
 
 export interface Message extends BaseMessage {
- isStreaming?: boolean
+  isStreaming?: boolean
 }
 
 export interface MinimalChat {
