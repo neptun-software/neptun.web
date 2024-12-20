@@ -1,120 +1,184 @@
 <script setup lang="ts">
 import gsap from 'gsap'
+import { Loader2 } from 'lucide-vue-next'
 
 const colorMode = useColorMode()
-const floatingImage = ref<HTMLElement | null>(null)
+const activeTab = ref('All_Chats')
+const loadedImages = ref(new Set<string>())
+const currentY = ref(0)
+const FLOAT_LIMIT = 8
+const movingUp = ref(true)
+const imageLoadingStates = ref(new Map<string, boolean>())
 
 function initializeAnimation() {
-  gsap.to('.floating-image', {
-    y: -10,
-    duration: 2,
-    ease: 'power1.inOut',
+  gsap.killTweensOf('.floating-image')
+
+  const images = document.querySelectorAll('.floating-image')
+
+  if (images.length === 0) {
+    return
+  }
+
+  currentY.value = Math.max(Math.min(currentY.value, FLOAT_LIMIT), -FLOAT_LIMIT)
+  gsap.set(images, { y: currentY.value })
+
+  movingUp.value = !movingUp.value
+  const targetY = movingUp.value ? -FLOAT_LIMIT : FLOAT_LIMIT
+
+  gsap.to(images, {
+    y: targetY,
+    duration: 1.5,
+    ease: 'sine.inOut',
     yoyo: true,
     repeat: -1,
+    onUpdate() {
+      if (this.targets().length > 0) {
+        currentY.value = Math.max(
+          Math.min(this.targets()[0]._gsap.y, FLOAT_LIMIT),
+          -FLOAT_LIMIT,
+        )
+      }
+    },
   })
 }
 
-watch(floatingImage, (newValue) => {
-  if (newValue) {
+function handleImageLoad(src: string) {
+  loadedImages.value.add(src)
+  imageLoadingStates.value.set(src, false)
+  const currentImages = getCurrentTabImages()
+  if (currentImages.every(img => loadedImages.value.has(img))) {
     initializeAnimation()
   }
-})
+}
+
+function getCurrentTabImages(): string[] {
+  const isDark = colorMode.preference === 'dark'
+  if (activeTab.value === 'All_Chats') {
+    return [isDark ? '/assets/preview-dark.png' : '/assets/preview-light.png']
+  }
+  return [isDark ? '/assets/preview-dark-info.png' : '/assets/preview-light-info.png']
+}
+
+function handleTabChange() {
+  loadedImages.value.clear()
+  const allPossibleImages = [
+    '/assets/preview-dark.png',
+    '/assets/preview-light.png',
+    '/assets/preview-dark-info.png',
+    '/assets/preview-light-info.png',
+  ]
+  allPossibleImages.forEach((img) => {
+    imageLoadingStates.value.set(img, true)
+  })
+}
 
 onMounted(() => {
-  setTimeout(() => {
-    if (floatingImage.value) {
-      initializeAnimation()
-    }
-  }, 100)
+  handleTabChange()
+})
+
+onBeforeUnmount(() => {
+  gsap.killTweensOf('.floating-image')
 })
 </script>
 
 <template>
   <section class="relative w-full bg-background">
     <div class="mx-auto">
-      <div
-        class="flex flex-col items-center justify-center py-4 sm:py-12 lg:py-16"
-      >
+      <div class="flex flex-col items-center justify-center py-4 sm:py-12 lg:py-16">
         <div class="relative w-full">
-          <h3
-            class="pb-2 text-4xl font-bold text-center sm:text-6xl lg:text-8xl sm:pb-6"
-          >
+          <h3 class="pb-2 text-4xl font-bold text-center sm:text-6xl lg:text-8xl sm:pb-6">
             What?
           </h3>
 
           <!-- gradient shadow -->
-          <div
-            class="absolute top-2 lg:-top-8 left-1/2 transform -translate-x-1/2 w-[90%] mx-auto h-24 lg:h-80 bg-blue-950/50 rounded-full blur-3xl opacity-70"
-          />
+          <div class="absolute top-2 lg:-top-8 left-1/2 transform -translate-x-1/2 w-[90%] mx-auto h-24 lg:h-80 bg-blue-950/50 rounded-full blur-3xl opacity-70" />
 
           <div class="w-full max-w-screen-xl px-0 mx-auto">
-            <SlidingTabs :tabs="['All_Chats', 'Active_Chat']">
+            <SlidingTabs
+              v-model="activeTab"
+              :tabs="['All_Chats', 'Active_Chat']"
+            >
               <template #All_Chats>
-                <ClientOnly fallback-tag="div">
-                  <div class="relative w-full overflow-hidden rounded-lg">
-                    <NuxtImg
-                      v-if="colorMode.preference === 'light'"
-                      ref="floatingImage"
-                      class="relative object-contain w-full h-auto border border-t-2 rounded-lg floating-image border-t-primary/30"
-                      src="/assets/preview-light.png"
-                      alt="app preview image light"
-                    />
-                    <NuxtImg
-                      v-else
-                      ref="floatingImage"
-                      class="relative object-contain w-full h-auto border border-t-2 rounded-lg floating-image border-t-primary/30"
-                      src="/assets/preview-dark.png"
-                      alt="app preview image dark"
-                    />
+                <div class="relative w-full rounded-lg">
+                  <div
+                    v-if="imageLoadingStates.get(colorMode.preference === 'light' ? '/assets/preview-light.png' : '/assets/preview-dark.png')"
+                    class="absolute inset-0 flex items-center justify-center bg-background/80"
+                  >
+                    <Loader2 class="w-12 h-12 text-blue-500 animate-spin" />
                   </div>
-                  <template #fallback>
-                    <div class="relative w-full overflow-hidden rounded-lg">
-                      <NuxtImg
-                        ref="floatingImage"
-                        class="relative object-contain w-full h-auto border border-t-2 rounded-lg floating-image border-t-primary/30"
-                        src="/assets/preview-light.png"
-                        alt="app preview image light"
-                      />
-                    </div>
-                  </template>
-                </ClientOnly>
+                  <NuxtImg
+                    v-if="colorMode.preference === 'light'"
+                    :preload="{
+                      fetchPriority: 'high',
+                    }"
+                    loading="eager"
+                    format="webp"
+                    class="relative object-contain w-full h-auto border border-t-2 rounded-lg floating-image border-t-primary/30"
+                    src="/assets/preview-light.png"
+                    alt="app preview image light"
+                    width="1916"
+                    height="907"
+                    @load="() => handleImageLoad('/assets/preview-light.png')"
+                  />
+                  <NuxtImg
+                    v-else
+                    :preload="{
+                      fetchPriority: 'high',
+                    }"
+                    loading="eager"
+                    format="webp"
+                    class="relative object-contain w-full h-auto border border-t-2 rounded-lg floating-image border-t-primary/30"
+                    src="/assets/preview-dark.png"
+                    alt="app preview image dark"
+                    width="1919"
+                    height="908"
+                    @load="() => handleImageLoad('/assets/preview-dark.png')"
+                  />
+                </div>
               </template>
+
               <template #Active_Chat>
-                <ClientOnly fallback-tag="div">
-                  <div class="relative w-full overflow-hidden rounded-lg">
-                    <NuxtImg
-                      v-if="colorMode.preference === 'light'"
-                      ref="floatingImage"
-                      class="relative object-contain w-full h-auto border border-t-2 rounded-lg floating-image border-t-primary/30"
-                      src="/assets/preview-light-info.png"
-                      alt="app preview image light"
-                    />
-                    <NuxtImg
-                      v-else
-                      ref="floatingImage"
-                      class="relative object-contain w-full h-auto border border-t-2 rounded-lg floating-image border-t-primary/30"
-                      src="/assets/preview-dark-info.png"
-                      alt="app preview image dark"
-                    />
+                <div class="relative w-full rounded-lg">
+                  <div
+                    v-if="imageLoadingStates.get(colorMode.preference === 'light' ? '/assets/preview-light-info.png' : '/assets/preview-dark-info.png')"
+                    class="absolute inset-0 flex items-center justify-center bg-background/80"
+                  >
+                    <Loader2 class="w-12 h-12 text-blue-500 animate-spin" />
                   </div>
-                  <template #fallback>
-                    <div class="relative w-full overflow-hidden rounded-lg">
-                      <NuxtImg
-                        ref="floatingImage"
-                        class="relative object-contain w-full h-auto border border-t-2 rounded-lg floating-image border-t-primary/30"
-                        src="/assets/preview-light-info.png"
-                        alt="app preview image light"
-                      />
-                    </div>
-                  </template>
-                </ClientOnly>
+                  <NuxtImg
+                    v-if="colorMode.preference === 'light'"
+                    :preload="{
+                      fetchPriority: 'high',
+                    }"
+                    loading="eager"
+                    format="webp"
+                    class="relative object-contain w-full h-auto border border-t-2 rounded-lg floating-image border-t-primary/30"
+                    src="/assets/preview-light-info.png"
+                    alt="app preview image light info"
+                    width="1917"
+                    height="908"
+                    @load="() => handleImageLoad('/assets/preview-light-info.png')"
+                  />
+                  <NuxtImg
+                    v-else
+                    :preload="{
+                      fetchPriority: 'high',
+                    }"
+                    loading="eager"
+                    format="webp"
+                    class="relative object-contain w-full h-auto border border-t-2 rounded-lg floating-image border-t-primary/30"
+                    src="/assets/preview-dark-info.png"
+                    alt="app preview image dark info"
+                    width="1918"
+                    height="907"
+                    @load="() => handleImageLoad('/assets/preview-dark-info.png')"
+                  />
+                </div>
               </template>
             </SlidingTabs>
 
-            <!-- gradient effect img -->
-            <div
-              class="absolute bottom-0 left-0 w-full h-8 rounded-lg xs:h-12 sm:h-20 md:h-28 bg-gradient-to-b from-background/0 via-background/50 to-background"
-            />
+            <!-- gradient effect -->
+            <div class="absolute bottom-0 left-0 w-full h-8 rounded-lg xs:h-12 sm:h-20 md:h-28 bg-gradient-to-b from-background/0 via-background/50 to-background" />
           </div>
         </div>
       </div>
