@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { type Message, useChat } from '@ai-sdk/vue' // NOTE: can only be called in setup scripts ("Could not get current instance, check to make sure that `useSwrv` is declared in the top level of the setup function.")
+import type { Message } from '~/lib/types/chat'
+import { useChat } from '@ai-sdk/vue' // NOTE: can only be called in setup scripts ("Could not get current instance, check to make sure that `useSwrv` is declared in the top level of the setup function.")
+import { Icon } from '@iconify/vue'
 import {
   CornerDownLeft,
   Delete,
@@ -45,6 +47,8 @@ const {
   api: selectedAiChatKey.value,
   keepLastMessageOnError: true,
 })
+
+const autoScrollEnabled = ref(true)
 
 watch(chatError, () => {
   if (chatError.value) {
@@ -353,6 +357,33 @@ async function deleteLast() {
 async function downloadChatMessages(_event = null) {
   await downloadAsFile(chatMessages.value, 'chat-messages')
 }
+
+const messagesWithStreaming = computed(() => {
+  return chatMessages.value.map((message) => {
+    if (message.role === 'assistant'
+      && message === chatMessages.value[chatMessages.value.length - 1]) {
+      return {
+        ...message,
+        isStreaming: chatResponseIsLoading.value,
+      }
+    }
+    return message
+  })
+})
+
+watch(
+  [
+    () => chatMessages.value.length,
+    chatResponseIsLoading,
+    () => messagesWithStreaming.value[messagesWithStreaming.value.length - 1]?.content,
+  ],
+  () => {
+    if (autoScrollEnabled.value) {
+      scrollToBottom()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -401,6 +432,7 @@ async function downloadChatMessages(_event = null) {
           :on-click-async="() => downloadChatMessages()"
         >
           <Download class="size-6" />
+          <span class="sr-only">Download Chat</span>
         </AsyncButton>
 
         <AiChatShareDialog />
@@ -411,7 +443,18 @@ async function downloadChatMessages(_event = null) {
           @click="scrollToBottom"
         >
           <Mouse class="size-6" />
+          <span class="sr-only">Scroll to bottom</span>
         </ShadcnButton>
+        <ShadcnToggle
+          :pressed="autoScrollEnabled"
+          class="px-2"
+          @update:pressed="autoScrollEnabled = $event"
+        >
+          <Icon icon="mdi:automatic" class="size-6" />
+          <span class="sr-only">
+            {{ autoScrollEnabled ? 'Disable' : 'Enable' }} auto-scroll
+          </span>
+        </ShadcnToggle>
       </div>
     </div>
 
@@ -424,7 +467,7 @@ async function downloadChatMessages(_event = null) {
 
     <div class="flex flex-col flex-grow max-w-full min-h-0 pt-10 pb-6">
       <ShadcnScrollArea ref="$scrollArea">
-        <AiChatMessages :key="chatMessagesKey" :messages="chatMessages" />
+        <AiChatMessages :key="chatMessagesKey" :messages="messagesWithStreaming" />
 
         <template v-if="isLoading">
           <MessagesSkeleton />
@@ -601,6 +644,7 @@ async function downloadChatMessages(_event = null) {
               <AsyncButton
                 variant="ghost"
                 size="icon"
+                :hide-loader="true"
                 :is-disabled="
                   chatResponseIsLoading || chatMessages.length === 0
                 "

@@ -1,5 +1,10 @@
+import type { Message as BaseMessage } from '@ai-sdk/vue'
 import type { AllowedAiModels } from './ai.models'
 import type { ReadChatConversation } from './database.tables/schema'
+
+export interface Message extends BaseMessage {
+ isStreaming?: boolean
+}
 
 export interface MinimalChat {
   id: ReadChatConversation['id']

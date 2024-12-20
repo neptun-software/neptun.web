@@ -1,9 +1,11 @@
 <script lang="ts" setup>
-import type { Message } from '@ai-sdk/vue'
+import type { Message } from '~/lib/types/chat'
 
-defineProps<{
+const props = defineProps<{
   message: Message
 }>()
+
+const messageContent = computed(() => props.message.content)
 </script>
 
 <template>
@@ -20,12 +22,17 @@ defineProps<{
       class="px-4 py-2 border rounded-lg bg-background border-slate-200 max-w-[80%] relative dark:border-border"
       :data-message-created-at="message.createdAt"
     >
-      <AiChatMessageContent :content="message.content" />
-      <ShadcnSeparator class="my-4" label="Controls" />
-      <AiChatMessageControls
-        :key="message.content"
-        :message="message.content"
-      />
+      <template v-if="!message.isStreaming">
+        <AiChatMessageContent :content="messageContent" />
+        <ShadcnSeparator class="my-4" label="Controls" />
+        <AiChatMessageControls
+          :key="messageContent"
+          :message="messageContent"
+        />
+      </template>
+      <div v-else class="break-words whitespace-pre-wrap">
+        {{ messageContent }}
+      </div>
     </div>
 
     <div
@@ -34,7 +41,7 @@ defineProps<{
       class="px-4 py-2 border rounded-lg bg-background border-slate-200 max-w-[80%] dark:border-border"
       :data-message-created-at="message.createdAt"
     >
-      <AiChatMessageContent :content="message.content" />
+      <AiChatMessageContent :content="messageContent" />
     </div>
   </div>
 </template>
