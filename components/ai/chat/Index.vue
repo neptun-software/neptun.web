@@ -360,14 +360,20 @@ async function downloadChatMessages(_event = null) {
 
 const messagesWithStreaming = computed(() => {
   return chatMessages.value.map((message) => {
-    if (message.role === 'assistant'
-      && message === chatMessages.value[chatMessages.value.length - 1]) {
+    const sanitizedContent = getSanitizedMessageContent(message.content)
+    
+    if (message.role === 'assistant' 
+        && message === chatMessages.value[chatMessages.value.length - 1]) {
       return {
         ...message,
+        content: sanitizedContent,
         isStreaming: chatResponseIsLoading.value,
       }
     }
-    return message
+    return {
+      ...message,
+      content: sanitizedContent
+    }
   })
 })
 
