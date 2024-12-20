@@ -1,5 +1,8 @@
+import rehypeExternalLinks from 'rehype-external-links'
 import rehypeParse from 'rehype-parse' // parse HTML
 import rehypeRemark from 'rehype-remark' // HTML => Markdown
+import rehypeSanitize from 'rehype-sanitize'
+import remarkFlexibleCodeTitles from 'remark-flexible-code-titles'
 import remarkGfm from 'remark-gfm' // support for GitHub Flavored Markdown
 import remarkStringify from 'remark-stringify' // stringify Markdown
 import { unified } from 'unified' // HTML and Markdown Utilities
@@ -29,8 +32,11 @@ export default defineCachedEventHandler(async (event) => {
       try {
         const file = await unified()
           .use(rehypeParse, { emitParseErrors: false })
+          .use(rehypeSanitize)
+          .use(rehypeExternalLinks, { target: '_blank', rel: ['nofollow', 'noopener', 'noreferrer'] })
           .use(rehypeRemark)
           .use(remarkGfm)
+          .use(remarkFlexibleCodeTitles)
           .use(remarkStringify)
           .process(html)
 

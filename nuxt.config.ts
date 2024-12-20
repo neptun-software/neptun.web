@@ -132,13 +132,18 @@ export default defineNuxtConfig({
     remarkPlugins: {
       'remark-flexible-code-titles': {},
     },
+    // see https://github.com/nuxt-modules/mdc/issues/315
     /* rehypePlugins: {
       options: {
         // Configure rehype options to extend the parser
       },
       plugins: {
-        // Register/Configure rehype plugin to extend the parser
-      }
+        'rehype-external-links': {
+          rel: ['nofollow', 'noopener', 'noreferrer'],
+          target: '_blank',
+        },
+        'rehype-sanitize': {},
+      },
     }, */
     highlight: {
       highlighter: 'shiki',

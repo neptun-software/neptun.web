@@ -53,6 +53,7 @@ export default withNuxt(
       'max-statements-per-line': ['error', { max: 1 }],
       'style/indent': ['error', 2],
       'style/brace-style': ['error', '1tbs', { allowSingleLine: false }],
+      'antfu/consistent-list-newline': 'off',
     },
   },
   {
