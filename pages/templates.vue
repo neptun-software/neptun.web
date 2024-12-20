@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import { templatesAliases } from '~/utils/pages'
+
 definePageMeta({
   name: 'Templates',
-  alias: ['/snippets', '/shared'],
+  alias: templatesAliases,
 })
 
 // defineOgImageComponent('NuxtSeo');
