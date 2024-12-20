@@ -61,8 +61,19 @@ defineProps<{
           >
             <ShadcnScrollArea class="h-screen px-2 py-1 border rounded-md">
               <ClientOnly>
-                <MDC
+                <!-- <MDC
                   :value="`\`\`\`${
+                    supportedShikiLanguages.includes(
+                      c.fileName.split('.')[
+                        c.fileName.split('.').length - 1
+                      ] as BundledLanguage,
+                    )
+                      ? c.fileName.split('.')[c.fileName.split('.').length - 1]
+                      : 'text'
+                  }\n${c.code?.trim()} \n\`\`\``"
+                /> -->
+                <MarkdownRenderer
+                  :content="`\`\`\`${
                     supportedShikiLanguages.includes(
                       c.fileName.split('.')[
                         c.fileName.split('.').length - 1

@@ -47,10 +47,7 @@ async function downloadConfiguration() {
       <ShadcnScrollBar orientation="horizontal" />
       <div>
         <ClientOnly fallback-tag="div">
-          <MDC
-            class="break-words whitespace-pre-wrap"
-            :value="cliConfigurationMarkdown"
-          />
+          <MarkdownRenderer :content="cliConfigurationMarkdown" />
           <template #fallback>
             <ShadcnSkeleton class="w-full h-10 my-2 bg-slate-400" />
           </template>

@@ -134,7 +134,7 @@ const colorMode = useColorMode()
             </template>
             <template v-else>
               <ClientOnly fallback-tag="div">
-                <MDC :value="selectedFileVersionMarkdown" />
+                <MarkdownRenderer :content="selectedFileVersionMarkdown" />
                 <template #fallback>
                   <ShadcnSkeleton
                     class="absolute top-0 left-0 w-full h-full bg-slate-400"

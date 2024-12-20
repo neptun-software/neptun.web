@@ -6,14 +6,7 @@ defineProps<{
 
 <template>
   <div>
-    <MDC
-      v-if="(content?.length ?? 0) > 0"
-      class="break-words whitespace-pre-wrap"
-      :value="content"
-    />
-    <div v-else class="break-words whitespace-pre-wrap">
-      {{ content }}
-    </div>
+    <MarkdownRenderer :content="content" />
   </div>
 </template>
 
