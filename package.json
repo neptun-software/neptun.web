@@ -94,7 +94,7 @@
     "@iconify-json/radix-icons": "^1.2.1",
     "@iconify/vue": "^4.1.2",
     "@mermaid-js/mermaid-cli": "^11.4.2",
-    "@nuxt/eslint": "^0.6.1",
+    "@nuxt/eslint": "^0.7.0",
     "@nuxtjs/color-mode": "^3.5.2",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@tailwindcss/typography": "^0.5.15",
