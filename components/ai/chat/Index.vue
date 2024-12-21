@@ -638,7 +638,7 @@ watch(
                 </ShadcnAlertDialogHeader>
                 <ShadcnAlertDialogFooter>
                   <ShadcnAlertDialogCancel>Cancel</ShadcnAlertDialogCancel>
-                  <ShadcnAlertDialogAction @click="resetAiPlaygroundChat">
+                  <ShadcnAlertDialogAction @click="resetAiPlaygroundChat()">
                     Continue
                   </ShadcnAlertDialogAction>
                 </ShadcnAlertDialogFooter>
