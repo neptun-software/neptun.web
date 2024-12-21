@@ -9,6 +9,8 @@ import {
   github_app_installation_repository,
   neptun_user,
   neptun_user_oauth_account,
+  neptun_user_template,
+  neptun_user_template_collection,
 } from './schema'
 
 export const neptun_userRelations = relations(neptun_user, ({ many }) => ({
@@ -20,6 +22,8 @@ export const neptun_userRelations = relations(neptun_user, ({ many }) => ({
   ),
   chat_conversation_messages: many(chat_conversation_message),
   chat_conversation_files: many(chat_conversation_file),
+  templates: many(neptun_user_template),
+  template_collections: many(neptun_user_template_collection),
 }))
 
 export const neptun_user_oauth_accountRelations = relations(
@@ -129,5 +133,27 @@ export const chat_conversation_fileRelations = relations(
       fields: [chat_conversation_file.chat_conversation_message_id],
       references: [chat_conversation_message.id],
     }),
+  }),
+)
+
+export const neptun_user_templateRelations = relations(neptun_user_template, ({ one }) => ({
+  neptun_user: one(neptun_user, {
+    fields: [neptun_user_template.neptun_user_id],
+    references: [neptun_user.id],
+  }),
+  template_collection: one(neptun_user_template_collection, {
+    fields: [neptun_user_template.template_collection_id],
+    references: [neptun_user_template_collection.id],
+  }),
+}))
+
+export const neptun_user_template_collectionRelations = relations(
+  neptun_user_template_collection,
+  ({ one, many }) => ({
+    neptun_user: one(neptun_user, {
+      fields: [neptun_user_template_collection.neptun_user_id],
+      references: [neptun_user.id],
+    }),
+    templates: many(neptun_user_template),
   }),
 )

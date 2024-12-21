@@ -57,6 +57,58 @@ export const SelectUserSchema = SelectUserSchemaBase.pick({
   updated_at: true,
 })
 
+/* USERS TEMPLATES */
+
+export const neptun_user_template = pgTable('neptun_user_template', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description'),
+  file_name: text('file_name').notNull(),
+  language: text('language').default('text').notNull(),
+  extension: text('file_extension').default('txt').notNull(),
+  content: text('content').notNull(),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+
+  neptun_user_id: integer('neptun_user_id')
+    .notNull()
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
+  template_collection_id: integer('template_collection_id')
+    .references(() => neptun_user_template_collection.id, { onDelete: 'cascade' }),
+})
+
+type NewTemplate = typeof neptun_user_template.$inferInsert
+type GetTemplate = typeof neptun_user_template.$inferSelect
+
+export type TemplateToCreate = Omit<NewTemplate, 'id' | 'created_at' | 'updated_at'>
+export type ReadTemplate = GetTemplate
+
+/* USERS TEMPLATE COLLECTIONS */
+
+export const neptun_user_template_collection = pgTable('neptun_user_template_collection', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  is_shared: boolean('is_shared').default(false).notNull(),
+  share_uuid: uuid('share_id').defaultRandom().notNull().unique(),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+
+  neptun_user_id: integer('neptun_user_id')
+    .notNull()
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
+})
+
+type NewTemplateCollection = typeof neptun_user_template_collection.$inferInsert
+type GetTemplateCollection = typeof neptun_user_template_collection.$inferSelect
+
+export type TemplateCollectionToCreate = Omit<NewTemplateCollection, 'id' | 'share_uuid' | 'created_at' | 'updated_at'>
+export type ReadTemplateCollection = GetTemplateCollection
+
 /* OAuth ACCOUNTS */
 
 export const POSSIBLE_OAUTH_PROVIDERS = pgEnum('oauth_provider_enum', [
