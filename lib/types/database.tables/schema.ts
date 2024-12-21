@@ -57,16 +57,14 @@ export const SelectUserSchema = SelectUserSchemaBase.pick({
   updated_at: true,
 })
 
-/* USERS TEMPLATES */
+/* USER FILES */
 
-export const neptun_user_template = pgTable('neptun_user_template', {
+export const neptun_user_file = pgTable('neptun_user_file', {
   id: serial('id').primaryKey(),
-  title: text('title').notNull(),
-  description: text('description'),
-  file_name: text('file_name').notNull(),
+  title: text('title'),
+  text: text('text').notNull(),
   language: text('language').default('text').notNull(),
   extension: text('file_extension').default('txt').notNull(),
-  content: text('content').notNull(),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at')
     .defaultNow()
@@ -75,15 +73,22 @@ export const neptun_user_template = pgTable('neptun_user_template', {
   neptun_user_id: integer('neptun_user_id')
     .notNull()
     .references(() => neptun_user.id, { onDelete: 'cascade' }),
-  template_collection_id: integer('template_collection_id')
-    .references(() => neptun_user_template_collection.id, { onDelete: 'cascade' }),
 })
 
-type NewTemplate = typeof neptun_user_template.$inferInsert
-type GetTemplate = typeof neptun_user_template.$inferSelect
+type NewUserFile = typeof neptun_user_file.$inferInsert
+type GetUserFile = typeof neptun_user_file.$inferSelect
 
-export type TemplateToCreate = Omit<NewTemplate, 'id' | 'created_at' | 'updated_at'>
-export type ReadTemplate = GetTemplate
+export type UserFileToCreate = Omit<NewUserFile, 'id' | 'created_at' | 'updated_at'>
+export type ReadUserFile = GetUserFile
+
+const InsertUserFileSchemaBase = createInsertSchema(neptun_user_file)
+export const InsertUserFileSchema = InsertUserFileSchemaBase.pick({
+  title: true,
+  text: true,
+  language: true,
+  extension: true,
+})
+export const SelectUserFileSchema = createSelectSchema(neptun_user_file)
 
 /* USERS TEMPLATE COLLECTIONS */
 
@@ -108,6 +113,32 @@ type GetTemplateCollection = typeof neptun_user_template_collection.$inferSelect
 
 export type TemplateCollectionToCreate = Omit<NewTemplateCollection, 'id' | 'share_uuid' | 'created_at' | 'updated_at'>
 export type ReadTemplateCollection = GetTemplateCollection
+
+/* USERS TEMPLATES */
+
+export const neptun_user_template = pgTable('neptun_user_template', {
+  id: serial('id').primaryKey(),
+  description: text('description'),
+  file_name: text('file_name').notNull(),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+
+  neptun_user_id: integer('neptun_user_id')
+    .notNull()
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
+  template_collection_id: integer('template_collection_id')
+    .references(() => neptun_user_template_collection.id, { onDelete: 'cascade' }),
+  user_file_id: integer('user_file_id')
+    .references(() => neptun_user_file.id, { onDelete: 'cascade' }),
+})
+
+type NewTemplate = typeof neptun_user_template.$inferInsert
+type GetTemplate = typeof neptun_user_template.$inferSelect
+
+export type TemplateToCreate = Omit<NewTemplate, 'id' | 'created_at' | 'updated_at'>
+export type ReadTemplate = GetTemplate
 
 /* OAuth ACCOUNTS */
 
@@ -366,10 +397,6 @@ export const SelectChatConversationMessageSchema = createSelectSchema(
 // const POSSIBLE_CHAT_CONVERSATION_FILE_EXTENSIONS = pgEnum('chat_conversation_file_extensions_enum', Object.values(supportedFileExtensionsMap) as [string, ...string[]]);
 export const chat_conversation_file = pgTable('chat_conversation_file', {
   id: serial('id').primaryKey(),
-  title: text('title'),
-  language: text('language').default('text').notNull(),
-  extension: text('file_extension').default('txt').notNull(),
-  text: text('text').notNull(),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at')
     .defaultNow()
@@ -385,6 +412,9 @@ export const chat_conversation_file = pgTable('chat_conversation_file', {
   chat_conversation_message_id: integer('chat_conversation_message_id')
     .notNull()
     .references(() => chat_conversation_message.id, { onDelete: 'cascade' }),
+  neptun_user_file_id: integer('neptun_user_file_id')
+    .notNull()
+    .references(() => neptun_user_file.id, { onDelete: 'cascade' }),
 })
 
 type NewChatConversationFile = typeof chat_conversation_file.$inferInsert
@@ -392,21 +422,27 @@ type GetChatConversationFile = typeof chat_conversation_file.$inferSelect
 
 export type ChatConversationFileToCreate = Omit<
   NewChatConversationFile,
-  'id' | 'created_at' | 'updated_at'
->
-export type ReadChatConversationFile = GetChatConversationFile
+  'id' | 'created_at' | 'updated_at' | 'neptun_user_file_id'
+> & Pick<UserFileToCreate, 'title' | 'text' | 'language' | 'extension'>
 
-const InsertFileSchemaBase = createInsertSchema(chat_conversation_file)
-export const InsertFileSchema = InsertFileSchemaBase.pick({
-  title: true,
-  language: true,
-  extension: true,
-  text: true,
-}) // neptun_user_id: true, chat_conversation_id: true, chat_conversation_message_id: true
+export type ReadChatConversationFile = Omit<
+  GetChatConversationFile,
+  'neptun_user_file_id'
+> & Pick<ReadUserFile, 'title' | 'text' | 'language' | 'extension'>
+
+const InsertChatFileSchemaBase = createInsertSchema(chat_conversation_file)
+export const InsertChatFileSchema = InsertChatFileSchemaBase.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+  neptun_user_file_id: true,
+}).merge(InsertUserFileSchema)
+
 export const InsertFileUniversalSchema = z
-  .object({ files: z.array(InsertFileSchema) })
-  .or(InsertFileSchema) // files: [] could be shortened to []
-export const SelectFileSchema = createSelectSchema(chat_conversation_file)
+  .object({ files: z.array(InsertChatFileSchema) })
+  .or(InsertChatFileSchema) // files: [] could be shortened to []
+
+export const SelectChatFileSchema = createSelectSchema(chat_conversation_file)
 
 /* GITHUB APP INSTALLATION */
 

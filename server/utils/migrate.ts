@@ -4,19 +4,34 @@ import { migrate as neonMigrate } from 'drizzle-orm/neon-serverless/migrator'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import postgres from 'postgres'
-import { connectionString, databaseMap } from './db'
+import { databaseMap } from './db'
 import { IS_DEV, IS_SERVERLESS } from './globals' // needed, if run as package.json script
+
+const environment = process.argv[2]?.split('=')[1] || 'dev'
+console.log('Running migrations for environment:', environment)
+if (IS_DEV) {
+  console.log('Database connection string:', process.env.DEVELOPMENT_DATABASE_CONNECTION_STRING)
+}
+console.log()
+
+export const databaseMigrationConnectionString = (environment === 'prod'
+  ? process.env.PRODUCTION_DATABASE_CONNECTION_STRING
+  : process.env.DEVELOPMENT_DATABASE_CONNECTION_STRING)
+|| 'postgresql://postgres:postgres@localhost:5432/postgres'
+export const migrationFolder = (environment === 'prod'
+  ? './server/database/migrations-prod'
+  : './server/database/migrations-dev')
 
 async function migrateDatabase() {
   if (IS_SERVERLESS) {
-    const migrationClient = new NeonPostgres(connectionString)
+    const migrationClient = new NeonPostgres(databaseMigrationConnectionString)
 
     const drizzleClient = neonDrizzle(migrationClient, {
       schema: databaseMap,
     })
 
     return neonMigrate(drizzleClient, {
-      migrationsFolder: 'server/database/migrations',
+      migrationsFolder: migrationFolder,
     })
       .then(() => {
         if (IS_DEV) {
@@ -43,14 +58,14 @@ async function migrateDatabase() {
       })
   }
 
-  const migrationClient = postgres(connectionString, { max: 1 })
+  const migrationClient = postgres(databaseMigrationConnectionString, { max: 1 })
 
   const drizzleClient = drizzle(migrationClient, {
     schema: databaseMap,
   })
 
   return migrate(drizzleClient, {
-    migrationsFolder: 'server/database/migrations',
+    migrationsFolder: migrationFolder,
   })
     .then(() => {
       if (IS_DEV) {
@@ -74,12 +89,14 @@ async function migrateDatabase() {
 
 export default migrateDatabase
 
-void (async () => {
-  try {
-    await migrateDatabase()
-    process.exit(0)
-  } catch (error) {
-    console.error('Failed to migrate database:', error)
-    process.exit(1)
-  }
-})()
+if (require.main === module || import.meta.url === import.meta.resolve('./migrate.ts')) {
+  void (async () => {
+    try {
+      await migrateDatabase()
+      process.exit(0)
+    } catch (error) {
+      console.error('Failed to migrate database:', error)
+      process.exit(1)
+    }
+  })()
+}

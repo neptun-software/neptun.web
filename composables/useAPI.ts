@@ -127,6 +127,12 @@ export function useAPI() {
     const { aiPlaygroundChatMessages: messagesRef } = useAiChatPlayground()
     const messages = messagesRef.value
 
+    console.log('Starting message persistence with:', {
+      user_id,
+      chat_id,
+      messages,
+    })
+
     if (!messages) {
       console.error('No messages to persist!')
       return
@@ -139,6 +145,11 @@ export function useAPI() {
         body: { messages },
         lazy: true,
       }
+
+      console.log('Attempting to persist messages with:', {
+        url,
+        options,
+      })
 
       const toastMessages = {
         loading: 'Persisting chat messages...',
@@ -153,22 +164,31 @@ export function useAPI() {
           chatMessages: ReadChatConversationMessage[]
         }>(url, options, toastMessages)
 
+        console.log('Messages persisted successfully:', messagesPersisted)
+
         for (const message of messagesPersisted.chatMessages) {
           if (message.actor === 'assistant') {
             try {
-              await persistCodeBlocks(
+              console.log('Attempting to persist code blocks for message:', message.id)
+
+              const codeBlocksResult = await persistCodeBlocks(
                 message.neptun_user_id,
                 message.chat_conversation_id,
                 message.id,
                 message.message,
               )
-            } catch {
-              console.error('Failed to persist code blocks!')
+
+              console.log('Code blocks persistence result:', codeBlocksResult)
+            } catch (error) {
+              console.error('Failed to persist code blocks!', error)
             }
           }
         }
-      } catch {
-        console.error('Failed to persist chat messages!')
+      } catch (error) {
+        console.error('Failed to persist chat messages!', {
+          error,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        })
       }
 
       messagesRef.value = []
@@ -223,23 +243,33 @@ export function useAPI() {
 
       if (codeBlocks.length > 0) {
         try {
+          const files = codeBlocks.map(block => ({
+            neptun_user_id: user_id,
+            chat_conversation_id: chat_id,
+            chat_conversation_message_id: message_id,
+            title: block.title,
+            text: block.text,
+            language: block.language,
+            extension: block.extension,
+          }))
+
+          const requestBody = files.length === 1 ? files[0] : { files }
+
           const persistedCodeBlocks = await $fetch(
             `/api/users/${user_id}/chats/${chat_id}/files/${message_id}`,
             {
               method: 'POST',
-              body: {
-                files: codeBlocks,
-              },
+              body: requestBody,
             },
           )
 
           return persistedCodeBlocks
-        } catch {
-          console.error('Failed to persist code blocks!')
+        } catch (error) {
+          console.error('Failed to persist code blocks!', error)
         }
       }
-    } catch {
-      console.error('Failed to parse code blocks!')
+    } catch (error) {
+      console.error('Failed to parse code blocks!', error)
     }
 
     return null
@@ -391,12 +421,12 @@ export function useFetchFiles() {
       }
 
       try {
-        const _data = await $fetch(
+        const data = await $fetch<{ chatFiles: ReadChatConversationFile[] }>(
           `/api/users/${user_id}/chats/${chat_id}/files`,
         )
-        if (_data.chatFiles && _data.chatFiles.length > 0) {
-          const chatFiles = _data.chatFiles
-          fetchedFiles.value = (chatFiles as ReadChatConversationFile[]) ?? []
+
+        if (data.chatFiles && data.chatFiles.length > 0) {
+          fetchedFiles.value = data.chatFiles
         }
       } catch {
         console.error('Failed to fetch files!')

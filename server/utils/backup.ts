@@ -13,7 +13,7 @@ async function backupDatabase() {
 
     await mkdir(backupDir, { recursive: true })
 
-    const connectionString = process.env.DATABASE_CONNECTION_STRING || 'postgresql://postgres:postgres@localhost:5432/postgres'
+    const connectionString = process.env.PRODUCTION_DATABASE_CONNECTION_STRING || 'postgresql://postgres:postgres@localhost:5432/postgres'
 
     const url = new URL(connectionString)
     const [username, password] = url.username.includes(':')

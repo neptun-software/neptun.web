@@ -16,7 +16,7 @@ export default defineCachedEventHandler(async (event) => {
   const uuid = maybeUuid.data?.uuid
 
   const collection = await readTemplateCollection(uuid)
-  
+
   if (!collection) {
     return sendError(
       event,

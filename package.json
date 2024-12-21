@@ -23,11 +23,16 @@
     "info": "npx nuxi info",
     "find-version": "node ./info/find-package-version.cjs",
     "statistics": "npx nuxi analyze",
-    "db:push": "drizzle-kit push --config drizzle.config.ts",
-    "db:pull": "drizzle-kit introspect --config drizzle.config.ts",
-    "db:generate": "drizzle-kit generate --dialect postgresql --schema ./lib/types/database.tables/schema.ts --out=./server/database/migrations",
-    "db:migrate": "bun run ./server/utils/migrate.ts",
-    "db:studio": "drizzle-kit studio --config drizzle.config.ts --host 127.0.0.1",
+    "db:push": "drizzle-kit push --config drizzle-dev.config.ts",
+    "db:push:prod": "drizzle-kit push --config drizzle-prod.config.ts",
+    "db:pull": "drizzle-kit introspect --config drizzle-dev.config.ts",
+    "db:pull:prod": "drizzle-kit introspect --config drizzle-prod.config.ts",
+    "db:generate": "drizzle-kit generate --config=drizzle-dev.config.ts",
+    "db:generate:prod": "drizzle-kit generate --config=drizzle-prod.config.ts",
+    "db:migrate": "bun run ./server/utils/migrate.ts environment=dev",
+    "db:migrate:prod": "bun run ./server/utils/migrate.ts environment=prod",
+    "db:studio": "drizzle-kit studio --config drizzle-dev.config.ts --host 127.0.0.1",
+    "db:studio:prod": "drizzle-kit studio --config drizzle-prod.config.ts --host 127.0.0.1",
     "db:dump-data": "bun run ./server/utils/backup.ts",
     "db:dump-schema": "bun run ./server/utils/backup.ts --schema-only",
     "db:mermaid": "bun run ./server/utils/schema-to-mermaid.ts",
@@ -96,7 +101,7 @@
     "@iconify-json/radix-icons": "^1.2.1",
     "@iconify/vue": "^4.1.2",
     "@mermaid-js/mermaid-cli": "^11.4.2",
-    "@nuxt/eslint": "^0.6.1",
+    "@nuxt/eslint": "^0.7.4",
     "@nuxtjs/color-mode": "^3.5.2",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@tailwindcss/typography": "^0.5.15",
@@ -118,7 +123,8 @@
   },
   "pnpm": {
     "overrides": {
-      "drizzle-orm": "^0.33.0"
+      "drizzle-kit": "0.24.2",
+      "drizzle-orm": "0.33.0"
     }
   }
 }

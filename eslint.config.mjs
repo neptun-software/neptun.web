@@ -40,7 +40,6 @@ export default withNuxt(
       // https://typescript-eslint.io/rules/ban-ts-comment
       'ts/no-unsafe-assignment': 'off', // temporarily disabled
       'unused-imports/no-unused-vars': 'off', // some are used in template tags, which causes false positives
-      /* 'ts/no-use-before-define': 'off', */
       '@typescript-eslint/ban-ts-comment': 'off',
       'ts/ban-ts-comment': 'off',
       'node/prefer-global/process': 'off',
@@ -60,6 +59,12 @@ export default withNuxt(
     files: ['**/*.md'],
     rules: {
       'no-irregular-whitespace': 'off',
+    },
+  },
+  {
+    files: ['**/migrations-prod/schema.ts', '**/migrations-dev/schema.ts'],
+    rules: {
+      'ts/no-use-before-define': 'off',
     },
   },
 )

@@ -1,6 +1,6 @@
 {
-  "id": "6c56e55a-7891-42eb-b9a5-254cf064566f",
-  "prevId": "38d7fa47-9a76-4652-a493-5bb7fb206279",
+  "id": "c774118e-97ad-450e-bd79-4d81039fa52d",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -77,32 +77,6 @@
           "primaryKey": true,
           "notNull": true
         },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "language": {
-          "name": "language",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'text'"
-        },
-        "file_extension": {
-          "name": "file_extension",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'txt'"
-        },
-        "text": {
-          "name": "text",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -131,6 +105,12 @@
         },
         "chat_conversation_message_id": {
           "name": "chat_conversation_message_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "neptun_user_file_id": {
+          "name": "neptun_user_file_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -170,6 +150,19 @@
           "tableTo": "chat_conversation_message",
           "columnsFrom": [
             "chat_conversation_message_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "chat_conversation_file_neptun_user_file_id_neptun_user_file_id_fk": {
+          "name": "chat_conversation_file_neptun_user_file_id_neptun_user_file_id_fk",
+          "tableFrom": "chat_conversation_file",
+          "tableTo": "neptun_user_file",
+          "columnsFrom": [
+            "neptun_user_file_id"
           ],
           "columnsTo": [
             "id"
@@ -264,8 +257,169 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.chat_github_app_installation": {
-      "name": "chat_github_app_installation",
+    "public.chat_conversation_share": {
+      "name": "chat_conversation_share",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "is_shared": {
+          "name": "is_shared",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "share_id": {
+          "name": "share_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "is_protected": {
+          "name": "is_protected",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "hashed_password": {
+          "name": "hashed_password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "chat_conversation_id": {
+          "name": "chat_conversation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chat_conversation_share_chat_conversation_id_chat_conversation_id_fk": {
+          "name": "chat_conversation_share_chat_conversation_id_chat_conversation_id_fk",
+          "tableFrom": "chat_conversation_share",
+          "tableTo": "chat_conversation",
+          "columnsFrom": [
+            "chat_conversation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "chat_conversation_share_share_id_unique": {
+          "name": "chat_conversation_share_share_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "share_id"
+          ]
+        },
+        "chat_conversation_share_chat_conversation_id_unique": {
+          "name": "chat_conversation_share_chat_conversation_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "chat_conversation_id"
+          ]
+        }
+      }
+    },
+    "public.chat_conversation_share_whitelist_entry": {
+      "name": "chat_conversation_share_whitelist_entry",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "whitelisted_neptun_user_id": {
+          "name": "whitelisted_neptun_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "chat_conversation_share_id": {
+          "name": "chat_conversation_share_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chat_conversation_share_whitelist_entry_whitelisted_neptun_user_id_neptun_user_id_fk": {
+          "name": "chat_conversation_share_whitelist_entry_whitelisted_neptun_user_id_neptun_user_id_fk",
+          "tableFrom": "chat_conversation_share_whitelist_entry",
+          "tableTo": "neptun_user",
+          "columnsFrom": [
+            "whitelisted_neptun_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "chat_conversation_share_whitelist_entry_chat_conversation_share_id_chat_conversation_share_id_fk": {
+          "name": "chat_conversation_share_whitelist_entry_chat_conversation_share_id_chat_conversation_share_id_fk",
+          "tableFrom": "chat_conversation_share_whitelist_entry",
+          "tableTo": "chat_conversation_share",
+          "columnsFrom": [
+            "chat_conversation_share_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.github_app_installation": {
+      "name": "github_app_installation",
       "schema": "",
       "columns": {
         "id": {
@@ -321,9 +475,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "chat_github_app_installation_neptun_user_id_neptun_user_id_fk": {
-          "name": "chat_github_app_installation_neptun_user_id_neptun_user_id_fk",
-          "tableFrom": "chat_github_app_installation",
+        "github_app_installation_neptun_user_id_neptun_user_id_fk": {
+          "name": "github_app_installation_neptun_user_id_neptun_user_id_fk",
+          "tableFrom": "github_app_installation",
           "tableTo": "neptun_user",
           "columnsFrom": [
             "neptun_user_id"
@@ -440,8 +594,8 @@
           "notNull": false,
           "default": "now()"
         },
-        "chat_github_app_installation_id": {
-          "name": "chat_github_app_installation_id",
+        "github_app_installation_id": {
+          "name": "github_app_installation_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -449,12 +603,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "github_app_installation_repository_chat_github_app_installation_id_chat_github_app_installation_id_fk": {
-          "name": "github_app_installation_repository_chat_github_app_installation_id_chat_github_app_installation_id_fk",
+        "github_app_installation_repository_github_app_installation_id_github_app_installation_id_fk": {
+          "name": "github_app_installation_repository_github_app_installation_id_github_app_installation_id_fk",
           "tableFrom": "github_app_installation_repository",
-          "tableTo": "chat_github_app_installation",
+          "tableTo": "github_app_installation",
           "columnsFrom": [
-            "chat_github_app_installation_id"
+            "github_app_installation_id"
           ],
           "columnsTo": [
             "id"
@@ -515,6 +669,82 @@
           ]
         }
       }
+    },
+    "public.neptun_user_file": {
+      "name": "neptun_user_file",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'text'"
+        },
+        "file_extension": {
+          "name": "file_extension",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'txt'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "neptun_user_id": {
+          "name": "neptun_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "neptun_user_file_neptun_user_id_neptun_user_id_fk": {
+          "name": "neptun_user_file_neptun_user_id_neptun_user_id_fk",
+          "tableFrom": "neptun_user_file",
+          "tableTo": "neptun_user",
+          "columnsFrom": [
+            "neptun_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     },
     "public.neptun_user_oauth_account": {
       "name": "neptun_user_oauth_account",
@@ -584,6 +814,190 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
+    },
+    "public.neptun_user_template": {
+      "name": "neptun_user_template",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "file_name": {
+          "name": "file_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "neptun_user_id": {
+          "name": "neptun_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "template_collection_id": {
+          "name": "template_collection_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_file_id": {
+          "name": "user_file_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "neptun_user_template_neptun_user_id_neptun_user_id_fk": {
+          "name": "neptun_user_template_neptun_user_id_neptun_user_id_fk",
+          "tableFrom": "neptun_user_template",
+          "tableTo": "neptun_user",
+          "columnsFrom": [
+            "neptun_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "neptun_user_template_template_collection_id_neptun_user_template_collection_id_fk": {
+          "name": "neptun_user_template_template_collection_id_neptun_user_template_collection_id_fk",
+          "tableFrom": "neptun_user_template",
+          "tableTo": "neptun_user_template_collection",
+          "columnsFrom": [
+            "template_collection_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "neptun_user_template_user_file_id_neptun_user_file_id_fk": {
+          "name": "neptun_user_template_user_file_id_neptun_user_file_id_fk",
+          "tableFrom": "neptun_user_template",
+          "tableTo": "neptun_user_file",
+          "columnsFrom": [
+            "user_file_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.neptun_user_template_collection": {
+      "name": "neptun_user_template_collection",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_shared": {
+          "name": "is_shared",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "share_id": {
+          "name": "share_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "neptun_user_id": {
+          "name": "neptun_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "neptun_user_template_collection_neptun_user_id_neptun_user_id_fk": {
+          "name": "neptun_user_template_collection_neptun_user_id_neptun_user_id_fk",
+          "tableFrom": "neptun_user_template_collection",
+          "tableTo": "neptun_user",
+          "columnsFrom": [
+            "neptun_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "neptun_user_template_collection_share_id_unique": {
+          "name": "neptun_user_template_collection_share_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "share_id"
+          ]
+        }
+      }
     }
   },
   "enums": {
@@ -591,8 +1005,9 @@
       "name": "ai_model_enum",
       "schema": "public",
       "values": [
+        "mistralai/Mistral-7B-Instruct-v0.1",
         "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
-        "mistralai/Mistral-7B-Instruct-v0.1"
+        "meta-llama/Meta-Llama-3-8B-Instruct"
       ]
     },
     "public.chat_conversation_message_actor_enum": {

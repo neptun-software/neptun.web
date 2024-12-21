@@ -57,7 +57,7 @@ export default defineNuxtConfig({
     },
   ],
   devtools: {
-    enabled: false,
+    enabled: true,
     componentInspector: false, // https://github.com/nuxt/devtools/issues/722
     timeline: {
       enabled: false,
@@ -292,7 +292,12 @@ export default defineNuxtConfig({
 
   vite: {
     logLevel: 'warn', // 'info' | 'warn' | 'error' | 'silent'
-    plugins: [removeConsole()],
+    plugins:
+      NODE_ENV !== 'development'
+        ? [
+          removeConsole(),
+        ]
+        : [],
     css: {
       preprocessorOptions: {
         sass: {

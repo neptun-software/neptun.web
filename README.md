@@ -69,6 +69,125 @@ or
 docker compose -f ./configurations/production/docker-compose.yml -f ./configurations/development/docker-compose.yml up --build
 ```
 
+### Database Commands
+
+> Those commands are postgres specific.
+
+Get all enum values:
+
+```bash
+SELECT typname, enumlabel
+FROM pg_enum e
+JOIN pg_type t ON e.enumtypid = t.oid;
+```
+
+Get specific enum values:
+
+```sql
+SELECT unnest(enum_range(NULL::<enum_name>));
+```
+
+Update enum values (if the migration get's messed up somehow):
+
+```sql
+ALTER TYPE <enum_name> RENAME TO <enum_name>_old;
+CREATE TYPE <enum_name> AS ENUM (
+    'Value1',
+    'Value2',
+);
+ALTER TABLE <table_name>
+  ALTER COLUMN <column_name> TYPE <enum_name>
+  USING (
+    CASE <column_name>::text
+      WHEN 'removedValue' THEN 'existingValue'
+      ELSE <column_name>::text
+    END::<enum_name>
+  );
+DROP TYPE <enum_name>_old;
+```
+
+#### Overview
+
+> These commands help manage your database schema and migrations using Drizzle ORM.
+
+#### Commands in Order of Common Usage
+
+```bash
+# 1. Pull existing schema from database (if you have an existing database)
+npm run db:pull        # Pulls current database schema into TypeScript files
+
+# 2. Generate SQL migrations from schema changes
+npm run db:generate    # Creates SQL migration files based on schema changes
+
+# 3. Apply migrations to database
+npm run db:migrate     # Executes pending SQL migrations on the database
+
+# 4. (Alternative to 2+3) Push schema changes directly
+npm run db:push        # Directly applies schema changes without migration files
+                       # ⚠️ Use only in development! Not recommended for production
+
+# Development Tools
+npm run db:studio      # Opens Drizzle Studio for visual database management
+```
+
+#### When to Use Which Command
+
+- **db:pull**
+
+  - When starting work with an existing database
+  - To sync your TypeScript schema with database changes made outside your codebase
+  - For database-first development approach
+
+- **db:generate**
+
+  - After making changes to your schema TypeScript files
+  - When you need SQL migration files for version control
+  - Before deploying to production
+  - For team collaboration
+
+- **db:migrate**
+
+  - After generating migration files
+  - When deploying to production
+  - To apply pending migrations in a controlled manner
+  - For tracking migration history
+
+- **db:push**
+
+  - During local development for quick iterations
+  - For prototyping
+  - ⚠️ Never use in production - it can lead to data loss
+  - When migration history is not important
+
+- **db:studio**
+  - For visual database inspection
+  - To manage data during development
+  - For debugging database state
+
+#### Best Practices
+
+1. **Development Workflow**
+
+   ```bash
+   # Make schema changes in TypeScript
+   npm run db:generate  # Create migration files
+   npm run db:migrate   # Apply migrations
+   ```
+
+2. **Production Workflow**
+
+   ```bash
+   # Never use db:push in production!
+   npm run db:generate  # Create migration files
+   # Review migrations
+   npm run db:migrate   # Apply migrations
+   ```
+
+3. **Team Collaboration**
+   - Always commit migration files to version control
+   - Use `db:generate` and `db:migrate` instead of `db:push`
+   - Pull latest migrations before making schema changes
+
 ### Schema
 
 #### Exporting

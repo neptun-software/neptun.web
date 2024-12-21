@@ -1,6 +1,6 @@
 {
-  "id": "721bc304-7952-4c8a-b018-265735f14c90",
-  "prevId": "91faf3cd-118d-4293-a3ea-0a5505a4e84f",
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -41,8 +41,8 @@
           "notNull": false,
           "default": "now()"
         },
-        "chat_user_id": {
-          "name": "chat_user_id",
+        "neptun_user_id": {
+          "name": "neptun_user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -50,12 +50,13 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "chat_conversation_chat_user_id_chat_user_id_fk": {
-          "name": "chat_conversation_chat_user_id_chat_user_id_fk",
+        "chat_conversation_neptun_user_id_neptun_user_id_fk": {
+          "name": "chat_conversation_neptun_user_id_neptun_user_id_fk",
           "tableFrom": "chat_conversation",
-          "tableTo": "chat_user",
+          "tableTo": "neptun_user",
+          "schemaTo": "public",
           "columnsFrom": [
-            "chat_user_id"
+            "neptun_user_id"
           ],
           "columnsTo": [
             "id"
@@ -117,8 +118,8 @@
           "notNull": false,
           "default": "now()"
         },
-        "chat_user_id": {
-          "name": "chat_user_id",
+        "neptun_user_id": {
+          "name": "neptun_user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -138,12 +139,13 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "chat_conversation_file_chat_user_id_chat_user_id_fk": {
-          "name": "chat_conversation_file_chat_user_id_chat_user_id_fk",
+        "chat_conversation_file_neptun_user_id_neptun_user_id_fk": {
+          "name": "chat_conversation_file_neptun_user_id_neptun_user_id_fk",
           "tableFrom": "chat_conversation_file",
-          "tableTo": "chat_user",
+          "tableTo": "neptun_user",
+          "schemaTo": "public",
           "columnsFrom": [
-            "chat_user_id"
+            "neptun_user_id"
           ],
           "columnsTo": [
             "id"
@@ -151,10 +153,11 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "chat_conversation_file_chat_conversation_id_chat_conversation_id_fk": {
-          "name": "chat_conversation_file_chat_conversation_id_chat_conversation_id_fk",
+        "chat_conversation_file_chat_conversation_id_chat_conversation_i": {
+          "name": "chat_conversation_file_chat_conversation_id_chat_conversation_i",
           "tableFrom": "chat_conversation_file",
           "tableTo": "chat_conversation",
+          "schemaTo": "public",
           "columnsFrom": [
             "chat_conversation_id"
           ],
@@ -164,10 +167,11 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "chat_conversation_file_chat_conversation_message_id_chat_conversation_message_id_fk": {
-          "name": "chat_conversation_file_chat_conversation_message_id_chat_conversation_message_id_fk",
+        "chat_conversation_file_chat_conversation_message_id_chat_conver": {
+          "name": "chat_conversation_file_chat_conversation_message_id_chat_conver",
           "tableFrom": "chat_conversation_file",
           "tableTo": "chat_conversation_message",
+          "schemaTo": "public",
           "columnsFrom": [
             "chat_conversation_message_id"
           ],
@@ -219,8 +223,8 @@
           "notNull": false,
           "default": "now()"
         },
-        "chat_user_id": {
-          "name": "chat_user_id",
+        "neptun_user_id": {
+          "name": "neptun_user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -234,12 +238,13 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "chat_conversation_message_chat_user_id_chat_user_id_fk": {
-          "name": "chat_conversation_message_chat_user_id_chat_user_id_fk",
+        "chat_conversation_message_neptun_user_id_neptun_user_id_fk": {
+          "name": "chat_conversation_message_neptun_user_id_neptun_user_id_fk",
           "tableFrom": "chat_conversation_message",
-          "tableTo": "chat_user",
+          "tableTo": "neptun_user",
+          "schemaTo": "public",
           "columnsFrom": [
-            "chat_user_id"
+            "neptun_user_id"
           ],
           "columnsTo": [
             "id"
@@ -247,10 +252,11 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "chat_conversation_message_chat_conversation_id_chat_conversation_id_fk": {
-          "name": "chat_conversation_message_chat_conversation_id_chat_conversation_id_fk",
+        "chat_conversation_message_chat_conversation_id_chat_conversatio": {
+          "name": "chat_conversation_message_chat_conversation_id_chat_conversatio",
           "tableFrom": "chat_conversation_message",
           "tableTo": "chat_conversation",
+          "schemaTo": "public",
           "columnsFrom": [
             "chat_conversation_id"
           ],
@@ -264,8 +270,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.chat_github_app_installation": {
-      "name": "chat_github_app_installation",
+    "public.github_app_installation": {
+      "name": "github_app_installation",
       "schema": "",
       "columns": {
         "id": {
@@ -288,7 +294,7 @@
         },
         "github_account_id": {
           "name": "github_account_id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -296,7 +302,7 @@
           "name": "github_account_name",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -312,8 +318,8 @@
           "notNull": false,
           "default": "now()"
         },
-        "chat_user_id": {
-          "name": "chat_user_id",
+        "neptun_user_id": {
+          "name": "neptun_user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -321,12 +327,13 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "chat_github_app_installation_chat_user_id_chat_user_id_fk": {
-          "name": "chat_github_app_installation_chat_user_id_chat_user_id_fk",
-          "tableFrom": "chat_github_app_installation",
-          "tableTo": "chat_user",
+        "github_app_installation_neptun_user_id_neptun_user_id_fk": {
+          "name": "github_app_installation_neptun_user_id_neptun_user_id_fk",
+          "tableFrom": "github_app_installation",
+          "tableTo": "neptun_user",
+          "schemaTo": "public",
           "columnsFrom": [
-            "chat_user_id"
+            "neptun_user_id"
           ],
           "columnsTo": [
             "id"
@@ -338,8 +345,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.chat_github_app_installation_repositories": {
-      "name": "chat_github_app_installation_repositories",
+    "public.github_app_installation_repository": {
+      "name": "github_app_installation_repository",
       "schema": "",
       "columns": {
         "id": {
@@ -350,7 +357,7 @@
         },
         "github_repository_id": {
           "name": "github_repository_id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -360,8 +367,68 @@
           "primaryKey": false,
           "notNull": true
         },
+        "github_repository_description": {
+          "name": "github_repository_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "github_repository_size": {
+          "name": "github_repository_size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "github_repository_language": {
+          "name": "github_repository_language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "github_repository_license": {
+          "name": "github_repository_license",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "github_repository_url": {
+          "name": "github_repository_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "github_repository_website_url": {
+          "name": "github_repository_website_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "github_repository_default_branch": {
+          "name": "github_repository_default_branch",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "github_repository_is_private": {
           "name": "github_repository_is_private",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "github_repository_is_fork": {
+          "name": "github_repository_is_fork",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "github_repository_is_template": {
+          "name": "github_repository_is_template",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "github_repository_is_archived": {
+          "name": "github_repository_is_archived",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true
@@ -380,8 +447,8 @@
           "notNull": false,
           "default": "now()"
         },
-        "chat_github_app_installation_id": {
-          "name": "chat_github_app_installation_id",
+        "github_app_installation_id": {
+          "name": "github_app_installation_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -389,12 +456,13 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "chat_github_app_installation_repositories_chat_github_app_installation_id_chat_github_app_installation_id_fk": {
-          "name": "chat_github_app_installation_repositories_chat_github_app_installation_id_chat_github_app_installation_id_fk",
-          "tableFrom": "chat_github_app_installation_repositories",
-          "tableTo": "chat_github_app_installation",
+        "github_app_installation_repository_github_app_installation_id_g": {
+          "name": "github_app_installation_repository_github_app_installation_id_g",
+          "tableFrom": "github_app_installation_repository",
+          "tableTo": "github_app_installation",
+          "schemaTo": "public",
           "columnsFrom": [
-            "chat_github_app_installation_id"
+            "github_app_installation_id"
           ],
           "columnsTo": [
             "id"
@@ -406,8 +474,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.chat_user": {
-      "name": "chat_user",
+    "public.neptun_user": {
+      "name": "neptun_user",
       "schema": "",
       "columns": {
         "id": {
@@ -447,17 +515,17 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "chat_user_primary_email_unique": {
-          "name": "chat_user_primary_email_unique",
-          "nullsNotDistinct": false,
+        "neptun_user_primary_email_unique": {
           "columns": [
             "primary_email"
-          ]
+          ],
+          "nullsNotDistinct": false,
+          "name": "neptun_user_primary_email_unique"
         }
       }
     },
-    "public.chat_user_oauth_account": {
-      "name": "chat_user_oauth_account",
+    "public.neptun_user_oauth_account": {
+      "name": "neptun_user_oauth_account",
       "schema": "",
       "columns": {
         "id": {
@@ -499,8 +567,8 @@
           "notNull": false,
           "default": "now()"
         },
-        "chat_user_id": {
-          "name": "chat_user_id",
+        "neptun_user_id": {
+          "name": "neptun_user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -508,12 +576,177 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "chat_user_oauth_account_chat_user_id_chat_user_id_fk": {
-          "name": "chat_user_oauth_account_chat_user_id_chat_user_id_fk",
-          "tableFrom": "chat_user_oauth_account",
-          "tableTo": "chat_user",
+        "neptun_user_oauth_account_neptun_user_id_neptun_user_id_fk": {
+          "name": "neptun_user_oauth_account_neptun_user_id_neptun_user_id_fk",
+          "tableFrom": "neptun_user_oauth_account",
+          "tableTo": "neptun_user",
+          "schemaTo": "public",
           "columnsFrom": [
-            "chat_user_id"
+            "neptun_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.chat_conversation_share": {
+      "name": "chat_conversation_share",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "is_shared": {
+          "name": "is_shared",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "share_id": {
+          "name": "share_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "is_protected": {
+          "name": "is_protected",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "hashed_password": {
+          "name": "hashed_password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "chat_conversation_id": {
+          "name": "chat_conversation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chat_conversation_share_chat_conversation_id_chat_conversation_": {
+          "name": "chat_conversation_share_chat_conversation_id_chat_conversation_",
+          "tableFrom": "chat_conversation_share",
+          "tableTo": "chat_conversation",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "chat_conversation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "chat_conversation_share_share_id_unique": {
+          "columns": [
+            "share_id"
+          ],
+          "nullsNotDistinct": false,
+          "name": "chat_conversation_share_share_id_unique"
+        },
+        "chat_conversation_share_chat_conversation_id_unique": {
+          "columns": [
+            "chat_conversation_id"
+          ],
+          "nullsNotDistinct": false,
+          "name": "chat_conversation_share_chat_conversation_id_unique"
+        }
+      }
+    },
+    "public.chat_conversation_share_whitelist_entry": {
+      "name": "chat_conversation_share_whitelist_entry",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "whitelisted_neptun_user_id": {
+          "name": "whitelisted_neptun_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "chat_conversation_share_id": {
+          "name": "chat_conversation_share_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chat_conversation_share_whitelist_entry_whitelisted_neptun_user": {
+          "name": "chat_conversation_share_whitelist_entry_whitelisted_neptun_user",
+          "tableFrom": "chat_conversation_share_whitelist_entry",
+          "tableTo": "neptun_user",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "whitelisted_neptun_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "chat_conversation_share_whitelist_entry_chat_conversation_share": {
+          "name": "chat_conversation_share_whitelist_entry_chat_conversation_share",
+          "tableFrom": "chat_conversation_share_whitelist_entry",
+          "tableTo": "chat_conversation_share",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "chat_conversation_share_id"
           ],
           "columnsTo": [
             "id"
@@ -529,34 +762,38 @@
   "enums": {
     "public.ai_model_enum": {
       "name": "ai_model_enum",
-      "schema": "public",
       "values": [
         "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
-        "mistralai/Mistral-7B-Instruct-v0.1"
-      ]
+        "mistralai/Mistral-7B-Instruct-v0.1",
+        "meta-llama/Meta-Llama-3-8B-Instruct"
+      ],
+      "schema": "public"
     },
     "public.chat_conversation_message_actor_enum": {
       "name": "chat_conversation_message_actor_enum",
-      "schema": "public",
       "values": [
         "user",
         "assistant"
-      ]
+      ],
+      "schema": "public"
     },
     "public.oauth_provider_enum": {
       "name": "oauth_provider_enum",
-      "schema": "public",
       "values": [
         "github",
         "google"
-      ]
+      ],
+      "schema": "public"
     }
   },
   "schemas": {},
   "sequences": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
     "tables": {}
   }
 }

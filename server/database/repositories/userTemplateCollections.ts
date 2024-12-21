@@ -1,5 +1,7 @@
 import { eq } from 'drizzle-orm'
-import { neptun_user_template_collection } from '~/lib/types/database.tables/schema'
+import {
+  neptun_user_template_collection,
+} from '~/lib/types/database.tables/schema'
 
 // TODO: createTemplateCollection, updateTemplateCollection, deleteTemplateCollection
 
@@ -8,14 +10,13 @@ export async function readTemplateCollection(share_uuid: string) {
     where: eq(neptun_user_template_collection.share_uuid, share_uuid),
     with: {
       templates: {
+        with: {
+          neptun_user_file: true,
+        },
         columns: {
           id: true,
-          title: true,
           description: true,
           file_name: true,
-          language: true,
-          extension: true,
-          content: true,
           created_at: true,
           updated_at: true,
         },
@@ -31,9 +32,20 @@ export async function readTemplateCollection(share_uuid: string) {
     },
   })
 
-  if (!collection) {
+  if (!collection || !collection.templates) {
     return null
   }
 
-  return collection
+  // Transform the data to include file information
+  return {
+    ...collection,
+    templates: collection.templates
+      .map(template => ({
+        ...template,
+        title: template.neptun_user_file?.title,
+        text: template.neptun_user_file?.text,
+        language: template.neptun_user_file?.language || 'text',
+        extension: template.neptun_user_file?.extension || 'txt',
+      })),
+  }
 }
