@@ -35,7 +35,7 @@
     "db:diagram": "bun run db:mermaid && bun run db:png"
   },
   "dependencies": {
-    "@ai-sdk/vue": "^0.0.58",
+    "@ai-sdk/vue": "^1.0.0",
     "@formkit/auto-animate": "^0.8.2",
     "@huggingface/inference": "^2.8.1",
     "@neondatabase/serverless": "^0.10.1",
