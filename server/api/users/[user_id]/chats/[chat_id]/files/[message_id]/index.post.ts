@@ -26,12 +26,13 @@ export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, (body) => {
     return InsertFileUniversalSchema.safeParse(body)
   })
+
   if (!body.success || !body.data) {
     return sendError(
       event,
       createError({
         statusCode: 400,
-        statusMessage: 'Bad Request. Invalid body(file | files).',
+        statusMessage: 'Bad Request. Invalid body(file | files). [1]',
         data: body.error,
       }),
     )
@@ -88,7 +89,7 @@ export default defineEventHandler(async (event) => {
     event,
     createError({
       statusCode: 400,
-      statusMessage: 'Bad Request. Invalid body(file | files).',
+      statusMessage: 'Bad Request. Invalid body(file | files). [2]',
     }),
   )
 })

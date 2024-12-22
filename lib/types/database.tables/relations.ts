@@ -17,17 +17,17 @@ import {
 export const neptun_userRelations = relations(
   neptun_user,
   ({ many }) => ({
-  neptun_user_oauth_accounts: many(neptun_user_oauth_account),
-  github_app_installations: many(github_app_installation),
-  chat_conversations: many(chat_conversation),
-  chat_conversation_share_whitelists: many(
-    chat_conversation_share_whitelist_entry,
-  ),
-  chat_conversation_messages: many(chat_conversation_message),
-  chat_conversation_files: many(chat_conversation_file),
-  templates: many(neptun_user_template),
-  template_collections: many(neptun_user_template_collection),
-}))
+    neptun_user_oauth_accounts: many(neptun_user_oauth_account),
+    github_app_installations: many(github_app_installation),
+    chat_conversations: many(chat_conversation),
+    chat_conversation_share_whitelists: many(
+      chat_conversation_share_whitelist_entry,
+    ),
+    chat_conversation_messages: many(chat_conversation_message),
+    chat_conversation_files: many(chat_conversation_file),
+    templates: many(neptun_user_template),
+    template_collections: many(neptun_user_template_collection),
+  }))
 
 export const neptun_user_oauth_accountRelations = relations(
   neptun_user_oauth_account,
@@ -124,49 +124,49 @@ export const chat_conversation_messageRelations = relations(
 export const chat_conversation_fileRelations = relations(
   chat_conversation_file,
   ({ one }) => ({
-  neptun_user: one(neptun_user, {
-    fields: [chat_conversation_file.neptun_user_id],
-    references: [neptun_user.id],
-  }),
-  chat_conversation: one(chat_conversation, {
-    fields: [chat_conversation_file.chat_conversation_id],
-    references: [chat_conversation.id],
-  }),
-  chat_conversation_message: one(chat_conversation_message, {
-    fields: [chat_conversation_file.chat_conversation_message_id],
-    references: [chat_conversation_message.id],
-  }),
-  neptun_user_file: one(neptun_user_file, {
-    fields: [chat_conversation_file.neptun_user_file_id],
-    references: [neptun_user_file.id],
-  }),
-}))
+    neptun_user: one(neptun_user, {
+      fields: [chat_conversation_file.neptun_user_id],
+      references: [neptun_user.id],
+    }),
+    chat_conversation: one(chat_conversation, {
+      fields: [chat_conversation_file.chat_conversation_id],
+      references: [chat_conversation.id],
+    }),
+    chat_conversation_message: one(chat_conversation_message, {
+      fields: [chat_conversation_file.chat_conversation_message_id],
+      references: [chat_conversation_message.id],
+    }),
+    neptun_user_file: one(neptun_user_file, {
+      fields: [chat_conversation_file.neptun_user_file_id],
+      references: [neptun_user_file.id],
+    }),
+  }))
 
 export const neptun_user_fileRelations = relations(
   neptun_user_file,
   ({ one }) => ({
-  neptun_user: one(neptun_user, {
-    fields: [neptun_user_file.neptun_user_id],
-    references: [neptun_user.id],
-  }),
-}))
+    neptun_user: one(neptun_user, {
+      fields: [neptun_user_file.neptun_user_id],
+      references: [neptun_user.id],
+    }),
+  }))
 
 export const neptun_user_templateRelations = relations(
   neptun_user_template,
   ({ one }) => ({
-  neptun_user: one(neptun_user, {
-    fields: [neptun_user_template.neptun_user_id],
-    references: [neptun_user.id],
-  }),
-  template_collection: one(neptun_user_template_collection, {
-    fields: [neptun_user_template.template_collection_id],
-    references: [neptun_user_template_collection.id],
-  }),
-  neptun_user_file: one(neptun_user_file, {
-    fields: [neptun_user_template.user_file_id],
-    references: [neptun_user_file.id],
-  }),
-}))
+    neptun_user: one(neptun_user, {
+      fields: [neptun_user_template.neptun_user_id],
+      references: [neptun_user.id],
+    }),
+    template_collection: one(neptun_user_template_collection, {
+      fields: [neptun_user_template.template_collection_id],
+      references: [neptun_user_template_collection.id],
+    }),
+    neptun_user_file: one(neptun_user_file, {
+      fields: [neptun_user_template.user_file_id],
+      references: [neptun_user_file.id],
+    }),
+  }))
 
 export const neptun_user_template_collectionRelations = relations(
   neptun_user_template_collection,

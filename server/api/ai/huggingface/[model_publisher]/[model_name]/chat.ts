@@ -130,7 +130,13 @@ export default defineLazyEventHandler(async () => {
           }),
         )
       } else if (model_name === AllowedAiModelNamesEnum.metaLlama) {
-        inputs = buildMetaLlama3Prompt(minimalMessages)
+        // Sanitize messages before building prompt
+        const sanitizedMessages = minimalMessages.map(msg => ({
+          ...msg,
+          content: getSanitizedMessageContent(msg.content),
+        }))
+
+        inputs = buildMetaLlama3Prompt(sanitizedMessages)
       }
 
       // if (LOG_BACKEND) console.info('---');
@@ -142,6 +148,35 @@ export default defineLazyEventHandler(async () => {
           model_name ?? defaultAiModel
         ]?.configuration(inputs),
       )
+
+      // let responseToStream = response
+
+      // Sanitize Llama3 messages during streaming
+      /* if (model_name === AllowedAiModelNamesEnum.metaLlama) {
+        responseToStream = (async function* () {
+          try {
+            let accumulatedText = ''
+            for await (const chunk of response) {
+              if (chunk.token?.text) {
+                accumulatedText += chunk.token.text
+                const sanitizedText = getSanitizedMessageContent(accumulatedText)
+                yield {
+                  ...chunk,
+                  token: {
+                    ...chunk.token,
+                    text: sanitizedText.slice(accumulatedText.length - chunk.token.text.length)
+                  }
+                }
+              } else {
+                yield chunk
+              }
+            }
+          } catch (error) {
+            if (LOG_BACKEND) console.error('Streaming error:', error)
+            throw error
+          }
+        })()
+      } */
 
       // https://sdk.vercel.ai/docs/ai-sdk-ui/storing-messages
       const stream = HuggingFaceStream(response, {

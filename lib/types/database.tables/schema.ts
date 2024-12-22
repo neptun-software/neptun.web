@@ -435,7 +435,10 @@ export const InsertChatFileSchema = InsertChatFileSchemaBase.omit({
   id: true,
   created_at: true,
   updated_at: true,
+  neptun_user_id: true,
   neptun_user_file_id: true,
+  chat_conversation_id: true,
+  chat_conversation_message_id: true,
 }).merge(InsertUserFileSchema)
 
 export const InsertFileUniversalSchema = z
