@@ -4,17 +4,25 @@ import path from 'node:path'
 
 async function convertToPng() {
   try {
+    console.log('\n=== Starting PNG Conversion ===')
+
     const schemaDir = './backup/schema'
+    console.log('📁 Working directory:', schemaDir)
+
     const files = await readdir(schemaDir)
+    console.log('📋 Found files:', files)
+
     const latestMermaid = files
       .filter(f => f.endsWith('.mermaid'))
       .sort()
       .reverse()[0]
 
     if (!latestMermaid) {
-      console.error('No Mermaid-File found')
+      console.error('❌ No Mermaid-File found')
       return
     }
+
+    console.log('📄 Using Mermaid file:', latestMermaid)
 
     const inputFile = path.join(schemaDir, latestMermaid)
     const outputFile = inputFile.replace('.mermaid', '.png')
@@ -30,8 +38,17 @@ async function convertToPng() {
       cssFile: path.join(process.cwd(), 'server/utils/mermaid-theme.css'),
     }
 
-    await writeFile(configFile, JSON.stringify(config))
+    console.log('\n⚙️  Mermaid Configuration:')
+    console.log(`  • Theme: ${config.theme}`)
+    console.log(`  • Resolution: ${config.width}x${config.height}`)
+    console.log(`  • Scale: ${config.scale}`)
+    console.log(`  • CSS File: ${config.cssFile}`)
 
+    console.log('\n💾 Writing config file...')
+    await writeFile(configFile, JSON.stringify(config))
+    console.log('✅ Config file created:', configFile)
+
+    console.log('\n🚀 Preparing mermaid-cli command...')
     const command = `npx -p @mermaid-js/mermaid-cli mmdc \
       -i ${inputFile} \
       -o ${outputFile} \
@@ -39,33 +56,58 @@ async function convertToPng() {
       -b transparent \
       --scale ${config.scale}`
 
-    exec(command, (error) => {
-      // Delete the config file
-      void (async () => {
-        try {
-          await unlink(configFile)
-        } catch (unlinkError) {
-          console.error('Failed to delete config file:', unlinkError)
-        }
-      })()
+    console.log('📝 Command:', command)
 
-      if (error) {
-        console.error('PNG-Conversion failed:', error)
-        return
-      }
-      console.log(`PNG-File created: ${outputFile}`)
+    console.log('\n⏳ Converting to PNG...')
+
+    // Wrap exec in a Promise
+    await new Promise((resolve, reject) => {
+      exec(command, (error, stdout, stderr) => {
+        if (stdout) {
+          console.log('📝 Output:', stdout)
+        }
+        if (stderr) {
+          console.warn('⚠️  Warnings:', stderr)
+        }
+
+        const cleanup = async () => {
+          try {
+            console.log('\n🧹 Cleaning up config file...')
+            await unlink(configFile)
+            console.log('✅ Config file deleted')
+          } catch (unlinkError) {
+            console.error('❌ Failed to delete config file:', unlinkError)
+          }
+        }
+
+        void cleanup()
+
+        if (error) {
+          console.error('\n❌ PNG-Conversion failed:', error)
+          reject(error)
+          return
+        }
+
+        console.log('\n✅ PNG-File created successfully!')
+        console.log('📄 Output file:', outputFile)
+        console.log('\n=== PNG Conversion Complete ===\n')
+        resolve(true)
+      })
     })
   } catch (error) {
-    console.error('Conversion failed:', error)
+    console.error('\n💥 Conversion process failed with error:')
+    console.error(error)
+    throw error
   }
 }
 
 void (async () => {
   try {
     await convertToPng()
+    console.log('🎉 PNG conversion process completed successfully')
     process.exit(0)
   } catch (error) {
-    console.error('Conversion failed:', error)
+    console.error('💥 PNG conversion process failed:', error)
     process.exit(1)
   }
 })()

@@ -8,6 +8,13 @@
       "when": 1734801445135,
       "tag": "0000_supreme_sentinels",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1734833351077,
+      "tag": "0001_acoustic_elektra",
+      "breakpoints": true
     }
   ]
 }

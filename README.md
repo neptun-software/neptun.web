@@ -203,7 +203,8 @@ That is why I wrote 3 scripts. One for generating a database schema sql-dump, on
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y postgresql-client-16
+sudo apt-get install -y postgresql-client-16 # needed for pg_dump
+npx puppeteer browsers install chrome-headless-shell # needed for mermaid-to-png (doesn't work on wsl2)
 ```
 
 ```bash
@@ -218,7 +219,146 @@ bun run db:mermaid
 bun run db:png
 ```
 
-![ERD](backup/schema/2024-12-09T18-48-00-180Z.png)
+```mermaid
+erDiagram
+    chat_conversation {
+        integer_NOT_NULL id
+        text_NOT_NULL name
+        ai_model_enum_NOT_NULL model
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        integer_NOT_NULL neptun_user_id
+    }
+    chat_conversation_file {
+        integer_NOT_NULL id
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        integer_NOT_NULL neptun_user_id
+        integer_NOT_NULL chat_conversation_id
+        integer_NOT_NULL chat_conversation_message_id
+        integer_NOT_NULL neptun_user_file_id
+    }
+    chat_conversation_message {
+        integer_NOT_NULL id
+        text_NOT_NULL message
+        chat_conversation_message_actor_enum actor
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        integer_NOT_NULL neptun_user_id
+        integer_NOT_NULL chat_conversation_id
+    }
+    chat_conversation_share {
+        integer_NOT_NULL id
+        boolean_NOT_NULL is_shared
+        uuid_NOT_NULL share_id
+        boolean_NOT_NULL is_protected
+        text hashed_password
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        integer_NOT_NULL chat_conversation_id
+    }
+    chat_conversation_share_whitelist_entry {
+        integer_NOT_NULL id
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        integer_NOT_NULL whitelisted_neptun_user_id
+        integer_NOT_NULL chat_conversation_share_id
+    }
+    github_app_installation {
+        integer_NOT_NULL id
+        text_NOT_NULL github_account_type
+        text_NOT_NULL github_account_avatar_url
+        integer_NOT_NULL github_account_id
+        text github_account_name
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        integer_NOT_NULL neptun_user_id
+    }
+    github_app_installation_repository {
+        integer_NOT_NULL id
+        integer_NOT_NULL github_repository_id
+        text_NOT_NULL github_repository_name
+        text github_repository_description
+        integer github_repository_size
+        text github_repository_language
+        text github_repository_license
+        text_NOT_NULL github_repository_url
+        text github_repository_website_url
+        text github_repository_default_branch
+        boolean_NOT_NULL github_repository_is_private
+        boolean github_repository_is_fork
+        boolean github_repository_is_template
+        boolean_NOT_NULL github_repository_is_archived
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        integer_NOT_NULL github_app_installation_id
+    }
+    neptun_user {
+        integer_NOT_NULL id
+        text_NOT_NULL primary_email
+        text hashed_password
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    neptun_user_oauth_account {
+        integer_NOT_NULL id
+        oauth_provider_enum_NOT_NULL provider
+        text_NOT_NULL oauth_user_id
+        text_NOT_NULL oauth_email
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        integer_NOT_NULL neptun_user_id
+    }
+    neptun_user_file {
+        integer_NOT_NULL id
+        text title
+        text_NOT_NULL text
+        text language
+        text file_extension
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        integer_NOT_NULL neptun_user_id
+    }
+    neptun_user_template {
+        integer_NOT_NULL id
+        text description
+        text_NOT_NULL file_name
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        integer_NOT_NULL neptun_user_id
+        integer template_collection_id
+        integer user_file_id
+    }
+    neptun_user_template_collection {
+        integer_NOT_NULL id
+        text_NOT_NULL name
+        text description
+        boolean_NOT_NULL is_shared
+        uuid_NOT_NULL share_id
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        integer_NOT_NULL neptun_user_id
+    }
+
+    chat_conversation_file }o--|| chat_conversation : "references"
+    chat_conversation_file }o--|| chat_conversation_message : "references"
+    chat_conversation_file }o--|| neptun_user_file : "references"
+    chat_conversation_file }o--|| neptun_user : "references"
+    chat_conversation_message }o--|| chat_conversation : "references"
+    chat_conversation_message }o--|| neptun_user : "references"
+    chat_conversation }o--|| neptun_user : "references"
+    chat_conversation_share }o--|| chat_conversation : "references"
+    chat_conversation_share_whitelist_entry }o--|| chat_conversation_share : "references"
+    chat_conversation_share_whitelist_entry }o--|| neptun_user : "references"
+    github_app_installation }o--|| neptun_user : "references"
+    github_app_installation_repository }o--|| github_app_installation : "references"
+    neptun_user_file }o--|| neptun_user : "references"
+    neptun_user_oauth_account }o--|| neptun_user : "references"
+    neptun_user_template_collection }o--|| neptun_user : "references"
+    neptun_user_template }o--|| neptun_user : "references"
+    neptun_user_template }o--|| neptun_user_template_collection : "references"
+    neptun_user_template }o--|| neptun_user_file : "references"
+```
 
 ## Production
 

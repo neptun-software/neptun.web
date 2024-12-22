@@ -37,7 +37,7 @@
     "db:dump-schema": "bun run ./server/utils/backup.ts --schema-only",
     "db:mermaid": "bun run ./server/utils/schema-to-mermaid.ts",
     "db:png": "bun run ./server/utils/mermaid-to-png.ts",
-    "db:diagram": "bun run db:mermaid && bun run db:png"
+    "db:diagram": "bun run db:dump-schema && bun run db:mermaid && bun run db:png"
   },
   "dependencies": {
     "@ai-sdk/vue": "^0.0.58",
