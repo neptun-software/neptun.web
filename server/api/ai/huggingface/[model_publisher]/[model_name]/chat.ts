@@ -1,7 +1,6 @@
 import type { Actor } from '~/lib/types/database.tables/schema'
 import { HfInference } from '@huggingface/inference'
 import { HuggingFaceStream, type Message, StreamingTextResponse } from 'ai'
-import { experimental_buildLlama2Prompt } from 'ai/prompts'
 import {
   ALLOWED_AI_MODELS,
   AllowedAiModelNamesEnum,
@@ -122,15 +121,16 @@ export default defineLazyEventHandler(async () => {
             statusMessage: 'Service not available anymore.',
           }),
         )
-
-        // inputs = experimental_buildOpenAssistantPrompt(minimalMessages); // basically convertToCoreMessages from 'ai'
-        // if (LOG_BACKEND) console.info('using custom prompt builder for OpenAssistant');
       } else if (model_name === AllowedAiModelNamesEnum.Mistral) {
-        inputs = experimental_buildLlama2Prompt(minimalMessages)
-        // if (LOG_BACKEND) console.info('using custom prompt builder for Llama2');
+        return sendError(
+          event,
+          createError({
+            statusCode: 400,
+            statusMessage: 'Service not available anymore.',
+          }),
+        )
       } else if (model_name === AllowedAiModelNamesEnum.metaLlama) {
         inputs = buildMetaLlama3Prompt(minimalMessages)
-        // if (LOG_BACKEND) console.info('using custom prompt builder for metaLlama');
       }
 
       // if (LOG_BACKEND) console.info('---');
