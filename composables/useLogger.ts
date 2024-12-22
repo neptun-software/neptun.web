@@ -6,7 +6,7 @@ export function useLogger() {
 
   // So that it doesn't always log, only if true is also present. (no env-vars available in the frontend)
 
-  const LOG_FRONTEND = false // true && IS_DEV
+  const LOG_FRONTEND = IS_DEV
 
   if (!LOG_FRONTEND) {
     consola.pauseLogs()
