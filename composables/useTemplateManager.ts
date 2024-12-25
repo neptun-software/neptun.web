@@ -8,7 +8,6 @@ import type {
 } from '~/lib/types/database.tables/schema'
 
 // TODO:
-// implement templates UD
 // move collection mutation endpoints to `/users` and extend readAllTemplateCollections(allow fetching by userID) (protect them)
 // only update client-state if server-update was successful
 
@@ -160,7 +159,64 @@ export function useTemplateManager() {
         return response.template
       }
     } catch (error) {
-      console.error('Failed to create template!', error)
+      console.error('Failed to create template!')
+    }
+  }
+
+  async function updateTemplate(templateId: number, data: Partial<TemplateToCreate>) {
+    try {
+      const collection = collections.value.find(c =>
+        c.templates.some(t => t.id === templateId),
+      )
+
+      if (!collection?.share_uuid) {
+        console.error('Collection not found!')
+        return
+      }
+
+      const response = await $fetch(`/api/shared/collections/${collection.share_uuid}/templates/${templateId}`, {
+        method: 'PATCH',
+        body: data,
+      })
+
+      if (response?.template) {
+        const collectionIndex = collections.value.findIndex(c => c.id === collection.id)
+        const templateIndex = collections.value[collectionIndex].templates.findIndex(t => t.id === templateId)
+
+        if (templateIndex !== -1) {
+          collections.value[collectionIndex].templates[templateIndex] = {
+            ...collections.value[collectionIndex].templates[templateIndex],
+            ...response.template,
+            created_at: response.template.created_at ? new Date(response.template.created_at) : null,
+            updated_at: response.template.updated_at ? new Date(response.template.updated_at) : null,
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to update template!')
+    }
+  }
+
+  async function deleteTemplate(templateId: number) {
+    try {
+      const collection = collections.value.find(c =>
+        c.templates.some(t => t.id === templateId),
+      )
+
+      if (!collection?.share_uuid) {
+        console.error('Collection not found!')
+        return
+      }
+
+      await $fetch(`/api/shared/collections/${collection.share_uuid}/templates/${templateId}`, {
+        method: 'DELETE',
+      })
+
+      const collectionIndex = collections.value.findIndex(c => c.id === collection.id)
+      collections.value[collectionIndex].templates = collections.value[collectionIndex].templates
+        .filter(t => t.id !== templateId)
+    } catch (error) {
+      console.error('Failed to delete template!')
     }
   }
 
@@ -174,5 +230,7 @@ export function useTemplateManager() {
     updateCollection,
     deleteCollection,
     createTemplate,
+    updateTemplate,
+    deleteTemplate,
   }
 }

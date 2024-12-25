@@ -15,6 +15,8 @@ const {
   updateCollection,
   deleteCollection,
   createTemplate,
+  updateTemplate,
+  deleteTemplate,
 } = useTemplateManager()
 
 const isUpdating = ref(false)
@@ -107,7 +109,7 @@ async function handleCreateTemplate() {
     showNewTemplateDialog.value = false
     files.value = []
   } catch (error) {
-    console.error('Failed to create template:', error)
+    console.error('Failed to create template!')
   } finally {
     isUpdating.value = false
   }
@@ -124,14 +126,6 @@ watch(() => collections.value, (newCollections) => {
 async function toggleShared(collection: TemplateCollectionWithTemplates) {
   const currentState = sharedStates.value.get(collection.id) ?? collection.is_shared
   const newState = !currentState
-
-  console.log('Toggle shared:', {
-    id: collection.id,
-    currentState,
-    newState,
-    collectionIsShared: collection.is_shared,
-    mapValue: sharedStates.value.get(collection.id),
-  })
 
   sharedStates.value.set(collection.id, newState)
 
@@ -248,7 +242,7 @@ onMounted(() => {
           class="p-4 space-y-2 border rounded-lg"
         >
           <div class="flex items-center justify-between gap-2">
-            <div class="flex-1">
+            <div class="flex-1 px-2 pt-2 pb-3 rounded-md bg-secondary">
               <div
                 v-if="editingCollection === collection.id"
                 class="edit-container"
@@ -335,6 +329,12 @@ onMounted(() => {
               </div>
             </div>
           </div>
+          <TemplateList
+            :templates="collection.templates"
+            :is-updating="isUpdating"
+            :on-update="updateTemplate"
+            :on-delete="deleteTemplate"
+          />
         </div>
         <InfoBlock
           :is-visible="collections.length === 0"

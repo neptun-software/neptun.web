@@ -82,3 +82,63 @@ export async function readTemplate(id: number) {
     extension: template.neptun_user_file.extension,
   }
 }
+
+export async function updateTemplate(
+  id: number,
+  data: Partial<TemplateToCreate> & {
+    file?: Partial<UserFileToCreate>
+  },
+) {
+  return db.transaction(async (tx) => {
+    // Fetch the template first to get the user_file_id
+    const [template] = await tx
+      .select()
+      .from(neptun_user_template)
+      .where(eq(neptun_user_template.id, id))
+
+    if (!template) {
+      throw new Error('Template not found')
+    }
+
+    // Update template
+    const [updatedTemplate] = await tx
+      .update(neptun_user_template)
+      .set({
+        description: data.description,
+        file_name: data.file_name,
+        updated_at: new Date(),
+      })
+      .where(eq(neptun_user_template.id, id))
+      .returning()
+
+    // Update associated file if file data is provided
+    if (data.file && template.user_file_id) {
+      const [updatedFile] = await tx
+        .update(neptun_user_file)
+        .set({
+          title: data.file.title,
+          text: data.file.text,
+          language: data.file.language,
+          extension: data.file.extension,
+        })
+        .where(eq(neptun_user_file.id, template.user_file_id))
+        .returning()
+
+      return {
+        ...updatedTemplate,
+        title: updatedFile.title,
+        text: updatedFile.text,
+        language: updatedFile.language,
+        extension: updatedFile.extension,
+      }
+    }
+
+    return updatedTemplate
+  })
+}
+
+export async function deleteTemplate(id: number) {
+  await db
+    .delete(neptun_user_template)
+    .where(eq(neptun_user_template.id, id))
+}
