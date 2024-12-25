@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TemplateCollectionWithTemplates } from './types'
-import type { TemplateCollectionToCreate } from '~/lib/types/database.tables/schema'
+import type { TemplateCollectionToCreate, TemplateToCreate, UserFileToCreate } from '~/lib/types/database.tables/schema'
 import {
   Trash2,
 } from 'lucide-vue-next'
@@ -14,6 +14,7 @@ const {
   readCollections,
   updateCollection,
   deleteCollection,
+  createTemplate,
 } = useTemplateManager()
 
 const isUpdating = ref(false)
@@ -27,8 +28,90 @@ const newCollection = ref<Omit<TemplateCollectionToCreate, | 'description'> & { 
 })
 
 const editingCollection = ref<number | null>(null)
-
 const sharedStates = ref(new Map<number, boolean>())
+
+const showNewTemplateDialog = ref(false)
+const selectedCollectionId = ref<number | null>(null)
+
+interface ExtendedFile extends File {
+  customTitle?: string
+  description?: string
+}
+
+const files = ref<ExtendedFile[]>([])
+const inputFileRef = ref<HTMLInputElement | null>(null)
+const dropZoneRef = ref<HTMLDivElement>()
+
+const { isOverDropZone } = useDropZone(dropZoneRef, {
+  onDrop,
+})
+
+function onDrop(droppedFiles: File[] | null) {
+  if (droppedFiles) {
+    files.value = [...files.value, ...droppedFiles]
+    updateInputFileValue()
+  }
+}
+
+function onFileInput(event: Event) {
+  const input = event.target as HTMLInputElement
+  if (input.files) {
+    files.value = [...files.value, ...Array.from(input.files)]
+    updateInputFileValue()
+  }
+}
+
+function updateInputFileValue() {
+  if (inputFileRef.value) {
+    const dataTransfer = new DataTransfer()
+    files.value.forEach(file => dataTransfer.items.add(file))
+    inputFileRef.value.files = dataTransfer.files
+  }
+}
+
+function draftNewTemplate(collection: TemplateCollectionWithTemplates) {
+  selectedCollectionId.value = collection.id
+  showNewTemplateDialog.value = true
+  files.value = []
+}
+
+async function handleCreateTemplate() {
+  if (!selectedCollectionId.value || files.value.length === 0) {
+    return
+  }
+
+  try {
+    isUpdating.value = true
+
+    for (const file of files.value) {
+      const fileContent = await file.text()
+
+      const fileData: UserFileToCreate = {
+        title: file.customTitle || file.name,
+        text: fileContent,
+        neptun_user_id: session.value.user?.id ?? -1,
+        language: file.type || 'text',
+        extension: file.name.split('.').pop() || 'txt',
+      }
+
+      const templateData: TemplateToCreate = {
+        file_name: file.name,
+        description: file.description || '',
+        template_collection_id: selectedCollectionId.value,
+        neptun_user_id: session.value.user?.id ?? -1,
+      }
+
+      await createTemplate(selectedCollectionId.value, templateData, fileData)
+    }
+
+    showNewTemplateDialog.value = false
+    files.value = []
+  } catch (error) {
+    console.error('Failed to create template:', error)
+  } finally {
+    isUpdating.value = false
+  }
+}
 
 watch(() => collections.value, (newCollections) => {
   newCollections.forEach((collection) => {
@@ -96,15 +179,6 @@ async function handleDelete(shareUuid: string) {
     isUpdating.value = false
   }
 }
-
-/* async function handleCreateTemplate(collection: TemplateCollectionWithTemplates) {
-  isUpdating.value = true
-  try {
-    await createNewTemplate(collection)
-  } finally {
-    isUpdating.value = false
-  }
-} */
 
 function startEditing(collection: TemplateCollectionWithTemplates, event?: MouseEvent) {
   event?.stopPropagation()
@@ -245,6 +319,7 @@ onMounted(() => {
                   <ShadcnButton
                     variant="outline"
                     :disabled="isUpdating"
+                    @click="() => draftNewTemplate(collection)"
                   >
                     Add Template
                   </ShadcnButton>
@@ -322,6 +397,82 @@ onMounted(() => {
             }"
           >
             Create
+          </ShadcnButton>
+        </ShadcnDialogFooter>
+      </ShadcnDialogContent>
+    </ShadcnDialog>
+
+    <!-- Add New Template Dialog -->
+    <ShadcnDialog v-model:open="showNewTemplateDialog">
+      <ShadcnDialogContent>
+        <ShadcnDialogHeader>
+          <ShadcnDialogTitle>Add New Template</ShadcnDialogTitle>
+        </ShadcnDialogHeader>
+
+        <div class="space-y-4">
+          <!-- File Upload -->
+          <div class="flex flex-col gap-2 p-4 border rounded-md">
+            <ShadcnInput
+              ref="inputFileRef"
+              type="file"
+              multiple
+              class="flex items-center justify-center w-full h-32 p-4 border-2 border-dashed rounded-md bg-secondary text-secondary-foreground border-primary"
+              @change="onFileInput"
+            >
+              <div
+                ref="dropZoneRef"
+                class="flex items-center justify-center w-full h-full p-4 bg-secondary text-secondary-foreground"
+              >
+                Drop files here... ({{ isOverDropZone }})
+              </div>
+            </ShadcnInput>
+
+            <!-- File List -->
+            <div>
+              <strong>Selected Files:</strong>
+              <ShadcnScrollArea class="h-36">
+                <div v-for="(file, index) in files" :key="index" class="px-1 py-2 space-y-2">
+                  <!-- File Details -->
+                  <div class="space-y-2">
+                    <ShadcnInput
+                      v-model="file.customTitle"
+                      :placeholder="file.name"
+                      label="Title"
+                    />
+                    <ShadcnTextarea
+                      v-model="file.description"
+                      placeholder="Enter description..."
+                      label="Description"
+                      :rows="2"
+                    />
+                    <div class="text-sm text-muted-foreground">
+                      <p>Size: {{ file.size }}</p>
+                      <p>Type: {{ file.type || 'Unknown' }}</p>
+                      <p>Last modified: {{ new Date(file.lastModified).toLocaleString() }}</p>
+                    </div>
+                  </div>
+                  <ShadcnSeparator v-if="index < files.length - 1" class="my-2" />
+                </div>
+                <p v-if="files.length === 0">
+                  No files selected yet...
+                </p>
+              </ShadcnScrollArea>
+            </div>
+          </div>
+        </div>
+
+        <ShadcnDialogFooter>
+          <ShadcnButton
+            variant="outline"
+            @click="showNewTemplateDialog = false"
+          >
+            Cancel
+          </ShadcnButton>
+          <ShadcnButton
+            :disabled="files.length === 0 || isUpdating"
+            @click="handleCreateTemplate"
+          >
+            Create Template
           </ShadcnButton>
         </ShadcnDialogFooter>
       </ShadcnDialogContent>

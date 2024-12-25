@@ -157,8 +157,6 @@ export const InsertTemplateSchema = InsertTemplateSchemaBase.pick({
   description: true,
   file_name: true,
   neptun_user_id: true,
-  user_file_id: true,
-  template_collection_id: true,
 })
 export const SelectTemplateSchema = createSelectSchema(
   neptun_user_template,

@@ -3,10 +3,12 @@ import type { FetchError } from 'ofetch'
 import type { TemplateCollectionWithTemplates } from '~/components/pages/templates/(shared)/types'
 import type {
   TemplateCollectionToCreate,
+  TemplateToCreate,
+  UserFileToCreate,
 } from '~/lib/types/database.tables/schema'
 
 // TODO:
-// implement templates CRUD
+// implement templates UD
 // move collection mutation endpoints to `/users` and extend readAllTemplateCollections(allow fetching by userID) (protect them)
 // only update client-state if server-update was successful
 
@@ -111,6 +113,57 @@ export function useTemplateManager() {
     }
   }
 
+  async function createTemplate(collectionId: number, templateData: TemplateToCreate, fileData: UserFileToCreate) {
+    try {
+      const collection = collections.value.find(c => c.id === collectionId)
+      if (!collection?.share_uuid) {
+        console.error('Collection not found!')
+        return
+      }
+
+      // Escape HTML-like content in the text (XSS n shit (searched for about 2 hours till i found out, that this was the problem...))
+      const escapedText = fileData.text
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+
+      const template = {
+        neptun_user_id: templateData.neptun_user_id,
+        file_name: templateData.file_name,
+        description: templateData.description || '',
+      }
+
+      const file = {
+        neptun_user_id: templateData.neptun_user_id,
+        title: fileData.title || templateData.file_name,
+        text: escapedText, // Use escaped text
+        language: fileData.language || 'text',
+        extension: fileData.extension || 'txt',
+      }
+
+      const response = await $fetch(`/api/shared/collections/${collection.share_uuid}/templates`, {
+        method: 'POST',
+        body: {
+          template,
+          file,
+        },
+      })
+
+      if (response?.template) {
+        const collectionIndex = collections.value.findIndex(c => c.id === collectionId)
+        if (collectionIndex !== -1) {
+          collections.value[collectionIndex].templates.push({
+            ...response.template,
+            created_at: response.template.created_at ? new Date(response.template.created_at) : null,
+            updated_at: response.template.updated_at ? new Date(response.template.updated_at) : null,
+          })
+        }
+        return response.template
+      }
+    } catch (error) {
+      console.error('Failed to create template!', error)
+    }
+  }
+
   return {
     collections,
     fetchStatus,
@@ -120,5 +173,6 @@ export function useTemplateManager() {
     readCollections,
     updateCollection,
     deleteCollection,
+    createTemplate,
   }
 }

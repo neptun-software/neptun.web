@@ -24,23 +24,6 @@ const { currentPage, pageCount, isFirstPage, isLastPage, prev, next }
 
 <template>
   <div v-if="templates.length > 0">
-    <!-- <DevOnly>
-      <div class="inline-grid items-center grid-cols-2 p-4 gap-x-4">
-        <div opacity="50">total:</div>
-        <div>{{ database.length }}</div>
-        <div opacity="50">pageCount:</div>
-        <div>{{ pageCount }}</div>
-        <div opacity="50">currentPageSize:</div>
-        <div>{{ currentPageSize }}</div>
-        <div opacity="50">currentPage:</div>
-        <div>{{ currentPage }}</div>
-        <div opacity="50">isFirstPage:</div>
-        <div>{{ isFirstPage }}</div>
-        <div opacity="50">isLastPage:</div>
-        <div>{{ isLastPage }}</div>
-      </div>
-    </DevOnly> -->
-
     <div class="flex gap-1 mb-2">
       <ShadcnButton :disabled="isFirstPage" @click="prev">
         prev

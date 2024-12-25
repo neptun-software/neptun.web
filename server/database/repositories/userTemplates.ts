@@ -3,30 +3,47 @@ import {
   neptun_user_file,
   neptun_user_template,
   type TemplateToCreate,
+  type UserFileToCreate,
 } from '~/lib/types/database.tables/schema'
 
-export async function createTemplate(template: TemplateToCreate) {
+export async function createTemplate(template: TemplateToCreate & { file: UserFileToCreate }) {
   return db.transaction(async (tx) => {
+    // Transform escaped HTML entities back to original characters
+    const unescapedText = template.file.text
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+
+    // Create the user file first with unescaped text
     const [userFile] = await tx
       .insert(neptun_user_file)
       .values({
-        title: template.file_name,
-        text: '',
-        language: 'text',
-        extension: 'txt',
+        title: template.file.title || template.file_name,
+        text: unescapedText, // Use unescaped text
+        language: template.file.language || 'text',
+        extension: template.file.extension || 'txt',
         neptun_user_id: template.neptun_user_id,
       })
       .returning()
 
+    // Then create the template with the file reference
     const [createdTemplate] = await tx
       .insert(neptun_user_template)
       .values({
-        ...template,
+        description: template.description,
+        file_name: template.file_name,
+        neptun_user_id: template.neptun_user_id,
+        template_collection_id: template.template_collection_id,
         user_file_id: userFile.id,
       })
       .returning()
 
-    return createdTemplate
+    return {
+      ...createdTemplate,
+      title: userFile.title,
+      text: userFile.text,
+      language: userFile.language,
+      extension: userFile.extension,
+    }
   }).catch((err) => {
     if (LOG_BACKEND) {
       console.error('Failed to create template in database', err)

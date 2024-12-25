@@ -3,7 +3,7 @@ import { type TemplateData, templates } from '../lib/(templates)/templates'
 export function useTemplates() {
   const database = useState<TemplateData[]>('project-template-list', () => [])
   const isLoading = useState<boolean>('project-template-list-is-loading', () => false)
-  const totalItems = computed(() => database.value.length)
+  const totalItems = useState<number>('project-template-item-amount', () => database.value.length)
 
   async function fetchTemplateData(page: number, pageSize: number): Promise<TemplateData[]> {
     try {
@@ -12,25 +12,9 @@ export function useTemplates() {
 
       const data = await $fetch('/api/shared/collections')
       if (data?.collections) {
-        const allTemplates = data.collections.flatMap(collection =>
-          collection.templates.map(template => ({
-            id: template.id,
-            name: template.file_name,
-            author: collection.name,
-            code: [{
-              fileName: template.file_name,
-              code: template.text || '',
-            }],
-            readme: template.description || '',
-            collectionName: collection.name,
-            collectionId: collection.id,
-          })),
-        )
-
-        database.value = [...templates, ...allTemplates]
-
-        const actualEnd = Math.min(end, allTemplates.length)
-        return allTemplates.slice(start, actualEnd)
+        database.value = templates
+        const actualEnd = Math.min(end, totalItems.value)
+        return database.value.slice(start, actualEnd)
       }
 
       return []
