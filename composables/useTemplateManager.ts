@@ -1,42 +1,18 @@
 import type { AsyncDataRequestStatus } from '#app'
 import type { FetchError } from 'ofetch'
+import type { TemplateCollectionWithTemplates } from '~/components/pages/templates/(shared)/types'
 import type {
   TemplateCollectionToCreate,
 } from '~/lib/types/database.tables/schema'
 
-interface Template {
-  title: string | null | undefined
-  text: string | undefined
-  language: string
-  extension: string
-  id: number
-  created_at: Date | null
-  updated_at: Date | null
-  description: string | null
-  file_name: string
-  neptun_user_file: any | null
-}
-
-interface TemplateCollection {
-  id: number
-  name: string
-  description: string
-  is_shared: boolean
-  share_uuid: string
-  // created_at: Date | null
-  // updated_at: Date | null
-  // neptun_user_id: number
-  templates: Template[]
-}
-
-// TODO: improve typing (goal: no linting errors) and
-// move collection mutation endpoints to users/ (protect them),
-// only update state if update was successful
+// TODO:
 // implement templates CRUD
+// move collection mutation endpoints to `/users` and extend readAllTemplateCollections(allow fetching by userID) (protect them)
+// only update client-state if server-update was successful
 
 export function useTemplateManager() {
   const showShared = useState<boolean | null>('template-manager-show-shared', () => null)
-  const collections = useState<TemplateCollection[]>('template-manager-collections', () => [])
+  const collections = useState<TemplateCollectionWithTemplates[]>('template-manager-collections', () => [])
   const fetchStatus = useState<AsyncDataRequestStatus>('template-manager-status', () => 'pending')
   const fetchError = useState<FetchError | null>('template-manager-error', () => null)
 
@@ -57,14 +33,20 @@ export function useTemplateManager() {
         return
       }
 
-      collections.value = response.collections.map((collection: any) => ({
+      collections.value = response.collections.map(collection => ({
         ...collection,
         description: collection.description || '',
         is_shared: Boolean(collection.is_shared),
-        templates: collection.templates.map((template: any) => ({
+        created_at: collection.created_at ? new Date(collection.created_at) : null,
+        updated_at: collection.updated_at ? new Date(collection.updated_at) : null,
+        templates: collection.templates.map(template => ({
           ...template,
+          text: template.text || '',
+          title: template.title || '',
           created_at: template.created_at ? new Date(template.created_at) : null,
           updated_at: template.updated_at ? new Date(template.updated_at) : null,
+          template_collection_id: collection.id,
+          user_file_id: template.neptun_user_file?.id ?? null,
         })),
       }))
       fetchStatus.value = 'success'
@@ -117,11 +99,12 @@ export function useTemplateManager() {
       })
 
       const newCollection = response.collection
-
       collections.value = [...collections.value, {
         ...newCollection,
-        templates: [],
         description: newCollection.description || '',
+        created_at: newCollection.created_at ? new Date(newCollection.created_at) : null,
+        updated_at: newCollection.updated_at ? new Date(newCollection.updated_at) : null,
+        templates: [] as TemplateCollectionWithTemplates['templates'],
       }]
     } catch (error) {
       console.error('Failed to create collection!')

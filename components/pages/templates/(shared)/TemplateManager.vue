@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { TemplateCollectionWithTemplates } from './types'
 import type { TemplateCollectionToCreate } from '~/lib/types/database.tables/schema'
 import {
   Trash2,
@@ -37,7 +38,7 @@ watch(() => collections.value, (newCollections) => {
   })
 }, { immediate: true })
 
-async function toggleShared(collection: any) {
+async function toggleShared(collection: TemplateCollectionWithTemplates) {
   const currentState = sharedStates.value.get(collection.id) ?? collection.is_shared
   const newState = !currentState
 
@@ -68,7 +69,7 @@ async function toggleShared(collection: any) {
   }
 }
 
-async function handleSave(collection: any) {
+async function handleSave(collection: TemplateCollectionWithTemplates) {
   if (isUpdating.value) {
     return
   }
@@ -96,7 +97,7 @@ async function handleDelete(shareUuid: string) {
   }
 }
 
-/* async function handleCreateTemplate(collection: any) {
+/* async function handleCreateTemplate(collection: TemplateCollectionWithTemplates) {
   isUpdating.value = true
   try {
     await createNewTemplate(collection)
@@ -105,7 +106,7 @@ async function handleDelete(shareUuid: string) {
   }
 } */
 
-function startEditing(collection: any, event?: MouseEvent) {
+function startEditing(collection: TemplateCollectionWithTemplates, event?: MouseEvent) {
   event?.stopPropagation()
 
   if (editingCollection.value === collection.id) {
@@ -115,7 +116,7 @@ function startEditing(collection: any, event?: MouseEvent) {
   editingCollection.value = collection.id
 }
 
-function handleBlur(event: FocusEvent, collection: any) {
+function handleBlur(event: FocusEvent, collection: TemplateCollectionWithTemplates) {
   setTimeout(() => {
     const relatedTarget = event.relatedTarget as HTMLElement | null
     const editContainer = (event.target as HTMLElement)?.closest('.edit-container')
