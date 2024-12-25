@@ -17,9 +17,21 @@ export async function createUserFile(file: UserFileToCreate) {
 }
 
 export async function readUserFile(id: number) {
-  const file = await db.query.neptun_user_file.findFirst({
-    where: eq(neptun_user_file.id, id),
-  })
+  const file = await db
+    .query
+    .neptun_user_file
+    .findFirst({
+      where: eq(neptun_user_file.id, id),
+    })
+    .catch((err) => {
+      if (LOG_BACKEND) {
+        console.error(
+          'Failed to read user file from database',
+          err,
+        )
+      }
+      return null
+    })
 
   return file || null
 }

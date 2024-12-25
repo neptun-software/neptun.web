@@ -87,6 +87,7 @@ export const InsertUserFileSchema = InsertUserFileSchemaBase.pick({
   text: true,
   language: true,
   extension: true,
+  neptun_user_id: true,
 })
 export const SelectUserFileSchema = createSelectSchema(neptun_user_file)
 
@@ -114,6 +115,17 @@ type GetTemplateCollection = typeof neptun_user_template_collection.$inferSelect
 export type TemplateCollectionToCreate = Omit<NewTemplateCollection, 'id' | 'share_uuid' | 'created_at' | 'updated_at'>
 export type ReadTemplateCollection = GetTemplateCollection
 
+export const InsertTemplateCollectionSchemaBase = createInsertSchema(neptun_user_template_collection)
+export const InsertTemplateCollectionSchema = InsertTemplateCollectionSchemaBase.pick({
+  name: true,
+  description: true,
+  is_shared: true,
+  neptun_user_id: true,
+})
+export const SelectTemplateCollectionSchema = createSelectSchema(
+  neptun_user_template_collection,
+)
+
 /* USERS TEMPLATES */
 
 export const neptun_user_template = pgTable('neptun_user_template', {
@@ -139,6 +151,18 @@ type GetTemplate = typeof neptun_user_template.$inferSelect
 
 export type TemplateToCreate = Omit<NewTemplate, 'id' | 'created_at' | 'updated_at'>
 export type ReadTemplate = GetTemplate
+
+export const InsertTemplateSchemaBase = createInsertSchema(neptun_user_template)
+export const InsertTemplateSchema = InsertTemplateSchemaBase.pick({
+  description: true,
+  file_name: true,
+  neptun_user_id: true,
+  user_file_id: true,
+  template_collection_id: true,
+})
+export const SelectTemplateSchema = createSelectSchema(
+  neptun_user_template,
+)
 
 /* OAuth ACCOUNTS */
 
@@ -435,11 +459,14 @@ export const InsertChatFileSchema = InsertChatFileSchemaBase.omit({
   id: true,
   created_at: true,
   updated_at: true,
-  neptun_user_id: true,
-  neptun_user_file_id: true,
-  chat_conversation_id: true,
-  chat_conversation_message_id: true,
-}).merge(InsertUserFileSchema)
+  neptun_user_file_id: true, // assigned in repository
+  chat_conversation_id: true, // in route params
+  chat_conversation_message_id: true, // in route params
+})
+  .merge(InsertUserFileSchema)
+  .omit({
+    neptun_user_id: true, // in route params
+  })
 
 export const InsertFileUniversalSchema = z
   .object({ files: z.array(InsertChatFileSchema) })

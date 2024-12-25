@@ -10,23 +10,24 @@ export function useTemplates() {
       const start = (page - 1) * pageSize
       const end = start + pageSize
 
-      const { data } = await useFetch('/api/shared/collections')
-      if (data.value?.collections) {
-        const allTemplates = data.value.collections.flatMap(collection => 
+      const data = await $fetch('/api/shared/collections')
+      if (data?.collections) {
+        const allTemplates = data.collections.flatMap(collection =>
           collection.templates.map(template => ({
             id: template.id,
             name: template.file_name,
             author: collection.name,
             code: [{
               fileName: template.file_name,
-              code: template.text || ''
+              code: template.text || '',
             }],
             readme: template.description || '',
             collectionName: collection.name,
             collectionId: collection.id,
-          }))
+          })),
         )
-        database.value = allTemplates
+
+        database.value = [...templates, ...allTemplates]
 
         const actualEnd = Math.min(end, allTemplates.length)
         return allTemplates.slice(start, actualEnd)

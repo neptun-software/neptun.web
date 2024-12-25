@@ -23,9 +23,9 @@ const props = defineProps<{
       )
     "
   >
-    <Loader2 class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
+    <Loader2 v-if="showLoader" class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
     <p class="flex-grow">
-      <slot /><LoadingDots />
+      <slot /><LoadingDots v-if="showDots" />
     </p>
   </div>
 </template>

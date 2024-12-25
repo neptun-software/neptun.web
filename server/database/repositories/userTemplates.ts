@@ -18,10 +18,6 @@ export async function createTemplate(template: TemplateToCreate) {
       })
       .returning()
 
-    if (!userFile) {
-      return null
-    }
-
     const [createdTemplate] = await tx
       .insert(neptun_user_template)
       .values({
@@ -30,7 +26,7 @@ export async function createTemplate(template: TemplateToCreate) {
       })
       .returning()
 
-    return createdTemplate || null
+    return createdTemplate
   }).catch((err) => {
     if (LOG_BACKEND) {
       console.error('Failed to create template in database', err)
@@ -61,7 +57,6 @@ export async function readTemplate(id: number) {
     return null
   }
 
-  // Transform the data to include file information
   return {
     ...template,
     title: template.neptun_user_file.title,

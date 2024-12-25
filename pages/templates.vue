@@ -6,25 +6,42 @@ definePageMeta({
   alias: templatesAliases,
 })
 
+const { loggedIn } = useUserSession()
+
 // defineOgImageComponent('NuxtSeo');
 </script>
 
 <template>
   <div class="p-4">
-    <ShadcnTabs default-value="paginated-pages" class="w-full">
+    <ShadcnTabs default-value="templates" class="w-full">
       <ShadcnTabsList class="flex justify-start flex-grow">
-        <ShadcnTabsTrigger value="paginated-pages">
-          Paginated Pages
+        <ShadcnTabsTrigger value="templates">
+          Templates
         </ShadcnTabsTrigger>
-        <ShadcnTabsTrigger value="infinite-scroll">
-          Infinite Scroll
+        <ShadcnTabsTrigger v-if="loggedIn" value="manage">
+          Manage
         </ShadcnTabsTrigger>
       </ShadcnTabsList>
-      <ShadcnTabsContent value="paginated-pages" class="p-4 border rounded-md">
-        <PaginatedTemplates />
+      <ShadcnTabsContent value="templates" class="p-4 border rounded-md">
+        <ShadcnTabs default-value="paginated-pages" class="w-full">
+          <ShadcnTabsList class="flex justify-start flex-grow">
+            <ShadcnTabsTrigger value="paginated-pages">
+              Paginated Pages
+            </ShadcnTabsTrigger>
+            <ShadcnTabsTrigger value="infinite-scroll">
+              Infinite Scroll
+            </ShadcnTabsTrigger>
+          </ShadcnTabsList>
+          <ShadcnTabsContent value="paginated-pages" class="p-4 border rounded-md">
+            <PaginatedTemplates />
+          </ShadcnTabsContent>
+          <ShadcnTabsContent value="infinite-scroll" class="p-4 border rounded-md">
+            <InfiniteTemplates />
+          </ShadcnTabsContent>
+        </ShadcnTabs>
       </ShadcnTabsContent>
-      <ShadcnTabsContent value="infinite-scroll" class="p-4 border rounded-md">
-        <InfiniteTemplates />
+      <ShadcnTabsContent v-if="loggedIn" value="manage" class="p-4 border rounded-md">
+        <TemplateManager />
       </ShadcnTabsContent>
     </ShadcnTabs>
   </div>

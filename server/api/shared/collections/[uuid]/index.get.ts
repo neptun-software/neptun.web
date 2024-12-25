@@ -2,6 +2,7 @@ import { readTemplateCollection } from '~/server/database/repositories/userTempl
 
 // Read all files of a shared template collection
 export default defineCachedEventHandler(async (event) => {
+  /* VALIDATE PARAMS */
   const maybeUuid = await validateParamUuid(event)
   if (maybeUuid.statusCode !== 200) {
     return sendError(
