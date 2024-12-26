@@ -20,79 +20,59 @@ defineProps<{
       class="grid grid-cols-1 gap-2 lg:grid-cols-2"
     >
       <div
-        v-for="template in templates"
-        :key="template.id"
+        v-for="collection in templates"
+        :key="`${collection.id}-${collection.share_uuid}`"
         class="p-2 border rounded-md"
       >
         <div class="flex justify-between pb-2">
           <h3 class="text-lg font-bold">
-            {{ template.name }}
+            {{ collection.name }}
           </h3>
 
-          <AsyncButton :on-click-async="downloadTemplateHandler(template)">
+          <AsyncButton :on-click-async="downloadTemplateHandler(collection)">
             download
           </AsyncButton>
         </div>
 
-        <div v-if="template.readme" class="border rounded-md">
-          {{ template.readme }}
-        </div>
-
-        <ShadcnTabs :default-value="template.code[0].fileName" class="w-full">
+        <ShadcnTabs
+          :default-value="collection.templates[0]?.file_name"
+          class="w-full"
+        >
           <ShadcnScrollArea class="max-w-full">
             <ShadcnTabsList class="flex justify-start flex-grow">
               <ShadcnScrollBar orientation="horizontal" />
               <ShadcnTabsTrigger
-                v-for="(c, index) in template.code"
-                :key="index"
-                :value="c.fileName"
+                v-for="template in collection.templates"
+                :key="template.id"
+                :value="template.file_name"
               >
-                <code>
-                  {{ c.fileName }}
-                </code>
+                <code>{{ template.file_name }}</code>
               </ShadcnTabsTrigger>
             </ShadcnTabsList>
           </ShadcnScrollArea>
+
           <ShadcnTabsContent
-            v-for="(c, index) in template.code"
-            :key="index"
+            v-for="template in collection.templates"
+            :key="template.id"
             class="relative"
-            :value="c.fileName"
+            :value="template.file_name"
           >
             <ShadcnScrollArea class="h-screen px-2 py-1 border rounded-md">
               <ClientOnly>
-                <!-- <MDC
-                  :value="`\`\`\`${
-                    supportedShikiLanguages.includes(
-                      c.fileName.split('.')[
-                        c.fileName.split('.').length - 1
-                      ] as BundledLanguage,
-                    )
-                      ? c.fileName.split('.')[c.fileName.split('.').length - 1]
-                      : 'text'
-                  }\n${c.code?.trim()} \n\`\`\``"
-                /> -->
+                <!-- MDC is not flexible enough -->
                 <MarkdownRenderer
-                  :content="`\`\`\`${
-                    supportedShikiLanguages.includes(
-                      c.fileName.split('.')[
-                        c.fileName.split('.').length - 1
-                      ] as BundledLanguage,
-                    )
-                      ? c.fileName.split('.')[c.fileName.split('.').length - 1]
-                      : 'text'
-                  }\n${c.code?.trim()} \n\`\`\``"
+                  :content="`\`\`\`${supportedShikiLanguages.includes(template.language as BundledLanguage) ? template.language : 'text'}\n${template.text?.trim()} \n\`\`\``"
                 />
                 <template #fallback>
                   <div class="overflow-x-auto break-words whitespace-pre-wrap">
-                    {{ c.code }}
+                    {{ template.text }}
                   </div>
                 </template>
               </ClientOnly>
             </ShadcnScrollArea>
 
             <div class="absolute top-0 right-0">
-              <CopyToClipboard :text="c.code?.trim()" />
+              <CopyToClipboard :text="template.text?.trim()" />
             </div>
           </ShadcnTabsContent>
         </ShadcnTabs>

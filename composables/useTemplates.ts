@@ -1,25 +1,45 @@
-import { type TemplateData, templates } from '../lib/(templates)/templates'
+import { recommendedCollections, type TemplateData } from '../lib/(templates)/templates'
 
 export function useTemplates() {
   const database = useState<TemplateData[]>('project-template-list', () => [])
   const isLoading = useState<boolean>('project-template-list-is-loading', () => false)
-  const totalItems = useState<number>('project-template-item-amount', () => database.value.length)
+  const totalItems = useState<number>('project-template-item-amount', () => 0)
 
   async function fetchTemplateData(page: number, pageSize: number): Promise<TemplateData[]> {
     try {
       const start = (page - 1) * pageSize
       const end = start + pageSize
 
-      const data = await $fetch('/api/shared/collections')
-      if (data?.collections) {
-        database.value = templates
-        const actualEnd = Math.min(end, totalItems.value)
-        return database.value.slice(start, actualEnd)
-      }
+      const { collections } = await $fetch('/api/shared/collections')
 
-      return []
+      const allTemplates = [
+        ...recommendedCollections,
+        ...collections.map(collection => ({
+          ...collection,
+          description: collection.description || '',
+          created_at: collection.created_at ? new Date(collection.created_at) : null,
+          updated_at: collection.updated_at ? new Date(collection.updated_at) : null,
+          templates: collection.templates.map(template => ({
+            id: template.id,
+            description: template.description || '',
+            file_name: template.file_name,
+            title: template.title || template.file_name,
+            text: template.text || '',
+            language: template.language || 'text',
+            extension: template.extension || 'txt',
+            created_at: template.created_at ? new Date(template.created_at) : null,
+            updated_at: template.updated_at ? new Date(template.updated_at) : null,
+          })),
+        }))
+      ].filter(collection => collection.templates.length > 0)
+
+      database.value = allTemplates
+      totalItems.value = allTemplates.length
+
+      const actualEnd = Math.min(end, totalItems.value)
+      return database.value.slice(start, actualEnd)
     } catch (error) {
-      console.error('Error fetching template data:', error)
+      console.error('Error fetching template data!')
       return []
     }
   }
