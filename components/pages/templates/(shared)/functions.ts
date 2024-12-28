@@ -1,6 +1,8 @@
 import type { TemplateCollectionWithTemplatesWithoutIds as TemplateData } from '~/components/pages/templates/(shared)/types'
-import { saveAs } from 'file-saver'
+import pkg from 'file-saver'
 import JSZip from 'jszip'
+
+const { saveAs } = pkg
 
 export async function downloadTemplateZip(collection: TemplateData) {
   const zip = new JSZip()
