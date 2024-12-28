@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FunctionalComponent } from 'vue'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Book } from 'lucide-vue-next'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/shadcn/card'
 
 interface FeaturesProps {
   icon: FunctionalComponent

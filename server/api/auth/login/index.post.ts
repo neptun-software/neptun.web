@@ -1,4 +1,4 @@
-import { UserLogInSchema } from '~/lib/types/input.validation'
+import { UserLogInSchema } from '~/lib/validation/user'
 import { validateUserCredentials } from '~/server/database/repositories/users'
 
 export default defineEventHandler(async (event) => {

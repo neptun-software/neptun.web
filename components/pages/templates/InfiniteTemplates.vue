@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TemplateData } from '~/lib/(templates)/templates'
+import type { TemplateCollectionWithTemplatesWithoutIds as TemplateData } from '~/components/pages/templates/(shared)/types'
 
 const { totalItems, isLoading, fetchInfiniteData } = useTemplates()
 const data = ref<TemplateData[]>([])
@@ -20,7 +20,7 @@ useInfiniteScroll(document, loadMore, {
 
 <template>
   <div v-if="data.length > 0">
-    <Templates :templates="data" :is-loading="isLoading" />
+    <Templates :collections="data" :is-loading="isLoading" />
 
     <div
       v-if="!isLoading && data.length > 0 && data.length === totalItems"

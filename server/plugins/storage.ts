@@ -17,13 +17,14 @@ export default defineNitroPlugin(() => {
       if (LOG_BACKEND) {
         console.error('Error:', error.message)
       }
+
       throw createError({
         statusCode: 500,
         message: error.message,
       })
     } else {
       if (LOG_BACKEND) {
-        console.error('Error:', error.message)
+        console.error('Unknown error!')
       }
       throw createError({
         statusCode: 500,

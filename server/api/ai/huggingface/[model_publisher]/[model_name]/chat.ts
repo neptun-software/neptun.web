@@ -1,14 +1,14 @@
 import type { Actor } from '~/lib/types/database.tables/schema'
 import { HfInference } from '@huggingface/inference'
 import { HuggingFaceStream, type Message, StreamingTextResponse } from 'ai'
+import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
+import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema'
 import {
   ALLOWED_AI_MODELS,
   AllowedAiModelNamesEnum,
   defaultAiModel,
   defaultAiModelProvider,
-  POSSIBLE_AI_MODELS,
-} from '~/lib/types/ai.models'
-import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema'
+} from '~/lib/types/models/ai'
 import {
   validateParamAiModelName,
   validateQueryChatId,

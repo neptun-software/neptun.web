@@ -1,4 +1,4 @@
-import { defaultAiModelDomain } from '~/lib/types/ai.models'
+import { defaultAiModelDomain } from '~/lib/types/models/ai'
 
 export default defineEventHandler(async (event) => {
   const sessionState = await requireUserSession(event)

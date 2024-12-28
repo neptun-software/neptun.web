@@ -2,18 +2,18 @@ import type { User } from '#auth-utils'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import type { ZodError } from 'zod'
 import { z } from 'zod'
+import { primaryIdSchema } from '~/lib/types/database.tables/schema'
 import {
   AllowedAiModelNamesEnum,
   AllowedAiModelPublishersEnum,
-} from '~/lib/types/ai.models'
+} from '~/lib/types/models/ai'
 import {
   type ChatConversationKeys,
   type OrderByDirection,
   possibleOrderByColumns,
   possibleOrderByDirections,
-} from '~/lib/types/chat'
-import { primaryIdSchema } from '~/lib/types/database.tables/schema'
-import { emailSchema } from '~/lib/types/input.validation'
+} from '~/lib/types/models/chat'
+import { emailSchema } from '~/lib/validation/user/email'
 
 /* ROUTE PARAMETER SCHEMAs */
 export const UserIdSchema = z.object({

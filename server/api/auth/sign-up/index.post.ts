@@ -1,4 +1,4 @@
-import { UserLogInSchema } from '~/lib/types/input.validation'
+import { UserLogInSchema } from '~/lib/validation/user'
 import {
   createUser,
   readUserUsingPrimaryEmail,

@@ -1,14 +1,6 @@
 <script lang="ts" setup>
-import type { Import } from './types'
+import type { GetGithubAppInstallationRepositoryEssentials as Import } from '~/lib/types/database.tables/schema'
 import { NuxtLink } from '#components'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { CaretSortIcon } from '@radix-icons/vue'
 import {
   type ColumnDef,
@@ -21,7 +13,15 @@ import {
   useVueTable,
 } from '@tanstack/vue-table'
 import { toast } from 'vue-sonner'
-import { Button } from '~/components/ui/button'
+import { Button } from '~/components/shadcn/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '~/components/shadcn/table'
 import { valueUpdater } from '~/lib/utils'
 
 const props = defineProps<{

@@ -1,5 +1,5 @@
+import { randomUUID } from 'node:crypto'
 import { and, eq, like, sql } from 'drizzle-orm'
-import { generateUUID } from '~/lib/utils'
 import {
   type GetUser,
   neptun_user,
@@ -75,7 +75,7 @@ export async function createEmptyUser() {
     .insert(neptun_user)
     .values({
       primary_email: encryptColumn(
-        `${generateUUID()}@account.oAuth`,
+        `${randomUUID()}@account.oAuth`,
       ) /* TODO: do not allow login with email and password, if email and password are placeholders */,
       hashed_password: encryptSecret('NONE'),
     })

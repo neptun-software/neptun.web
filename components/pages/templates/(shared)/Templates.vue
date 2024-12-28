@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import type { BundledLanguage } from 'shiki'
-import type { TemplateData } from '~/lib/(templates)/templates'
+import type { TemplateCollectionWithTemplatesWithoutIds as TemplateData } from '~/components/pages/templates/(shared)/types'
 import { downloadTemplateHandler } from './functions'
 
 defineProps<{
-  templates: TemplateData[]
+  collections: TemplateData[]
   isLoading: boolean
 }>()
 </script>
@@ -16,12 +16,12 @@ defineProps<{
     </InfoBlock>
 
     <div
-      v-if="templates.length > 0"
+      v-if="collections.length > 0"
       class="grid grid-cols-1 gap-2 lg:grid-cols-2"
     >
       <div
-        v-for="collection in templates"
-        :key="`${collection.id}-${collection.share_uuid}`"
+        v-for="(collection, collectionIndex) in collections"
+        :key="collectionIndex"
         class="p-2 border rounded-md"
       >
         <div class="flex justify-between pb-2">
@@ -42,8 +42,8 @@ defineProps<{
             <ShadcnTabsList class="flex justify-start flex-grow">
               <ShadcnScrollBar orientation="horizontal" />
               <ShadcnTabsTrigger
-                v-for="template in collection.templates"
-                :key="template.id"
+                v-for="(template, templateIndex) in collection.templates"
+                :key="templateIndex"
                 :value="template.file_name"
               >
                 <code>{{ template.file_name }}</code>
@@ -52,12 +52,12 @@ defineProps<{
           </ShadcnScrollArea>
 
           <ShadcnTabsContent
-            v-for="template in collection.templates"
-            :key="template.id"
+            v-for="(template, templateBodyIndex) in collection.templates"
+            :key="templateBodyIndex"
             class="relative"
             :value="template.file_name"
           >
-            <ShadcnScrollArea class="h-screen px-2 py-1 border rounded-md">
+            <ShadcnScrollArea class="h-screen px-2 py-1 border rounded-md bg-accent">
               <ClientOnly>
                 <!-- MDC is not flexible enough -->
                 <MarkdownRenderer

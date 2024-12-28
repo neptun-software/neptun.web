@@ -1,4 +1,4 @@
-import { UserUpdateSchema } from '~/lib/types/input.validation'
+import { UserUpdateSchema } from '~/lib/validation/user'
 import { updateUser } from '~/server/database/repositories/users'
 
 // Update user

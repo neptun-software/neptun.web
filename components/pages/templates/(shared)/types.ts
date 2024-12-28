@@ -8,3 +8,8 @@ export type TemplateCollectionWithTemplates = Omit<
   description: string
   templates: FileTemplate[]
 }
+export type TemplateCollectionWithTemplatesWithoutIds = Omit<TemplateCollectionWithTemplates, 'id' | 'templates'> & {
+  templates: Omit<
+    FileTemplate,
+    'template_collection_id' | 'user_file_id' | 'id'>[]
+}

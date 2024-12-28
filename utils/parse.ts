@@ -1,4 +1,5 @@
 import type { BundledLanguage } from 'shiki'
+import type { CodeBlock } from '~/lib/types/database.tables/schema'
 import remarkParse from 'remark-parse'
 import remarkStringify from 'remark-stringify'
 import strip from 'strip-markdown'
@@ -44,13 +45,6 @@ function getValidatedCodeBlockLanguage(language: string) {
   }
 
   return 'text'
-}
-
-interface CodeBlock {
-  title: string
-  language: string
-  extension: string
-  text: string
 }
 
 export async function stripMarkdown(markdown: string) {

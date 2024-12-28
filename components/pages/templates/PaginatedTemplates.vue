@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { TemplateData } from '~/lib/(templates)/templates'
+import type { TemplateCollectionWithTemplatesWithoutIds as TemplateData } from '~/components/pages/templates/(shared)/types'
 
 const { totalItems, isLoading, fetchPaginatedData } = useTemplates()
-const templates = ref<TemplateData[]>([])
+const data = ref<TemplateData[]>([])
 const pageSize = ref(2)
 const page = ref(1)
 
-fetchPaginatedData(page.value, pageSize.value, templates)
+fetchPaginatedData(page.value, pageSize.value, data)
 
 const { currentPage, pageCount, isFirstPage, isLastPage, prev, next }
   = useOffsetPagination({
@@ -14,16 +14,16 @@ const { currentPage, pageCount, isFirstPage, isLastPage, prev, next }
     page,
     pageSize,
     onPageChange: ({ currentPage, currentPageSize }) => {
-      fetchPaginatedData(currentPage, currentPageSize, templates)
+      fetchPaginatedData(currentPage, currentPageSize, data)
     },
     onPageSizeChange: ({ currentPage, currentPageSize }) => {
-      fetchPaginatedData(currentPage, currentPageSize, templates)
+      fetchPaginatedData(currentPage, currentPageSize, data)
     },
   })
 </script>
 
 <template>
-  <div v-if="templates.length > 0">
+  <div v-if="data.length > 0">
     <div class="flex gap-1 mb-2">
       <ShadcnButton :disabled="isFirstPage" @click="prev">
         prev
@@ -41,7 +41,7 @@ const { currentPage, pageCount, isFirstPage, isLastPage, prev, next }
       </ShadcnButton>
     </div>
 
-    <Templates :templates="templates" :is-loading="isLoading" />
+    <Templates :collections="data" :is-loading="isLoading" />
   </div>
   <div v-else>
     <p>No templates found</p>

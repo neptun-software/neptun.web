@@ -2,7 +2,8 @@ node_modules
 public
 .nuxt
 .vercel
-components/ui/**
+components/shadcn/**
 server/.generated/**
-server/database/migrations/**
+server/database/migrations-dev/**
+server/database/migrations-prod/**
 pnpm-lock.yaml

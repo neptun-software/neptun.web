@@ -7,11 +7,11 @@ definePageMeta({
   alias: dashboardAliases,
 })
 
-const { headerNavigationElement } = useUiStore()
+const { $headerNavigationElement } = useUiStore()
 
 const headerNavigationHeight = ref(0)
-watch(headerNavigationElement, (newHeaderNavigationElement) => {
-  const { height } = useElementSize(newHeaderNavigationElement) // needs access to lifecycle hooks (that is why it is not defined in the store or a composable)
+watch($headerNavigationElement, (new$headerNavigationElement) => {
+  const { height } = useElementSize(new$headerNavigationElement) // needs access to lifecycle hooks (that is why it is not defined in the store or a composable)
   headerNavigationHeight.value = height.value
 })
 

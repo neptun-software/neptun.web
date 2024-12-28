@@ -10,6 +10,17 @@
     "zignd.html-css-class-completion",
     "qufiwefefwoyn.inline-sql-syntax",
     "moalamri.inline-fold",
-    "ecmel.vscode-html-css"
+    "ms-azuretools.vscode-docker",
+    "antfu.goto-alias",
+    "antfu.iconify",
+    "yzhang.markdown-all-in-one",
+    "csstools.postcss",
+    "bradlc.vscode-tailwindcss",
+    "vue.volar",
+    "bierner.markdown-mermaid",
+    "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
+    "mattpocock.ts-error-translator",
+    "stylelint.vscode-stylelint",
+    "simonsiefke.svg-preview"
   ]
 }

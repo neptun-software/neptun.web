@@ -118,5 +118,7 @@ export async function updateTemplateCollection(share_uuid: string, data: Partial
 }
 
 export async function deleteTemplateCollection(id: string) {
-  await db.delete(neptun_user_template_collection).where(eq(neptun_user_template_collection.share_uuid, id))
+  await db
+    .delete(neptun_user_template_collection)
+    .where(eq(neptun_user_template_collection.share_uuid, id))
 }

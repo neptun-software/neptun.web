@@ -1,15 +1,6 @@
 <script lang="ts" setup>
-import type { Import } from './imports/types'
+import type { GetGithubAppInstallationRepositoryEssentials as Import } from '~/lib/types/database.tables/schema'
 import { NuxtImg } from '#components'
-import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { CaretSortIcon } from '@radix-icons/vue'
 import {
   type ColumnDef,
@@ -22,7 +13,16 @@ import {
   useVueTable,
 } from '@tanstack/vue-table'
 import { toast } from 'vue-sonner'
-import Button from '~/components/ui/button/Button.vue'
+import Button from '~/components/shadcn/button/Button.vue'
+import { Input } from '~/components/shadcn/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '~/components/shadcn/table'
 import { valueUpdater } from '~/lib/utils'
 
 const { user } = useUserSession()

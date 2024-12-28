@@ -48,12 +48,12 @@ export default defineNuxtConfig({
     },
     // prefix needed, because pathPrefix: true doesn't work, when files are called `Index.vue` (the keyword index is thrown away completely, also for the component name)
     {
-      path: '~/components/ai/chat',
-      prefix: 'AiChat',
+      path: '~/components/pages/dashboard/chat',
+      prefix: 'DashboardChat',
     },
     {
-      path: '~/components/ai/chats',
-      prefix: 'AiChats',
+      path: '~/components/pages/dashboard/chats',
+      prefix: 'DashboardChats',
     },
   ],
   devtools: {
@@ -370,6 +370,6 @@ export default defineNuxtConfig({
      * Directory that the component lives in.
      * @default "./components/ui"
      */
-    componentDir: './components/ui',
+    componentDir: './components/shadcn',
   },
 })

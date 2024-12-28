@@ -1,4 +1,4 @@
-import type { ChatConversationKeys, OrderByDirection } from '~/lib/types/chat'
+import type { ChatConversationKeys, OrderByDirection } from '~/lib/types/models/chat'
 
 export function parseOrderByString(order_by: string) {
   const orders = order_by.split(',').map((order) => {

@@ -1,5 +1,5 @@
 <script setup>
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/shadcn/card'
 
 defineProps(['src', 'icon', 'title', 'description', 'index'])
 </script>

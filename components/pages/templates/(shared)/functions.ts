@@ -1,4 +1,4 @@
-import type { TemplateData } from '~/lib/(templates)/templates'
+import type { TemplateCollectionWithTemplatesWithoutIds as TemplateData } from '~/components/pages/templates/(shared)/types'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 

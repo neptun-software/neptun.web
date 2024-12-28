@@ -12,7 +12,7 @@ import {
 // import { supportedShikiLanguages, supportedFileExtensionsMap } from '../../../utils/formatters'; // || '#imports' // causes cjs, mjs compatibility issues, thanks for nothing drizzle :|
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import { AllowedAiModelsEnum, allowedModelsConst } from '../ai.models'
+import { AllowedAiModelsEnum, allowedModelsConst } from '../models/ai'
 
 // Types used, and not interfaces, because you do not get full intellisense on interfaces and we do not need any features that interfaces provide...
 // Enums do not apply to all norm forms of relational databases, I know. They are nice tho, at least, till they are not, because you have to update them...
@@ -75,8 +75,9 @@ export const neptun_user_file = pgTable('neptun_user_file', {
     .references(() => neptun_user.id, { onDelete: 'cascade' }),
 })
 
-type NewUserFile = typeof neptun_user_file.$inferInsert
-type GetUserFile = typeof neptun_user_file.$inferSelect
+export type NewUserFile = typeof neptun_user_file.$inferInsert
+export type GetUserFile = typeof neptun_user_file.$inferSelect
+export type CodeBlock = Omit<GetUserFile, 'id' | 'neptun_user_id' | 'created_at' | 'updated_at'>
 
 export type UserFileToCreate = Omit<NewUserFile, 'id' | 'created_at' | 'updated_at'>
 export type ReadUserFile = GetUserFile
@@ -504,6 +505,9 @@ export const InsertGithubAppInstallationSchema
     github_account_name: true,
     neptun_user_id: true,
   })
+export type GetGithubAppInstallation = z.infer<
+  typeof SelectGithubAppInstallationSchema
+>
 export type NewGithubAppInstallation = z.infer<
   typeof InsertGithubAppInstallationSchema
 >
@@ -565,6 +569,10 @@ export const InsertGithubAppInstallationRepositorySchema
     github_repository_is_archived: true,
     github_app_installation_id: true,
   })
+export type GetGithubAppInstallationRepository = z.infer<
+  typeof SelectGithubAppInstallationRepositorySchema
+>
+export type GetGithubAppInstallationRepositoryEssentials = Omit<GetGithubAppInstallationRepository, 'id' | 'created_at' | 'updated_at'>
 export type NewGithubAppInstallationRepository = z.infer<
   typeof InsertGithubAppInstallationRepositorySchema
 >

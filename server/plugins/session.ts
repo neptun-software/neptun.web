@@ -10,7 +10,9 @@ export default defineNitroPlugin(() => {
     })
   })
 
-  /* sessionHooks.hook('clear', async (session, event) => {
-    if (LOG_BACKEND) console.info('session cleared...');
-  }); */
+  sessionHooks.hook('clear', async (_session, _event) => {
+    if (LOG_BACKEND) {
+      console.info('session cleared...')
+    }
+  })
 })

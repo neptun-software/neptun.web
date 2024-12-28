@@ -329,7 +329,7 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <TemplateList
+          <MutatableTemplates
             :templates="collection.templates"
             :is-updating="isUpdating"
             :on-update="updateTemplate"

@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
       )
     }
 
-    const session = await requireUserSession(event) // should return error if no session
+    const session = await requireUserSession(event) // throws a 401 error if the user is not logged in
     event.context.user
       = session.user /* Context is accessible in the route, that runs after the middleware. */
   }

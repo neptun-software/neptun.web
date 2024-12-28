@@ -159,7 +159,7 @@ useHead({
     </template>
     <div v-if="status !== 'error'">
       <ShadcnScrollArea>
-        <AiChatMessages
+        <DashboardChatMessages
           v-if="status === 'success' && chatMessages.length > 0"
           :messages="chatMessages"
         />

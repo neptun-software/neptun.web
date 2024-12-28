@@ -4,7 +4,8 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import * as z from 'zod'
-import { emailSchema, passwordSchema } from '~/lib/types/input.validation'
+import { passwordSchema } from '~/lib/validation/user'
+import { emailSchema } from '~/lib/validation/user/email'
 
 // defineOgImageComponent('NuxtSeo');
 
