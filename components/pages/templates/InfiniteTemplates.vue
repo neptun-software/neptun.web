@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import type { TemplateCollectionWithTemplatesWithoutIds as TemplateData } from '~/components/pages/templates/(shared)/types'
 
-const { totalItems, isLoading, fetchInfiniteData } = useTemplates()
+const { totalItems, isLoading, fetchInfiniteData, refreshData } = useTemplates()
 const data = ref<TemplateData[]>([])
 const pageSize = ref(2)
 const page = ref(1)
+
+async function refresh() {
+  data.value = []
+  page.value = 1
+  return refreshData().then(() => loadMore())
+}
+
+defineExpose({ refresh })
 
 async function loadMore() {
   const hasMoreData = await fetchInfiniteData(page.value, pageSize.value, data)
@@ -20,7 +28,7 @@ useInfiniteScroll(document, loadMore, {
 
 <template>
   <div v-if="data.length > 0">
-    <Templates :collections="data" :is-loading="isLoading" />
+    <CollectionTemplateList :collections="data" :is-loading="isLoading" />
 
     <div
       v-if="!isLoading && data.length > 0 && data.length === totalItems"

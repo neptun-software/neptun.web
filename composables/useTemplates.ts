@@ -300,12 +300,14 @@ export function useTemplates() {
   const database = useState<TemplateData[]>('project-template-list', () => [])
   const isLoading = useState<boolean>('project-template-list-is-loading', () => false)
   const totalItems = useState<number>('project-template-list-length', () => 0)
+  const isInitialized = useState<boolean>('project-template-list-initialized', () => false)
 
-  async function fetchTemplateData(page: number, pageSize: number): Promise<TemplateData[]> {
+  async function initializeDatabase(force = false) {
+    if (isInitialized.value && !force) {
+      return
+    }
+
     try {
-      const start = (page - 1) * pageSize
-      const end = start + pageSize
-
       const { collections } = await $fetch('/api/shared/collections')
 
       const allTemplates = [
@@ -330,14 +332,29 @@ export function useTemplates() {
       ].filter(collection => collection.templates.length > 0)
 
       database.value = allTemplates
-      totalItems.value = allTemplates.length
-
-      const actualEnd = Math.min(end, totalItems.value)
-      return database.value.slice(start, actualEnd)
+      await nextTick(() => {
+        totalItems.value = allTemplates.length
+      })
+      isInitialized.value = true
     } catch (error) {
       console.error('Error fetching template data!')
       return []
     }
+  }
+
+  async function refreshData() {
+    isInitialized.value = false
+    await initializeDatabase(true)
+  }
+
+  async function fetchTemplateData(page: number, pageSize: number): Promise<TemplateData[]> {
+    if (!isInitialized.value) {
+      await initializeDatabase()
+    }
+
+    const start = (page - 1) * pageSize
+    const end = Math.min(start + pageSize, totalItems.value)
+    return database.value.slice(start, end)
   }
 
   async function fetchInfiniteData(
@@ -345,12 +362,16 @@ export function useTemplates() {
     pageSize: number,
     existingData: Ref<TemplateData[]>,
   ) {
-    if (isLoading.value || existingData.value.length >= database.value.length) {
+    if (isLoading.value || existingData.value.length >= totalItems.value) {
       return false
     }
 
     isLoading.value = true
     try {
+      if (!isInitialized.value) {
+        await initializeDatabase()
+      }
+
       const newData = await fetchTemplateData(page, pageSize)
       if (newData.length > 0) {
         existingData.value = [...existingData.value, ...newData]
@@ -358,7 +379,8 @@ export function useTemplates() {
       }
       return false
     } catch (error) {
-      console.error('Error fetching template data!')
+      console.error('Error fetching infinite data!')
+      return false
     } finally {
       isLoading.value = false
     }
@@ -371,6 +393,10 @@ export function useTemplates() {
   ) {
     isLoading.value = true
     try {
+      if (!isInitialized.value) {
+        await initializeDatabase()
+      }
+
       targetData.value = await fetchTemplateData(page, pageSize)
     } catch (error) {
       console.error('Error fetching template data!')
@@ -386,5 +412,6 @@ export function useTemplates() {
     fetchTemplateData,
     fetchInfiniteData,
     fetchPaginatedData,
+    refreshData,
   }
 }

@@ -658,20 +658,17 @@ export async function validateParamCollectionUuid(
   return validateParams<CollectionUuidType>(
     event,
     async () => {
-      // @ts-expect-error
-      const user_id = Number(params?.user_id) // => NaN if not a number, not present
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const uuid = params?.uuid
 
-      const result = await getValidatedRouterParams(
-        event,
-        params => CollectionUuidSchema.safeParse({
-          user_id,
-          // @ts-expect-error
-          uuid: params?.uuid,
-        }),
-      )
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.uuid = uuid
 
-      event.context.validated.params.user_id = result?.data?.user_id || null
-      event.context.validated.params.uuid = result?.data?.uuid || null
+        return CollectionUuidSchema.safeParse({ user_id, uuid })
+      })
 
       if (result.success) {
         return {
@@ -699,24 +696,20 @@ export async function validateParamTemplateId(
   return validateParams<TemplateIdType>(
     event,
     async () => {
-      // @ts-expect-error
-      const user_id = Number(params?.user_id) // => NaN if not a number, not present
-      // @ts-expect-error
-      const id = Number(params?.id)
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const id = Number(params?.id)
+        // @ts-expect-error
+        const uuid = params?.uuid
 
-      const result = await getValidatedRouterParams(
-        event,
-        params => TemplateIdSchema.safeParse({
-          user_id,
-          id,
-          // @ts-expect-error
-          uuid: params.uuid,
-        }),
-      )
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.uuid = uuid
+        event.context.validated.params.id = id
 
-      event.context.validated.params.user_id = result?.data?.user_id || null
-      event.context.validated.params.uuid = result?.data?.uuid || null
-      event.context.validated.params.id = result?.data?.id || null
+        return TemplateIdSchema.safeParse({ user_id, uuid, id })
+      })
 
       if (result.success) {
         return {

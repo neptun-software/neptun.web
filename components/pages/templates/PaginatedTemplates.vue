@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import type { TemplateCollectionWithTemplatesWithoutIds as TemplateData } from '~/components/pages/templates/(shared)/types'
 
-const { totalItems, isLoading, fetchPaginatedData } = useTemplates()
+const { totalItems, isLoading, fetchPaginatedData, refreshData } = useTemplates()
 const data = ref<TemplateData[]>([])
 const pageSize = ref(2)
 const page = ref(1)
-
-fetchPaginatedData(page.value, pageSize.value, data)
 
 const { currentPage, pageCount, isFirstPage, isLastPage, prev, next }
   = useOffsetPagination({
@@ -20,6 +18,16 @@ const { currentPage, pageCount, isFirstPage, isLastPage, prev, next }
       fetchPaginatedData(currentPage, currentPageSize, data)
     },
   })
+
+async function refresh() {
+  return refreshData().then(() => fetchPaginatedData(page.value, pageSize.value, data))
+}
+
+defineExpose({ refresh })
+
+onMounted(async () => {
+  await fetchPaginatedData(page.value, pageSize.value, data)
+})
 </script>
 
 <template>
@@ -41,7 +49,7 @@ const { currentPage, pageCount, isFirstPage, isLastPage, prev, next }
       </ShadcnButton>
     </div>
 
-    <Templates :collections="data" :is-loading="isLoading" />
+    <CollectionTemplateList :collections="data" :is-loading="isLoading" />
   </div>
   <div v-else>
     <p>No templates found</p>

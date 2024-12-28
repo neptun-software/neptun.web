@@ -9,7 +9,7 @@ const { loggedIn } = useUserSession()
 const router = useRouter()
 const routes = router.options.routes
 
-const hiddenRoutes = ['/new-password', '/shared/chats/:uuid()']
+const hiddenRoutes = ['/new-password', '/shared/chats/:uuid()', '/shared/collections/:uuid()']
 const hiddenRoutesIfLoggedIn = hiddenRoutes.concat(['/log-in', '/sign-up'])
 const hiddenRoutesIfLoggedOut = hiddenRoutes.concat([
   '/',

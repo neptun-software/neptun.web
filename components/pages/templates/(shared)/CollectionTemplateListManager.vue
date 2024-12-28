@@ -211,6 +211,8 @@ function resetNewCollection() {
 onMounted(() => {
   void readCollections()
 })
+
+const requestUrl = useRequestURL()
 </script>
 
 <template>
@@ -329,12 +331,16 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <MutatableTemplates
+          <CollectionTemplateListMutatable
             :templates="collection.templates"
             :is-updating="isUpdating"
             :on-update="updateTemplate"
             :on-delete="deleteTemplate"
           />
+          <div v-if="collection.is_shared" class="flex items-center gap-2 px-2 py-1 border rounded-sm bg-accent">
+            {{ `http${IS_DEV ? '' : 's'}://${requestUrl.host}/shared/collections/${collection.share_uuid}` }}
+            <CopyToClipboard :text="`http${IS_DEV ? '' : 's'}://${requestUrl.host}/shared/collections/${collection.share_uuid}`" />
+          </div>
         </div>
         <InfoBlock
           :is-visible="collections.length === 0"
