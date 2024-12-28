@@ -3,18 +3,18 @@ import { deleteTemplateCollection } from '~/server/database/repositories/userTem
 // Delete template Collection
 export default defineEventHandler(async (event) => {
   /* VALIDATE PARAMS */
-  const maybeUuid = await validateParamUuid(event)
-  if (maybeUuid.statusCode !== 200) {
+  const maybeCollectionUuid = await validateParamCollectionUuid(event)
+  if (maybeCollectionUuid.statusCode !== 200) {
     return sendError(
       event,
       createError({
-        statusCode: maybeUuid.statusCode,
-        statusMessage: maybeUuid.statusMessage,
-        data: maybeUuid.data,
+        statusCode: maybeCollectionUuid.statusCode,
+        statusMessage: maybeCollectionUuid.statusMessage,
+        data: maybeCollectionUuid.data,
       }),
     )
   }
-  const uuid = maybeUuid.data?.uuid
+  const { uuid } = maybeCollectionUuid.data
 
   try {
     await deleteTemplateCollection(uuid)

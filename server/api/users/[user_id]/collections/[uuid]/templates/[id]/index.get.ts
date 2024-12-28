@@ -1,18 +1,18 @@
 import { readTemplate } from '~/server/database/repositories/userTemplates'
 
 export default defineEventHandler(async (event) => {
-  const id = Number.parseInt(event.context.params?.id || '')
-
-  if (Number.isNaN(id)) {
+  const maybeTemplateId = await validateParamTemplateId(event)
+  if (maybeTemplateId.statusCode !== 200) {
     return sendError(
       event,
       createError({
-        statusCode: 400,
-        statusMessage: 'Bad Request',
-        message: 'Invalid template ID',
+        statusCode: maybeTemplateId.statusCode,
+        statusMessage: maybeTemplateId.statusMessage,
+        data: maybeTemplateId.data,
       }),
     )
   }
+  const { id } = maybeTemplateId.data
 
   const template = await readTemplate(id)
 

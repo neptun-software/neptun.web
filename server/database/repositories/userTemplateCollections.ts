@@ -1,13 +1,27 @@
 import type {
   TemplateCollectionToCreate } from '~/lib/types/database.tables/schema'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import {
   neptun_user_template_collection,
 } from '~/lib/types/database.tables/schema'
 
-export async function readTemplateCollection(share_uuid: string) {
+export async function readTemplateCollection(share_uuid: string, {
+  is_shared = null,
+  user_id = null,
+}: {
+  is_shared?: boolean | null
+  user_id?: number | null
+}) {
   const collection = await db.query.neptun_user_template_collection.findFirst({
-    where: eq(neptun_user_template_collection.share_uuid, share_uuid),
+    where: and(
+      eq(neptun_user_template_collection.share_uuid, share_uuid),
+      is_shared !== null
+        ? eq(neptun_user_template_collection.is_shared, is_shared)
+        : undefined,
+      user_id !== null
+        ? eq(neptun_user_template_collection.neptun_user_id, user_id)
+        : undefined,
+    ),
     with: {
       templates: {
         with: {
@@ -49,11 +63,22 @@ export async function readTemplateCollection(share_uuid: string) {
   }
 }
 
-export async function readAllTemplateCollections(is_shared: boolean | null) {
+export async function readAllTemplateCollections({
+  is_shared = null,
+  user_id = null,
+}: {
+  is_shared?: boolean | null
+  user_id?: number | null
+}) {
   const collections = await db.query.neptun_user_template_collection.findMany({
-    where: is_shared !== null
-      ? eq(neptun_user_template_collection.is_shared, is_shared)
-      : undefined,
+    where: and(
+      is_shared !== null
+        ? eq(neptun_user_template_collection.is_shared, is_shared)
+        : undefined,
+      user_id !== null
+        ? eq(neptun_user_template_collection.neptun_user_id, user_id)
+        : undefined,
+    ),
     with: {
       templates: {
         with: {

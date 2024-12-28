@@ -1,20 +1,20 @@
 import { InsertTemplateCollectionSchema } from '~/lib/types/database.tables/schema'
-import { updateTemplateCollection } from '~/server/database/repositories/userTemplateCollections'
+import { createTemplateCollection } from '~/server/database/repositories/userTemplateCollections'
 
+// Create a new user template collection
 export default defineEventHandler(async (event) => {
-  /* VALIDATE PARAMS */
-  const maybeUuid = await validateParamUuid(event)
-  if (maybeUuid.statusCode !== 200) {
+  const maybeUserId = await validateParamUserId(event)
+  if (maybeUserId.statusCode !== 200) {
     return sendError(
       event,
       createError({
-        statusCode: maybeUuid.statusCode,
-        statusMessage: maybeUuid.statusMessage,
-        data: maybeUuid.data,
+        statusCode: maybeUserId.statusCode,
+        statusMessage: maybeUserId.statusMessage,
+        data: maybeUserId.data,
       }),
     )
   }
-  const uuid = maybeUuid.data?.uuid
+  const user_id = maybeUserId.data?.user_id
 
   /* VALIDATE BODY */
   const body = await readValidatedBody(event, (body) => {
@@ -26,26 +26,26 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
-        message: 'Invalid body({ name?, description?, is_shared? })',
+        message: 'Invalid body({ name, description?, is_shared? })',
         data: body.error,
       }),
     )
   }
 
   try {
-    const collection = await updateTemplateCollection(
-      uuid,
-      body.data,
-    )
+    const collection = await createTemplateCollection({
+      ...body.data,
+      neptun_user_id: user_id,
+    })
 
     return { collection }
-  } catch (error) {
+  } catch {
     return sendError(
       event,
       createError({
         statusCode: 500,
         statusMessage: 'Internal Server Error',
-        data: error,
+        data: null,
       }),
     )
   }

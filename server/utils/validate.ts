@@ -74,6 +74,27 @@ export const ModelSchema = z.object({
 
 type ModelType = z.infer<typeof ModelSchema>
 
+export const CollectionUuidSchema = z.object({
+  user_id: primaryIdSchema,
+  uuid: z.string().uuid(),
+})
+
+type CollectionUuidType = z.infer<typeof CollectionUuidSchema>
+
+export const TemplateIdSchema = z.object({
+  user_id: primaryIdSchema,
+  uuid: z.string().uuid(),
+  id: primaryIdSchema,
+})
+
+type TemplateIdType = z.infer<typeof TemplateIdSchema>
+
+export const UuidSchema = z.object({
+  uuid: z.string().uuid(),
+})
+
+type UuidType = z.infer<typeof UuidSchema>
+
 /* QUERY SCHEMAs */
 
 /**
@@ -108,11 +129,11 @@ const OrderByQuerySchema = z.object({
 
 type OrderByQueryType = z.infer<typeof OrderByQuerySchema>
 
-export const ChatUuidSchema = z.object({
-  uuid: z.string().uuid(),
+export const IsSharedQuerySchema = z.object({
+  is_shared: z.boolean().optional().or(z.null()),
 })
 
-type ChatUuidType = z.infer<typeof ChatUuidSchema>
+type IsSharedQueryType = z.infer<typeof IsSharedQuerySchema>
 
 /* BODY SCHEMAs */
 
@@ -235,7 +256,7 @@ async function validateParams<S, E = S>(
 export async function validateQueryChatId(
   event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<ChatIdQueryType>> {
-  return validateParams<ChatIdQueryType, ChatIdQueryType>(
+  return validateParams<ChatIdQueryType>(
     event,
     async () => {
       const result = await getValidatedQuery(event, (params) => {
@@ -254,6 +275,31 @@ export async function validateQueryChatId(
     'Successfully validated queryParams(chat_id).',
     'Invalid queryParams(chat_id).',
     'queryParams(chat_id):',
+  )
+}
+
+export async function validateQueryIsShared(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<IsSharedQueryType>> {
+  return validateParams<IsSharedQueryType>(
+    event,
+    async () => {
+      const result = await getValidatedQuery(event, (params) => {
+        // @ts-expect-error
+        const is_shared = params?.is_shared
+        event.context.validated.query.is_shared = is_shared
+
+        return IsSharedQuerySchema.safeParse({ is_shared })
+      })
+      if (result.success) {
+        return { success: true, data: { is_shared: result.data.is_shared } }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated queryParams(is_shared).',
+    'Invalid queryParams(is_shared).',
+    'queryParams(is_shared):',
   )
 }
 
@@ -605,15 +651,103 @@ export async function validateParamAiModelName(
   )
 }
 
+/* VALIDATE ROUTE PARAMS(user_id, uuid) */
+export async function validateParamCollectionUuid(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<CollectionUuidType>> {
+  return validateParams<CollectionUuidType>(
+    event,
+    async () => {
+      // @ts-expect-error
+      const user_id = Number(params?.user_id) // => NaN if not a number, not present
+
+      const result = await getValidatedRouterParams(
+        event,
+        params => CollectionUuidSchema.safeParse({
+          user_id,
+          // @ts-expect-error
+          uuid: params?.uuid,
+        }),
+      )
+
+      event.context.validated.params.user_id = result?.data?.user_id || null
+      event.context.validated.params.uuid = result?.data?.uuid || null
+
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            user_id: result.data.user_id,
+            uuid: result.data.uuid,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, uuid).',
+    `Invalid routeParams(user_id, uuid). The resource with uuid=${event.context.validated.params.uuid} does not exist or you do not have access to it.`,
+    'queryParams(user_id, uuid):',
+    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, uuid, id) */
+export async function validateParamTemplateId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<TemplateIdType>> {
+  return validateParams<TemplateIdType>(
+    event,
+    async () => {
+      // @ts-expect-error
+      const user_id = Number(params?.user_id) // => NaN if not a number, not present
+      // @ts-expect-error
+      const id = Number(params?.id)
+
+      const result = await getValidatedRouterParams(
+        event,
+        params => TemplateIdSchema.safeParse({
+          user_id,
+          id,
+          // @ts-expect-error
+          uuid: params.uuid,
+        }),
+      )
+
+      event.context.validated.params.user_id = result?.data?.user_id || null
+      event.context.validated.params.uuid = result?.data?.uuid || null
+      event.context.validated.params.id = result?.data?.id || null
+
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            user_id: result.data.user_id,
+            uuid: result.data.uuid,
+            id: result.data.id,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, uuid, id).',
+    `Invalid routeParams(user_id, uuid, id). The resource with id=${event.context.validated.params.id} does not exist or you do not have access to it.`,
+    'queryParams(user_id, uuid, id):',
+    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(uuid) */
 export async function validateParamUuid(
   event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<ChatUuidType>> {
-  return validateParams<ChatUuidType>(
+): Promise<ValidationResult<UuidType>> {
+  return validateParams<UuidType>(
     event,
     async () => {
       const result = await getValidatedRouterParams(
         event,
-        params => ChatUuidSchema.safeParse(params),
+        params => UuidSchema.safeParse(params),
       )
 
       event.context.validated.params.uuid = result?.data?.uuid || null

@@ -16,7 +16,9 @@ export default defineCachedEventHandler(async (event) => {
   }
   const uuid = maybeUuid.data?.uuid
 
-  const collection = await readTemplateCollection(uuid)
+  const collection = await readTemplateCollection(uuid, {
+    is_shared: true,
+  })
 
   if (!collection) {
     return sendError(
@@ -29,18 +31,5 @@ export default defineCachedEventHandler(async (event) => {
     )
   }
 
-  if (!collection.is_shared) {
-    return sendError(
-      event,
-      createError({
-        statusCode: 403,
-        statusMessage: 'Forbidden',
-        message: 'This template collection is not shared',
-      }),
-    )
-  }
-
-  return {
-    collection,
-  }
+  return { collection }
 })

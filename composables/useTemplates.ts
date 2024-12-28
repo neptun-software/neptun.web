@@ -9,9 +9,7 @@ import type {
 } from '~/lib/types/database.tables/schema'
 import { recommendedCollections } from '../components/pages/templates/(shared)/data'
 
-// TODO:
-// move collection mutation endpoints to `/users` and extend readAllTemplateCollections(allow fetching by userID) (protect them)
-// only update client-state if server-update was successful
+// TODO: only update client-state if server-update was successful
 
 /**
  * Provides a composable function for managing and fetching template collections.
@@ -54,15 +52,16 @@ export function useTemplateManager() {
   const collections = useState<TemplateCollectionWithTemplates[]>('template-manager-collections', () => [])
   const fetchStatus = useState<AsyncDataRequestStatus>('template-manager-status', () => 'pending')
   const fetchError = useState<FetchError | null>('template-manager-error', () => null)
+  const { user } = useUserSession()
 
   const query = computed(() =>
-    showShared.value !== null ? { is_shared: String(showShared.value) } : {},
+    showShared.value !== null ? { is_shared: showShared.value } : {},
   )
 
   async function readCollections() {
     try {
       fetchStatus.value = 'pending'
-      const response = await $fetch('/api/shared/collections', {
+      const response = await $fetch(`/api/users/${user.value?.id}/collections`, {
         method: 'GET',
         query: query.value,
       })
@@ -101,7 +100,7 @@ export function useTemplateManager() {
     }
 
     try {
-      const updatedCollection = await $fetch(`/api/shared/collections/${share_uuid}`, {
+      const updatedCollection = await $fetch(`/api/users/${user.value?.id}/collections/${share_uuid}`, {
         method: 'PATCH',
         body: data,
       })
@@ -120,7 +119,7 @@ export function useTemplateManager() {
 
   async function deleteCollection(share_uuid: string) {
     try {
-      await $fetch(`/api/shared/collections/${share_uuid}`, {
+      await $fetch(`/api/users/${user.value?.id}/collections/${share_uuid}`, {
         method: 'DELETE',
       })
 
@@ -132,7 +131,7 @@ export function useTemplateManager() {
 
   async function createNewCollection(collection: TemplateCollectionToCreate) {
     try {
-      const response = await $fetch('/api/shared/collections', {
+      const response = await $fetch(`/api/users/${user.value?.id}/collections`, {
         method: 'POST',
         body: collection,
       })
@@ -177,7 +176,7 @@ export function useTemplateManager() {
         extension: fileData.extension || 'txt',
       }
 
-      const response = await $fetch(`/api/shared/collections/${collection.share_uuid}/templates`, {
+      const response = await $fetch(`/api/users/${user.value?.id}/collections/${collection.share_uuid}/templates`, {
         method: 'POST',
         body: {
           template,
@@ -212,7 +211,7 @@ export function useTemplateManager() {
         return
       }
 
-      const response = await $fetch(`/api/shared/collections/${collection.share_uuid}/templates/${templateId}`, {
+      const response = await $fetch(`/api/users/${user.value?.id}/collections/${collection.share_uuid}/templates/${templateId}`, {
         method: 'PATCH',
         body: data,
       })
@@ -246,7 +245,7 @@ export function useTemplateManager() {
         return
       }
 
-      await $fetch(`/api/shared/collections/${collection.share_uuid}/templates/${templateId}`, {
+      await $fetch(`/api/users/${user.value?.id}/collections/${collection.share_uuid}/templates/${templateId}`, {
         method: 'DELETE',
       })
 
