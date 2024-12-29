@@ -11,7 +11,7 @@ const activeTab = ref('paginated-pages')
 const { isLoading } = useTemplates()
 const { loggedIn } = useUserSession()
 
-const paginatedTemplatesRef = ref<{ refresh: () => Promise<void>} | null>(null)
+const paginatedTemplatesRef = ref<{ refresh: () => Promise<void> } | null>(null)
 const infiniteTemplatesRef = ref<{ refresh: () => Promise<void> } | null>(null)
 
 async function refreshTemplates() {
@@ -51,10 +51,10 @@ async function refreshTemplates() {
                   </ShadcnTabsTrigger>
                 </ShadcnTabsList>
 
-                <ShadcnButton 
-                  variant="outline" 
-                  size="icon" 
-                  :disabled="isLoading" 
+                <ShadcnButton
+                  variant="outline"
+                  size="icon"
+                  :disabled="isLoading"
                   @click="refreshTemplates"
                 >
                   <RefreshCcw class="size-4" />

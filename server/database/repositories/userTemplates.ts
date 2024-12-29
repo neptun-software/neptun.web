@@ -106,7 +106,6 @@ export async function updateTemplate(
       .set({
         description: data.description,
         file_name: data.file_name,
-        updated_at: new Date(),
       })
       .where(eq(neptun_user_template.id, id))
       .returning()

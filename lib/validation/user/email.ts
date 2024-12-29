@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod'
 
 export const emailSchema = z.string().min(5, {
   message: 'Email must be at least 5 characters',
