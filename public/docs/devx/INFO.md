@@ -30,33 +30,15 @@
 - `GET` && `POST` `/api/users/{user_id}/chats/{chat_id}/shares` [read](../api_users_chats_shares.md) | [create](../api_users_chats_shares_create.md)
 - `POST` [`/api/users/{user_id}/chats/{chat_id}/shares/{share_id}/whitelist-entries`](../api_users_chats_shares_whitelist_entries_create.md)
 
+- `GET` [`/api/shared/collections`](../api_shared_collections.get.md)
+- `GET` [`/api/shared/collections/{uuid}`](../api_shared_collections_uuid.get.md)
+- `GET` [`/api/users/{user_id}/collections`](../api_users_collections.get.md)
+- `POST` [`/api/users/{user_id}/collections`](../api_users_collections.post.md)
+- `PATCH` && `DELETE` `/api/users/{user_id}/collections/{uuid}` [update](../api_users_collections_uuid.patch.md) | [delete](../api_users_collections_uuid.delete.md)
+- `POST` [`/api/users/{user_id}/collections/{uuid}/templates`](../api_users_collections_uuid_templates.post.md)
+- `GET` && `PATCH` && `DELETE` [read](../api_users_collections_uuid_templates_id.get.md) | [update](../api_users_collections_uuid_templates_id.patch.md) | [delete](../api_users_collections_uuid_templates_id.delete.md)
+
 - `GET` [`/api/users/{user_id}/installations`](../api_users_installations.md)
 - `GET` [`/api/users/{user_id}/installations/{installation_id}/imports`](../api_users_installations_imports.md)
 
 - `GET` [`/api/html-to-markdown/{url}`](../api_html-to-markdown.md)
-
-<!--
-* `POST` `/api/ai/huggingface/{model_publisher}/{model_name}/chat`
-* `HEAD` `/api/auth/check`
-* `POST` `/api/auth/login`
-* `POST` `/api/auth/logout`
-* `POST` `/api/auth/sign-up`
-* `GET` `/api/html-to-markdown/{url}`
-* `GET` `/api/shared/chats/{uuid}`
-* `DELETE` `/api/users/{user_id}/chats/{chat_id}`
-* `POST` `/api/users/{user_id}/chats/{chat_id}/files/{message_id}`
-* `GET` `/api/users/{user_id}/chats/{chat_id}/files`
-* `POST` `/api/users/{user_id}/chats/{chat_id}/messages`
-* `DELETE` `/api/users/{user_id}/chats/{chat_id}/messages/last`
-* `GET` `/api/users/{user_id}/chats/{chat_id}/messages`
-* `POST` `/api/users/{user_id}/chats/{chat_id}/shares`
-* `POST` `/api/users/{user_id}/chats/{chat_id}/shares/{share_id}/whitelist-entries`
-* `GET` `/api/users/{user_id}/chats/{chat_id}/shares`
-* `PATCH` `/api/users/{user_id}/chats/{chat_id}`
-* `GET` && `POST` && `DELETE` `/api/users/{user_id}/chats`
-* `GET` `/api/users/{user_id}/cli`
-* `DELETE` `/api/users/{user_id}`
-* `GET` `/api/users/{user_id}/installations/{installation_id}/imports`
-* `GET` `/api/users/{user_id}/installations`
-* `PATCH` `/api/users/{user_id}`
--->
