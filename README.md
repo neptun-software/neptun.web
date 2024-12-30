@@ -1,26 +1,105 @@
 # Neptun Website
 
-The website of the neptun-tool. View status [here](https://pfn4gnjb.status.cron-job.org).
+> [!NOTE]
+> The website of the neptun-tool.
+
+View status [here](https://pfn4gnjb.status.cron-job.org).
 
 ## Info
 
-Built with [Nuxt 3](https://nuxt.com/docs/getting-started/introduction), [Nitro](https://nitro.unjs.io), [Vite](https://vitejs.dev) and [Vue 3](https://vuejs.org).
+> Built with [Nuxt 3](https://nuxt.com/docs/getting-started/introduction), [Nitro](https://nitro.unjs.io), [Vite](https://vitejs.dev) and [Vue 3](https://vuejs.org).
 
 ## Setup
 
+Install `ni` globally:
+
 ```bash
-pnpm install
+npm i -g @antfu/ni
+```
+
+Install packages:
+
+```bash
+ni # same as npm i, pnpm i, yarn i, bun i
+```
+
+Install new packages:
+
+```bash
+ni [package_name] # same as npm i [package_name], pnpm i [package_name], yarn i [package_name], bun i [package_name]
 ```
 
 ## Development
 
+Run the development server:
+
 ```bash
-pnpm run dev
+nr dev
 ```
 
-### Development Server
+Finding the version of a sub-dependency:
 
-How the keys were generated:
+```bash
+nr find-version [package_name]
+```
+
+<details>
+<summary>All scripts</summary>
+
+```js
+"scripts": {
+  "dev": "set EDITOR=code && nuxt dev",
+  "devx": "set EDITOR=code && nuxt dev --host --https --ssl-cert ./configurations/development/ssl/server.crt --ssl-key ./configurations/development/ssl/server.key",
+  "app": "export EDITOR=code && nuxt dev",
+  "appx": "export EDITOR=code && nuxt dev --host --https --ssl-cert ./configurations/development/ssl/server.crt --ssl-key ./configurations/development/ssl/server.key",
+  "preparex": "npm run types && npm run render",
+  "types": "npx nuxi prepare",
+  "render": "nuxt generate",
+  "postinstall": "nuxt prepare",
+  "build": "nuxt build",
+  "preview": "nuxt preview",
+  "format-and-lint": "npx prettier --plugin-search-dir . --check . && npx eslint .",
+  "format": "npx prettier --write . --single-quote --trailing-comma es5 --semi",
+  "lint": "eslint . --fix",
+  "lint-settings": "npx @eslint/config-inspector",
+  "check": "npx nuxi typecheck",
+  "shadcn": "npx shadcn-vue@latest add",
+  "cleanup": "pnpx nuxi cleanup .",
+  "fresh": "npm cache verify && pnpm rebuild && pnpx nuxi cleanup",
+  "upgrade": "npx nuxi upgrade -f",
+  "statistics": "npx nuxi analyze",
+  "info": "npx nuxi info",
+  "find-version": "node ./helpers/find-package-version.cjs",
+  "db:push": "drizzle-kit push --config drizzle-dev.config.ts",
+  "db:push:prod": "drizzle-kit push --config drizzle-prod.config.ts",
+  "db:pull": "drizzle-kit introspect --config drizzle-dev.config.ts",
+  "db:pull:prod": "drizzle-kit introspect --config drizzle-prod.config.ts",
+  "db:generate": "drizzle-kit generate --config=drizzle-dev.config.ts",
+  "db:generate:prod": "drizzle-kit generate --config=drizzle-prod.config.ts",
+  "db:migrate": "bun run ./helpers/migrate.ts environment=dev",
+  "db:migrate:prod": "bun run ./helpers/migrate.ts environment=prod",
+  "db:studio": "drizzle-kit studio --config drizzle-dev.config.ts --host 127.0.0.1",
+  "db:studio:prod": "drizzle-kit studio --config drizzle-prod.config.ts --host 127.0.0.1",
+  "db:dump-data": "bun run ./helpers/backup.ts",
+  "db:dump-schema": "bun run ./helpers/backup.ts --schema-only",
+  "db:mermaid": "bun run ./helpers/schema-to-mermaid.ts",
+  "db:png": "bun run ./helpers/mermaid-to-png.ts",
+  "db:diagram": "powershell \"Start-Process cmd -Verb RunAs -ArgumentList '/k cd /d \\\"%CD%\\\" && helpers\\generate-diagram-native.bat'\""
+},
+```
+
+</details>
+
+### Network-wide access
+
+> SSL for network-wide access. This is useful, if you want to test it on mobile, while still developing on your local machine.
+
+```bash
+nr devx
+```
+
+<details>
+<summary>How the keys were generated</summary>
 
 ```bash
 openssl genrsa 2048 > server.key
@@ -45,13 +124,16 @@ Common Name (e.g. server FQDN or YOUR name) []:localhost
 Email Address []:neptunai.contact@gmail.com
 ```
 
+</details>
+
 ### Known Issues
 
 - Doesn't work in `bun@1.1.30`.
-- Extremely slow on `Windows11` (faster in WSL (might be better in nuxt@v4, which is currently in nightly-channel)).
-- `srcDir` causes some imports and types to break... (could improve performance on windows theoretically tho).
-- SSL needed for mobile, if `--https` is set. (else `ERR_SSL_PROTOCOL_ERROR`).
-- Oauth doesn't work using https in development mode. (causes `ERR_EMPTY_RESPONSE`).
+- Slow on `Windows11` (faster in WSL2 (might be better in `nuxt@v4`, which is currently in nightly-channel))
+  - If you are coding in a folder, that is in your NAS/Cloud (hopefully with a file- and folder [blacklist](https://gist.github.com/jonasfroeller/0e42c350947c7d04b0dc8a9735f2412e)), disable syncing while developing, so that it doesn't cause performance issues, because Windows loves to lock files.
+  - `srcDir` (`nuxt@v4` feature, that can be used in `nuxt@v3` already) causes some imports and types to break... (could improve performance on Windows theoretically tho).
+- SSL needed for mobile, if `--https` is set. (else `ERR_SSL_PROTOCOL_ERROR`). Use `devx` for that.
+- Oauth doesn't work using https in development mode. (causes `ERR_EMPTY_RESPONSE`). Just use E-Mail and Password login for now.
 
 ### Docker
 
@@ -69,9 +151,15 @@ or
 docker compose -f ./configurations/production/docker-compose.yml -f ./configurations/development/docker-compose.yml up --build
 ```
 
-### Database Commands
+### Database
 
-> Those commands are postgres specific.
+> The database, currently Postgres, is managed with [Drizzle](https://orm.drizzle.team) and can be replaced with any other database, that Drizzle supports.
+
+**Tables**: `lib\types\database.tables\schema.ts`
+**Relations**: `lib\types\database.tables\relations.ts`
+
+<details>
+<summary>Postgres specific commands, i needed (and didn't know) nonetheless</summary>
 
 Get all enum values:
 
@@ -106,28 +194,30 @@ ALTER TABLE <table_name>
 DROP TYPE <enum_name>_old;
 ```
 
+</details>
+
 #### Overview
 
-> These commands help manage your database schema and migrations using Drizzle ORM.
+> These commands help manage the database schema and migrations using Drizzle ORM.
 
 #### Commands in Order of Common Usage
 
 ```bash
 # 1. Pull existing schema from database (if you have an existing database)
-npm run db:pull        # Pulls current database schema into TypeScript files
+nr db:pull        # Pulls current database schema into TypeScript files
 
 # 2. Generate SQL migrations from schema changes
-npm run db:generate    # Creates SQL migration files based on schema changes
+nr db:generate    # Creates SQL migration files based on schema changes
 
 # 3. Apply migrations to database
-npm run db:migrate     # Executes pending SQL migrations on the database
+bun run db:migrate     # Executes pending SQL migrations on the database (executes a .ts file, NodeJs theoretically supports execution in the newest version too, you could also use a global package)
 
 # 4. (Alternative to 2+3) Push schema changes directly
-npm run db:push        # Directly applies schema changes without migration files
+nr db:push        # Directly applies schema changes without migration files
                        # ⚠️ Use only in development! Not recommended for production
 
 # Development Tools
-npm run db:studio      # Opens Drizzle Studio for visual database management
+nr db:studio      # Opens Drizzle Studio for visual database management
 ```
 
 #### When to Use Which Command
@@ -164,180 +254,127 @@ npm run db:studio      # Opens Drizzle Studio for visual database management
   - To manage data during development
   - For debugging database state
 
-#### Best Practices
-
-1. **Development Workflow**
-
-   ```bash
-   # Make schema changes in TypeScript
-   npm run db:generate  # Create migration files
-   npm run db:migrate   # Apply migrations
-   ```
-
-2. **Production Workflow**
-
-   ```bash
-   # Never use db:push in production!
-   npm run db:generate  # Create migration files
-   # Review migrations
-   npm run db:migrate   # Apply migrations
-   ```
-
-3. **Team Collaboration**
-   - Always commit migration files to version control
-   - Use `db:generate` and `db:migrate` instead of `db:push`
-   - Pull latest migrations before making schema changes
-
-### Schema
-
-#### Exporting
-
-```bash
-bun run db:dump-schema
-```
-
-#### ERD
-
-[drawio.com](https://www.drawio.com/blog/diagrams-from-code) allows you to import sql, but you have to connect the tables yourself, which is too much work imo.
-That is why I wrote 3 scripts. One for generating a database schema sql-dump, one to generate a mermaid ERD from that SQL and one to generate a mermaid png-diagram from that ERD.
-
-```bash
-sudo apt-get update
-sudo apt-get install -y postgresql-client-16 # needed for pg_dump
-npx puppeteer browsers install chrome-headless-shell # needed for mermaid-to-png (doesn't work on wsl2)
-```
-
-```bash
-bun run db:dump-schema
-```
-
-```bash
-bun run db:mermaid
-```
-
-```bash
-bun run db:png
-```
+#### Schema
 
 ```mermaid
 erDiagram
     chat_conversation {
-        integer_NOT_NULL id
-        text_NOT_NULL name
-        ai_model_enum_NOT_NULL model
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
-        integer_NOT_NULL neptun_user_id
+        id integer_NOT_NULL
+        name text_NOT_NULL
+        model ai_model_enum_NOT_NULL
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
     }
     chat_conversation_file {
-        integer_NOT_NULL id
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
-        integer_NOT_NULL neptun_user_id
-        integer_NOT_NULL chat_conversation_id
-        integer_NOT_NULL chat_conversation_message_id
-        integer_NOT_NULL neptun_user_file_id
+        id integer_NOT_NULL
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
+        chat_conversation_id integer_NOT_NULL
+        chat_conversation_message_id integer_NOT_NULL
+        neptun_user_file_id integer_NOT_NULL
     }
     chat_conversation_message {
-        integer_NOT_NULL id
-        text_NOT_NULL message
-        chat_conversation_message_actor_enum actor
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
-        integer_NOT_NULL neptun_user_id
-        integer_NOT_NULL chat_conversation_id
+        id integer_NOT_NULL
+        message text_NOT_NULL
+        actor chat_conversation_message_actor_enum
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
+        chat_conversation_id integer_NOT_NULL
     }
     chat_conversation_share {
-        integer_NOT_NULL id
-        boolean_NOT_NULL is_shared
-        uuid_NOT_NULL share_id
-        boolean_NOT_NULL is_protected
-        text hashed_password
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
-        integer_NOT_NULL chat_conversation_id
+        id integer_NOT_NULL
+        is_shared boolean_NOT_NULL
+        share_id uuid_NOT_NULL
+        is_protected boolean_NOT_NULL
+        hashed_password text
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        chat_conversation_id integer_NOT_NULL
     }
     chat_conversation_share_whitelist_entry {
-        integer_NOT_NULL id
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
-        integer_NOT_NULL whitelisted_neptun_user_id
-        integer_NOT_NULL chat_conversation_share_id
+        id integer_NOT_NULL
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        whitelisted_neptun_user_id integer_NOT_NULL
+        chat_conversation_share_id integer_NOT_NULL
     }
     github_app_installation {
-        integer_NOT_NULL id
-        text_NOT_NULL github_account_type
-        text_NOT_NULL github_account_avatar_url
-        integer_NOT_NULL github_account_id
-        text github_account_name
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
-        integer_NOT_NULL neptun_user_id
+        id integer_NOT_NULL
+        github_account_type text_NOT_NULL
+        github_account_avatar_url text_NOT_NULL
+        github_account_id integer_NOT_NULL
+        github_account_name text
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
     }
     github_app_installation_repository {
-        integer_NOT_NULL id
-        integer_NOT_NULL github_repository_id
-        text_NOT_NULL github_repository_name
-        text github_repository_description
-        integer github_repository_size
-        text github_repository_language
-        text github_repository_license
-        text_NOT_NULL github_repository_url
-        text github_repository_website_url
-        text github_repository_default_branch
-        boolean_NOT_NULL github_repository_is_private
-        boolean github_repository_is_fork
-        boolean github_repository_is_template
-        boolean_NOT_NULL github_repository_is_archived
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
-        integer_NOT_NULL github_app_installation_id
+        id integer_NOT_NULL
+        github_repository_id integer_NOT_NULL
+        github_repository_name text_NOT_NULL
+        github_repository_description text
+        github_repository_size integer
+        github_repository_language text
+        github_repository_license text
+        github_repository_url text_NOT_NULL
+        github_repository_website_url text
+        github_repository_default_branch text
+        github_repository_is_private boolean_NOT_NULL
+        github_repository_is_fork boolean
+        github_repository_is_template boolean
+        github_repository_is_archived boolean_NOT_NULL
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        github_app_installation_id integer_NOT_NULL
     }
     neptun_user {
-        integer_NOT_NULL id
-        text_NOT_NULL primary_email
-        text hashed_password
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
+        id integer_NOT_NULL
+        primary_email text_NOT_NULL
+        hashed_password text
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
     }
     neptun_user_oauth_account {
-        integer_NOT_NULL id
-        oauth_provider_enum_NOT_NULL provider
-        text_NOT_NULL oauth_user_id
-        text_NOT_NULL oauth_email
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
-        integer_NOT_NULL neptun_user_id
+        id integer_NOT_NULL
+        provider oauth_provider_enum_NOT_NULL
+        oauth_user_id text_NOT_NULL
+        oauth_email text_NOT_NULL
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
     }
     neptun_user_file {
-        integer_NOT_NULL id
-        text title
-        text_NOT_NULL text
-        text language
-        text file_extension
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
-        integer_NOT_NULL neptun_user_id
+        id integer_NOT_NULL
+        title text
+        text text_NOT_NULL
+        language text
+        file_extension text
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
     }
     neptun_user_template {
-        integer_NOT_NULL id
-        text description
-        text_NOT_NULL file_name
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
-        integer_NOT_NULL neptun_user_id
-        integer template_collection_id
-        integer user_file_id
+        id integer_NOT_NULL
+        description text
+        file_name text_NOT_NULL
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
+        template_collection_id integer
+        user_file_id integer
     }
     neptun_user_template_collection {
-        integer_NOT_NULL id
-        text_NOT_NULL name
-        text description
-        boolean_NOT_NULL is_shared
-        uuid_NOT_NULL share_id
-        timestamp_without_time_zone created_at
-        timestamp_without_time_zone updated_at
-        integer_NOT_NULL neptun_user_id
+        id integer_NOT_NULL
+        name text_NOT_NULL
+        description text
+        is_shared boolean_NOT_NULL
+        share_id uuid_NOT_NULL
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
     }
 
     chat_conversation_file }o--|| chat_conversation : "references"
@@ -360,19 +397,71 @@ erDiagram
     neptun_user_template }o--|| neptun_user_file : "references"
 ```
 
-## Production
+##### Exporting
 
 ```bash
-pnpm run build
+bun run db:dump-schema
+```
+
+##### ERD
+
+[drawio.com](https://www.drawio.com/blog/diagrams-from-code) allows you to import sql, but you have to connect the tables yourself, which is too much work imo.
+That is why I wrote 3 scripts. One for generating a database schema sql-dump, one to generate a mermaid ERD from that SQL and one to generate a mermaid png-diagram from that ERD.
+
+###### Windows
+
+> Generating 6 files at once. 3 with timestamp, 3 being the latest version for the documentation.
+
+> [!IMPORTANT]
+> This does not work with bun. It only works with npm, pnpm or yarn.  
+> The script installs all required tools and dependencies (NOT `npm`, run `ni` before executing it).
+
+```bash
+npm run db:diagram # There is also `generate-diagram-wsl.bat`, but I did parts of it blindly and didn't test it properly, because my virtualization is broken right now. (CPU overheated and now some features do not work anymore... A new one is on the way anyway.)
+```
+
+###### Linux
+
+```bash
+# postgresql needed for pg_dump
+sudo apt-get update
+sudo apt-get install -y wget ca-certificates
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+sudo apt-get install -y postgresql-client-16
+
+# needed for mermaid-to-png (doesn't work on wsl2, because puppeteer doesn't work there)
+# puppeteer should be in `node_modules` already, but if it is not, you can install it with this command: `npm install -g puppeteer`
+npx puppeteer browsers install chrome-headless-shell
+```
+
+```bash
+bun run db:dump-schema
+```
+
+```bash
+bun run db:mermaid
+```
+
+```bash
+bun run db:png
+```
+
+## Production
+
+### NodeJS Server
+
+```bash
+nr build
 ```
 
 Locally preview production build:
 
 ```bash
-pnpm run preview
+nr preview
 ```
 
-### Docker
+### Dockerize NodeJS Server
 
 ```bash
 docker build -t neptun -f ./configurations/production/Dockerfile.prod .
