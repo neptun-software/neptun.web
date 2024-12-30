@@ -1,44 +1,44 @@
 # Routes
 
-- `POST` [`/auth/otp`](../auth_otp.md)
-- `POST` [`/{email}/reset-password`](../email_reset-password.md)
-- `GET` [`/health`](../health.md)
+- `POST` [`/auth/otp`](../auth-otp.post.md)
+- `POST` [`/{email}/reset-password`](../email-{email}-reset-password.post.md)
+- `GET` [`/health`](../health.get.md)
 
 ## API Routes
 
-- `POST` [`/api/ai/huggingface/{model_publisher}/{model_name}/chat`](../api_ai_huggingface_chat.md)
+- `POST` [`/api/ai/huggingface/{model_publisher}/{model_name}/chat`](../api-ai-huggingface-{model_publisher}-{model_name}-chat.post.md)
 
-- `HEAD` [`/api/auth/check`](../api_auth_check.md)
-- `POST` [`/api/auth/login`](../api_auth_login.md)
-- `POST` [`/api/auth/logout`](../api_auth_logout.md)
-- `POST` [`/api/auth/sign-up`](../api_auth_sign-up.md)
+- `HEAD` [`/api/auth/check`](../api-auth-check.head.md)
+- `POST` [`/api/auth/login`](../api-auth-login.post.md)
+- `POST` [`/api/auth/logout`](../api-auth-logout.post.md)
+- `POST` [`/api/auth/sign-up`](../api-auth-sign-up.post.md)
 
-- `PATCH` && `DELETE` `/api/users/{user_id}` [update](../api_users_update.md) | [delete](../api_users_delete.md)
-- `GET` [`/api/users/{user_id}/cli`](../api_users_cli.md)
+- `PATCH` && `DELETE` `/api/users/{user_id}` [update](../api-users-{user_id}.patch.md) | [delete](../api-users-{user_id}.delete.md)
+- `GET` [`/api/users/{user_id}/cli`](../api-users-{user_id}-cli.get.md)
 
-- `GET` && `POST` && `DELETE` `/api/users/{user_id}/chats` [read, create, delete](../api_users_chats.md)
-- `PATCH` && `DELETE` `/api/users/{user_id}/chats/{chat_id}` [update](../api_users_chats_update.md) | [delete](../api_users_chats_delete.md)
+- `GET` && `POST` && `DELETE` `/api/users/{user_id}/chats` [read, create, delete](../api-users-{user_id}-chats.get.post.delete.md)
+- `PATCH` && `DELETE` `/api/users/{user_id}/chats/{chat_id}` [update](../api-users-{user_id}-chats-{chat_id}.patch.md) | [delete](../api-users-{user_id}-chats-{chat_id}.delete.md)
 
-- `GET` [`/api/shared/chats/{uuid}`](../api_shared_chats.md)
+- `GET` [`/api/shared/chats/{uuid}`](../api-shared-chats-{uuid}.get.md)
 
-- `GET` && `POST` `/api/users/{user_id}/chats/{chat_id}/messages` [read](../api_users_chats_messages.md) | [create](../api_users_chats_messages_create.md)
-- `DELETE` [`/api/users/{user_id}/chats/{chat_id}/messages/last`](../api_users_chats_messages_last_delete.md)
+- `GET` && `POST` `/api/users/{user_id}/chats/{chat_id}/messages` [read](../api-users-{user_id}-chats-{chat_id}-messages.get.md) | [create](../api-users-{user_id}-chats-{chat_id}-messages.post.md)
+- `DELETE` [`/api/users/{user_id}/chats/{chat_id}/messages/last`](../api-users-{user_id}-chats-{chat_id}-messages-last.delete.md)
 
-- `GET` [`/api/users/{user_id}/chats/{chat_id}/files`](../api_users_chats_files.md)
-- `POST` [`/api/users/{user_id}/chats/{chat_id}/files/{message_id}`](../api_users_chats_files_create.md)
+- `GET` [`/api/users/{user_id}/chats/{chat_id}/files`](../api-users-{user_id}-chats-{chat_id}-files.get.md)
+- `POST` [`/api/users/{user_id}/chats/{chat_id}/files/{message_id}`](../api-users-{user_id}-chats-{chat_id}-files-{message_id}.post.md)
 
-- `GET` && `POST` `/api/users/{user_id}/chats/{chat_id}/shares` [read](../api_users_chats_shares.md) | [create](../api_users_chats_shares_create.md)
-- `POST` [`/api/users/{user_id}/chats/{chat_id}/shares/{share_id}/whitelist-entries`](../api_users_chats_shares_whitelist_entries_create.md)
+- `GET` && `POST` `/api/users/{user_id}/chats/{chat_id}/shares` [read](../api-users-{user_id}-chats-{chat_id}-shares.get.md) | [create](../api-users-{user_id}-chats-{chat_id}-shares.post.md)
+- `POST` [`/api/users/{user_id}/chats/{chat_id}/shares/{share_id}/whitelist-entries`](../api-users-{user_id}-chats-{chat_id}-shares-{share_id}-whitelist-entries.post.md)
 
-- `GET` [`/api/shared/collections`](../api_shared_collections.get.md)
-- `GET` [`/api/shared/collections/{uuid}`](../api_shared_collections_uuid.get.md)
-- `GET` [`/api/users/{user_id}/collections`](../api_users_collections.get.md)
-- `POST` [`/api/users/{user_id}/collections`](../api_users_collections.post.md)
-- `PATCH` && `DELETE` `/api/users/{user_id}/collections/{uuid}` [update](../api_users_collections_uuid.patch.md) | [delete](../api_users_collections_uuid.delete.md)
-- `POST` [`/api/users/{user_id}/collections/{uuid}/templates`](../api_users_collections_uuid_templates.post.md)
-- `GET` && `PATCH` && `DELETE` [read](../api_users_collections_uuid_templates_id.get.md) | [update](../api_users_collections_uuid_templates_id.patch.md) | [delete](../api_users_collections_uuid_templates_id.delete.md)
+- `GET` [`/api/shared/collections`](../api-shared-collections.get.md)
+- `GET` [`/api/shared/collections/{uuid}`](../api-shared-collections-{uuid}.get.md)
+- `GET` [`/api/users/{user_id}/collections`](../api-users-{user_id}-collections.get.md)
+- `POST` [`/api/users/{user_id}/collections`](../api-users-{user_id}-collections.post.md)
+- `PATCH` && `DELETE` `/api/users/{user_id}/collections/{uuid}` [update](../api-users-{user_id}-collections-{uuid}.patch.md) | [delete](../api-users-{user_id}-collections-{uuid}.delete.md)
+- `POST` [`/api/users/{user_id}/collections/{uuid}/templates`](../api-users-{user_id}-collections-{uuid}-templates.post.md)
+- `GET` && `PATCH` && `DELETE` `/api/users/{user_id}/collections/{uuid}/templates/{id}` [read](../api-users-{user_id}-collections-{uuid}-templates-{id}.get.md) | [update](../api-users-{user_id}-collections-{uuid}-templates-{id}.patch.md) | [delete](../api-users-{user_id}-collections-{uuid}-templates-{id}.delete.md)
 
-- `GET` [`/api/users/{user_id}/installations`](../api_users_installations.md)
-- `GET` [`/api/users/{user_id}/installations/{installation_id}/imports`](../api_users_installations_imports.md)
+- `GET` [`/api/users/{user_id}/installations`](../api-users-{user_id}-installations.get.md)
+- `GET` [`/api/users/{user_id}/installations/{installation_id}/imports`](../api-users-{user_id}-installations-{installation_id}-imports.get.md)
 
-- `GET` [`/api/html-to-markdown/{url}`](../api_html-to-markdown.md)
+- `GET` [`/api/html-to-markdown/{url}`](../api-html-to-markdown-{url}.get.md)
