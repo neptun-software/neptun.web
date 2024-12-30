@@ -2,114 +2,135 @@ import { readdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 async function convertToMermaid() {
-  try {
-    const schemaDir = './backup/schema'
-    console.log('\n=== Starting Mermaid Conversion ===')
+  const schemaDir = './backup/schema'
+  console.log('\n=== Starting Mermaid Conversion ===')
+  console.log('📁 Working directory:', schemaDir)
 
-    const files = await readdir(schemaDir)
-    console.log('Found files in schema directory:', files)
+  const files = await readdir(schemaDir)
+  console.log('📋 Found files in directory:', files)
 
-    const latestSql = files
-      .filter(f => f.endsWith('.sql'))
-      .sort()
-      .reverse()[0]
+  const sqlFiles = files
+    .filter(f => f.endsWith('.sql') && f !== 'schema.sql')
+    .sort((a, b) => {
+      const timestampA = a.split('.')[0]
+      const timestampB = b.split('.')[0]
+      return timestampB.localeCompare(timestampA)
+    })
+  
+  const latestSql = sqlFiles[0]
 
-    if (!latestSql) {
-      console.error('❌ No SQL-File found')
-      return
+  if (!latestSql) {
+    console.error('❌ No SQL-File found')
+    process.exit(1)
+  }
+
+  console.log('\n📄 Processing SQL file:', latestSql)
+  const sqlContent = await readFile(path.join(schemaDir, latestSql), 'utf-8')
+  console.log('📝 SQL content length:', sqlContent.length, 'characters')
+
+  console.log('\n⚙️  Conversion Configuration:')
+  console.log('  • Input: SQL Schema')
+  console.log('  • Output: Mermaid ER Diagram')
+  console.log('  • Format: Entity Relationship')
+
+  const tableRegex = /CREATE TABLE (?:public\.)?["']?(\w+)["']?\s*\(([\s\S]*?)\);/g
+  let mermaid = 'erDiagram\n'
+  const relationships = new Set()
+
+  let tableCount = 0
+  console.log('\n🔍 Scanning for tables...')
+  for (const match of sqlContent.matchAll(tableRegex)) {
+    const tableName = match[1].replace(/"/g, '')
+    const columns = match[2]
+      .split(/,\s*(?=(?:[^']*'[^']*')*[^']*$)/)
+      .map(col => col.trim())
+      .filter(col => col && !col.startsWith('CONSTRAINT') && !col.startsWith('PRIMARY KEY'))
+    tableCount++
+    console.log(`📊 Found table: ${tableName} with ${columns.length} columns`)
+
+    mermaid += `    ${tableName} {\n`
+
+    for (const col of columns) {
+      const [colName, ...colTypeParts] = col.split(/\s+/)
+      const cleanedType = colTypeParts.join(' ')
+        .replace(/public\./g, '')
+        .replace(/DEFAULT '[^']*'/g, '')
+        .replace(/DEFAULT "[^"]*"/g, '')
+        .replace(/DEFAULT \w+\(\)/g, '')
+        .replace(/DEFAULT \w+/g, '')
+        .replace(/::[^,)]+/g, '')
+        .replace(/\(\)/g, '')
+        .replace(/NOT NULL/g, 'NOT_NULL')
+        .trim()
+
+      const formattedName = colName.replace(/"/g, '').trim()
+      const formattedType = cleanedType
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(part => part.trim())
+        .filter(part => part !== '')
+        .join('_')
+      mermaid += `        ${formattedName} ${formattedType}\n`
     }
+    mermaid += '    }\n'
+  }
 
-    console.log('📄 Processing SQL file:', latestSql)
-    const sqlContent = await readFile(path.join(schemaDir, latestSql), 'utf-8')
-    console.log('📝 SQL content length:', sqlContent.length, 'characters')
+  console.log(`\n✅ Found ${tableCount} tables`)
 
-    const tableRegex = /CREATE TABLE (?:public\.)?["']?(\w+)["']?\s*\(([\s\S]*?)\);/g
-    let mermaid = 'erDiagram\n'
-    const relationships = new Set()
+  console.log('\n🔍 Scanning for relationships...')
+  const alterTableRegex = /ALTER TABLE ONLY public\.(\w+)\s+ADD CONSTRAINT [^)]+ FOREIGN KEY[^)]+\) REFERENCES public\.(\w+)\([^)]+\)(?: ON DELETE (\w+))?/g
+  const alterMatches = sqlContent.matchAll(alterTableRegex)
 
-    let tableCount = 0
-    console.log('\n🔍 Scanning for tables...')
-    for (const match of sqlContent.matchAll(tableRegex)) {
-      const tableName = match[1].replace(/"/g, '')
-      const columns = match[2].split(',\n').map(col => col.trim())
-      tableCount++
-      console.log(`📊 Found table: ${tableName} with ${columns.length} columns`)
+  let relationCount = 0
+  for (const match of alterMatches) {
+    const fromTable = match[1]
+    const toTable = match[2]
+    const onDelete = (match[3] || '').toLowerCase()
+    relationCount++
 
-      mermaid += `    ${tableName} {\n`
-
-      for (const col of columns) {
-        if (col.startsWith('CONSTRAINT') || col.startsWith('PRIMARY KEY')) {
-          console.log(`  ⏩ Skipping constraint in ${tableName}: ${col.slice(0, 50)}...`)
-          continue
-        }
-
-        const [colName, ...colType] = col.split(' ')
-        const cleanedType = colType.join(' ')
-          .replace(/public\./g, '')
-          .replace(/DEFAULT '[^']*'/g, '')
-          .replace(/DEFAULT "[^"]*"/g, '')
-          .replace(/DEFAULT \w+\(\)/g, '')
-          .replace(/DEFAULT \w+/g, '')
-          .replace(/::[^,)]+/g, '')
-          .replace(/\(\)/g, '')
-          .trim()
-
-        const formattedCol = `        ${cleanedType.replace(/\s+/g, '_')} ${colName.replace(/"/g, '')}`
-        mermaid += `${formattedCol}\n`
+    if (fromTable && toTable) {
+      let relation = '||--o{'
+      if (onDelete === 'cascade') {
+        relation = '}o--||'
       }
-      mermaid += '    }\n'
+      console.log(`🔗 Found relationship: ${fromTable} ${relation} ${toTable} (ON DELETE ${onDelete || 'no action'})`)
+      relationships.add(`    ${fromTable} ${relation} ${toTable} : "references"\n`)
     }
+  }
 
-    console.log(`\n✅ Found ${tableCount} tables`)
+  console.log(`\n✅ Found ${relationCount} relationships`)
 
-    console.log('\n🔍 Scanning for relationships...')
-    const alterTableRegex = /ALTER TABLE ONLY public\.(\w+)\s+ADD CONSTRAINT [^)]+ FOREIGN KEY[^)]+\) REFERENCES public\.(\w+)\([^)]+\)(?: ON DELETE (\w+))?/g
-    const alterMatches = sqlContent.matchAll(alterTableRegex)
+  mermaid += `\n${Array.from(relationships).join('')}`
 
-    let relationCount = 0
-    for (const match of alterMatches) {
-      const fromTable = match[1]
-      const toTable = match[2]
-      const onDelete = (match[3] || '').toLowerCase()
-      relationCount++
+  const timestamp = latestSql.split('.')[0]
+  console.log('\n📁 Creating output files:')
+  console.log(`   • Source SQL: ${latestSql}`)
+  console.log(`   • Timestamp: ${timestamp}`)
+  
+  const timestampMermaidFile = `${timestamp}.mermaid`
+  const timestampMermaidPath = path.join(schemaDir, timestampMermaidFile)
+  const schemaMermaidPath = path.join(schemaDir, 'schema.mermaid')
 
-      if (fromTable && toTable) {
-        let relation = '||--o{'
-        if (onDelete === 'cascade') {
-          relation = '}o--||'
-        }
-        console.log(`🔗 Found relationship: ${fromTable} ${relation} ${toTable} (ON DELETE ${onDelete || 'no action'})`)
-        relationships.add(`    ${fromTable} ${relation} ${toTable} : "references"\n`)
-      }
-    }
+  console.log('\n💾 Writing Mermaid files...')
+  await writeFile(timestampMermaidPath, mermaid)
+  await writeFile(schemaMermaidPath, mermaid)
+  console.log('✅ Mermaid files created:')
+  console.log(`   • Timestamp file: ${path.relative('.', timestampMermaidPath)}`)
+  console.log(`   • Schema file: ${path.relative('.', schemaMermaidPath)}`)
+  console.log('\n=== Mermaid Conversion Complete ===\n')
 
-    console.log(`\n✅ Found ${relationCount} relationships`)
-
-    mermaid += `\n${Array.from(relationships).join('')}`
-
-    const mermaidFile = latestSql.replace('.sql', '.mermaid')
-    const mermaidPath = path.join(schemaDir, mermaidFile)
-
-    console.log('\n💾 Writing Mermaid file...')
-    await writeFile(mermaidPath, mermaid)
-    console.log(`✅ Mermaid file created: ${mermaidPath}`)
-
-    // Verify file was written
-    const stats = await readFile(mermaidPath, 'utf-8')
-    console.log(`📊 Mermaid file size: ${stats.length} characters`)
-    console.log('\n=== Mermaid Conversion Complete ===\n')
-
-    return mermaidPath
-  } catch (error) {
-    console.error('\n❌ Conversion to Mermaid failed:', error)
-    throw error
+  return {
+    timestampMermaidPath: path.relative('.', timestampMermaidPath),
+    schemaMermaidPath: path.relative('.', schemaMermaidPath)
   }
 }
 
 void (async () => {
   try {
-    const filePath = await convertToMermaid()
-    console.log('🎉 Process completed successfully:', filePath)
+    const result = await convertToMermaid()
+    console.log('🎉 Process completed successfully:')
+    console.log(`   • Timestamp file: ${result.timestampMermaidPath}`)
+    console.log(`   • Schema file: ${result.schemaMermaidPath}`)
     process.exit(0)
   } catch (error) {
     console.error('💥 Process failed:', error)

@@ -39,7 +39,7 @@
     "db:dump-schema": "bun run ./helpers/backup.ts --schema-only",
     "db:mermaid": "bun run ./helpers/schema-to-mermaid.ts",
     "db:png": "bun run ./helpers/mermaid-to-png.ts",
-    "db:diagram": "bun run db:dump-schema && bun run db:mermaid && bun run db:png"
+    "db:diagram": "powershell \"Start-Process cmd -Verb RunAs -ArgumentList '/k cd /d \\\"%CD%\\\" && helpers\\generate-diagram-native.bat'\""
   },
   "dependencies": {
     "@ai-sdk/vue": "^0.0.58",

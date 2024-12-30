@@ -1,6 +1,6 @@
 const { exec } = require('node:child_process')
 
-// Example usage: pnpm run find-version @nuxt/devtools
+// Example usage: npm run find-version @nuxt/devtools
 const packageName = process.argv[2]
 
 if (!packageName) {
