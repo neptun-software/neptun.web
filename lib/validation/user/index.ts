@@ -1,10 +1,10 @@
 import { z } from 'zod'
+import { emailSchema } from './email'
 import {
   addPasswordFieldIssue,
   confirmPasswordSchema,
   passwordSchema,
 } from './password'
-import { emailSchema } from './email'
 
 export { confirmPasswordSchema, passwordSchema }
 
