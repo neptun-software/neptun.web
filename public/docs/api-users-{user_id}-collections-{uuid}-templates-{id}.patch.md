@@ -16,56 +16,56 @@ PATCH
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                                     |
-|-----------|---------|----------|-------------------------------------------------|
-| user_id   | integer | Yes      | The ID of the authenticated user               |
+| Parameter | Type    | Required | Description                                      |
+| --------- | ------- | -------- | ------------------------------------------------ |
+| user_id   | integer | Yes      | The ID of the authenticated user                 |
 | uuid      | string  | Yes      | The unique identifier of the template collection |
-| id        | integer | Yes      | The ID of the template                         |
+| id        | integer | Yes      | The ID of the template                           |
 
 ### Headers
 
-| Header          | Value            | Required | Description                    |
-|-----------------|------------------|----------|--------------------------------|
-| Accept          | application/json | Yes      | Specifies the response format |
-| Content-Type    | application/json | Yes      | Request body format           |
-| Cookie          | neptun-session   | Yes      | Session authentication cookie |
+| Header       | Value            | Required | Description                   |
+| ------------ | ---------------- | -------- | ----------------------------- |
+| Accept       | application/json | Yes      | Specifies the response format |
+| Content-Type | application/json | Yes      | Request body format           |
+| Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
 ### Request Body
 
-| Field       | Type   | Required | Description                          |
-|------------|---------|----------|--------------------------------------|
-| description | string | No       | New description of the template      |
-| file_name   | string | No       | New name of the template file        |
+| Field       | Type   | Required | Description                     |
+| ----------- | ------ | -------- | ------------------------------- |
+| description | string | No       | New description of the template |
+| file_name   | string | No       | New name of the template file   |
 
 ## Response Format
 
 ### Success Response (200 OK)
 
-| Field       | Type   | Description                                     |
-|-------------|--------|------------------------------------------------|
-| template    | object | The updated template object                     |
+| Field    | Type   | Description                 |
+| -------- | ------ | --------------------------- |
+| template | object | The updated template object |
 
 ### TypeScript Types
 
 ```typescript
 interface Template {
-  id: number;
-  description?: string;
-  file_name: string;
-  created_at: Date;
-  updated_at: Date;
-  neptun_user_id: number;
-  template_collection_id?: number;
-  user_file_id?: number;
+  id: number
+  description?: string
+  file_name: string
+  created_at: Date
+  updated_at: Date
+  neptun_user_id: number
+  template_collection_id?: number
+  user_file_id?: number
 }
 
 interface UpdateTemplateRequest {
-  description?: string;
-  file_name?: string;
+  description?: string
+  file_name?: string
 }
 
 interface ApiResponse {
-  template: Template;
+  template: Template
 }
 ```
 
@@ -124,13 +124,13 @@ async def update_template(
     session_cookie: str = None
 ) -> dict:
     url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}/templates/{template_id}"
-    
+
     data = {}
     if description is not None:
         data["description"] = description
     if file_name is not None:
         data["file_name"] = file_name
-    
+
     async with httpx.AsyncClient() as client:
         response = await client.patch(
             url,
@@ -165,13 +165,13 @@ async function updateTemplate(
       },
       body: JSON.stringify(data),
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json();
+  return await response.json()
 }
 ```
 
@@ -205,11 +205,11 @@ async function updateTemplate(
 
 ### Response Status Codes
 
-| Status Code | Description                                |
-|-------------|--------------------------------------------|
-| 200         | Successfully updated template              |
-| 400         | Bad Request (invalid request body)         |
-| 401         | Unauthorized (invalid or missing session)   |
-| 403         | Forbidden (user_id mismatch)               |
-| 404         | Template not found                         |
-| 500         | Server error                               | 
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully updated template             |
+| 400         | Bad Request (invalid request body)        |
+| 401         | Unauthorized (invalid or missing session) |
+| 403         | Forbidden (user_id mismatch)              |
+| 404         | Template not found                        |
+| 500         | Server error                              |

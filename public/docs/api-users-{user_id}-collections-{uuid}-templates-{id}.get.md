@@ -16,43 +16,43 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                                     |
-|-----------|---------|----------|-------------------------------------------------|
-| user_id   | integer | Yes      | The ID of the authenticated user               |
+| Parameter | Type    | Required | Description                                      |
+| --------- | ------- | -------- | ------------------------------------------------ |
+| user_id   | integer | Yes      | The ID of the authenticated user                 |
 | uuid      | string  | Yes      | The unique identifier of the template collection |
-| id        | integer | Yes      | The ID of the template                         |
+| id        | integer | Yes      | The ID of the template                           |
 
 ### Headers
 
-| Header          | Value            | Required | Description                    |
-|-----------------|------------------|----------|--------------------------------|
-| Accept          | application/json | Yes      | Specifies the response format |
-| Cookie          | neptun-session   | Yes      | Session authentication cookie |
+| Header | Value            | Required | Description                   |
+| ------ | ---------------- | -------- | ----------------------------- |
+| Accept | application/json | Yes      | Specifies the response format |
+| Cookie | neptun-session   | Yes      | Session authentication cookie |
 
 ## Response Format
 
 ### Success Response (200 OK)
 
-| Field       | Type   | Description                                     |
-|-------------|--------|------------------------------------------------|
-| template    | object | The template object with its details           |
+| Field    | Type   | Description                          |
+| -------- | ------ | ------------------------------------ |
+| template | object | The template object with its details |
 
 ### TypeScript Types
 
 ```typescript
 interface Template {
-  id: number;
-  description?: string;
-  file_name: string;
-  created_at: Date;
-  updated_at: Date;
-  neptun_user_id: number;
-  template_collection_id?: number;
-  user_file_id?: number;
+  id: number
+  description?: string
+  file_name: string
+  created_at: Date
+  updated_at: Date
+  neptun_user_id: number
+  template_collection_id?: number
+  user_file_id?: number
 }
 
 interface ApiResponse {
-  template: Template;
+  template: Template
 }
 ```
 
@@ -99,7 +99,7 @@ async def get_template(
     session_cookie: str
 ) -> dict:
     url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}/templates/{template_id}"
-    
+
     async with httpx.AsyncClient() as client:
         response = await client.get(
             url,
@@ -123,17 +123,17 @@ async function getTemplate(
     {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
-        'Cookie': `neptun-session=${sessionCookie}`,
+        Accept: 'application/json',
+        Cookie: `neptun-session=${sessionCookie}`,
       },
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json();
+  return await response.json()
 }
 ```
 
@@ -167,10 +167,10 @@ async function getTemplate(
 
 ### Response Status Codes
 
-| Status Code | Description                                |
-|-------------|--------------------------------------------|
-| 200         | Successfully retrieved template            |
-| 401         | Unauthorized (invalid or missing session)   |
-| 403         | Forbidden (user_id mismatch)               |
-| 404         | Template not found                         |
-| 500         | Server error                               | 
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully retrieved template           |
+| 401         | Unauthorized (invalid or missing session) |
+| 403         | Forbidden (user_id mismatch)              |
+| 404         | Template not found                        |
+| 500         | Server error                              |

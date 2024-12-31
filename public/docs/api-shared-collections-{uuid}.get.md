@@ -16,54 +16,54 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                                     |
-|-----------|--------|----------|-------------------------------------------------|
+| Parameter | Type   | Required | Description                                      |
+| --------- | ------ | -------- | ------------------------------------------------ |
 | uuid      | string | Yes      | The unique identifier of the template collection |
 
 ### Headers
 
-| Header          | Value            | Required | Description                    |
-|-----------------|------------------|----------|--------------------------------|
-| Accept          | application/json | Yes      | Specifies the response format |
+| Header | Value            | Required | Description                   |
+| ------ | ---------------- | -------- | ----------------------------- |
+| Accept | application/json | Yes      | Specifies the response format |
 
 ## Response Format
 
 ### Success Response (200 OK)
 
-| Field       | Type   | Description                                     |
-|-------------|--------|-------------------------------------------------|
-| collection  | object | The template collection object                  |
-| templates   | array  | Array of templates belonging to the collection  |
+| Field      | Type   | Description                                    |
+| ---------- | ------ | ---------------------------------------------- |
+| collection | object | The template collection object                 |
+| templates  | array  | Array of templates belonging to the collection |
 
 ### TypeScript Types
 
 ```typescript
 interface Template {
-  id: number;
-  description?: string;
-  file_name: string;
-  created_at: Date;
-  updated_at: Date;
-  neptun_user_id: number;
-  template_collection_id?: number;
-  user_file_id?: number;
+  id: number
+  description?: string
+  file_name: string
+  created_at: Date
+  updated_at: Date
+  neptun_user_id: number
+  template_collection_id?: number
+  user_file_id?: number
 }
 
 interface TemplateCollection {
-  id: number;
-  name: string;
-  description?: string;
-  is_shared: boolean;
-  share_uuid: string;
-  created_at: Date;
-  updated_at: Date;
-  neptun_user_id: number;
-  templates: Template[];
+  id: number
+  name: string
+  description?: string
+  is_shared: boolean
+  share_uuid: string
+  created_at: Date
+  updated_at: Date
+  neptun_user_id: number
+  templates: Template[]
 }
 
 interface ApiResponse {
-  collection: TemplateCollection;
-  templates: Template[];
+  collection: TemplateCollection
+  templates: Template[]
 }
 ```
 
@@ -116,7 +116,7 @@ import httpx
 
 async def get_shared_collection(uuid: str) -> dict:
     url = f"https://neptun-webui.vercel.app/api/shared/collections/{uuid}"
-    
+
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
         response.raise_for_status()
@@ -132,16 +132,16 @@ async function getSharedCollection(uuid: string): Promise<ApiResponse> {
     {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json();
+  return await response.json()
 }
 ```
 
@@ -187,8 +187,8 @@ async function getSharedCollection(uuid: string): Promise<ApiResponse> {
 
 ### Response Status Codes
 
-| Status Code | Description                                |
-|-------------|--------------------------------------------|
-| 200         | Successfully retrieved collection          |
+| Status Code | Description                                  |
+| ----------- | -------------------------------------------- |
+| 200         | Successfully retrieved collection            |
 | 404         | Template collection with UUID does not exist |
-| 403         | Collection is not shared                   |
+| 403         | Collection is not shared                     |

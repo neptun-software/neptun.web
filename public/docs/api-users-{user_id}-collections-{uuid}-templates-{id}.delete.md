@@ -16,18 +16,18 @@ DELETE
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                                     |
-|-----------|---------|----------|-------------------------------------------------|
-| user_id   | integer | Yes      | The ID of the authenticated user               |
+| Parameter | Type    | Required | Description                                      |
+| --------- | ------- | -------- | ------------------------------------------------ |
+| user_id   | integer | Yes      | The ID of the authenticated user                 |
 | uuid      | string  | Yes      | The unique identifier of the template collection |
-| id        | integer | Yes      | The ID of the template                         |
+| id        | integer | Yes      | The ID of the template                           |
 
 ### Headers
 
-| Header          | Value            | Required | Description                    |
-|-----------------|------------------|----------|--------------------------------|
-| Accept          | application/json | Yes      | Specifies the response format |
-| Cookie          | neptun-session   | Yes      | Session authentication cookie |
+| Header | Value            | Required | Description                   |
+| ------ | ---------------- | -------- | ----------------------------- |
+| Accept | application/json | Yes      | Specifies the response format |
+| Cookie | neptun-session   | Yes      | Session authentication cookie |
 
 ## Response Format
 
@@ -38,7 +38,7 @@ Returns `true` on successful deletion.
 ### TypeScript Types
 
 ```typescript
-type ApiResponse = boolean;
+type ApiResponse = boolean
 ```
 
 ### Python Types
@@ -72,7 +72,7 @@ async def delete_template(
     session_cookie: str
 ) -> bool:
     url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}/templates/{template_id}"
-    
+
     async with httpx.AsyncClient() as client:
         response = await client.delete(
             url,
@@ -96,17 +96,17 @@ async function deleteTemplate(
     {
       method: 'DELETE',
       headers: {
-        'Accept': 'application/json',
-        'Cookie': `neptun-session=${sessionCookie}`,
+        Accept: 'application/json',
+        Cookie: `neptun-session=${sessionCookie}`,
       },
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json();
+  return await response.json()
 }
 ```
 
@@ -129,10 +129,10 @@ true
 
 ### Response Status Codes
 
-| Status Code | Description                                |
-|-------------|--------------------------------------------|
-| 200         | Successfully deleted template              |
-| 401         | Unauthorized (invalid or missing session)   |
-| 403         | Forbidden (user_id mismatch)               |
-| 404         | Template not found                         |
-| 500         | Server error                               | 
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully deleted template             |
+| 401         | Unauthorized (invalid or missing session) |
+| 403         | Forbidden (user_id mismatch)              |
+| 404         | Template not found                        |
+| 500         | Server error                              |

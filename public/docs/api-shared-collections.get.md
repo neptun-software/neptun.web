@@ -16,48 +16,48 @@ GET
 
 ### Headers
 
-| Header          | Value            | Required | Description                    |
-|-----------------|------------------|----------|--------------------------------|
-| Accept          | application/json | Yes      | Specifies the response format |
+| Header | Value            | Required | Description                   |
+| ------ | ---------------- | -------- | ----------------------------- |
+| Accept | application/json | Yes      | Specifies the response format |
 
 ## Response Format
 
 ### Success Response (200 OK)
 
-| Field       | Type    | Description                                     |
-|-------------|---------|------------------------------------------------|
-| collections | array   | Array of shared template collection objects     |
-| total       | number  | Total number of shared collections             |
+| Field       | Type   | Description                                 |
+| ----------- | ------ | ------------------------------------------- |
+| collections | array  | Array of shared template collection objects |
+| total       | number | Total number of shared collections          |
 
 ### TypeScript Types
 
 ```typescript
 interface Template {
-  id: number;
-  description?: string;
-  file_name: string;
-  created_at: Date;
-  updated_at: Date;
-  neptun_user_id: number;
-  template_collection_id?: number;
-  user_file_id?: number;
+  id: number
+  description?: string
+  file_name: string
+  created_at: Date
+  updated_at: Date
+  neptun_user_id: number
+  template_collection_id?: number
+  user_file_id?: number
 }
 
 interface TemplateCollection {
-  id: number;
-  name: string;
-  description?: string;
-  is_shared: boolean;
-  share_uuid: string;
-  created_at: Date;
-  updated_at: Date;
-  neptun_user_id: number;
-  templates: Template[];
+  id: number
+  name: string
+  description?: string
+  is_shared: boolean
+  share_uuid: string
+  created_at: Date
+  updated_at: Date
+  neptun_user_id: number
+  templates: Template[]
 }
 
 interface ApiResponse {
-  collections: TemplateCollection[];
-  total: number;
+  collections: TemplateCollection[]
+  total: number
 }
 ```
 
@@ -110,7 +110,7 @@ import httpx
 
 async def get_shared_collections() -> dict:
     url = "https://neptun-webui.vercel.app/api/shared/collections"
-    
+
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
         response.raise_for_status()
@@ -126,16 +126,16 @@ async function getSharedCollections(): Promise<ApiResponse> {
     {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json();
+  return await response.json()
 }
 ```
 
@@ -184,7 +184,7 @@ async function getSharedCollections(): Promise<ApiResponse> {
 
 ### Response Status Codes
 
-| Status Code | Description                          |
-|------------|--------------------------------------|
-| 200        | Successfully retrieved collections    |
-| 500        | Server error                         |
+| Status Code | Description                        |
+| ----------- | ---------------------------------- |
+| 200         | Successfully retrieved collections |
+| 500         | Server error                       |

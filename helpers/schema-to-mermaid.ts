@@ -16,7 +16,7 @@ async function convertToMermaid() {
       const timestampB = b.split('.')[0]
       return timestampB.localeCompare(timestampA)
     })
-  
+
   const latestSql = sqlFiles[0]
 
   if (!latestSql) {
@@ -42,9 +42,10 @@ async function convertToMermaid() {
   for (const match of sqlContent.matchAll(tableRegex)) {
     const tableName = match[1].replace(/"/g, '')
     const columns = match[2]
-      .split(/,\s*(?=(?:[^']*'[^']*')*[^']*$)/)
-      .map(col => col.trim())
-      .filter(col => col && !col.startsWith('CONSTRAINT') && !col.startsWith('PRIMARY KEY'))
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line && !line.startsWith('CONSTRAINT') && !line.startsWith('PRIMARY KEY'))
+      .map(line => line.replace(/,$/, ''))
     tableCount++
     console.log(`📊 Found table: ${tableName} with ${columns.length} columns`)
 
@@ -106,7 +107,7 @@ async function convertToMermaid() {
   console.log('\n📁 Creating output files:')
   console.log(`   • Source SQL: ${latestSql}`)
   console.log(`   • Timestamp: ${timestamp}`)
-  
+
   const timestampMermaidFile = `${timestamp}.mermaid`
   const timestampMermaidPath = path.join(schemaDir, timestampMermaidFile)
   const schemaMermaidPath = path.join(schemaDir, 'schema.mermaid')
@@ -121,7 +122,7 @@ async function convertToMermaid() {
 
   return {
     timestampMermaidPath: path.relative('.', timestampMermaidPath),
-    schemaMermaidPath: path.relative('.', schemaMermaidPath)
+    schemaMermaidPath: path.relative('.', schemaMermaidPath),
   }
 }
 

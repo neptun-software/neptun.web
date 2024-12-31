@@ -1,5 +1,5 @@
 import { exec } from 'node:child_process'
-import { mkdir, copyFile } from 'node:fs/promises'
+import { copyFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
 
 // https://www.postgresql.org/docs/current/app-pgdump.html
@@ -49,10 +49,10 @@ async function backupDatabase() {
     console.log('📝 Command:', command.replace(password || '', '********'))
 
     console.log('\n⏳ Executing backup...')
-    
+
     // Wrap exec in a Promise
     await new Promise((resolve, reject) => {
-      exec(command, { env: { PGPASSWORD: password } }, async (error, stdout, stderr) => {
+      exec(command, { env: { PGPASSWORD: password } }, (error, stdout, stderr) => {
         if (error) {
           console.error('\n❌ Backup failed!')
           console.error('Error details:', error)
@@ -65,19 +65,21 @@ async function backupDatabase() {
         if (stdout) {
           console.log('📝 Output:', stdout)
         }
-        try {
-          console.log(`\n✅ ${isSchemaOnly ? 'Schema' : 'Data'}-Backup successful!`)
-          console.log('📄 Backup files created:')
-          console.log(`  • Timestamp file: ${path.relative('.', filepath)}`)
-          await copyFile(filepath, schemaFilepath)
-          console.log(`  • Schema file: ${path.relative('.', schemaFilepath)}`)
 
-          console.log('\n=== Backup Process Complete ===\n')
-          resolve(true)
-        } catch (copyError) {
-          console.error('❌ Failed to copy file:', copyError)
-          reject(copyError)
-        }
+        console.log(`\n✅ ${isSchemaOnly ? 'Schema' : 'Data'}-Backup successful!`)
+        console.log('📄 Backup files created:')
+        console.log(`  • Timestamp file: ${path.relative('.', filepath)}`)
+        
+        void copyFile(filepath, schemaFilepath)
+          .then(() => {
+            console.log(`  • Schema file: ${path.relative('.', schemaFilepath)}`)
+            console.log('\n=== Backup Process Complete ===\n')
+            resolve(true)
+          })
+          .catch((copyError) => {
+            console.error('❌ Failed to copy file:', copyError)
+            reject(copyError)
+          })
       })
     })
   } catch (error) {

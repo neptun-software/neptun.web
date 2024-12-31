@@ -16,67 +16,67 @@ POST
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                                     |
-|-----------|---------|----------|-------------------------------------------------|
-| user_id   | integer | Yes      | The ID of the authenticated user               |
+| Parameter | Type    | Required | Description                                      |
+| --------- | ------- | -------- | ------------------------------------------------ |
+| user_id   | integer | Yes      | The ID of the authenticated user                 |
 | uuid      | string  | Yes      | The unique identifier of the template collection |
 
 ### Headers
 
-| Header          | Value            | Required | Description                    |
-|-----------------|------------------|----------|--------------------------------|
-| Accept          | application/json | Yes      | Specifies the response format |
-| Content-Type    | application/json | Yes      | Request body format           |
-| Cookie          | neptun-session   | Yes      | Session authentication cookie |
+| Header       | Value            | Required | Description                   |
+| ------------ | ---------------- | -------- | ----------------------------- |
+| Accept       | application/json | Yes      | Specifies the response format |
+| Content-Type | application/json | Yes      | Request body format           |
+| Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
 ### Request Body
 
-| Field                | Type    | Required | Description                          |
-|---------------------|---------|----------|--------------------------------------|
-| template.description | string  | No       | Description of the template         |
-| template.file_name   | string  | Yes      | Name of the template file          |
-| file.content        | string  | Yes      | Content of the template file        |
-| file.name           | string  | Yes      | Original name of the uploaded file  |
-| file.type           | string  | Yes      | MIME type of the file              |
+| Field                | Type   | Required | Description                        |
+| -------------------- | ------ | -------- | ---------------------------------- |
+| template.description | string | No       | Description of the template        |
+| template.file_name   | string | Yes      | Name of the template file          |
+| file.content         | string | Yes      | Content of the template file       |
+| file.name            | string | Yes      | Original name of the uploaded file |
+| file.type            | string | Yes      | MIME type of the file              |
 
 ## Response Format
 
 ### Success Response (201 Created)
 
-| Field       | Type   | Description                                     |
-|-------------|--------|------------------------------------------------|
-| template    | object | The created template object                     |
+| Field    | Type   | Description                 |
+| -------- | ------ | --------------------------- |
+| template | object | The created template object |
 
 ### TypeScript Types
 
 ```typescript
 interface Template {
-  id: number;
-  description?: string;
-  file_name: string;
-  created_at: Date;
-  updated_at: Date;
-  neptun_user_id: number;
-  template_collection_id?: number;
-  user_file_id?: number;
+  id: number
+  description?: string
+  file_name: string
+  created_at: Date
+  updated_at: Date
+  neptun_user_id: number
+  template_collection_id?: number
+  user_file_id?: number
 }
 
 interface UserFile {
-  content: string;
-  name: string;
-  type: string;
+  content: string
+  name: string
+  type: string
 }
 
 interface CreateTemplateRequest {
   template: {
-    description?: string;
-    file_name: string;
-  };
-  file: UserFile;
+    description?: string
+    file_name: string
+  }
+  file: UserFile
 }
 
 interface ApiResponse {
-  template: Template;
+  template: Template
 }
 ```
 
@@ -152,7 +152,7 @@ async def create_template(
     session_cookie: str = None
 ) -> dict:
     url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}/templates"
-    
+
     data = {
         "template": {
             "file_name": file_name,
@@ -164,7 +164,7 @@ async def create_template(
             "type": file_type
         }
     }
-    
+
     async with httpx.AsyncClient() as client:
         response = await client.post(
             url,
@@ -198,13 +198,13 @@ async function createTemplate(
       },
       body: JSON.stringify(data),
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json();
+  return await response.json()
 }
 ```
 
@@ -238,11 +238,11 @@ async function createTemplate(
 
 ### Response Status Codes
 
-| Status Code | Description                                |
-|-------------|--------------------------------------------|
-| 201         | Successfully created template              |
-| 400         | Bad Request (invalid request body)         |
-| 401         | Unauthorized (invalid or missing session)   |
-| 403         | Forbidden (user_id mismatch)               |
-| 404         | Collection not found                       |
-| 500         | Server error                               | 
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 201         | Successfully created template             |
+| 400         | Bad Request (invalid request body)        |
+| 401         | Unauthorized (invalid or missing session) |
+| 403         | Forbidden (user_id mismatch)              |
+| 404         | Collection not found                      |
+| 500         | Server error                              |

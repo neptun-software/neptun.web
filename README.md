@@ -46,46 +46,48 @@ nr find-version [package_name]
 <details>
 <summary>All scripts</summary>
 
-```js
-"scripts": {
-  "dev": "set EDITOR=code && nuxt dev",
-  "devx": "set EDITOR=code && nuxt dev --host --https --ssl-cert ./configurations/development/ssl/server.crt --ssl-key ./configurations/development/ssl/server.key",
-  "app": "export EDITOR=code && nuxt dev",
-  "appx": "export EDITOR=code && nuxt dev --host --https --ssl-cert ./configurations/development/ssl/server.crt --ssl-key ./configurations/development/ssl/server.key",
-  "preparex": "npm run types && npm run render",
-  "types": "npx nuxi prepare",
-  "render": "nuxt generate",
-  "postinstall": "nuxt prepare",
-  "build": "nuxt build",
-  "preview": "nuxt preview",
-  "format-and-lint": "npx prettier --plugin-search-dir . --check . && npx eslint .",
-  "format": "npx prettier --write . --single-quote --trailing-comma es5 --semi",
-  "lint": "eslint . --fix",
-  "lint-settings": "npx @eslint/config-inspector",
-  "check": "npx nuxi typecheck",
-  "shadcn": "npx shadcn-vue@latest add",
-  "cleanup": "pnpx nuxi cleanup .",
-  "fresh": "npm cache verify && pnpm rebuild && pnpx nuxi cleanup",
-  "upgrade": "npx nuxi upgrade -f",
-  "statistics": "npx nuxi analyze",
-  "info": "npx nuxi info",
-  "find-version": "node ./helpers/find-package-version.cjs",
-  "db:push": "drizzle-kit push --config drizzle-dev.config.ts",
-  "db:push:prod": "drizzle-kit push --config drizzle-prod.config.ts",
-  "db:pull": "drizzle-kit introspect --config drizzle-dev.config.ts",
-  "db:pull:prod": "drizzle-kit introspect --config drizzle-prod.config.ts",
-  "db:generate": "drizzle-kit generate --config=drizzle-dev.config.ts",
-  "db:generate:prod": "drizzle-kit generate --config=drizzle-prod.config.ts",
-  "db:migrate": "bun run ./helpers/migrate.ts environment=dev",
-  "db:migrate:prod": "bun run ./helpers/migrate.ts environment=prod",
-  "db:studio": "drizzle-kit studio --config drizzle-dev.config.ts --host 127.0.0.1",
-  "db:studio:prod": "drizzle-kit studio --config drizzle-prod.config.ts --host 127.0.0.1",
-  "db:dump-data": "bun run ./helpers/backup.ts",
-  "db:dump-schema": "bun run ./helpers/backup.ts --schema-only",
-  "db:mermaid": "bun run ./helpers/schema-to-mermaid.ts",
-  "db:png": "bun run ./helpers/mermaid-to-png.ts",
-  "db:diagram": "powershell \"Start-Process cmd -Verb RunAs -ArgumentList '/k cd /d \\\"%CD%\\\" && helpers\\generate-diagram-native.bat'\""
-},
+```jsonc
+{
+  "scripts": {
+    "dev": "set EDITOR=code && nuxt dev",
+    "devx": "set EDITOR=code && nuxt dev --host --https --ssl-cert ./configurations/development/ssl/server.crt --ssl-key ./configurations/development/ssl/server.key",
+    "app": "export EDITOR=code && nuxt dev",
+    "appx": "export EDITOR=code && nuxt dev --host --https --ssl-cert ./configurations/development/ssl/server.crt --ssl-key ./configurations/development/ssl/server.key",
+    "preparex": "npm run types && npm run render",
+    "types": "npx nuxi prepare",
+    "render": "nuxt generate",
+    "postinstall": "nuxt prepare",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "format-and-lint": "npx prettier --plugin-search-dir . --check . && npx eslint .",
+    "format": "npx prettier --write . --single-quote --trailing-comma es5 --semi",
+    "lint": "eslint . --fix",
+    "lint-settings": "npx @eslint/config-inspector",
+    "check": "npx nuxi typecheck",
+    "shadcn": "npx shadcn-vue@latest add",
+    "cleanup": "pnpx nuxi cleanup .",
+    "fresh": "npm cache verify && pnpm rebuild && pnpx nuxi cleanup",
+    "upgrade": "npx nuxi upgrade -f",
+    "statistics": "npx nuxi analyze",
+    "info": "npx nuxi info",
+    "find-version": "node ./helpers/find-package-version.cjs",
+    "db:push": "drizzle-kit push --config drizzle-dev.config.ts",
+    "db:push:prod": "drizzle-kit push --config drizzle-prod.config.ts",
+    "db:pull": "drizzle-kit introspect --config drizzle-dev.config.ts",
+    "db:pull:prod": "drizzle-kit introspect --config drizzle-prod.config.ts",
+    "db:generate": "drizzle-kit generate --config=drizzle-dev.config.ts",
+    "db:generate:prod": "drizzle-kit generate --config=drizzle-prod.config.ts",
+    "db:migrate": "bun run ./helpers/migrate.ts environment=dev",
+    "db:migrate:prod": "bun run ./helpers/migrate.ts environment=prod",
+    "db:studio": "drizzle-kit studio --config drizzle-dev.config.ts --host 127.0.0.1",
+    "db:studio:prod": "drizzle-kit studio --config drizzle-prod.config.ts --host 127.0.0.1",
+    "db:dump-data": "bun run ./helpers/backup.ts",
+    "db:dump-schema": "bun run ./helpers/backup.ts --schema-only",
+    "db:mermaid": "bun run ./helpers/schema-to-mermaid.ts",
+    "db:png": "bun run ./helpers/mermaid-to-png.ts",
+    "db:diagram": "powershell \"Start-Process cmd -Verb RunAs -ArgumentList '/k cd /d \\\"%CD%\\\" && helpers\\generate-diagram-native.bat'\""
+  }
+}
 ```
 
 </details>
@@ -132,8 +134,43 @@ Email Address []:neptunai.contact@gmail.com
 - Slow on `Windows11` (faster in WSL2 (might be better in `nuxt@v4`, which is currently in nightly-channel))
   - If you are coding in a folder, that is in your NAS/Cloud (hopefully with a file- and folder [blacklist](https://gist.github.com/jonasfroeller/0e42c350947c7d04b0dc8a9735f2412e)), disable syncing while developing, so that it doesn't cause performance issues, because Windows loves to lock files.
   - `srcDir` (`nuxt@v4` feature, that can be used in `nuxt@v3` already) causes some imports and types to break... (could improve performance on Windows theoretically tho).
+  - Update: With the `AMD Ryzen 5 2600 Six-Core Processor` it took at least 5-8 minutes to generate the types, start the server and pre-render routes. With my new CPU, it takes less than two minutes.
 - SSL needed for mobile, if `--https` is set. (else `ERR_SSL_PROTOCOL_ERROR`). Use `devx` for that.
 - Oauth doesn't work using https in development mode. (causes `ERR_EMPTY_RESPONSE`). Just use E-Mail and Password login for now.
+
+<details>
+<summary>Dev-Server-Logs with the new CPU</summary>
+
+```bash
+> set EDITOR=code && nuxt dev
+
+Nuxt 3.15.0 with Nitro 2.10.4                                                                                               16:14:50
+ℹ NODE_ENV: development                                                                                                    16:14:51
+                                                                                                                            16:14:51
+  ➜ Local:    http://localhost:42124/
+  ➜ Network:  use --host to expose
+
+ℹ NODE_ENV: development                                                                                                    16:14:53
+ℹ Using default Tailwind CSS file                                                                         nuxt:tailwindcss 16:14:54
+  ➜ DevTools: press Shift + Alt + D in the browser (v1.7.0)                                                                 16:15:00
+
+ℹ Tailwind Viewer: http://localhost:42124/_tailwind/                                                      nuxt:tailwindcss 16:15:03
+✔ Vite client built in 169ms                                                                                               16:15:10
+✔ Vite server built in 130ms                                                                                               16:15:10
+✔ Nuxt Nitro server built in 12243 ms                                                                                nitro 16:15:24
+IS_SERVERLESS: false
+LOG_SQL_QUERIES: true
+LOG_BACKEND: true
+ℹ Vite server warmed up in 28410ms                                                                                         16:15:53
+ℹ Vite client warmed up in 29434ms                                                                                         16:15:54
+ℹ IS_DEV: true
+LOG_FRONTEND: useLogger()
+IS_PRERENDER: false
+IS_CLIENT: false
+IS_SERVER: true
+```
+
+</details>
 
 ### Docker
 
@@ -413,7 +450,7 @@ That is why I wrote 3 scripts. One for generating a database schema sql-dump, on
 > Generating 6 files at once. 3 with timestamp, 3 being the latest version for the documentation.
 
 > [!IMPORTANT]
-> This does not work with bun. It only works with npm, pnpm or yarn.  
+> This does not work with bun. It only works with npm, pnpm or yarn.
 > The script installs all required tools and dependencies (NOT `npm`, run `ni` before executing it).
 
 ```bash

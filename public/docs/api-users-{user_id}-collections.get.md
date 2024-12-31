@@ -16,55 +16,55 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                    |
-|-----------|---------|----------|--------------------------------|
+| Parameter | Type    | Required | Description                      |
+| --------- | ------- | -------- | -------------------------------- |
 | user_id   | integer | Yes      | The ID of the authenticated user |
 
 ### Headers
 
-| Header          | Value            | Required | Description                    |
-|-----------------|------------------|----------|--------------------------------|
-| Accept          | application/json | Yes      | Specifies the response format |
-| Cookie          | neptun-session   | Yes      | Session authentication cookie |
+| Header | Value            | Required | Description                   |
+| ------ | ---------------- | -------- | ----------------------------- |
+| Accept | application/json | Yes      | Specifies the response format |
+| Cookie | neptun-session   | Yes      | Session authentication cookie |
 
 ## Response Format
 
 ### Success Response (200 OK)
 
-| Field       | Type    | Description                                     |
-|-------------|---------|------------------------------------------------|
-| collections | array   | Array of template collection objects            |
-| total       | number  | Total number of collections                     |
+| Field       | Type   | Description                          |
+| ----------- | ------ | ------------------------------------ |
+| collections | array  | Array of template collection objects |
+| total       | number | Total number of collections          |
 
 ### TypeScript Types
 
 ```typescript
 interface Template {
-  id: number;
-  description?: string;
-  file_name: string;
-  created_at: Date;
-  updated_at: Date;
-  neptun_user_id: number;
-  template_collection_id?: number;
-  user_file_id?: number;
+  id: number
+  description?: string
+  file_name: string
+  created_at: Date
+  updated_at: Date
+  neptun_user_id: number
+  template_collection_id?: number
+  user_file_id?: number
 }
 
 interface TemplateCollection {
-  id: number;
-  name: string;
-  description?: string;
-  is_shared: boolean;
-  share_uuid: string;
-  created_at: Date;
-  updated_at: Date;
-  neptun_user_id: number;
-  templates: Template[];
+  id: number
+  name: string
+  description?: string
+  is_shared: boolean
+  share_uuid: string
+  created_at: Date
+  updated_at: Date
+  neptun_user_id: number
+  templates: Template[]
 }
 
 interface ApiResponse {
-  collections: TemplateCollection[];
-  total: number;
+  collections: TemplateCollection[]
+  total: number
 }
 ```
 
@@ -118,7 +118,7 @@ import httpx
 
 async def get_user_collections(user_id: int, session_cookie: str) -> dict:
     url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections"
-    
+
     async with httpx.AsyncClient() as client:
         response = await client.get(
             url,
@@ -140,17 +140,17 @@ async function getUserCollections(
     {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
-        'Cookie': `neptun-session=${sessionCookie}`,
+        Accept: 'application/json',
+        Cookie: `neptun-session=${sessionCookie}`,
       },
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json();
+  return await response.json()
 }
 ```
 
@@ -199,9 +199,9 @@ async function getUserCollections(
 
 ### Response Status Codes
 
-| Status Code | Description                                |
-|-------------|--------------------------------------------|
-| 200         | Successfully retrieved collections         |
-| 401         | Unauthorized (invalid or missing session)   |
-| 403         | Forbidden (user_id mismatch)               |
-| 500         | Server error                               |
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully retrieved collections        |
+| 401         | Unauthorized (invalid or missing session) |
+| 403         | Forbidden (user_id mismatch)              |
+| 500         | Server error                              |

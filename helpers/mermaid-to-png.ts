@@ -1,5 +1,5 @@
 import { exec } from 'node:child_process'
-import { readdir, unlink, writeFile, copyFile } from 'node:fs/promises'
+import { copyFile, readdir, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 async function convertToPng() {
@@ -69,7 +69,7 @@ async function convertToPng() {
 
   // Wrap exec in a Promise
   await new Promise((resolve, reject) => {
-    exec(command, async (error, stdout, stderr) => {
+    exec(command, (error, stdout, stderr) => {
       if (stdout) {
         console.log('📝 Output:', stdout)
       }
@@ -78,44 +78,48 @@ async function convertToPng() {
       }
 
       const cleanup = async () => {
-        try {
-          console.log('\n🧹 Cleaning up config file...')
-          await unlink(configFile)
-          console.log('✅ Config file deleted')
-        } catch (unlinkError) {
-          console.error('❌ Failed to delete config file:', unlinkError)
-        }
+        console.log('\n🧹 Cleaning up config file...')
+
+        return unlink(configFile)
+          .then(() => {
+            console.log('✅ Config file deleted')
+          })
+          .catch((unlinkError) => {
+            console.error('❌ Failed to delete config file:', unlinkError)
+          })
       }
 
       if (error) {
-        await cleanup()
-        console.error('\n❌ PNG-Conversion failed:', error)
-        reject(error)
+        void cleanup().then(() => {
+          console.error('\n❌ PNG-Conversion failed:', error)
+          reject(error)
+        })
         return
       }
 
-      try {
-        console.log('\n📋 Creating schema.png...')
-        await copyFile(timestampPngFile, schemaPngFile)
-        console.log('✅ Schema PNG created')
-      } catch (copyError) {
-        console.error('❌ Failed to create schema.png:', copyError)
-        reject(copyError)
-        return
-      }
-
-      await cleanup()
-      console.log('\n✅ PNG files created successfully:')
-      console.log(`  • Timestamp file: ${path.relative('.', timestampPngFile)}`)
-      console.log(`  • Schema file: ${path.relative('.', schemaPngFile)}`)
-      console.log('\n=== PNG Conversion Complete ===\n')
-      resolve(true)
+      console.log('\n📋 Creating schema.png...')
+      void copyFile(timestampPngFile, schemaPngFile)
+        .then(async () => {
+          console.log('✅ Schema PNG created')
+          return cleanup()
+        })
+        .then(() => {
+          console.log('\n✅ PNG files created successfully:')
+          console.log(`  • Timestamp file: ${path.relative('.', timestampPngFile)}`)
+          console.log(`  • Schema file: ${path.relative('.', schemaPngFile)}`)
+          console.log('\n=== PNG Conversion Complete ===\n')
+          resolve(true)
+        })
+        .catch((err) => {
+          console.error('❌ Failed to create schema.png:', err)
+          reject(err)
+        })
     })
   })
 
   return {
     timestampPngFile: path.relative('.', timestampPngFile),
-    schemaPngFile: path.relative('.', schemaPngFile)
+    schemaPngFile: path.relative('.', schemaPngFile),
   }
 }
 

@@ -16,68 +16,68 @@ POST
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                    |
-|-----------|---------|----------|--------------------------------|
+| Parameter | Type    | Required | Description                      |
+| --------- | ------- | -------- | -------------------------------- |
 | user_id   | integer | Yes      | The ID of the authenticated user |
 
 ### Headers
 
-| Header          | Value            | Required | Description                    |
-|-----------------|------------------|----------|--------------------------------|
-| Accept          | application/json | Yes      | Specifies the response format |
-| Content-Type    | application/json | Yes      | Request body format           |
-| Cookie          | neptun-session   | Yes      | Session authentication cookie |
+| Header       | Value            | Required | Description                   |
+| ------------ | ---------------- | -------- | ----------------------------- |
+| Accept       | application/json | Yes      | Specifies the response format |
+| Content-Type | application/json | Yes      | Request body format           |
+| Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
 ### Request Body
 
-| Field       | Type    | Required | Description                          |
-|-------------|---------|----------|--------------------------------------|
-| name        | string  | Yes      | Name of the collection              |
-| description | string  | No       | Description of the collection       |
-| is_shared   | boolean | Yes      | Whether the collection is shared    |
+| Field       | Type    | Required | Description                      |
+| ----------- | ------- | -------- | -------------------------------- |
+| name        | string  | Yes      | Name of the collection           |
+| description | string  | No       | Description of the collection    |
+| is_shared   | boolean | Yes      | Whether the collection is shared |
 
 ## Response Format
 
 ### Success Response (201 Created)
 
-| Field       | Type   | Description                                     |
-|-------------|--------|------------------------------------------------|
-| collection  | object | The created template collection object          |
+| Field      | Type   | Description                            |
+| ---------- | ------ | -------------------------------------- |
+| collection | object | The created template collection object |
 
 ### TypeScript Types
 
 ```typescript
 interface Template {
-  id: number;
-  description?: string;
-  file_name: string;
-  created_at: Date;
-  updated_at: Date;
-  neptun_user_id: number;
-  template_collection_id?: number;
-  user_file_id?: number;
+  id: number
+  description?: string
+  file_name: string
+  created_at: Date
+  updated_at: Date
+  neptun_user_id: number
+  template_collection_id?: number
+  user_file_id?: number
 }
 
 interface TemplateCollection {
-  id: number;
-  name: string;
-  description?: string;
-  is_shared: boolean;
-  share_uuid: string;
-  created_at: Date;
-  updated_at: Date;
-  neptun_user_id: number;
-  templates: Template[];
+  id: number
+  name: string
+  description?: string
+  is_shared: boolean
+  share_uuid: string
+  created_at: Date
+  updated_at: Date
+  neptun_user_id: number
+  templates: Template[]
 }
 
 interface CreateCollectionRequest {
-  name: string;
-  description?: string;
-  is_shared: boolean;
+  name: string
+  description?: string
+  is_shared: boolean
 }
 
 interface ApiResponse {
-  collection: TemplateCollection;
+  collection: TemplateCollection
 }
 ```
 
@@ -148,13 +148,13 @@ async def create_user_collection(
     session_cookie: str
 ) -> dict:
     url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections"
-    
+
     data = {
         "name": name,
         "is_shared": is_shared,
         "description": description
     }
-    
+
     async with httpx.AsyncClient() as client:
         response = await client.post(
             url,
@@ -184,13 +184,13 @@ async function createUserCollection(
       },
       body: JSON.stringify(data),
     }
-  );
+  )
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json();
+  return await response.json()
 }
 ```
 
@@ -225,10 +225,10 @@ async function createUserCollection(
 
 ### Response Status Codes
 
-| Status Code | Description                                |
-|-------------|--------------------------------------------|
-| 201         | Successfully created collection            |
-| 400         | Bad Request (invalid request body)         |
-| 401         | Unauthorized (invalid or missing session)   |
-| 403         | Forbidden (user_id mismatch)               |
-| 500         | Server error                               | 
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 201         | Successfully created collection           |
+| 400         | Bad Request (invalid request body)        |
+| 401         | Unauthorized (invalid or missing session) |
+| 403         | Forbidden (user_id mismatch)              |
+| 500         | Server error                              |
