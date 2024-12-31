@@ -85,8 +85,8 @@ importers:
         specifier: ^3.10.1
         version: 3.10.1
       lucide-vue-next:
-        specifier: ^0.454.0
-        version: 0.454.0(vue@3.5.13(typescript@5.7.2))
+        specifier: ^0.469.0
+        version: 0.469.0(vue@3.5.13(typescript@5.7.2))
       nodemailer:
         specifier: ^6.9.16
         version: 6.9.16
@@ -4772,8 +4772,8 @@ packages:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
 
-  lucide-vue-next@0.454.0:
-    resolution: {integrity: sha512-UeThgLHm5sZyVTBIE1pcFn2jJsZTKe7AWo94lY2OMQAgYTKgPnrj1QLlSco2lU+kE7iFWl/stNLSsbxfoWCd6A==}
+  lucide-vue-next@0.469.0:
+    resolution: {integrity: sha512-EjOap+vY3xEzCMrnaccDHO4BH3k3Lr+sOyvzRQCaayYxkxKla0w6Jr4h3cHAzA4vMSp63Dcy7vDiGeCPcCY+Gg==}
     peerDependencies:
       vue: '>=3.0.1'
 
@@ -12429,7 +12429,7 @@ snapshots:
 
   lru-cache@7.18.3: {}
 
-  lucide-vue-next@0.454.0(vue@3.5.13(typescript@5.7.2)):
+  lucide-vue-next@0.469.0(vue@3.5.13(typescript@5.7.2)):
     dependencies:
       vue: 3.5.13(typescript@5.7.2)
 
