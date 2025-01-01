@@ -1,15 +1,17 @@
 import { eq } from 'drizzle-orm'
+
 import {
   neptun_user_file,
   neptun_user_template,
+  type ReadTemplate,
   type TemplateToCreate,
   type UserFileToCreate,
 } from '~/lib/types/database.tables/schema'
 
-export async function createTemplate(template: TemplateToCreate & { file: UserFileToCreate }) {
+export async function createTemplate(template_entry: TemplateToCreate & { file: UserFileToCreate }) {
   return db.transaction(async (tx) => {
     // Transform escaped HTML entities back to original characters
-    const unescapedText = template.file.text
+    const unescapedText = template_entry.file.text
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
 
@@ -17,11 +19,11 @@ export async function createTemplate(template: TemplateToCreate & { file: UserFi
     const [userFile] = await tx
       .insert(neptun_user_file)
       .values({
-        title: template.file.title || template.file_name,
+        title: template_entry.file.title || template_entry.file_name,
         text: unescapedText, // Use unescaped text
-        language: template.file.language || 'text',
-        extension: template.file.extension || 'txt',
-        neptun_user_id: template.neptun_user_id,
+        language: template_entry.file.language || 'text',
+        extension: template_entry.file.extension || 'txt',
+        neptun_user_id: template_entry.neptun_user_id,
       })
       .returning()
 
@@ -29,10 +31,10 @@ export async function createTemplate(template: TemplateToCreate & { file: UserFi
     const [createdTemplate] = await tx
       .insert(neptun_user_template)
       .values({
-        description: template.description,
-        file_name: template.file_name,
-        neptun_user_id: template.neptun_user_id,
-        template_collection_id: template.template_collection_id,
+        description: template_entry.description,
+        file_name: template_entry.file_name,
+        neptun_user_id: template_entry.neptun_user_id,
+        template_collection_id: template_entry.template_collection_id,
         user_file_id: userFile.id,
       })
       .returning()
@@ -52,9 +54,9 @@ export async function createTemplate(template: TemplateToCreate & { file: UserFi
   })
 }
 
-export async function readTemplate(id: number) {
+export async function readTemplate(template_id: ReadTemplate['id']) {
   const template = await db.query.neptun_user_template.findFirst({
-    where: eq(neptun_user_template.id, id),
+    where: eq(neptun_user_template.id, template_id),
     with: {
       neptun_user_file: true,
     },
@@ -84,8 +86,8 @@ export async function readTemplate(id: number) {
 }
 
 export async function updateTemplate(
-  id: number,
-  data: Partial<TemplateToCreate> & {
+  template_id: ReadTemplate['id'],
+  template_entry: Partial<TemplateToCreate> & {
     file?: Partial<UserFileToCreate>
   },
 ) {
@@ -94,7 +96,7 @@ export async function updateTemplate(
     const [template] = await tx
       .select()
       .from(neptun_user_template)
-      .where(eq(neptun_user_template.id, id))
+      .where(eq(neptun_user_template.id, template_id))
 
     if (!template) {
       throw new Error('Template not found')
@@ -104,21 +106,21 @@ export async function updateTemplate(
     const [updatedTemplate] = await tx
       .update(neptun_user_template)
       .set({
-        description: data.description,
-        file_name: data.file_name,
+        description: template_entry.description,
+        file_name: template_entry.file_name,
       })
-      .where(eq(neptun_user_template.id, id))
+      .where(eq(neptun_user_template.id, template_id))
       .returning()
 
     // Update associated file if file data is provided
-    if (data.file && template.user_file_id) {
+    if (template_entry.file && template.user_file_id) {
       const [updatedFile] = await tx
         .update(neptun_user_file)
         .set({
-          title: data.file.title,
-          text: data.file.text,
-          language: data.file.language,
-          extension: data.file.extension,
+          title: template_entry.file.title,
+          text: template_entry.file.text,
+          language: template_entry.file.language,
+          extension: template_entry.file.extension,
         })
         .where(eq(neptun_user_file.id, template.user_file_id))
         .returning()
@@ -136,8 +138,15 @@ export async function updateTemplate(
   })
 }
 
-export async function deleteTemplate(id: number) {
-  await db
+export async function deleteTemplate(template_id: ReadTemplate['id']) {
+  return db
     .delete(neptun_user_template)
-    .where(eq(neptun_user_template.id, id))
+    .where(eq(neptun_user_template.id, template_id))
+    .then(() => true)
+    .catch((err) => {
+      if (LOG_BACKEND) {
+        console.error('Failed to delete template from database', err)
+      }
+      return false
+    })
 }

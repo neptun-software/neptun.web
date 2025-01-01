@@ -1,13 +1,14 @@
 import { eq } from 'drizzle-orm'
 import {
+  type GetGithubAppInstallationRepository,
   github_app_installation_repository,
   type NewGithubAppInstallationRepository,
 } from '~/lib/types/database.tables/schema'
 
-export async function createGithubAppInstallationRepositories(installationRepositoriesToCreate: NewGithubAppInstallationRepository[]) {
+export async function createGithubAppInstallationRepositories(installation_repository_list: NewGithubAppInstallationRepository[]) {
   const createdGithubAppInstallationRepositories = await db
     .insert(github_app_installation_repository)
-    .values(installationRepositoriesToCreate)
+    .values(installation_repository_list)
     .returning()
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -26,14 +27,14 @@ export async function createGithubAppInstallationRepositories(installationReposi
   return createdGithubAppInstallationRepositories
 }
 
-export async function readAllGithubAppInstallationRepositoriesOfInstallation(installationId: number) {
+export async function readAllGithubAppInstallationRepositoriesOfInstallation(installation_id: GetGithubAppInstallationRepository['github_app_installation_id']) {
   const fetchedGithubAppInstallationRepositories = await db
     .select()
     .from(github_app_installation_repository)
     .where(
       eq(
         github_app_installation_repository.github_app_installation_id,
-        installationId,
+        installation_id,
       ),
     )
     .catch((err) => {

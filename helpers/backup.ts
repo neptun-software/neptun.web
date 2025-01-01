@@ -69,7 +69,7 @@ async function backupDatabase() {
         console.log(`\n✅ ${isSchemaOnly ? 'Schema' : 'Data'}-Backup successful!`)
         console.log('📄 Backup files created:')
         console.log(`  • Timestamp file: ${path.relative('.', filepath)}`)
-        
+
         void copyFile(filepath, schemaFilepath)
           .then(() => {
             console.log(`  • Schema file: ${path.relative('.', schemaFilepath)}`)

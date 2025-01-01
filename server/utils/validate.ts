@@ -127,7 +127,7 @@ const OrderByQuerySchema = z.object({
     .optional(),
 })
 
-type OrderByQueryType = z.infer<typeof OrderByQuerySchema>
+export type OrderByQueryType = z.infer<typeof OrderByQuerySchema>
 
 export const IsSharedQuerySchema = z.object({
   is_shared: z.boolean().optional().or(z.null()),

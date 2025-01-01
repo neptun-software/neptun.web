@@ -7,12 +7,12 @@ import {
   type ReadChatConversationShare,
 } from '~/lib/types/database.tables/schema'
 
-export async function createChatConversationShare(share: ChatConversationShareToCreate) {
+export async function createChatConversationShare(chat_share_entry: ChatConversationShareToCreate) {
   const createdChatConversationShare = await db
     .insert(chat_conversation_share)
     .values({
-      ...share,
-      hashed_password: encryptColumn(share.hashed_password || ''),
+      ...chat_share_entry,
+      hashed_password: encryptColumn(chat_share_entry.hashed_password || ''),
     })
     .returning()
     .catch((err) => {
@@ -50,7 +50,7 @@ export async function readShareUuid(chat_id: ReadChatConversation['id']) {
   return shareUUid
 }
 
-export async function readShareInfo(id: ReadChatConversationShare['share_uuid']) {
+export async function readShareInfo(chat_share_uuid: ReadChatConversationShare['share_uuid']) {
   const shareStatus: {
     shareExists: boolean
     shareIsActive: boolean
@@ -59,7 +59,7 @@ export async function readShareInfo(id: ReadChatConversationShare['share_uuid'])
   } = await db
     .select()
     .from(chat_conversation_share)
-    .where(eq(chat_conversation_share.share_uuid, id))
+    .where(eq(chat_conversation_share.share_uuid, chat_share_uuid))
     .then((data) => {
       return {
         shareExists: data.length > 0,
@@ -84,7 +84,7 @@ export async function readShareInfo(id: ReadChatConversationShare['share_uuid'])
   return shareStatus
 }
 
-export async function readChatConversationShareMessages(id: ReadChatConversationShare['share_uuid']) {
+export async function readChatConversationShareMessages(chat_share_uuid: ReadChatConversationShare['share_uuid']) {
   const chatConversationShareMessages
     = await db.query.chat_conversation_message.findMany({
       with: {
@@ -94,7 +94,7 @@ export async function readChatConversationShareMessages(id: ReadChatConversation
           },
           with: {
             chat_conversation_shares: {
-              where: eq(chat_conversation_share.share_uuid, id),
+              where: eq(chat_conversation_share.share_uuid, chat_share_uuid),
               columns: {
                 id: true,
                 is_shared: true,
@@ -116,7 +116,7 @@ export async function readChatConversationShareMessages(id: ReadChatConversation
                 chat_conversation_share.chat_conversation_id,
                 chat_conversation_message.chat_conversation_id,
               ),
-              eq(chat_conversation_share.share_uuid, id),
+              eq(chat_conversation_share.share_uuid, chat_share_uuid),
             ),
           ),
       ),
@@ -132,14 +132,14 @@ export async function readChatConversationShareMessages(id: ReadChatConversation
   return chatConversationShareMessages
 }
 
-export async function sharePasswordIsValid(id: ReadChatConversationShare['share_uuid'], password: string) {
+export async function sharePasswordIsValid(chat_share_uuid: ReadChatConversationShare['share_uuid'], plain_password: ReadChatConversationShare['hashed_password']) {
   const sharePasswordIsValid = await db
     .select()
     .from(chat_conversation_share)
     .where(
       and(
-        like(chat_conversation_share.hashed_password, encryptColumn(password)),
-        eq(chat_conversation_share.share_uuid, id),
+        like(chat_conversation_share.hashed_password, encryptColumn(plain_password)),
+        eq(chat_conversation_share.share_uuid, chat_share_uuid),
       ),
     )
     .then(data => data.length > 0)
@@ -153,11 +153,11 @@ export async function sharePasswordIsValid(id: ReadChatConversationShare['share_
   return sharePasswordIsValid
 }
 
-export async function updateChatConversationShare(id: ReadChatConversationShare['id'], fields: Partial<ChatConversationShareToCreate>) {
+export async function updateChatConversationShare(chat_share_id: ReadChatConversationShare['id'], fields_to_update: Partial<ChatConversationShareToCreate>) {
   const updatedChatConversationShare = await db
     .update(chat_conversation_share)
-    .set(fields)
-    .where(eq(chat_conversation_share.id, id))
+    .set(fields_to_update)
+    .where(eq(chat_conversation_share.id, chat_share_id))
     .returning()
     .catch((err) => {
       if (LOG_BACKEND) {

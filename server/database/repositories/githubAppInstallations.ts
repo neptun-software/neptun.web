@@ -5,10 +5,10 @@ import {
   type ReadUser,
 } from '~/lib/types/database.tables/schema'
 
-export async function createGithubAppInstallation(installationToCreate: NewGithubAppInstallation) {
+export async function createGithubAppInstallation(installation_entry: NewGithubAppInstallation) {
   const createdGithubAppInstallation = await db
     .insert(github_app_installation)
-    .values(installationToCreate)
+    .values(installation_entry)
     .returning()
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -28,7 +28,7 @@ export async function createGithubAppInstallation(installationToCreate: NewGithu
 }
 
 // User can have multiple, because user can link multiple github organizations.
-export async function readAllGithubAppInstallationsOfUser(userId: ReadUser['id']) {
+export async function readAllGithubAppInstallationsOfUser(user_id: ReadUser['id']) {
   const fetchedGithubAppInstallations = await db
     .select({
       id: github_app_installation.id,
@@ -40,7 +40,7 @@ export async function readAllGithubAppInstallationsOfUser(userId: ReadUser['id']
       updated_at: github_app_installation.updated_at,
     })
     .from(github_app_installation)
-    .where(eq(github_app_installation.neptun_user_id, userId))
+    .where(eq(github_app_installation.neptun_user_id, user_id))
     .catch((err) => {
       if (LOG_BACKEND) {
         console.error(

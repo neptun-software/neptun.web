@@ -6,10 +6,10 @@ import {
   type ReadChatConversationMessage,
 } from '../../../lib/types/database.tables/schema'
 
-export async function createChatConversationMessages(messages: ChatConversationMessageToCreate[]) {
+export async function createChatConversationMessages(chat_message_list: ChatConversationMessageToCreate[]) {
   const createdChatConversationMessages = await db
     .insert(chat_conversation_message)
-    .values(messages)
+    .values(chat_message_list)
     .returning()
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -28,12 +28,12 @@ export async function createChatConversationMessages(messages: ChatConversationM
   return createdChatConversationMessages
 }
 
-export async function readChatConversationMessages(chat_conversation_id: ReadChatConversation['id']) {
+export async function readChatConversationMessages(chat_id: ReadChatConversation['id']) {
   const chatConversationMessages = await db
     .select()
     .from(chat_conversation_message)
     .where(
-      eq(chat_conversation_message.chat_conversation_id, chat_conversation_id),
+      eq(chat_conversation_message.chat_conversation_id, chat_id),
     )
     .orderBy(asc(chat_conversation_message.updated_at))
     .catch((err) => {
@@ -53,10 +53,10 @@ export async function readChatConversationMessages(chat_conversation_id: ReadCha
   return chatConversationMessages
 }
 
-export async function deleteChatConversationMessage(id: ReadChatConversationMessage['id']) {
+export async function deleteChatConversationMessage(chat_message_id: ReadChatConversationMessage['id']) {
   const successfullyDeleted = await db
     .delete(chat_conversation_message)
-    .where(eq(chat_conversation_message.id, id))
+    .where(eq(chat_conversation_message.id, chat_message_id))
     .then(() => true)
     .catch((err) => {
       if (LOG_BACKEND) {

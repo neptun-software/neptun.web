@@ -9,7 +9,7 @@ import {
   type UserToCreate,
 } from '../../../lib/types/database.tables/schema'
 
-export async function validateUserCredentials(email: ReadUser['primary_email'], password: GetUser['hashed_password']) {
+export async function validateUserCredentials(email: ReadUser['primary_email'], plain_password: GetUser['hashed_password']) {
   /* TODO: allow more than one email */
   const fetchedUser = await db
     .select({
@@ -22,7 +22,7 @@ export async function validateUserCredentials(email: ReadUser['primary_email'], 
         like(neptun_user.primary_email, encryptColumn(email)), // SELECT decrypt('\x2866794d48ffaaef22d27652555382a77dfce3e6b71b8fcb3c18ee1a5e6a466a'::bytea, 'secret', 'aes') LIKE 'e.mail@example.com' AS decrypted_primary_email; --check (\x<hex>)
         like(
           neptun_user.hashed_password,
-          compareWithSecret(password, neptun_user.hashed_password),
+          compareWithSecret(plain_password, neptun_user.hashed_password),
         ), // SELECT crypt('password', '$2a$12$rUibDTAV38yIModD5ufgmOnlpy89Syof3sU0QitE9J.aKdKtwH3IC') LIKE '$2a$12$rUibDTAV38yIModD5ufgmOnlpy89Syof3sU0QitE9J.aKdKtwH3IC' AS password_is_correct; --check
       ),
     )
@@ -41,13 +41,13 @@ export async function validateUserCredentials(email: ReadUser['primary_email'], 
   return fetchedUser[0]
 }
 
-export async function createUser(user: UserToCreate) {
+export async function createUser(user_entry: UserToCreate) {
   /* TODO: only allow, if email is verified via email code => needs extended login flow */
   const createdUser = await db
     .insert(neptun_user)
     .values({
-      primary_email: encryptColumn(user.primary_email), // SELECT encode(encrypt('e.mail@example.com', 'secret', 'aes'), 'hex') AS encrypted_primary_email; --encrypt
-      hashed_password: encryptSecret(user.password), // SELECT crypt('password', gen_salt('bf', 12)) AS hashed_password; --encrypt
+      primary_email: encryptColumn(user_entry.primary_email), // SELECT encode(encrypt('e.mail@example.com', 'secret', 'aes'), 'hex') AS encrypted_primary_email; --encrypt
+      hashed_password: encryptSecret(user_entry.password), // SELECT crypt('password', gen_salt('bf', 12)) AS hashed_password; --encrypt
     })
     // @ts-expect-error (is allowed, just not properly typed)
     .returning({
@@ -191,7 +191,7 @@ export async function readUserUsingGithubOauthId(github_oauth_id: ReadOauthAccou
   return fetchedUser.neptun_user
 }
 
-export async function updateUser(id: ReadUser['id'], primary_email: ReadUser['primary_email'] | undefined, password: GetUser['hashed_password'] | undefined) {
+export async function updateUser(user_id: ReadUser['id'], primary_email: ReadUser['primary_email'] | undefined, plain_password: GetUser['hashed_password'] | undefined) {
   /* TODO: check for old password, before allowing update, only allow email, if verified via email code */
 
   const updated_primary_email = () => {
@@ -205,12 +205,12 @@ export async function updateUser(id: ReadUser['id'], primary_email: ReadUser['pr
   }
 
   const updated_password = () => {
-    if (!password) {
+    if (!plain_password) {
       return null
     }
 
     return {
-      hashed_password: encryptSecret(password),
+      hashed_password: encryptSecret(plain_password),
     }
   }
 
@@ -222,7 +222,7 @@ export async function updateUser(id: ReadUser['id'], primary_email: ReadUser['pr
   const updatedUser = await db
     .update(neptun_user)
     .set(updatedUserInformation)
-    .where(eq(neptun_user.id, id))
+    .where(eq(neptun_user.id, user_id))
     // @ts-expect-error (is allowed, just not properly typed)
     .returning({
       id: neptun_user.id,
@@ -242,10 +242,10 @@ export async function updateUser(id: ReadUser['id'], primary_email: ReadUser['pr
   return updatedUser[0]
 }
 
-export async function deleteUser(id: ReadUser['id']) {
+export async function deleteUser(user_id: ReadUser['id']) {
   return db
     .delete(neptun_user)
-    .where(eq(neptun_user.id, id))
+    .where(eq(neptun_user.id, user_id))
     .then(() => true)
     .catch((err) => {
       if (LOG_BACKEND) {

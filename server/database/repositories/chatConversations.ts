@@ -1,3 +1,4 @@
+import type { OrderByQueryType } from '~/server/utils/validate'
 import { asc, desc, eq, inArray } from 'drizzle-orm'
 import {
   chat_conversation,
@@ -7,11 +8,11 @@ import {
 } from '../../../lib/types/database.tables/schema'
 
 export async function createChatConversation(
-  conversation: ChatConversationToCreate,
+  chat_entry: ChatConversationToCreate,
 ) {
   const createdChatConversation = await db
     .insert(chat_conversation)
-    .values(conversation)
+    .values(chat_entry)
     .returning()
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -33,7 +34,7 @@ export async function createChatConversation(
 // 2.5. https://github.com/drizzle-team/drizzle-orm/issues/1644#issuecomment-1893746141
 export async function readAllChatConversationsOfUser(
   user_id: ReadUser['id'],
-  order_by?: string,
+  order_by?: OrderByQueryType['order_by'],
 ) {
   let query = db
     .select()
@@ -71,8 +72,8 @@ export async function readAllChatConversationsOfUser(
 }
 
 export async function updateChatConversation(
-  id: ReadChatConversation['id'],
-  fields: Partial<
+  chat_id: ReadChatConversation['id'],
+  fields_to_update: Partial<
     Omit<
       ReadChatConversation,
       'id' | 'model' | 'created_at' | 'updated_at' | 'neptun_user_id'
@@ -81,8 +82,8 @@ export async function updateChatConversation(
 ) {
   const updatedChatConversation = await db
     .update(chat_conversation)
-    .set(fields)
-    .where(eq(chat_conversation.id, id))
+    .set(fields_to_update)
+    .where(eq(chat_conversation.id, chat_id))
     .returning()
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -98,10 +99,10 @@ export async function updateChatConversation(
   return updatedChatConversation[0]
 }
 
-export async function deleteChatConversation(id: ReadChatConversation['id']) {
+export async function deleteChatConversation(chat_id: ReadChatConversation['id']) {
   const successfullyDeleted = await db
     .delete(chat_conversation)
-    .where(eq(chat_conversation.id, id))
+    .where(eq(chat_conversation.id, chat_id))
     .then(() => true)
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -114,11 +115,11 @@ export async function deleteChatConversation(id: ReadChatConversation['id']) {
 }
 
 export async function deleteChatConversations(
-  ids: ReadChatConversation['id'][],
+  chat_ids: ReadChatConversation['id'][],
 ) {
   const successfullyDeleted = await db
     .delete(chat_conversation)
-    .where(inArray(chat_conversation.id, ids))
+    .where(inArray(chat_conversation.id, chat_ids))
     .then(() => true)
     .catch((err) => {
       if (LOG_BACKEND) {

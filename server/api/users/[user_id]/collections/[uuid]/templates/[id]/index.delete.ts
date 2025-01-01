@@ -15,8 +15,7 @@ export default defineEventHandler(async (event) => {
   const { id } = maybeTemplateId.data
 
   try {
-    await deleteTemplate(id)
-    return true
+    return await deleteTemplate(id)
   } catch (error) {
     return sendError(
       event,

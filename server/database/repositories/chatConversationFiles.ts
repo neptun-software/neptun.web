@@ -8,12 +8,12 @@ import {
 } from '~/lib/types/database.tables/schema'
 
 export async function createChatConversationFiles(
-  files: ChatConversationFileToCreate[],
+  chat_file_list: ChatConversationFileToCreate[],
 ) {
   return db.transaction(async (tx) => {
     const createdFiles: ReadChatConversationFile[] = []
 
-    for (const file of files) {
+    for (const file of chat_file_list) {
       try {
         const { title, text, language, extension, ...chatFileData } = file
 
@@ -69,10 +69,10 @@ export async function createChatConversationFiles(
 }
 
 export async function readAllChatConversationFilesOfChatConversation(
-  chat_conversation_id: ReadChatConversationFile['chat_conversation_id'],
+  chat_id: ReadChatConversationFile['chat_conversation_id'],
 ) {
   const chatConversationFiles = await db.query.chat_conversation_file.findMany({
-    where: eq(chat_conversation_file.chat_conversation_id, chat_conversation_id),
+    where: eq(chat_conversation_file.chat_conversation_id, chat_id),
     with: {
       neptun_user_file: true,
     },

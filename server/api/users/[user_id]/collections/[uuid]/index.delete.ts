@@ -17,8 +17,7 @@ export default defineEventHandler(async (event) => {
   const { uuid } = maybeCollectionUuid.data
 
   try {
-    await deleteTemplateCollection(uuid)
-    return true
+    return await deleteTemplateCollection(uuid)
   } catch (error) {
     return sendError(
       event,
