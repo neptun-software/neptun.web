@@ -16,9 +16,9 @@ PATCH
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                   |
-| --------- | ------ | -------- | ----------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user |
+| Parameter | Type    | Required | Description                   |
+| --------- | ------- | -------- | ----------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user |
 
 ### Headers
 
@@ -42,20 +42,28 @@ At least one of the following fields must be provided:
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                                     |
+| ----------- | ----------------------------------------------- |
+| 200         | User successfully updated                       |
+| 400         | Invalid request body or missing required fields |
+| 401         | Unauthorized (invalid or missing session)       |
+| 404         | User not found                                  |
+| 500         | Server error during update                      |
+
 ### Success Response (200 OK)
 
 ```json
 {
   "user": {
-    "id": "user123",
+    "id": 123,
     "primary_email": "newemail@example.com"
   }
 }
 ```
 
-### Error Responses
-
-#### Bad Request (400)
+### Error Response (400 Bad Request)
 
 ```json
 {
@@ -74,7 +82,7 @@ At least one of the following fields must be provided:
 }
 ```
 
-#### TypeScript Interface
+### TypeScript Interface
 
 ```typescript
 interface UpdateUserRequest {
@@ -84,7 +92,7 @@ interface UpdateUserRequest {
 
 interface UpdateUserResponse {
   user: {
-    id: string
+    id: number
     primary_email: string
   }
 }
@@ -103,61 +111,65 @@ interface UpdateUserError {
 }
 ```
 
-#### Python Model
+### Python Model
 
 ```python
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
+
+class ValidationIssue(BaseModel):
+    code: str
+    validation: str
+    message: str
 
 class UpdateUserRequest(BaseModel):
-    email: Optional[EmailStr] = None
-    password: Optional[str] = None
+    email: Optional[EmailStr]
+    password: Optional[str]
 
-class UserInfo(BaseModel):
-    id: str
-    primary_email: EmailStr
+class User(BaseModel):
+    id: int
+    primary_email: str
 
 class UpdateUserResponse(BaseModel):
-    user: UserInfo
+    user: User
+
+class UpdateUserError(BaseModel):
+    statusCode: int
+    statusMessage: str
+    message: str
+    data: Optional[dict[str, List[ValidationIssue]]]
 ```
 
 ## Code Examples
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
-from pydantic import BaseModel, EmailStr
 import httpx
 from typing import Optional
 
-class UpdateUserRequest(BaseModel):
-    email: Optional[EmailStr] = None
-    password: Optional[str] = None
-
-class UserInfo(BaseModel):
-    id: str
-    primary_email: EmailStr
-
-class UpdateUserResponse(BaseModel):
-    user: UserInfo
-
 async def update_user(
-    user_id: str,
-    session_cookie: str,
+    user_id: int,
     email: Optional[str] = None,
-    password: Optional[str] = None
+    password: Optional[str] = None,
+    session_cookie: str = None
 ) -> UpdateUserResponse:
-    update_data = {}
-    if email:
-        update_data["email"] = email
-    if password:
-        update_data["password"] = password
+    url = f"https://neptun-webui.vercel.app/api/users/{user_id}"
+
+    data = {}
+    if email is not None:
+        data["email"] = email
+    if password is not None:
+        data["password"] = password
 
     async with httpx.AsyncClient() as client:
         response = await client.patch(
-            f"https://neptun-webui.vercel.app/api/users/{user_id}",
-            json=update_data,
-            cookies={"neptun-session": session_cookie}
+            url,
+            json=data,
+            headers={
+                "Content-Type": "application/json",
+                "Cookie": f"neptun-session={session_cookie}"
+            }
         )
         response.raise_for_status()
         return UpdateUserResponse(**response.json())
@@ -169,22 +181,17 @@ async def update_user(
 curl -X PATCH \
   -H "Content-Type: application/json" \
   -H "Cookie: neptun-session=your-session-cookie" \
-  -d '{
-    "email": "newemail@example.com",
-    "password": "newpassword"
-  }' \
+  -d '{"email":"newemail@example.com"}' \
   "https://neptun-webui.vercel.app/api/users/your-user-id"
 ```
 
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function updateUser(
-  userId: string,
-  updates: {
-    email?: string
-    password?: string
-  }
+  userId: number,
+  data: UpdateUserRequest,
+  sessionCookie: string
 ): Promise<UpdateUserResponse> {
   const response = await fetch(
     `https://neptun-webui.vercel.app/api/users/${userId}`,
@@ -192,9 +199,9 @@ async function updateUser(
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
+        'Cookie': `neptun-session=${sessionCookie}`,
       },
-      body: JSON.stringify(updates),
-      credentials: 'include', // Important for cookie handling
+      body: JSON.stringify(data),
     }
   )
 
@@ -202,19 +209,9 @@ async function updateUser(
     throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return await response.json() as UpdateUserResponse
+  return await response.json()
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                                     |
-| ----------- | ----------------------------------------------- |
-| 200         | User successfully updated                       |
-| 400         | Invalid request body or missing required fields |
-| 401         | Unauthorized (invalid or missing session)       |
-| 404         | User not found                                  |
-| 500         | Server error during update                      |
 
 ## Notes
 

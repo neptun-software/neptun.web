@@ -14,11 +14,15 @@ POST
 
 `/api/auth/logout`
 
+### Route Parameters
+
+No route parameters required.
+
 ### Headers
 
-| Header | Value            | Required | Description                   |
-| ------ | ---------------- | -------- | ----------------------------- |
-| Cookie | auth_session=xyz | Yes      | Authentication session cookie |
+| Header | Value          | Required | Description                   |
+| ------ | -------------- | -------- | ----------------------------- |
+| Cookie | neptun-session | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -28,13 +32,23 @@ No query parameters required.
 
 No request body required.
 
-### Route Parameters
-
-No route parameters required.
-
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                                   |
+| ----------- | --------------------------------------------- |
+| 200         | Request processed successfully                |
+| 401         | No valid session cookie provided              |
+| 500         | Server error occurred during session clearing |
+
 ### Success Response (200 OK)
+
+#### Headers
+
+| Header     | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Set-Cookie | Clears the neptun-session cookie by setting it to expired |
 
 #### When Active Session Was Cleared
 
@@ -48,15 +62,35 @@ true
 false
 ```
 
-#### TypeScript Interface
+### Error Response (401 Unauthorized)
+
+```json
+{
+  "statusCode": 401,
+  "statusMessage": "Unauthorized",
+  "data": {
+    "message": "No valid session"
+  }
+}
+```
+
+### TypeScript Interface
 
 ```typescript
 interface LogoutResponse {
   success: boolean
 }
+
+interface LogoutError {
+  statusCode: number
+  statusMessage: string
+  data: {
+    message: string
+  }
+}
 ```
 
-#### Python Model
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -67,7 +101,15 @@ class LogoutResponse(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### cURL Example
+
+```bash
+curl -X POST \
+  -H "Cookie: neptun-session=your-session-cookie" \
+  "https://neptun-webui.vercel.app/api/auth/logout"
+```
+
+### Python Example
 
 ```python
 from pydantic import BaseModel
@@ -81,7 +123,7 @@ async def logout() -> bool:
         try:
             response = await client.post(
                 "https://neptun-webui.vercel.app/api/auth/logout",
-                cookies={"auth_session": "your-session-cookie"},
+                cookies={"neptun-session": "your-session-cookie"},
             )
             response.raise_for_status()
             return response.json()
@@ -89,15 +131,7 @@ async def logout() -> bool:
             return False
 ```
 
-### cURL Example
-
-```bash
-curl -X POST \
-  -b "auth_session=your-session-cookie-here" \
-  https://neptun-webui.vercel.app/api/auth/logout
-```
-
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function logout(): Promise<boolean> {
@@ -121,14 +155,6 @@ async function logout(): Promise<boolean> {
   }
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                                   |
-| ----------- | --------------------------------------------- |
-| 200         | Request processed successfully                |
-| 401         | No valid session cookie provided              |
-| 500         | Server error occurred during session clearing |
 
 ## Notes
 

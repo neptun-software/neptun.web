@@ -28,6 +28,14 @@ No request body required.
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                          |
+| ----------- | ------------------------------------ |
+| 200         | Server is healthy and responding     |
+| 500         | Server encountered an internal error |
+| 503         | Server is temporarily unavailable    |
+
 ### Success Response (200 OK)
 
 #### Response Structure
@@ -38,9 +46,31 @@ The endpoint returns a JSON object with the following properties:
 | --------- | ------ | -------------------------------------------- |
 | status    | string | Current health status of the server          |
 | timestamp | string | ISO 8601 formatted timestamp of the response |
-| uptime    | number | Server uptime in seconds                     |
+| uptime    | double | Server uptime in seconds                     |
 
-#### TypeScript Interface
+### Error Response
+
+#### 500 Internal Server Error
+
+```json
+{
+  "status": "error",
+  "timestamp": "2024-03-20T10:30:45.123Z",
+  "error": "Internal server error occurred"
+}
+```
+
+#### 503 Service Unavailable
+
+```json
+{
+  "status": "unavailable",
+  "timestamp": "2024-03-20T10:30:45.123Z",
+  "error": "Service temporarily unavailable"
+}
+```
+
+### TypeScript Interface
 
 ```typescript
 interface HealthCheckResponse {
@@ -48,9 +78,15 @@ interface HealthCheckResponse {
   timestamp: string
   uptime: number
 }
+
+interface HealthCheckError {
+  status: string
+  timestamp: string
+  error: string
+}
 ```
 
-#### Python Model
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -60,6 +96,11 @@ class HealthCheckResponse(BaseModel):
     status: str
     timestamp: str
     uptime: float
+
+class HealthCheckError(BaseModel):
+    status: str
+    timestamp: str
+    error: str
 ```
 
 ### Example Response
@@ -74,7 +115,7 @@ class HealthCheckResponse(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 import httpx
@@ -99,7 +140,7 @@ async def check_health() -> HealthCheckResponse:
 curl -X GET https://neptun-webui.vercel.app/health
 ```
 
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function checkHealth(): Promise<HealthCheckResponse> {
@@ -111,9 +152,10 @@ async function checkHealth(): Promise<HealthCheckResponse> {
 }
 ```
 
-## Error Responses
+## Notes
 
-This endpoint typically only returns a 200 OK response. In case of server issues, standard HTTP error codes may be returned:
-
-- 500 Internal Server Error: If the server encounters an error while processing the request
-- 503 Service Unavailable: If the server is temporarily unavailable
+- No authentication required
+- Response times should be under 100ms
+- Status field values: "healthy", "error", "unavailable"
+- Timestamp is always in UTC
+- Uptime is measured in seconds with millisecond precision

@@ -30,38 +30,83 @@ PATCH
 | Content-Type | application/json | Yes      | Request body format           |
 | Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
+### Query Parameters
+
+No query parameters required.
+
 ### Request Body
 
 | Field       | Type   | Required | Description                     |
 | ----------- | ------ | -------- | ------------------------------- |
 | description | string | No       | New description of the template |
-| file_name   | string | No       | New name of the template file   |
+| file_name   | string | No       | New file name of the template   |
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully updated template             |
+| 400         | Bad Request (invalid request body)        |
+| 401         | Unauthorized (invalid or missing session) |
+| 403         | Forbidden (user_id mismatch)              |
+| 404         | Template not found                        |
+| 500         | Server error                              |
+
 ### Success Response (200 OK)
 
-| Field    | Type   | Description                 |
-| -------- | ------ | --------------------------- |
-| template | object | The updated template object |
+```json
+{
+  "template": {
+    "id": 1,
+    "description": "Updated Docker deployment script",
+    "file_name": "docker-deploy-v2.sh",
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-01T12:30:00Z",
+    "neptun_user_id": 1,
+    "template_collection_id": 1,
+    "user_file_id": 1
+  }
+}
+```
 
-### TypeScript Types
+### Error Response (400 Bad Request)
+
+```json
+{
+  "statusCode": 400,
+  "message": "Invalid template data"
+}
+```
+
+### TypeScript Interface
 
 ```typescript
 interface Template {
   id: number
   description?: string
   file_name: string
-  created_at: Date
-  updated_at: Date
+  created_at: string
+  updated_at: string
   neptun_user_id: number
   template_collection_id?: number
   user_file_id?: number
+  title?: string
+  text: string
+  language: string
+  extension: string
 }
 
 interface UpdateTemplateRequest {
   description?: string
   file_name?: string
+  file?: {
+    title?: string
+    text?: string
+    language?: string
+    extension?: string
+  }
 }
 
 interface ApiResponse {
@@ -69,16 +114,23 @@ interface ApiResponse {
 }
 ```
 
-### Python Types
+### Python Model
 
 ```python
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 
+class UpdateFileData(BaseModel):
+    title: Optional[str]
+    text: Optional[str]
+    language: Optional[str]
+    extension: Optional[str]
+
 class UpdateTemplateRequest(BaseModel):
     description: Optional[str]
     file_name: Optional[str]
+    file: Optional[UpdateFileData]
 
 class Template(BaseModel):
     id: int
@@ -89,6 +141,10 @@ class Template(BaseModel):
     neptun_user_id: int
     template_collection_id: Optional[int]
     user_file_id: Optional[int]
+    title: Optional[str]
+    text: str
+    language: str
+    extension: str
 
 class ApiResponse(BaseModel):
     template: Template
@@ -96,7 +152,7 @@ class ApiResponse(BaseModel):
 
 ## Code Examples
 
-### cURL
+### cURL Example
 
 ```bash
 curl -X PATCH "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e29b-41d4-a716-446655440000/templates/1" \
@@ -109,7 +165,7 @@ curl -X PATCH "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-
   }'
 ```
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 import httpx
@@ -122,7 +178,7 @@ async def update_template(
     description: Optional[str] = None,
     file_name: Optional[str] = None,
     session_cookie: str = None
-) -> dict:
+) -> ApiResponse:
     url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}/templates/{template_id}"
 
     data = {}
@@ -136,15 +192,16 @@ async def update_template(
             url,
             json=data,
             headers={
-                "Cookie": f"neptun-session={session_cookie}",
-                "Content-Type": "application/json"
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Cookie": f"neptun-session={session_cookie}"
             }
         )
         response.raise_for_status()
-        return response.json()
+        return ApiResponse(**response.json())
 ```
 
-### TypeScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function updateTemplate(
@@ -175,41 +232,9 @@ async function updateTemplate(
 }
 ```
 
-## Example Responses
+## Notes
 
-### Success Response
-
-```json
-{
-  "template": {
-    "id": 1,
-    "description": "Updated Docker deployment script",
-    "file_name": "docker-deploy-v2.sh",
-    "created_at": "2024-01-01T12:00:00Z",
-    "updated_at": "2024-01-01T12:30:00Z",
-    "neptun_user_id": 1,
-    "template_collection_id": 1,
-    "user_file_id": 1
-  }
-}
-```
-
-### Error Response
-
-```json
-{
-  "statusCode": 400,
-  "message": "Invalid template data"
-}
-```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Successfully updated template             |
-| 400         | Bad Request (invalid request body)        |
-| 401         | Unauthorized (invalid or missing session) |
-| 403         | Forbidden (user_id mismatch)              |
-| 404         | Template not found                        |
-| 500         | Server error                              |
+- The session cookie is required for authentication
+- At least one of description or file_name must be provided
+- The template must belong to the specified collection
+- The collection must belong to the specified user

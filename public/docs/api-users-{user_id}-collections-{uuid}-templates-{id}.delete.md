@@ -29,19 +29,50 @@ DELETE
 | Accept | application/json | Yes      | Specifies the response format |
 | Cookie | neptun-session   | Yes      | Session authentication cookie |
 
+### Query Parameters
+
+No query parameters required.
+
+### Request Body
+
+No request body required.
+
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully deleted template             |
+| 401         | Unauthorized (invalid or missing session) |
+| 403         | Forbidden (user_id mismatch)              |
+| 404         | Template not found                        |
+| 500         | Server error                              |
 
 ### Success Response (200 OK)
 
 Returns `true` on successful deletion.
 
-### TypeScript Types
+```json
+true
+```
+
+### Error Response (404 Not Found)
+
+```json
+{
+  "statusCode": 404,
+  "message": "Template not found"
+}
+```
+
+### TypeScript Interface
 
 ```typescript
 type ApiResponse = boolean
 ```
 
-### Python Types
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -52,7 +83,7 @@ class ApiResponse(BaseModel):
 
 ## Code Examples
 
-### cURL
+### cURL Example
 
 ```bash
 curl -X DELETE "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e29b-41d4-a716-446655440000/templates/1" \
@@ -60,7 +91,7 @@ curl -X DELETE "https://neptun-webui.vercel.app/api/users/1/collections/550e8400
   -H "Cookie: neptun-session=your-session-cookie"
 ```
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 import httpx
@@ -76,13 +107,16 @@ async def delete_template(
     async with httpx.AsyncClient() as client:
         response = await client.delete(
             url,
-            headers={"Cookie": f"neptun-session={session_cookie}"}
+            headers={
+                "Accept": "application/json",
+                "Cookie": f"neptun-session={session_cookie}"
+            }
         )
         response.raise_for_status()
         return response.json()
 ```
 
-### TypeScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function deleteTemplate(
@@ -110,29 +144,9 @@ async function deleteTemplate(
 }
 ```
 
-## Example Responses
+## Notes
 
-### Success Response
-
-```json
-true
-```
-
-### Error Response
-
-```json
-{
-  "statusCode": 404,
-  "message": "Template not found"
-}
-```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Successfully deleted template             |
-| 401         | Unauthorized (invalid or missing session) |
-| 403         | Forbidden (user_id mismatch)              |
-| 404         | Template not found                        |
-| 500         | Server error                              |
+- The session cookie is required for authentication
+- The template must belong to the specified collection
+- The collection must belong to the specified user
+- This operation cannot be undone

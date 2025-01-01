@@ -16,9 +16,9 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                   |
-| --------- | ------ | -------- | ----------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user |
+| Parameter | Type    | Required | Description                   |
+| --------- | ------- | -------- | ----------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user |
 
 ### Headers
 
@@ -36,14 +36,24 @@ No request body required.
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully retrieved installations      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | User not found                            |
+| 500         | Server error                              |
+
 ### Success Response (200 OK)
 
 ```json
 [
   {
     "id": 1,
-    "neptun_user_id": "user123",
-    "github_installation_id": "12345678",
+    "github_account_name": "octocat",
+    "github_account_type": "User",
+    "github_account_avatar_url": "https://avatars.githubusercontent.com/u/123456?v=4",
     "created_at": "2024-03-20T10:00:00Z",
     "updated_at": "2024-03-20T10:00:00Z"
   }
@@ -62,13 +72,14 @@ No request body required.
 }
 ```
 
-#### TypeScript Interfaces
+### TypeScript Interfaces
 
 ```typescript
 interface GithubAppInstallation {
   id: number
-  neptun_user_id: string
-  github_installation_id: string
+  github_account_name: string
+  github_account_type: string
+  github_account_avatar_url: string
   created_at: string
   updated_at: string
 }
@@ -82,7 +93,7 @@ interface GetInstallationsError {
 }
 ```
 
-#### Python Models
+### Python Models
 
 ```python
 from pydantic import BaseModel
@@ -90,8 +101,9 @@ from datetime import datetime
 
 class GithubAppInstallation(BaseModel):
     id: int
-    neptun_user_id: str
-    github_installation_id: str
+    github_account_name: str
+    github_account_type: str
+    github_account_avatar_url: str
     created_at: datetime
     updated_at: datetime
 
@@ -103,13 +115,13 @@ class GetInstallationsError(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 from typing import List
 
 async def get_github_installations(
-    user_id: str,
+    user_id: int,
     session_cookie: str
 ) -> List[GithubAppInstallation]:
     async with httpx.AsyncClient() as client:
@@ -129,11 +141,11 @@ curl -X GET \
   "https://neptun-webui.vercel.app/api/users/your-user-id/installations"
 ```
 
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function getGithubInstallations(
-  userId: string
+  userId: number
 ): Promise<GithubAppInstallation[]> {
   const response = await fetch(
     `https://neptun-webui.vercel.app/api/users/${userId}/installations`,
@@ -149,15 +161,6 @@ async function getGithubInstallations(
   return await response.json() as GithubAppInstallation[]
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Successfully retrieved installations      |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | User not found                            |
-| 500         | Server error                              |
 
 ## Notes
 

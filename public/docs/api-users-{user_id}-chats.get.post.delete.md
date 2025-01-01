@@ -18,9 +18,9 @@ This endpoint manages chat conversations for a specific user, supporting creatio
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                   |
-| --------- | ------ | -------- | ----------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user |
+| Parameter | Type    | Required | Description                   |
+| --------- | ------- | -------- | ----------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user |
 
 ### Headers
 
@@ -31,9 +31,9 @@ This endpoint manages chat conversations for a specific user, supporting creatio
 
 ### Query Parameters
 
-| Parameter | Type   | Required | Description                                    |
-| --------- | ------ | -------- | ---------------------------------------------- |
-| order_by  | string | No       | Sort order for chats (e.g., "created_at:desc") |
+| Parameter | Type   | Required | Description                                                                                                        |
+| --------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------ |
+| order_by  | string | No       | Sort order for chats (format: "column:direction", e.g., "created_at:desc"). Multiple fields can be comma-separated |
 
 ### Request Body
 
@@ -52,14 +52,26 @@ This endpoint manages chat conversations for a specific user, supporting creatio
 
 ## Response Format
 
-### GET Success Response (200 OK)
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Request successful                        |
+| 400         | Invalid request body or parameters        |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | User not found                            |
+| 500         | Server error                              |
+
+### Success Response (200 OK)
+
+#### GET Method
 
 ```json
 {
   "chats": [
     {
       "id": 1,
-      "neptun_user_id": "user123",
+      "neptun_user_id": 123,
       "model": "gpt-3.5",
       "name": "Project Discussion",
       "created_at": "2024-03-20T10:00:00Z"
@@ -68,13 +80,13 @@ This endpoint manages chat conversations for a specific user, supporting creatio
 }
 ```
 
-### POST Success Response (200 OK)
+#### POST Method
 
 ```json
 {
   "chat": {
     "id": 1,
-    "neptun_user_id": "user123",
+    "neptun_user_id": 123,
     "model": "gpt-3.5",
     "name": "New Chat",
     "created_at": "2024-03-20T10:00:00Z"
@@ -82,7 +94,7 @@ This endpoint manages chat conversations for a specific user, supporting creatio
 }
 ```
 
-### DELETE Success Response (200 OK)
+#### DELETE Method
 
 Returns true if deletion was successful.
 
@@ -107,15 +119,26 @@ true
 }
 ```
 
-#### TypeScript Interfaces
+### Error Response (401 Unauthorized)
+
+```json
+{
+  "statusCode": 401,
+  "statusMessage": "Unauthorized",
+  "message": "You do not have access to view the information."
+}
+```
+
+### TypeScript Interface
 
 ```typescript
 interface ChatConversation {
   id: number
-  neptun_user_id: string
+  neptun_user_id: number
   model: string
   name: string
   created_at: string
+  updated_at: string
 }
 
 interface CreateChatRequest {
@@ -136,7 +159,7 @@ interface CreateChatResponse {
 }
 ```
 
-#### Python Models
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -145,10 +168,11 @@ from datetime import datetime
 
 class ChatConversation(BaseModel):
     id: int
-    neptun_user_id: str
+    neptun_user_id: int
     model: str
     name: str
     created_at: datetime
+    updated_at: datetime
 
 class CreateChatRequest(BaseModel):
     model: str
@@ -166,7 +190,35 @@ class CreateChatResponse(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### cURL Example
+
+```bash
+# GET all chats
+curl -X GET \
+  -H "Cookie: neptun-session=your-session-cookie" \
+  "https://neptun-webui.vercel.app/api/users/your-user-id/chats"
+
+# POST new chat
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Cookie: neptun-session=your-session-cookie" \
+  -d '{
+    "model": "gpt-3.5",
+    "name": "New Chat"
+  }' \
+  "https://neptun-webui.vercel.app/api/users/your-user-id/chats"
+
+# DELETE chats
+curl -X DELETE \
+  -H "Content-Type: application/json" \
+  -H "Cookie: neptun-session=your-session-cookie" \
+  -d '{
+    "chat_ids": [1, 2, 3]
+  }' \
+  "https://neptun-webui.vercel.app/api/users/your-user-id/chats"
+```
+
+### Python Example
 
 ```python
 from pydantic import BaseModel
@@ -177,7 +229,7 @@ from datetime import datetime
 # ... (Previous model definitions) ...
 
 async def get_user_chats(
-    user_id: str,
+    user_id: int,
     session_cookie: str,
     order_by: Optional[str] = None
 ) -> GetChatsResponse:
@@ -192,7 +244,7 @@ async def get_user_chats(
         return GetChatsResponse(**response.json())
 
 async def create_chat(
-    user_id: str,
+    user_id: int,
     session_cookie: str,
     model: str,
     name: str
@@ -207,7 +259,7 @@ async def create_chat(
         return CreateChatResponse(**response.json())
 
 async def delete_chats(
-    user_id: str,
+    user_id: int,
     session_cookie: str,
     chat_ids: List[int]
 ) -> bool:
@@ -221,19 +273,89 @@ async def delete_chats(
         return response.json()
 ```
 
-### Response Status Codes
+### TypeScript/JavaScript Example
 
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Request successful                        |
-| 400         | Invalid request body or parameters        |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | User not found                            |
-| 500         | Server error                              |
+```typescript
+// Get all chats
+async function getUserChats(
+  userId: number,
+  orderBy?: string
+): Promise<GetChatsResponse> {
+  const params = orderBy ? `?order_by=${orderBy}` : ''
+  const response = await fetch(
+    `https://neptun-webui.vercel.app/api/users/${userId}/chats${params}`,
+    {
+      credentials: 'include', // Important for cookie handling
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return await response.json() as GetChatsResponse
+}
+
+// Create new chat
+async function createChat(
+  userId: number,
+  model: string,
+  name: string
+): Promise<CreateChatResponse> {
+  const response = await fetch(
+    `https://neptun-webui.vercel.app/api/users/${userId}/chats`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ model, name }),
+      credentials: 'include', // Important for cookie handling
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return await response.json() as CreateChatResponse
+}
+
+// Delete chats
+async function deleteChats(
+  userId: number,
+  chatIds: number[]
+): Promise<boolean> {
+  const response = await fetch(
+    `https://neptun-webui.vercel.app/api/users/${userId}/chats`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ chat_ids: chatIds }),
+      credentials: 'include', // Important for cookie handling
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return await response.json()
+}
+```
 
 ## Notes
 
-- The session cookie is required for all operations
+- Authentication via `neptun-session` cookie is required for all operations
 - The order_by parameter accepts values like "created_at:desc" or "created_at:asc"
 - Chat IDs must be valid and belong to the specified user for deletion
 - The model field should match one of the supported AI models
+- GET requests support optional sorting through the order_by parameter
+- POST requests require both model and name fields
+- DELETE requests can remove multiple chats in a single operation
+- Chat IDs must be valid and belong to the requesting user
+- The model field in POST requests must be a supported AI model
+- Deleted chats cannot be recovered
+- All chat messages are also deleted when a chat is removed

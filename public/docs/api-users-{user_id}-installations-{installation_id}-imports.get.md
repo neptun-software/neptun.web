@@ -16,10 +16,10 @@ GET
 
 ### Route Parameters
 
-| Parameter       | Type   | Required | Description                                      |
-| --------------- | ------ | -------- | ------------------------------------------------ |
-| user_id         | string | Yes      | Unique identifier of the user                    |
-| installation_id | number | Yes      | Unique identifier of the GitHub App installation |
+| Parameter       | Type    | Required | Description                                      |
+| --------------- | ------- | -------- | ------------------------------------------------ |
+| user_id         | integer | Yes      | Unique identifier of the user                    |
+| installation_id | integer | Yes      | Unique identifier of the GitHub App installation |
 
 ### Headers
 
@@ -37,18 +37,37 @@ No request body required.
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                                  |
+| ----------- | -------------------------------------------- |
+| 200         | Successfully retrieved imported repositories |
+| 401         | Unauthorized (invalid or missing session)    |
+| 404         | Installation or user not found               |
+| 500         | Server error                                 |
+
 ### Success Response (200 OK)
 
 ```json
 [
   {
     "id": 1,
-    "github_app_installation_id": 12345,
-    "repository_name": "my-project",
-    "repository_owner": "octocat",
-    "repository_url": "https://github.com/octocat/my-project",
+    "github_repository_id": 12345,
+    "github_repository_name": "my-project",
+    "github_repository_description": "A sample project",
+    "github_repository_size": 1024,
+    "github_repository_language": "TypeScript",
+    "github_repository_license": "MIT",
+    "github_repository_url": "https://github.com/octocat/my-project",
+    "github_repository_website_url": "https://my-project.example.com",
+    "github_repository_default_branch": "main",
+    "github_repository_is_private": false,
+    "github_repository_is_fork": false,
+    "github_repository_is_template": false,
+    "github_repository_is_archived": false,
     "created_at": "2024-03-20T10:00:00Z",
-    "updated_at": "2024-03-20T10:00:00Z"
+    "updated_at": "2024-03-20T10:00:00Z",
+    "github_app_installation_id": 67890
   }
 ]
 ```
@@ -65,17 +84,27 @@ No request body required.
 }
 ```
 
-#### TypeScript Interfaces
+### TypeScript Interfaces
 
 ```typescript
 interface GithubRepository {
   id: number
-  github_app_installation_id: number
-  repository_name: string
-  repository_owner: string
-  repository_url: string
+  github_repository_id: number
+  github_repository_name: string
+  github_repository_description?: string
+  github_repository_size?: number
+  github_repository_language?: string
+  github_repository_license?: string
+  github_repository_url: string
+  github_repository_website_url?: string
+  github_repository_default_branch?: string
+  github_repository_is_private: boolean
+  github_repository_is_fork?: boolean
+  github_repository_is_template?: boolean
+  github_repository_is_archived: boolean
   created_at: string
   updated_at: string
+  github_app_installation_id: number
 }
 
 interface GetImportsError {
@@ -87,20 +116,31 @@ interface GetImportsError {
 }
 ```
 
-#### Python Models
+### Python Models
 
 ```python
 from pydantic import BaseModel, HttpUrl
 from datetime import datetime
+from typing import Optional
 
 class GithubRepository(BaseModel):
     id: int
-    github_app_installation_id: int
-    repository_name: str
-    repository_owner: str
-    repository_url: HttpUrl
+    github_repository_id: int
+    github_repository_name: str
+    github_repository_description: Optional[str]
+    github_repository_size: Optional[int]
+    github_repository_language: Optional[str]
+    github_repository_license: Optional[str]
+    github_repository_url: str
+    github_repository_website_url: Optional[str]
+    github_repository_default_branch: Optional[str]
+    github_repository_is_private: bool
+    github_repository_is_fork: Optional[bool]
+    github_repository_is_template: Optional[bool]
+    github_repository_is_archived: bool
     created_at: datetime
     updated_at: datetime
+    github_app_installation_id: int
 
 class GetImportsError(BaseModel):
     statusCode: int
@@ -110,13 +150,13 @@ class GetImportsError(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 from typing import List
 
 async def get_installation_imports(
-    user_id: str,
+    user_id: int,
     installation_id: int,
     session_cookie: str
 ) -> List[GithubRepository]:
@@ -137,11 +177,11 @@ curl -X GET \
   "https://neptun-webui.vercel.app/api/users/your-user-id/installations/12345/imports"
 ```
 
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function getInstallationImports(
-  userId: string,
+  userId: number,
   installationId: number
 ): Promise<GithubRepository[]> {
   const response = await fetch(
@@ -158,15 +198,6 @@ async function getInstallationImports(
   return await response.json() as GithubRepository[]
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                                  |
-| ----------- | -------------------------------------------- |
-| 200         | Successfully retrieved imported repositories |
-| 401         | Unauthorized (invalid or missing session)    |
-| 404         | Installation or user not found               |
-| 500         | Server error                                 |
 
 ## Notes
 

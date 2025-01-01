@@ -16,10 +16,10 @@ DELETE
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                             |
-| --------- | ------ | -------- | --------------------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user           |
-| chat_id   | number | Yes      | Unique identifier of the chat to delete |
+| Parameter | Type    | Required | Description                             |
+| --------- | ------- | -------- | --------------------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user           |
+| chat_id   | integer | Yes      | Unique identifier of the chat to delete |
 
 ### Headers
 
@@ -36,6 +36,15 @@ No query parameters required.
 No request body required.
 
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Chat successfully deleted                 |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error during deletion              |
 
 ### Success Response (200 OK)
 
@@ -57,7 +66,7 @@ true
 }
 ```
 
-#### TypeScript Interface
+### TypeScript Interface
 
 ```typescript
 interface DeleteChatResponse {
@@ -73,7 +82,7 @@ interface DeleteChatError {
 }
 ```
 
-#### Python Model
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -92,7 +101,7 @@ class DeleteChatError(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 from pydantic import BaseModel
@@ -102,7 +111,7 @@ class DeleteChatResponse(BaseModel):
     success: bool
 
 async def delete_chat(
-    user_id: str,
+    user_id: int,
     chat_id: int,
     session_cookie: str
 ) -> bool:
@@ -123,11 +132,11 @@ curl -X DELETE \
   "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123"
 ```
 
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function deleteChat(
-  userId: string,
+  userId: number,
   chatId: number
 ): Promise<boolean> {
   const response = await fetch(
@@ -145,15 +154,6 @@ async function deleteChat(
   return await response.json()
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Chat successfully deleted                 |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | Chat or user not found                    |
-| 500         | Server error during deletion              |
 
 ## Notes
 

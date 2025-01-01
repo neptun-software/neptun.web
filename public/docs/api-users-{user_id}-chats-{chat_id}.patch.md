@@ -16,10 +16,10 @@ PATCH
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                             |
-| --------- | ------ | -------- | --------------------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user           |
-| chat_id   | number | Yes      | Unique identifier of the chat to update |
+| Parameter | Type    | Required | Description                             |
+| --------- | ------- | -------- | --------------------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user           |
+| chat_id   | integer | Yes      | Unique identifier of the chat to update |
 
 ### Headers
 
@@ -39,6 +39,16 @@ No query parameters required.
 | name  | string | Yes      | New name for the chat | Non-empty string |
 
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Chat successfully updated                 |
+| 400         | Invalid request body                      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error during update                |
 
 ### Success Response (200 OK)
 
@@ -71,7 +81,7 @@ No query parameters required.
 }
 ```
 
-#### TypeScript Interface
+### TypeScript Interface
 
 ```typescript
 interface UpdateChatRequest {
@@ -80,10 +90,11 @@ interface UpdateChatRequest {
 
 interface ChatConversation {
   id: number
-  neptun_user_id: string
+  neptun_user_id: number
   name: string
   model: string
   created_at: string
+  updated_at: string
 }
 
 interface UpdateChatResponse {
@@ -91,7 +102,7 @@ interface UpdateChatResponse {
 }
 ```
 
-#### Python Model
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -102,10 +113,11 @@ class UpdateChatRequest(BaseModel):
 
 class ChatConversation(BaseModel):
     id: int
-    neptun_user_id: str
+    neptun_user_id: int
     name: str
     model: str
     created_at: datetime
+    updated_at: datetime
 
 class UpdateChatResponse(BaseModel):
     chat: ChatConversation
@@ -113,7 +125,17 @@ class UpdateChatResponse(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### cURL Example
+
+```bash
+curl -X PATCH \
+  -H "Content-Type: application/json" \
+  -H "Cookie: neptun-session=your-session-cookie" \
+  -d '{"name": "New Chat Name"}' \
+  "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123"
+```
+
+### Python Example
 
 ```python
 from pydantic import BaseModel
@@ -125,16 +147,17 @@ class UpdateChatRequest(BaseModel):
 
 class ChatConversation(BaseModel):
     id: int
-    neptun_user_id: str
+    neptun_user_id: int
     name: str
     model: str
     created_at: datetime
+    updated_at: datetime
 
 class UpdateChatResponse(BaseModel):
     chat: ChatConversation
 
 async def update_chat(
-    user_id: str,
+    user_id: int,
     chat_id: int,
     name: str,
     session_cookie: str
@@ -149,21 +172,11 @@ async def update_chat(
         return UpdateChatResponse(**response.json())
 ```
 
-### cURL Example
-
-```bash
-curl -X PATCH \
-  -H "Content-Type: application/json" \
-  -H "Cookie: neptun-session=your-session-cookie" \
-  -d '{"name": "New Chat Name"}' \
-  "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123"
-```
-
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function updateChat(
-  userId: string,
+  userId: number,
   chatId: number,
   name: string
 ): Promise<UpdateChatResponse> {
@@ -186,16 +199,6 @@ async function updateChat(
   return await response.json() as UpdateChatResponse
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Chat successfully updated                 |
-| 400         | Invalid request body                      |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | Chat or user not found                    |
-| 500         | Server error during update                |
 
 ## Notes
 

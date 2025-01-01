@@ -16,10 +16,10 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                   |
-| --------- | ------ | -------- | ----------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user |
-| chat_id   | number | Yes      | Unique identifier of the chat |
+| Parameter | Type    | Required | Description                   |
+| --------- | ------- | -------- | ----------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user |
+| chat_id   | integer | Yes      | Unique identifier of the chat |
 
 ### Headers
 
@@ -36,6 +36,15 @@ No query parameters required.
 No request body required.
 
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully retrieved chat messages      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error                              |
 
 ### Success Response (200 OK)
 
@@ -74,7 +83,7 @@ No request body required.
 }
 ```
 
-#### TypeScript Interface
+### TypeScript Interface
 
 ```typescript
 interface ChatFile {
@@ -83,14 +92,20 @@ interface ChatFile {
   text: string
   language: string
   extension: string
+  neptun_user_id: number
+  chat_conversation_id: number
+  chat_conversation_message_id: number
+  created_at: string
+  updated_at: string
 }
 
 interface ChatMessage {
   id: number
   chat_conversation_id: number
-  role: 'user' | 'assistant' | 'system'
-  content: string
+  actor: 'user' | 'assistant'
+  message: string
   created_at: string
+  updated_at: string
   files?: ChatFile[]
 }
 
@@ -107,7 +122,7 @@ interface GetChatMessagesError {
 }
 ```
 
-#### Python Model
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -118,7 +133,6 @@ from enum import Enum
 class MessageRole(str, Enum):
     user = "user"
     assistant = "assistant"
-    system = "system"
 
 class ChatFile(BaseModel):
     id: int
@@ -126,13 +140,19 @@ class ChatFile(BaseModel):
     text: str
     language: str
     extension: str
+    neptun_user_id: int
+    chat_conversation_id: int
+    chat_conversation_message_id: int
+    created_at: datetime
+    updated_at: datetime
 
 class ChatMessage(BaseModel):
     id: int
     chat_conversation_id: int
-    role: MessageRole
-    content: str
+    actor: MessageRole
+    message: str
     created_at: datetime
+    updated_at: datetime
     files: Optional[List[ChatFile]] = None
 
 class GetChatMessagesResponse(BaseModel):
@@ -141,7 +161,15 @@ class GetChatMessagesResponse(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### cURL Example
+
+```bash
+curl -X GET \
+  -H "Cookie: neptun-session=your-session-cookie" \
+  "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123/messages"
+```
+
+### Python Example
 
 ```python
 from pydantic import BaseModel
@@ -150,7 +178,7 @@ from typing import List
 from datetime import datetime
 
 async def get_chat_messages(
-    user_id: str,
+    user_id: int,
     chat_id: int,
     session_cookie: str
 ) -> GetChatMessagesResponse:
@@ -163,19 +191,11 @@ async def get_chat_messages(
         return GetChatMessagesResponse(**response.json())
 ```
 
-### cURL Example
-
-```bash
-curl -X GET \
-  -H "Cookie: neptun-session=your-session-cookie" \
-  "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123/messages"
-```
-
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function getChatMessages(
-  userId: string,
+  userId: number,
   chatId: number
 ): Promise<GetChatMessagesResponse> {
   const response = await fetch(
@@ -192,15 +212,6 @@ async function getChatMessages(
   return await response.json() as GetChatMessagesResponse
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Successfully retrieved chat messages      |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | Chat or user not found                    |
-| 500         | Server error                              |
 
 ## Notes
 

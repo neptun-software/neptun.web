@@ -16,10 +16,10 @@ POST
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                   |
-| --------- | ------ | -------- | ----------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user |
-| chat_id   | number | Yes      | Unique identifier of the chat |
+| Parameter | Type    | Required | Description                   |
+| --------- | ------- | -------- | ----------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user |
+| chat_id   | integer | Yes      | Unique identifier of the chat |
 
 ### Headers
 
@@ -41,6 +41,16 @@ No query parameters required.
 | hashed_password | string  | No       | null    | Hashed password for protected shares   |
 
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Share successfully created                |
+| 400         | Invalid request body                      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error during share creation        |
 
 ### Success Response (200 OK)
 
@@ -75,7 +85,7 @@ No query parameters required.
 }
 ```
 
-#### TypeScript Interfaces
+### TypeScript Interface
 
 ```typescript
 interface CreateShareRequest {
@@ -87,11 +97,12 @@ interface CreateShareRequest {
 interface ChatShare {
   id: number
   chat_conversation_id: number
-  uuid: string
+  share_uuid: string
   is_shared: boolean
   is_protected: boolean
   hashed_password: string | null
   created_at: string
+  updated_at: string
 }
 
 interface CreateShareResponse {
@@ -110,7 +121,7 @@ interface CreateShareError {
 }
 ```
 
-#### Python Models
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -126,36 +137,18 @@ class CreateShareRequest(BaseModel):
 class ChatShare(BaseModel):
     id: int
     chat_conversation_id: int
-    uuid: UUID
+    share_uuid: UUID
     is_shared: bool
     is_protected: bool
     hashed_password: Optional[str]
     created_at: datetime
+    updated_at: datetime
 
 class CreateShareResponse(BaseModel):
     share: ChatShare
 ```
 
 ## Code Examples
-
-### Python Example (using httpx)
-
-```python
-async def create_chat_share(
-    user_id: str,
-    chat_id: int,
-    share_request: CreateShareRequest,
-    session_cookie: str
-) -> CreateShareResponse:
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"https://neptun-webui.vercel.app/api/users/{user_id}/chats/{chat_id}/shares",
-            json=share_request.dict(exclude_none=True),
-            cookies={"neptun-session": session_cookie}
-        )
-        response.raise_for_status()
-        return CreateShareResponse(**response.json())
-```
 
 ### cURL Example
 
@@ -170,11 +163,30 @@ curl -X POST \
   "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123/shares"
 ```
 
-### TypeScript/JavaScript Example (using fetch)
+### Python Example
+
+```python
+async def create_chat_share(
+    user_id: int,
+    chat_id: int,
+    share_request: CreateShareRequest,
+    session_cookie: str
+) -> CreateShareResponse:
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"https://neptun-webui.vercel.app/api/users/{user_id}/chats/{chat_id}/shares",
+            json=share_request.dict(exclude_none=True),
+            cookies={"neptun-session": session_cookie}
+        )
+        response.raise_for_status()
+        return CreateShareResponse(**response.json())
+```
+
+### TypeScript/JavaScript Example
 
 ```typescript
 async function createChatShare(
-  userId: string,
+  userId: number,
   chatId: number,
   shareRequest: CreateShareRequest
 ): Promise<CreateShareResponse> {
@@ -197,16 +209,6 @@ async function createChatShare(
   return await response.json() as CreateShareResponse
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Share successfully created                |
-| 400         | Invalid request body                      |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | Chat or user not found                    |
-| 500         | Server error during share creation        |
 
 ## Notes
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This endpoint handles user authentication and session management. It validates user credentials and creates or updates a session.
+This endpoint authenticates a user with their email and password.
 
 ## Request Details
 
@@ -13,6 +13,10 @@ POST
 ### Route
 
 `/api/auth/login`
+
+### Route Parameters
+
+No route parameters required.
 
 ### Headers
 
@@ -26,138 +30,127 @@ No query parameters required.
 
 ### Request Body
 
-| Field    | Type   | Required | Description          | Constraints                  |
-| -------- | ------ | -------- | -------------------- | ---------------------------- |
-| email    | string | Yes      | User's email address | Must be a valid email format |
-| password | string | Yes      | User's password      | Non-empty string             |
-
-#### TypeScript Interface
-
-```typescript
-interface LoginRequest {
-  email: string
-  password: string
-}
-
-interface LoginResponse {
-  user: {
-    id: string
-    primary_email: string
-  }
-  loggedInAt: string
-}
-```
-
-#### Python Model
-
-```python
-from pydantic import BaseModel, EmailStr
-from datetime import datetime
-
-class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
-
-class UserInfo(BaseModel):
-    id: str
-    primary_email: EmailStr
-
-class LoginResponse(BaseModel):
-    user: UserInfo
-    loggedInAt: datetime
-```
+| Field    | Type   | Required | Description                   | Constraints        |
+| -------- | ------ | -------- | ----------------------------- | ------------------ |
+| email    | string | Yes      | Email address of the user     | Valid email format |
+| password | string | Yes      | Password for the user account | Non-empty string   |
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                        |
+| ----------- | ---------------------------------- |
+| 200         | Successfully authenticated         |
+| 400         | Invalid request body               |
+| 401         | Invalid credentials                |
+| 500         | Server error during authentication |
+
 ### Success Response (200 OK)
+
+#### Headers
+
+| Header     | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Set-Cookie | Sets the neptun-session cookie for session authentication |
+
+#### Body
 
 ```json
 {
   "user": {
-    "id": "user123",
+    "id": 123,
     "primary_email": "user@example.com"
-  },
-  "loggedInAt": "2024-03-20T10:30:45.123Z"
-}
-```
-
-### Error Responses
-
-#### Invalid Credentials (401 Unauthorized)
-
-```json
-{
-  "statusCode": 401,
-  "statusMessage": "Unauthorized"
-}
-```
-
-#### Invalid Request Body (400 Bad Request)
-
-```json
-{
-  "statusCode": 400,
-  "statusMessage": "Bad Request",
-  "data": {
-    "issues": [
-      {
-        "code": "invalid_string",
-        "message": "Invalid email format"
-      }
-    ]
   }
 }
 ```
 
-## Code Examples
+### Error Response (401 Unauthorized)
 
-### Python Example (using httpx)
+```json
+{
+  "statusCode": 401,
+  "statusMessage": "Unauthorized",
+  "data": {
+    "message": "Invalid credentials"
+  }
+}
+```
+
+### TypeScript Interface
+
+```typescript
+interface LoginRequest {
+  email: string // Valid email format required
+  password: string // Non-empty string required
+}
+
+interface User {
+  id: number
+  primary_email: string
+}
+
+interface LoginResponse {
+  user: User
+}
+
+interface LoginError {
+  statusCode: number
+  statusMessage: string
+  data: {
+    message: string
+  }
+}
+```
+
+### Python Model
 
 ```python
 from pydantic import BaseModel, EmailStr
-import httpx
-from datetime import datetime
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
 class UserInfo(BaseModel):
-    id: str
+    id: int
     primary_email: EmailStr
 
 class LoginResponse(BaseModel):
     user: UserInfo
-    loggedInAt: datetime
+```
 
+## Code Examples
+
+### cURL Example
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "your-password"}' \
+  "https://neptun-webui.vercel.app/api/auth/login"
+```
+
+### Python Example
+
+```python
 async def login(email: str, password: str) -> LoginResponse:
     async with httpx.AsyncClient() as client:
         response = await client.post(
             "https://neptun-webui.vercel.app/api/auth/login",
-            json={
-                "email": email,
-                "password": password
-            }
+            json={"email": email, "password": password}
         )
         response.raise_for_status()
         return LoginResponse(**response.json())
 ```
 
-### cURL Example
-
-```bash
-curl -X POST https://neptun-webui.vercel.app/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "yourpassword"
-  }'
-```
-
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
-async function login(email: string, password: string): Promise<LoginResponse> {
+async function login(
+  email: string,
+  password: string
+): Promise<LoginResponse> {
   const response = await fetch(
     'https://neptun-webui.vercel.app/api/auth/login',
     {
@@ -165,11 +158,7 @@ async function login(email: string, password: string): Promise<LoginResponse> {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-      credentials: 'include', // Important for cookie handling
+      body: JSON.stringify({ email, password }),
     }
   )
 
@@ -181,10 +170,9 @@ async function login(email: string, password: string): Promise<LoginResponse> {
 }
 ```
 
-### Response Status Codes
+## Notes
 
-| Status Code | Description          |
-| ----------- | -------------------- |
-| 200         | Login successful     |
-| 400         | Invalid request body |
-| 401         | Invalid credentials  |
+- A successful login will set a `neptun-session` cookie for authentication
+- The session cookie is HttpOnly and Secure
+- The session cookie is required for subsequent authenticated requests
+- Password requirements are enforced on the server side

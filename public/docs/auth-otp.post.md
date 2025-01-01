@@ -44,51 +44,19 @@ The request body varies based on the `action` field:
 | otp          | string | Yes      | 5-digit OTP received via email       |
 | new_password | string | Yes      | New password to set after validation |
 
-#### TypeScript Interface
-
-```typescript
-interface OTPCreateRequest {
-  action: 'create'
-  email: string
-}
-
-interface OTPValidateRequest {
-  action: 'validate'
-  email: string
-  otp: string
-  new_password: string
-}
-
-interface OTPResponse {
-  success: boolean
-  message: string
-}
-```
-
-#### Python Model
-
-```python
-from pydantic import BaseModel
-from typing import Literal
-
-class OTPCreateRequest(BaseModel):
-    action: Literal['create']
-    email: str
-
-class OTPValidateRequest(BaseModel):
-    action: Literal['validate']
-    email: str
-    otp: str
-    new_password: str
-
-class OTPResponse(BaseModel):
-    success: bool
-    message: str
-```
-
 ## Response Format
 
-### Success Responses (200 OK)
+### Response Status Codes
+
+| Status Code | Description                            |
+| ----------- | -------------------------------------- |
+| 200         | OTP successfully created or validated  |
+| 400         | Invalid request body or missing fields |
+| 404         | Email not found                        |
+| 429         | Too many OTP requests                  |
+| 500         | Server error during OTP operation      |
+
+### Success Response (200 OK)
 
 #### OTP Creation Success
 
@@ -108,7 +76,7 @@ class OTPResponse(BaseModel):
 }
 ```
 
-### Error Responses
+### Error Response
 
 #### Invalid Action
 
@@ -137,9 +105,51 @@ class OTPResponse(BaseModel):
 }
 ```
 
+### TypeScript Interface
+
+```typescript
+interface OTPCreateRequest {
+  action: 'create'
+  email: string
+}
+
+interface OTPValidateRequest {
+  action: 'validate'
+  email: string
+  otp: string
+  new_password: string
+}
+
+interface OTPResponse {
+  success: boolean
+  message: string
+}
+```
+
+### Python Model
+
+```python
+from pydantic import BaseModel
+from typing import Literal
+
+class OTPCreateRequest(BaseModel):
+    action: Literal['create']
+    email: str
+
+class OTPValidateRequest(BaseModel):
+    action: Literal['validate']
+    email: str
+    otp: str
+    new_password: str
+
+class OTPResponse(BaseModel):
+    success: bool
+    message: str
+```
+
 ## Code Examples
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 import httpx
@@ -202,7 +212,7 @@ curl -X POST https://neptun-webui.vercel.app/auth/otp \
   -d '{"action": "validate", "email": "user@example.com", "otp": "12345", "new_password": "newSecurePassword123"}'
 ```
 
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function requestOTP(email: string): Promise<OTPResponse> {
@@ -249,3 +259,11 @@ async function validateOTP(
   return await response.json() as OTPResponse
 }
 ```
+
+## Notes
+
+- OTP is valid for 10 minutes after creation
+- Maximum 3 OTP requests per email address per hour
+- OTP must be exactly 5 digits
+- New password must meet security requirements (min 8 chars, etc.)
+- Failed validation attempts are limited to prevent brute force attacks

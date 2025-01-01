@@ -29,6 +29,10 @@ PATCH
 | Content-Type | application/json | Yes      | Request body format           |
 | Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
+### Query Parameters
+
+No query parameters required.
+
 ### Request Body
 
 | Field       | Type    | Required | Description                       |
@@ -39,24 +43,71 @@ PATCH
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully updated collection           |
+| 400         | Bad Request (invalid request body)        |
+| 401         | Unauthorized (invalid or missing session) |
+| 403         | Forbidden (user_id mismatch)              |
+| 404         | Collection not found                      |
+| 500         | Server error                              |
+
 ### Success Response (200 OK)
 
-| Field      | Type   | Description                            |
-| ---------- | ------ | -------------------------------------- |
-| collection | object | The updated template collection object |
+```json
+{
+  "collection": {
+    "id": 1,
+    "name": "Updated Templates",
+    "description": "Updated collection description",
+    "is_shared": true,
+    "share_uuid": "550e8400-e29b-41d4-a716-446655440000",
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-01T12:30:00Z",
+    "neptun_user_id": 1,
+    "templates": [
+      {
+        "id": 1,
+        "description": "Basic Docker deployment script",
+        "file_name": "docker-deploy.sh",
+        "created_at": "2024-01-01T12:00:00Z",
+        "updated_at": "2024-01-01T12:00:00Z",
+        "neptun_user_id": 1,
+        "template_collection_id": 1,
+        "user_file_id": 1
+      }
+    ]
+  }
+}
+```
 
-### TypeScript Types
+### Error Response (400 Bad Request)
+
+```json
+{
+  "statusCode": 400,
+  "message": "Invalid body({ name?, description?, is_shared? })"
+}
+```
+
+### TypeScript Interface
 
 ```typescript
 interface Template {
   id: number
   description?: string
   file_name: string
-  created_at: Date
-  updated_at: Date
+  created_at: string
+  updated_at: string
   neptun_user_id: number
   template_collection_id?: number
   user_file_id?: number
+  title?: string
+  text: string
+  language: string
+  extension: string
 }
 
 interface TemplateCollection {
@@ -65,8 +116,8 @@ interface TemplateCollection {
   description?: string
   is_shared: boolean
   share_uuid: string
-  created_at: Date
-  updated_at: Date
+  created_at: string
+  updated_at: string
   neptun_user_id: number
   templates: Template[]
 }
@@ -82,7 +133,7 @@ interface ApiResponse {
 }
 ```
 
-### Python Types
+### Python Model
 
 ```python
 from datetime import datetime
@@ -98,6 +149,10 @@ class Template(BaseModel):
     neptun_user_id: int
     template_collection_id: Optional[int]
     user_file_id: Optional[int]
+    title: Optional[str]
+    text: str
+    language: str
+    extension: str
 
 class TemplateCollection(BaseModel):
     id: int
@@ -121,7 +176,7 @@ class ApiResponse(BaseModel):
 
 ## Code Examples
 
-### cURL
+### cURL Example
 
 ```bash
 curl -X PATCH "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e29b-41d4-a716-446655440000" \
@@ -135,7 +190,7 @@ curl -X PATCH "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-
   }'
 ```
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 import httpx
@@ -148,7 +203,7 @@ async def update_user_collection(
     description: Optional[str] = None,
     is_shared: Optional[bool] = None,
     session_cookie: str = None
-) -> dict:
+) -> ApiResponse:
     url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}"
 
     data = {}
@@ -164,15 +219,16 @@ async def update_user_collection(
             url,
             json=data,
             headers={
-                "Cookie": f"neptun-session={session_cookie}",
-                "Content-Type": "application/json"
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Cookie": f"neptun-session={session_cookie}"
             }
         )
         response.raise_for_status()
-        return response.json()
+        return ApiResponse(**response.json())
 ```
 
-### TypeScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function updateUserCollection(
@@ -202,53 +258,9 @@ async function updateUserCollection(
 }
 ```
 
-## Example Responses
+## Notes
 
-### Success Response
-
-```json
-{
-  "collection": {
-    "id": 1,
-    "name": "Updated Templates",
-    "description": "Updated collection description",
-    "is_shared": true,
-    "share_uuid": "550e8400-e29b-41d4-a716-446655440000",
-    "created_at": "2024-01-01T12:00:00Z",
-    "updated_at": "2024-01-01T12:30:00Z",
-    "neptun_user_id": 1,
-    "templates": [
-      {
-        "id": 1,
-        "description": "Basic Docker deployment script",
-        "file_name": "docker-deploy.sh",
-        "created_at": "2024-01-01T12:00:00Z",
-        "updated_at": "2024-01-01T12:00:00Z",
-        "neptun_user_id": 1,
-        "template_collection_id": 1,
-        "user_file_id": 1
-      }
-    ]
-  }
-}
-```
-
-### Error Response
-
-```json
-{
-  "statusCode": 400,
-  "message": "Invalid body({ name?, description?, is_shared? })"
-}
-```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Successfully updated collection           |
-| 400         | Bad Request (invalid request body)        |
-| 401         | Unauthorized (invalid or missing session) |
-| 403         | Forbidden (user_id mismatch)              |
-| 404         | Collection not found                      |
-| 500         | Server error                              |
+- The session cookie is required for authentication
+- At least one of name, description, or is_shared must be provided
+- The collection must belong to the specified user
+- When is_shared is set to true, a share_uuid will be generated if not already present

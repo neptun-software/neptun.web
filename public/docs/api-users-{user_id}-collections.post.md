@@ -28,6 +28,10 @@ POST
 | Content-Type | application/json | Yes      | Request body format           |
 | Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
+### Query Parameters
+
+No query parameters required.
+
 ### Request Body
 
 | Field       | Type    | Required | Description                      |
@@ -38,21 +42,52 @@ POST
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 201         | Successfully created collection           |
+| 400         | Bad Request (invalid request body)        |
+| 401         | Unauthorized (invalid or missing session) |
+| 403         | Forbidden (user_id mismatch)              |
+| 500         | Server error                              |
+
 ### Success Response (201 Created)
 
-| Field      | Type   | Description                            |
-| ---------- | ------ | -------------------------------------- |
-| collection | object | The created template collection object |
+```json
+{
+  "collection": {
+    "id": 2,
+    "name": "My Templates",
+    "description": "Collection of my deployment templates",
+    "is_shared": false,
+    "share_uuid": "660f8500-e29b-41d4-a716-446655440000",
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-01T12:00:00Z",
+    "neptun_user_id": 1,
+    "templates": []
+  }
+}
+```
 
-### TypeScript Types
+### Error Response (401 Unauthorized)
+
+```json
+{
+  "statusCode": 401,
+  "message": "Unauthorized"
+}
+```
+
+### TypeScript Interface
 
 ```typescript
 interface Template {
   id: number
   description?: string
   file_name: string
-  created_at: Date
-  updated_at: Date
+  created_at: string
+  updated_at: string
   neptun_user_id: number
   template_collection_id?: number
   user_file_id?: number
@@ -64,8 +99,8 @@ interface TemplateCollection {
   description?: string
   is_shared: boolean
   share_uuid: string
-  created_at: Date
-  updated_at: Date
+  created_at: string
+  updated_at: string
   neptun_user_id: number
   templates: Template[]
 }
@@ -74,6 +109,7 @@ interface CreateCollectionRequest {
   name: string
   description?: string
   is_shared: boolean
+  neptun_user_id: number
 }
 
 interface ApiResponse {
@@ -81,7 +117,7 @@ interface ApiResponse {
 }
 ```
 
-### Python Types
+### Python Model
 
 ```python
 from datetime import datetime
@@ -113,6 +149,7 @@ class CreateCollectionRequest(BaseModel):
     name: str
     description: Optional[str]
     is_shared: bool
+    neptun_user_id: int
 
 class ApiResponse(BaseModel):
     collection: TemplateCollection
@@ -120,7 +157,7 @@ class ApiResponse(BaseModel):
 
 ## Code Examples
 
-### cURL
+### cURL Example
 
 ```bash
 curl -X POST "https://neptun-webui.vercel.app/api/users/1/collections" \
@@ -134,7 +171,7 @@ curl -X POST "https://neptun-webui.vercel.app/api/users/1/collections" \
   }'
 ```
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 import httpx
@@ -146,7 +183,7 @@ async def create_user_collection(
     is_shared: bool,
     description: Optional[str],
     session_cookie: str
-) -> dict:
+) -> ApiResponse:
     url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections"
 
     data = {
@@ -159,13 +196,17 @@ async def create_user_collection(
         response = await client.post(
             url,
             json=data,
-            headers={"Cookie": f"neptun-session={session_cookie}"}
+            headers={
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Cookie": f"neptun-session={session_cookie}"
+            }
         )
         response.raise_for_status()
-        return response.json()
+        return ApiResponse(**response.json())
 ```
 
-### TypeScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function createUserCollection(
@@ -194,41 +235,9 @@ async function createUserCollection(
 }
 ```
 
-## Example Responses
+## Notes
 
-### Success Response
-
-```json
-{
-  "collection": {
-    "id": 2,
-    "name": "My Templates",
-    "description": "Collection of my deployment templates",
-    "is_shared": false,
-    "share_uuid": "660f8500-e29b-41d4-a716-446655440000",
-    "created_at": "2024-01-01T12:00:00Z",
-    "updated_at": "2024-01-01T12:00:00Z",
-    "neptun_user_id": 1,
-    "templates": []
-  }
-}
-```
-
-### Error Response
-
-```json
-{
-  "statusCode": 401,
-  "message": "Unauthorized"
-}
-```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 201         | Successfully created collection           |
-| 400         | Bad Request (invalid request body)        |
-| 401         | Unauthorized (invalid or missing session) |
-| 403         | Forbidden (user_id mismatch)              |
-| 500         | Server error                              |
+- The session cookie is required for authentication
+- The name field must be unique for the user
+- When is_shared is true, a share_uuid will be generated
+- The templates array will initially be empty

@@ -1,8 +1,8 @@
-# Authentication Check Endpoint
+# Session Check Endpoint
 
 ## Overview
 
-This endpoint verifies if a user session is valid by checking the authentication cookie. It uses a HEAD request and returns no response body.
+This endpoint checks if the current session is valid.
 
 ## Request Details
 
@@ -14,11 +14,15 @@ HEAD
 
 `/api/auth/check`
 
+### Route Parameters
+
+No route parameters required.
+
 ### Headers
 
-| Header | Value            | Required | Description                   |
-| ------ | ---------------- | -------- | ----------------------------- |
-| Cookie | auth_session=xyz | Yes      | Authentication session cookie |
+| Header | Value          | Required | Description                   |
+| ------ | -------------- | -------- | ----------------------------- |
+| Cookie | neptun-session | Yes      | Session authentication cookie |
 
 ### Query Parameters
 
@@ -28,80 +32,70 @@ No query parameters required.
 
 No request body required.
 
-### Route Parameters
-
-No route parameters required.
-
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Session is valid                          |
+| 401         | Unauthorized (invalid or missing session) |
 
 ### Success Response (200 OK)
 
-The endpoint returns no response body, only a status code indicating a valid session.
+No response body (HEAD request).
 
-#### Response Headers
+### Error Response (401 Unauthorized)
 
-| Header         | Value | Description                   |
-| -------------- | ----- | ----------------------------- |
-| Content-Length | 0     | Indicates empty response body |
+No response body (HEAD request).
 
-### Error Responses
+### TypeScript Interface
 
-#### Unauthorized (401)
+No interfaces required (HEAD request).
 
-Returns status code 401 when the session is invalid or missing.
+### Python Model
 
-No response body is returned.
+No models required (HEAD request).
 
 ## Code Examples
-
-### Python Example (using httpx)
-
-```python
-from pydantic import BaseModel
-import httpx
-
-async def check_auth_session(session_cookie: str) -> bool:
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.head(
-                "https://neptun-webui.vercel.app/api/auth/check",
-                cookies={"auth_session": session_cookie}
-            )
-            return response.status_code == 200
-        except httpx.HTTPError:
-            return False
-```
 
 ### cURL Example
 
 ```bash
-curl -I -X HEAD \
-  -b "auth_session=your-session-cookie-here" \
-  https://neptun-webui.vercel.app/api/auth/check
+curl -I \
+  -H "Cookie: neptun-session=your-session-cookie" \
+  "https://neptun-webui.vercel.app/api/auth/check"
 ```
 
-### TypeScript/JavaScript Example (using fetch)
+### Python Example
+
+```python
+async def check_session(session_cookie: str) -> bool:
+    async with httpx.AsyncClient() as client:
+        response = await client.head(
+            "https://neptun-webui.vercel.app/api/auth/check",
+            cookies={"neptun-session": session_cookie}
+        )
+        return response.status_code == 200
+```
+
+### TypeScript/JavaScript Example
 
 ```typescript
-async function checkAuthSession(): Promise<boolean> {
-  try {
-    const response = await fetch(
-      'https://neptun-webui.vercel.app/api/auth/check',
-      {
-        method: 'HEAD',
-        credentials: 'include' // Includes cookies in the request
-      }
-    )
-    return response.ok
-  } catch (error) {
-    return false
-  }
+async function checkSession(): Promise<boolean> {
+  const response = await fetch(
+    'https://neptun-webui.vercel.app/api/auth/check',
+    {
+      method: 'HEAD',
+      credentials: 'include', // Important for cookie handling
+    }
+  )
+  return response.ok
 }
 ```
 
-### Response Status Codes
+## Notes
 
-| Status Code | Description                   |
-| ----------- | ----------------------------- |
-| 200         | Session is valid              |
-| 401         | Session is invalid or missing |
+- This endpoint is useful for checking session validity without fetching data
+- No response body is returned (HEAD request)
+- The session cookie is required for authentication

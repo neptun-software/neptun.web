@@ -16,11 +16,11 @@ POST
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                    |
-| --------- | ------ | -------- | ------------------------------ |
-| user_id   | string | Yes      | Unique identifier of the user  |
-| chat_id   | number | Yes      | Unique identifier of the chat  |
-| share_id  | number | Yes      | Unique identifier of the share |
+| Parameter | Type    | Required | Description                    |
+| --------- | ------- | -------- | ------------------------------ |
+| user_id   | integer | Yes      | Unique identifier of the user  |
+| chat_id   | integer | Yes      | Unique identifier of the chat  |
+| share_id  | integer | Yes      | Unique identifier of the share |
 
 ### Headers
 
@@ -40,6 +40,16 @@ No query parameters required.
 | emails | string[] | Yes      | Array of email addresses to whitelist |
 
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Whitelist entries successfully created    |
+| 400         | Invalid request body                      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Share, chat, or user not found            |
+| 500         | Server error                              |
 
 ### Success Response (200 OK)
 
@@ -79,7 +89,7 @@ No query parameters required.
 }
 ```
 
-#### TypeScript Interfaces
+### TypeScript Interface
 
 ```typescript
 interface CreateWhitelistRequest {
@@ -89,8 +99,9 @@ interface CreateWhitelistRequest {
 interface WhitelistEntry {
   id: number
   chat_conversation_share_id: number
-  whitelisted_neptun_user_id: string
+  whitelisted_neptun_user_id: number
   created_at: string
+  updated_at: string
 }
 
 interface CreateWhitelistResponse {
@@ -109,7 +120,7 @@ interface CreateWhitelistError {
 }
 ```
 
-#### Python Models
+### Python Model
 
 ```python
 from pydantic import BaseModel, EmailStr
@@ -122,8 +133,9 @@ class CreateWhitelistRequest(BaseModel):
 class WhitelistEntry(BaseModel):
     id: int
     chat_conversation_share_id: int
-    whitelisted_neptun_user_id: str
+    whitelisted_neptun_user_id: int
     created_at: datetime
+    updated_at: datetime
 
 class CreateWhitelistResponse(BaseModel):
     shareWhitelistEntries: List[WhitelistEntry]
@@ -131,11 +143,23 @@ class CreateWhitelistResponse(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### cURL Example
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Cookie: neptun-session=your-session-cookie" \
+  -d '{
+    "emails": ["user1@example.com", "user2@example.com"]
+  }' \
+  "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123/shares/456/whitelist-entries"
+```
+
+### Python Example
 
 ```python
 async def create_whitelist_entries(
-    user_id: str,
+    user_id: int,
     chat_id: int,
     share_id: int,
     emails: List[str],
@@ -151,23 +175,11 @@ async def create_whitelist_entries(
         return CreateWhitelistResponse(**response.json())
 ```
 
-### cURL Example
-
-```bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H "Cookie: neptun-session=your-session-cookie" \
-  -d '{
-    "emails": ["user1@example.com", "user2@example.com"]
-  }' \
-  "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123/shares/456/whitelist-entries"
-```
-
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function createWhitelistEntries(
-  userId: string,
+  userId: number,
   chatId: number,
   shareId: number,
   emails: string[]
@@ -191,16 +203,6 @@ async function createWhitelistEntries(
   return await response.json() as CreateWhitelistResponse
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Whitelist entries successfully created    |
-| 400         | Invalid request body                      |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | Share, chat, or user not found            |
-| 500         | Server error                              |
 
 ## Notes
 

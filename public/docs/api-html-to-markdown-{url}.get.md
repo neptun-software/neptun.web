@@ -34,6 +34,15 @@ No request body required.
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                             |
+| ----------- | --------------------------------------- |
+| 200         | Successfully converted HTML to Markdown |
+| 400         | Invalid URL or HTML parsing failed      |
+| 404         | URL not found                           |
+| 500         | Server error during conversion          |
+
 ### Success Response (200 OK)
 
 Returns the converted markdown content as plain text.
@@ -65,37 +74,41 @@ When the URL is invalid or the HTML content cannot be parsed:
 }
 ```
 
-#### TypeScript Interface
+### TypeScript Interface
 
 ```typescript
-interface HtmlToMarkdownResponse {
-  markdown: string
-}
+type HtmlToMarkdownResponse = string
 
 interface HtmlToMarkdownError {
   statusCode: number
   statusMessage: string
-  data: string
+  data: 'FAILED'
 }
 ```
 
-#### Python Model
+### Python Model
 
 ```python
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel
 
 class HtmlToMarkdownResponse(BaseModel):
-    markdown: str
+    content: str
 
 class HtmlToMarkdownError(BaseModel):
     statusCode: int
     statusMessage: str
-    data: str
+    data: Literal["FAILED"]
 ```
 
 ## Code Examples
 
-### Python Example (using httpx)
+### cURL Example
+
+```bash
+curl -X GET "https://neptun-webui.vercel.app/api/html-to-markdown/https%3A%2F%2Fexample.com"
+```
+
+### Python Example
 
 ```python
 from pydantic import BaseModel, HttpUrl
@@ -115,13 +128,7 @@ async def convert_html_to_markdown(url: str) -> str:
         return response.text
 ```
 
-### cURL Example
-
-```bash
-curl -X GET "https://neptun-webui.vercel.app/api/html-to-markdown/https%3A%2F%2Fexample.com"
-```
-
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function convertHtmlToMarkdown(url: string): Promise<string> {
@@ -137,15 +144,6 @@ async function convertHtmlToMarkdown(url: string): Promise<string> {
   return await response.text()
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                             |
-| ----------- | --------------------------------------- |
-| 200         | Successfully converted HTML to Markdown |
-| 400         | Invalid URL or HTML parsing failed      |
-| 404         | URL not found                           |
-| 500         | Server error during conversion          |
 
 ## Notes
 

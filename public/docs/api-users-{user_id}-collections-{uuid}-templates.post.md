@@ -29,58 +29,94 @@ POST
 | Content-Type | application/json | Yes      | Request body format           |
 | Cookie       | neptun-session   | Yes      | Session authentication cookie |
 
+### Query Parameters
+
+No query parameters required.
+
 ### Request Body
 
-| Field                | Type   | Required | Description                        |
-| -------------------- | ------ | -------- | ---------------------------------- |
-| template.description | string | No       | Description of the template        |
-| template.file_name   | string | Yes      | Name of the template file          |
-| file.content         | string | Yes      | Content of the template file       |
-| file.name            | string | Yes      | Original name of the uploaded file |
-| file.type            | string | Yes      | MIME type of the file              |
+| Field                | Type   | Required | Description                  |
+| -------------------- | ------ | -------- | ---------------------------- |
+| template.description | string | No       | Description of the template  |
+| template.file_name   | string | Yes      | Name of the template file    |
+| file                 | string | Yes      | Content of the template file |
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 201         | Successfully created template             |
+| 400         | Bad Request (invalid request body)        |
+| 401         | Unauthorized (invalid or missing session) |
+| 403         | Forbidden (user_id mismatch)              |
+| 404         | Collection not found                      |
+| 500         | Server error                              |
+
 ### Success Response (201 Created)
 
-| Field    | Type   | Description                 |
-| -------- | ------ | --------------------------- |
-| template | object | The created template object |
+```json
+{
+  "template": {
+    "id": 1,
+    "description": "Basic Docker deployment script",
+    "file_name": "docker-deploy.sh",
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-01T12:00:00Z",
+    "neptun_user_id": 1,
+    "template_collection_id": 1,
+    "user_file_id": 1
+  }
+}
+```
 
-### TypeScript Types
+### Error Response (400 Bad Request)
+
+```json
+{
+  "statusCode": 400,
+  "message": "Invalid body format. Expected { template, file }"
+}
+```
+
+### TypeScript Interface
 
 ```typescript
 interface Template {
   id: number
   description?: string
   file_name: string
-  created_at: Date
-  updated_at: Date
+  created_at: string
+  updated_at: string
   neptun_user_id: number
   template_collection_id?: number
   user_file_id?: number
 }
 
 interface UserFile {
-  content: string
-  name: string
-  type: string
+  title?: string
+  text: string
+  language: string
+  extension: string
+  neptun_user_id: number
 }
 
 interface CreateTemplateRequest {
   template: {
     description?: string
     file_name: string
+    neptun_user_id: number
   }
   file: UserFile
 }
 
 interface ApiResponse {
-  template: Template
+  template: Template & UserFile
 }
 ```
 
-### Python Types
+### Python Model
 
 ```python
 from datetime import datetime
@@ -88,13 +124,16 @@ from typing import Optional
 from pydantic import BaseModel
 
 class UserFile(BaseModel):
-    content: str
-    name: str
-    type: str
+    title: Optional[str]
+    text: str
+    language: str
+    extension: str
+    neptun_user_id: int
 
 class TemplateData(BaseModel):
     description: Optional[str]
     file_name: str
+    neptun_user_id: int
 
 class CreateTemplateRequest(BaseModel):
     template: TemplateData
@@ -109,14 +148,15 @@ class Template(BaseModel):
     neptun_user_id: int
     template_collection_id: Optional[int]
     user_file_id: Optional[int]
-
-class ApiResponse(BaseModel):
-    template: Template
+    title: Optional[str]
+    text: str
+    language: str
+    extension: str
 ```
 
 ## Code Examples
 
-### cURL
+### cURL Example
 
 ```bash
 curl -X POST "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e29b-41d4-a716-446655440000/templates" \
@@ -128,15 +168,11 @@ curl -X POST "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e
       "description": "Basic Docker deployment script",
       "file_name": "docker-deploy.sh"
     },
-    "file": {
-      "content": "#!/bin/bash\necho \"Hello Docker\"",
-      "name": "docker-deploy.sh",
-      "type": "text/x-shellscript"
-    }
+    "file": "#!/bin/bash\ndocker build -t myapp .\ndocker run -d myapp"
   }'
 ```
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 import httpx
@@ -147,10 +183,9 @@ async def create_template(
     collection_uuid: str,
     file_name: str,
     file_content: str,
-    file_type: str,
     description: Optional[str] = None,
     session_cookie: str = None
-) -> dict:
+) -> ApiResponse:
     url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}/templates"
 
     data = {
@@ -158,11 +193,7 @@ async def create_template(
             "file_name": file_name,
             "description": description
         },
-        "file": {
-            "content": file_content,
-            "name": file_name,
-            "type": file_type
-        }
+        "file": file_content
     }
 
     async with httpx.AsyncClient() as client:
@@ -170,15 +201,16 @@ async def create_template(
             url,
             json=data,
             headers={
-                "Cookie": f"neptun-session={session_cookie}",
-                "Content-Type": "application/json"
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Cookie": f"neptun-session={session_cookie}"
             }
         )
         response.raise_for_status()
-        return response.json()
+        return ApiResponse(**response.json())
 ```
 
-### TypeScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function createTemplate(
@@ -208,41 +240,9 @@ async function createTemplate(
 }
 ```
 
-## Example Responses
+## Notes
 
-### Success Response
-
-```json
-{
-  "template": {
-    "id": 1,
-    "description": "Basic Docker deployment script",
-    "file_name": "docker-deploy.sh",
-    "created_at": "2024-01-01T12:00:00Z",
-    "updated_at": "2024-01-01T12:00:00Z",
-    "neptun_user_id": 1,
-    "template_collection_id": 1,
-    "user_file_id": 1
-  }
-}
-```
-
-### Error Response
-
-```json
-{
-  "statusCode": 400,
-  "message": "Invalid body format. Expected { template, file }"
-}
-```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 201         | Successfully created template             |
-| 400         | Bad Request (invalid request body)        |
-| 401         | Unauthorized (invalid or missing session) |
-| 403         | Forbidden (user_id mismatch)              |
-| 404         | Collection not found                      |
-| 500         | Server error                              |
+- The session cookie is required for authentication
+- The collection must belong to the specified user
+- The file_name must be unique within the collection
+- The file content must be a valid text file

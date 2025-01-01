@@ -16,10 +16,10 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                   |
-| --------- | ------ | -------- | ----------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user |
-| chat_id   | number | Yes      | Unique identifier of the chat |
+| Parameter | Type    | Required | Description                   |
+| --------- | ------- | -------- | ----------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user |
+| chat_id   | integer | Yes      | Unique identifier of the chat |
 
 ### Headers
 
@@ -36,6 +36,15 @@ No query parameters required.
 No request body required.
 
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Successfully retrieved chat files         |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error                              |
 
 ### Success Response (200 OK)
 
@@ -67,17 +76,20 @@ No request body required.
 }
 ```
 
-#### TypeScript Interface
+### TypeScript Interface
 
 ```typescript
 interface ChatFile {
   id: number
   chat_conversation_id: number
-  name: string
-  size: number
-  type: string
+  chat_conversation_message_id: number
+  neptun_user_id: number
+  title: string
+  text: string
+  language: string
+  extension: string
   created_at: string
-  url: string
+  updated_at: string
 }
 
 interface GetChatFilesResponse {
@@ -93,7 +105,7 @@ interface GetChatFilesError {
 }
 ```
 
-#### Python Model
+### Python Model
 
 ```python
 from pydantic import BaseModel, HttpUrl
@@ -103,27 +115,35 @@ from typing import List
 class ChatFile(BaseModel):
     id: int
     chat_conversation_id: int
-    name: str
-    size: int
-    type: str
+    chat_conversation_message_id: int
+    neptun_user_id: int
+    title: str
+    text: str
+    language: str = "text"
+    extension: str = "txt"
     created_at: datetime
-    url: HttpUrl
+    updated_at: datetime
 
 class GetChatFilesResponse(BaseModel):
     chatFiles: List[ChatFile]
 
-class ErrorData(BaseModel):
-    message: str
-
 class GetChatFilesError(BaseModel):
     statusCode: int
     statusMessage: str
-    data: ErrorData
+    data: dict
 ```
 
 ## Code Examples
 
-### Python Example (using httpx)
+### cURL Example
+
+```bash
+curl -X GET \
+  -H "Cookie: neptun-session=your-session-cookie" \
+  "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123/files"
+```
+
+### Python Example
 
 ```python
 from pydantic import BaseModel, HttpUrl
@@ -134,17 +154,20 @@ from datetime import datetime
 class ChatFile(BaseModel):
     id: int
     chat_conversation_id: int
-    name: str
-    size: int
-    type: str
+    chat_conversation_message_id: int
+    neptun_user_id: int
+    title: str
+    text: str
+    language: str = "text"
+    extension: str = "txt"
     created_at: datetime
-    url: HttpUrl
+    updated_at: datetime
 
 class GetChatFilesResponse(BaseModel):
     chatFiles: List[ChatFile]
 
 async def get_chat_files(
-    user_id: str,
+    user_id: int,
     chat_id: int,
     session_cookie: str
 ) -> GetChatFilesResponse:
@@ -157,19 +180,11 @@ async def get_chat_files(
         return GetChatFilesResponse(**response.json())
 ```
 
-### cURL Example
-
-```bash
-curl -X GET \
-  -H "Cookie: neptun-session=your-session-cookie" \
-  "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123/files"
-```
-
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function getChatFiles(
-  userId: string,
+  userId: number,
   chatId: number
 ): Promise<GetChatFilesResponse> {
   const response = await fetch(
@@ -186,15 +201,6 @@ async function getChatFiles(
   return await response.json() as GetChatFilesResponse
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Successfully retrieved chat files         |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | Chat or user not found                    |
-| 500         | Server error                              |
 
 ## Notes
 

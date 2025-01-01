@@ -16,10 +16,10 @@ POST
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                   |
-| --------- | ------ | -------- | ----------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user |
-| chat_id   | number | Yes      | Unique identifier of the chat |
+| Parameter | Type    | Required | Description                   |
+| --------- | ------- | -------- | ----------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user |
+| chat_id   | integer | Yes      | Unique identifier of the chat |
 
 ### Headers
 
@@ -55,6 +55,16 @@ Where MessageInput contains:
 - role: string (user/assistant/system)
 
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Messages successfully created             |
+| 400         | Invalid request body                      |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error                              |
 
 ### Success Response (200 OK)
 
@@ -115,17 +125,17 @@ Where MessageInput contains:
 }
 ```
 
-#### TypeScript Interfaces
+### TypeScript Interface
 
 ```typescript
 interface MessageInput {
   content: string
-  role: 'user' | 'assistant' | 'system'
+  role: 'user' | 'assistant'
 }
 
 interface SingleMessageRequest {
   message: string
-  actor: string
+  actor: 'user' | 'assistant'
 }
 
 interface MultipleMessagesRequest {
@@ -135,10 +145,11 @@ interface MultipleMessagesRequest {
 interface ChatMessage {
   id: number
   chat_conversation_id: number
-  neptun_user_id: string
+  neptun_user_id: number
   message: string
-  actor: string
+  actor: 'user' | 'assistant'
   created_at: string
+  updated_at: string
 }
 
 interface SingleMessageResponse {
@@ -148,9 +159,20 @@ interface SingleMessageResponse {
 interface MultipleMessagesResponse {
   chatMessages: ChatMessage[]
 }
+
+interface CreateMessagesError {
+  statusCode: number
+  statusMessage: string
+  data: {
+    issues: Array<{
+      code: string
+      message: string
+    }>
+  }
+}
 ```
 
-#### Python Models
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -161,11 +183,14 @@ from enum import Enum
 class MessageRole(str, Enum):
     user = "user"
     assistant = "assistant"
-    system = "system"
 
 class MessageInput(BaseModel):
     content: str
     role: MessageRole
+
+class SingleMessageRequest(BaseModel):
+    message: str
+    actor: MessageRole
 
 class MultipleMessagesRequest(BaseModel):
     messages: List[MessageInput]
@@ -173,10 +198,11 @@ class MultipleMessagesRequest(BaseModel):
 class ChatMessage(BaseModel):
     id: int
     chat_conversation_id: int
-    neptun_user_id: str
+    neptun_user_id: int
     message: str
-    actor: str
+    actor: MessageRole
     created_at: datetime
+    updated_at: datetime
 
 class SingleMessageResponse(BaseModel):
     chatMessage: ChatMessage
@@ -186,25 +212,6 @@ class MultipleMessagesResponse(BaseModel):
 ```
 
 ## Code Examples
-
-### Python Example (using httpx)
-
-```python
-async def create_chat_messages(
-    user_id: str,
-    chat_id: int,
-    messages: List[MessageInput],
-    session_cookie: str
-) -> MultipleMessagesResponse:
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"https://neptun-webui.vercel.app/api/users/{user_id}/chats/{chat_id}/messages",
-            json={"messages": [msg.dict() for msg in messages]},
-            cookies={"neptun-session": session_cookie}
-        )
-        response.raise_for_status()
-        return MultipleMessagesResponse(**response.json())
-```
 
 ### cURL Example
 
@@ -227,15 +234,52 @@ curl -X POST \
   "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123/messages"
 ```
 
-### Response Status Codes
+### Python Example
 
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Messages successfully created             |
-| 400         | Invalid request body                      |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | Chat or user not found                    |
-| 500         | Server error                              |
+```python
+async def create_chat_messages(
+    user_id: int,
+    chat_id: int,
+    messages: List[MessageInput],
+    session_cookie: str
+) -> MultipleMessagesResponse:
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"https://neptun-webui.vercel.app/api/users/{user_id}/chats/{chat_id}/messages",
+            json={"messages": [msg.dict() for msg in messages]},
+            cookies={"neptun-session": session_cookie}
+        )
+        response.raise_for_status()
+        return MultipleMessagesResponse(**response.json())
+```
+
+### TypeScript/JavaScript Example
+
+```typescript
+async function createChatMessages(
+  userId: number,
+  chatId: number,
+  messages: MessageInput[]
+): Promise<MultipleMessagesResponse> {
+  const response = await fetch(
+    `https://neptun-webui.vercel.app/api/users/${userId}/chats/${chatId}/messages`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Important for cookie handling
+      body: JSON.stringify({ messages }),
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return await response.json() as MultipleMessagesResponse
+}
+```
 
 ## Notes
 

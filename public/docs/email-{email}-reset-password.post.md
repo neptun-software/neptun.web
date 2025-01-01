@@ -37,35 +37,17 @@ No query parameters required.
 | otp          | string | Yes      | One-time password received via email |
 | new_password | string | Yes      | New password for the account         |
 
-#### TypeScript Interface
-
-```typescript
-interface ResetPasswordRequest {
-  otp: string
-  new_password: string
-}
-
-interface ResetPasswordResponse {
-  success: boolean
-  message: string
-}
-```
-
-#### Python Model
-
-```python
-from pydantic import BaseModel
-
-class ResetPasswordRequest(BaseModel):
-    otp: str
-    new_password: str
-
-class ResetPasswordResponse(BaseModel):
-    success: bool
-    message: str
-```
-
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                            |
+| ----------- | -------------------------------------- |
+| 200         | Password successfully reset            |
+| 400         | Invalid request body or missing fields |
+| 404         | Email not found or OTP expired         |
+| 429         | Too many reset attempts                |
+| 500         | Server error during password reset     |
 
 ### Success Response (200 OK)
 
@@ -76,7 +58,7 @@ class ResetPasswordResponse(BaseModel):
 }
 ```
 
-### Error Responses
+### Error Response
 
 #### Invalid or Expired OTP
 
@@ -105,9 +87,37 @@ class ResetPasswordResponse(BaseModel):
 }
 ```
 
+### TypeScript Interface
+
+```typescript
+interface ResetPasswordRequest {
+  otp: string
+  new_password: string
+}
+
+interface ResetPasswordResponse {
+  success: boolean
+  message: string
+}
+```
+
+### Python Model
+
+```python
+from pydantic import BaseModel
+
+class ResetPasswordRequest(BaseModel):
+    otp: str
+    new_password: str
+
+class ResetPasswordResponse(BaseModel):
+    success: bool
+    message: str
+```
+
 ## Code Examples
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 import httpx
@@ -140,7 +150,7 @@ curl -X POST https://neptun-webui.vercel.app/user@example.com/reset-password \
   -d '{"otp": "123456", "new_password": "newSecurePassword123"}'
 ```
 
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function resetPassword(
@@ -169,3 +179,11 @@ async function resetPassword(
   return await response.json() as ResetPasswordResponse
 }
 ```
+
+## Notes
+
+- OTP must be valid and not expired
+- New password must meet security requirements (min 8 chars, etc.)
+- Limited number of reset attempts per email address
+- Password reset invalidates all existing sessions
+- Email address must be URL encoded in the request path

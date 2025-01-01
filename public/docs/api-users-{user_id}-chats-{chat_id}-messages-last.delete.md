@@ -16,10 +16,10 @@ DELETE
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                   |
-| --------- | ------ | -------- | ----------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user |
-| chat_id   | number | Yes      | Unique identifier of the chat |
+| Parameter | Type    | Required | Description                   |
+| --------- | ------- | -------- | ----------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user |
+| chat_id   | integer | Yes      | Unique identifier of the chat |
 
 ### Headers
 
@@ -36,6 +36,16 @@ No query parameters required.
 No request body required.
 
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Messages successfully deleted             |
+| 400         | No messages found in chat                 |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error                              |
 
 ### Success Response (200 OK)
 
@@ -79,15 +89,17 @@ No request body required.
 }
 ```
 
-#### TypeScript Interfaces
+### TypeScript Interface
 
 ```typescript
 interface ChatMessage {
   id: number
   chat_conversation_id: number
-  actor: 'user' | 'assistant' | 'system'
+  actor: 'user' | 'assistant'
   message: string
   created_at: string
+  updated_at: string
+  neptun_user_id: number
 }
 
 interface DeleteLastMessagesResponse {
@@ -104,7 +116,7 @@ interface DeleteLastMessagesError {
 }
 ```
 
-#### Python Models
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -115,7 +127,6 @@ from enum import Enum
 class MessageRole(str, Enum):
     user = "user"
     assistant = "assistant"
-    system = "system"
 
 class ChatMessage(BaseModel):
     id: int
@@ -123,6 +134,8 @@ class ChatMessage(BaseModel):
     actor: MessageRole
     message: str
     created_at: datetime
+    updated_at: datetime
+    neptun_user_id: int
 
 class DeleteLastMessagesResponse(BaseModel):
     maybeAssistantMessageToDelete: Optional[ChatMessage] = None
@@ -133,11 +146,19 @@ class DeleteLastMessagesResponse(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### cURL Example
+
+```bash
+curl -X DELETE \
+  -H "Cookie: neptun-session=your-session-cookie" \
+  "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123/messages/last"
+```
+
+### Python Example
 
 ```python
 async def delete_last_messages(
-    user_id: str,
+    user_id: int,
     chat_id: int,
     session_cookie: str
 ) -> DeleteLastMessagesResponse:
@@ -150,19 +171,11 @@ async def delete_last_messages(
         return DeleteLastMessagesResponse(**response.json())
 ```
 
-### cURL Example
-
-```bash
-curl -X DELETE \
-  -H "Cookie: neptun-session=your-session-cookie" \
-  "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123/messages/last"
-```
-
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function deleteLastMessages(
-  userId: string,
+  userId: number,
   chatId: number
 ): Promise<DeleteLastMessagesResponse> {
   const response = await fetch(
@@ -180,16 +193,6 @@ async function deleteLastMessages(
   return await response.json() as DeleteLastMessagesResponse
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Messages successfully deleted             |
-| 400         | No messages found in chat                 |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | Chat or user not found                    |
-| 500         | Server error                              |
 
 ## Notes
 

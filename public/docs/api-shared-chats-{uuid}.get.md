@@ -22,11 +22,10 @@ GET
 
 ### Headers
 
-| Header        | Value         | Required | Description                                          |
-| ------------- | ------------- | -------- | ---------------------------------------------------- |
-| Authorization | Basic {token} | No\*     | Base64 encoded username:password for protected chats |
-
-\*Required only for password-protected chats
+| Header       | Value            | Required | Description                   |
+| ------------ | ---------------- | -------- | ----------------------------- |
+| Content-Type | application/json | Yes      | Indicates JSON request body   |
+| Cookie       | neptun-session   | No       | Session authentication cookie |
 
 ### Query Parameters
 
@@ -38,27 +37,23 @@ No request body required.
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                                |
+| ----------- | ------------------------------------------ |
+| 200         | Successfully retrieved chat messages       |
+| 401         | Unauthorized (missing or invalid password) |
+| 403         | Forbidden (not on whitelist)               |
+| 404         | Share not found                            |
+| 500         | Server error                               |
+
 ### Success Response (200 OK)
-
-```typescript
-interface SharedChatResponse {
-  chatMessages: ChatMessage[]
-  shareInfo: {
-    shareExists: boolean
-    shareIsPrivate: boolean
-    shareHasPassword: boolean
-    shareHasWhitelist: boolean
-  }
-}
-```
-
-#### Example Response
 
 ```json
 {
   "chatMessages": [
     {
-      "id": "msg123",
+      "id": 123,
       "content": "Hello world",
       "role": "user",
       "timestamp": "2024-03-20T10:30:00Z"
@@ -111,74 +106,20 @@ interface SharedChatResponse {
 }
 ```
 
-## Code Examples
-
-### Python Example (using httpx)
-
-```python
-from pydantic import BaseModel
-import httpx
-import base64
-from typing import List, Optional
-from datetime import datetime
-
-class ChatMessage(BaseModel):
-    id: str
-    content: str
-    role: str
-    timestamp: datetime
-
-class ShareInfo(BaseModel):
-    shareExists: bool
-    shareIsPrivate: bool
-    shareHasPassword: bool
-    shareHasWhitelist: bool
-
-class SharedChatResponse(BaseModel):
-    chatMessages: List[ChatMessage]
-    shareInfo: ShareInfo
-
-async def get_shared_chat(
-    uuid: str,
-    password: Optional[str] = None
-) -> SharedChatResponse:
-    async with httpx.AsyncClient() as client:
-        headers = {}
-        if password:
-            auth = base64.b64encode(f":{password}".encode()).decode()
-            headers["Authorization"] = f"Basic {auth}"
-
-        response = await client.get(
-            f"https://neptun-webui.vercel.app/api/shared/chats/{uuid}",
-            headers=headers
-        )
-        response.raise_for_status()
-        return SharedChatResponse(**response.json())
-```
-
-### cURL Example
-
-```bash
-# Without password
-curl -X GET "https://neptun-webui.vercel.app/api/shared/chats/your-uuid-here"
-
-# With password
-curl -X GET "https://neptun-webui.vercel.app/api/shared/chats/your-uuid-here" \
-  -H "Authorization: Basic $(echo -n ':your-password' | base64)"
-```
-
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript Interface
 
 ```typescript
 interface ChatMessage {
-  id: string
+  id: number
   content: string
-  role: string
-  timestamp: string
+  role: 'user' | 'assistant'
+  created_at: string
+  updated_at: string
 }
 
 interface ShareInfo {
   shareExists: boolean
+  shareIsActive: boolean
   shareIsPrivate: boolean
   shareHasPassword: boolean
   shareHasWhitelist: boolean
@@ -189,19 +130,87 @@ interface SharedChatResponse {
   shareInfo: ShareInfo
 }
 
-async function getSharedChat(
-  uuid: string,
-  password?: string
-): Promise<SharedChatResponse> {
-  const headers: HeadersInit = {}
-  if (password) {
-    const auth = btoa(`:${password}`)
-    headers.Authorization = `Basic ${auth}`
+interface SharedChatError {
+  statusCode: number
+  statusMessage: string
+  message: string
+  data: {
+    shareInfo: ShareInfo
   }
+}
+```
 
+### Python Model
+
+```python
+from pydantic import BaseModel
+from typing import List
+from datetime import datetime
+
+class ChatMessage(BaseModel):
+    id: int
+    content: str
+    role: Literal['user', 'assistant']
+    created_at: datetime
+    updated_at: datetime
+
+class ShareInfo(BaseModel):
+    shareExists: bool
+    shareIsActive: bool
+    shareIsPrivate: bool
+    shareHasPassword: bool
+    shareHasWhitelist: bool
+
+class SharedChatResponse(BaseModel):
+    chatMessages: List[ChatMessage]
+    shareInfo: ShareInfo
+
+class SharedChatError(BaseModel):
+    statusCode: int
+    statusMessage: str
+    message: str
+    data: dict[str, ShareInfo]
+```
+
+## Code Examples
+
+### cURL Example
+
+```bash
+curl -X GET "https://neptun-webui.vercel.app/api/shared/chats/your-uuid-here" \
+  -H "Cookie: neptun-session=your-session-cookie"
+```
+
+### Python Example
+
+```python
+from pydantic import BaseModel
+import httpx
+from typing import List
+from datetime import datetime
+
+async def get_shared_chat(
+    uuid: str,
+    session_cookie: str
+) -> SharedChatResponse:
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"https://neptun-webui.vercel.app/api/shared/chats/{uuid}",
+            cookies={"neptun-session": session_cookie}
+        )
+        response.raise_for_status()
+        return SharedChatResponse(**response.json())
+```
+
+### TypeScript/JavaScript Example
+
+```typescript
+async function getSharedChat(uuid: string): Promise<SharedChatResponse> {
   const response = await fetch(
     `https://neptun-webui.vercel.app/api/shared/chats/${uuid}`,
-    { headers }
+    {
+      credentials: 'include', // Important for cookie handling
+    }
   )
 
   if (!response.ok) {
@@ -212,12 +221,9 @@ async function getSharedChat(
 }
 ```
 
-### Response Status Codes
+## Notes
 
-| Status Code | Description                                |
-| ----------- | ------------------------------------------ |
-| 200         | Successfully retrieved chat messages       |
-| 401         | Unauthorized (missing or invalid password) |
-| 403         | Forbidden (not on whitelist)               |
-| 404         | Share not found                            |
-| 500         | Server error                               |
+- The endpoint supports both password-protected and whitelist-based access control
+- The shareInfo object provides information about the share's protection status
+- Session cookie is required for authentication if the share is protected
+- Error responses include detailed share information for better error handling

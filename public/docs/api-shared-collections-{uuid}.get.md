@@ -26,128 +26,25 @@ GET
 | ------ | ---------------- | -------- | ----------------------------- |
 | Accept | application/json | Yes      | Specifies the response format |
 
+### Query Parameters
+
+No query parameters required.
+
+### Request Body
+
+No request body required.
+
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                                  |
+| ----------- | -------------------------------------------- |
+| 200         | Successfully retrieved collection            |
+| 404         | Template collection with UUID does not exist |
+| 403         | Collection is not shared                     |
+
 ### Success Response (200 OK)
-
-| Field      | Type   | Description                                    |
-| ---------- | ------ | ---------------------------------------------- |
-| collection | object | The template collection object                 |
-| templates  | array  | Array of templates belonging to the collection |
-
-### TypeScript Types
-
-```typescript
-interface Template {
-  id: number
-  description?: string
-  file_name: string
-  created_at: Date
-  updated_at: Date
-  neptun_user_id: number
-  template_collection_id?: number
-  user_file_id?: number
-}
-
-interface TemplateCollection {
-  id: number
-  name: string
-  description?: string
-  is_shared: boolean
-  share_uuid: string
-  created_at: Date
-  updated_at: Date
-  neptun_user_id: number
-  templates: Template[]
-}
-
-interface ApiResponse {
-  collection: TemplateCollection
-  templates: Template[]
-}
-```
-
-### Python Types
-
-```python
-from datetime import datetime
-from typing import Optional, List
-from pydantic import BaseModel
-
-class Template(BaseModel):
-    id: int
-    description: Optional[str]
-    file_name: str
-    created_at: datetime
-    updated_at: datetime
-    neptun_user_id: int
-    template_collection_id: Optional[int]
-    user_file_id: Optional[int]
-
-class TemplateCollection(BaseModel):
-    id: int
-    name: str
-    description: Optional[str]
-    is_shared: bool
-    share_uuid: str
-    created_at: datetime
-    updated_at: datetime
-    neptun_user_id: int
-    templates: List[Template]
-
-class ApiResponse(BaseModel):
-    collection: TemplateCollection
-    templates: List[Template]
-```
-
-## Code Examples
-
-### cURL
-
-```bash
-curl -X GET "https://neptun-webui.vercel.app/api/shared/collections/550e8400-e29b-41d4-a716-446655440000" \
-  -H "Accept: application/json"
-```
-
-### Python Example (using httpx)
-
-```python
-import httpx
-
-async def get_shared_collection(uuid: str) -> dict:
-    url = f"https://neptun-webui.vercel.app/api/shared/collections/{uuid}"
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-        response.raise_for_status()
-        return response.json()
-```
-
-### TypeScript Example (using fetch)
-
-```typescript
-async function getSharedCollection(uuid: string): Promise<ApiResponse> {
-  const response = await fetch(
-    `https://neptun-webui.vercel.app/api/shared/collections/${uuid}`,
-    {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    }
-  )
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
-  }
-
-  return await response.json()
-}
-```
-
-## Example Responses
-
-### Success Response
 
 ```json
 {
@@ -176,7 +73,9 @@ async function getSharedCollection(uuid: string): Promise<ApiResponse> {
 }
 ```
 
-### Error Response
+### Error Responses
+
+#### Not Found (404)
 
 ```json
 {
@@ -185,10 +84,141 @@ async function getSharedCollection(uuid: string): Promise<ApiResponse> {
 }
 ```
 
-### Response Status Codes
+#### Forbidden (403)
 
-| Status Code | Description                                  |
-| ----------- | -------------------------------------------- |
-| 200         | Successfully retrieved collection            |
-| 404         | Template collection with UUID does not exist |
-| 403         | Collection is not shared                     |
+```json
+{
+  "statusCode": 403,
+  "message": "Collection is not shared"
+}
+```
+
+### TypeScript Interface
+
+```typescript
+interface Template {
+  id: number
+  description: string | null
+  file_name: string
+  created_at: string
+  updated_at: string
+  title: string
+  text: string
+  language: string
+  extension: string
+}
+
+interface TemplateCollection {
+  id: number
+  name: string
+  description: string | null
+  is_shared: boolean
+  share_uuid: string
+  created_at: string
+  updated_at: string
+  templates: Template[]
+}
+
+interface GetSharedCollectionResponse {
+  collection: TemplateCollection
+}
+
+interface GetSharedCollectionError {
+  statusCode: number
+  statusMessage: string
+  message: string
+}
+```
+
+### Python Model
+
+```python
+from datetime import datetime
+from typing import Optional, List
+from pydantic import BaseModel
+
+class Template(BaseModel):
+    id: int
+    description: Optional[str]
+    file_name: str
+    created_at: datetime
+    updated_at: datetime
+    title: str
+    text: str
+    language: str = "text"
+    extension: str = "txt"
+
+class TemplateCollection(BaseModel):
+    id: int
+    name: str
+    description: Optional[str]
+    is_shared: bool
+    share_uuid: str
+    created_at: datetime
+    updated_at: datetime
+    templates: List[Template]
+
+class GetSharedCollectionResponse(BaseModel):
+    collection: TemplateCollection
+
+class GetSharedCollectionError(BaseModel):
+    statusCode: int
+    statusMessage: str
+    message: str
+```
+
+## Code Examples
+
+### cURL Example
+
+```bash
+curl -X GET "https://neptun-webui.vercel.app/api/shared/collections/550e8400-e29b-41d4-a716-446655440000" \
+  -H "Accept: application/json"
+```
+
+### Python Example
+
+```python
+import httpx
+
+async def get_shared_collection(uuid: str) -> ApiResponse:
+    url = f"https://neptun-webui.vercel.app/api/shared/collections/{uuid}"
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            url,
+            headers={"Accept": "application/json"}
+        )
+        response.raise_for_status()
+        return ApiResponse(**response.json())
+```
+
+### TypeScript/JavaScript Example
+
+```typescript
+async function getSharedCollection(uuid: string): Promise<ApiResponse> {
+  const response = await fetch(
+    `https://neptun-webui.vercel.app/api/shared/collections/${uuid}`,
+    {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return await response.json()
+}
+```
+
+## Notes
+
+- The endpoint requires a valid UUID to identify the template collection
+- Collections must be explicitly shared to be accessible via this endpoint
+- All templates associated with the collection are included in the response
+- Timestamps are returned in ISO 8601 format
+- Optional fields may be null or undefined

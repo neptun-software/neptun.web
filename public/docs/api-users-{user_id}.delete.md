@@ -16,9 +16,9 @@ DELETE
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                   |
-| --------- | ------ | -------- | ----------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user |
+| Parameter | Type    | Required | Description                   |
+| --------- | ------- | -------- | ----------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user |
 
 ### Headers
 
@@ -36,6 +36,16 @@ No request body required.
 
 ## Response Format
 
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | User successfully deleted                 |
+| 400         | Invalid user ID format                    |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | User not found                            |
+| 500         | Server error during deletion              |
+
 ### Success Response (200 OK)
 
 Returns a boolean indicating whether the deletion was successful.
@@ -44,9 +54,7 @@ Returns a boolean indicating whether the deletion was successful.
 true
 ```
 
-### Error Responses
-
-#### Invalid User ID (400 Bad Request)
+### Error Response (400 Bad Request)
 
 ```json
 {
@@ -58,7 +66,7 @@ true
 }
 ```
 
-#### User Not Found (404 Not Found)
+### Error Response (404 Not Found)
 
 ```json
 {
@@ -70,7 +78,7 @@ true
 }
 ```
 
-#### TypeScript Interface
+### TypeScript Interface
 
 ```typescript
 interface DeleteUserResponse {
@@ -86,7 +94,7 @@ interface DeleteUserError {
 }
 ```
 
-#### Python Model
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -105,7 +113,7 @@ class DeleteUserError(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 from pydantic import BaseModel
@@ -114,7 +122,7 @@ import httpx
 class DeleteUserResponse(BaseModel):
     success: bool
 
-async def delete_user(user_id: str, session_cookie: str) -> bool:
+async def delete_user(user_id: int, session_cookie: str) -> bool:
     async with httpx.AsyncClient() as client:
         response = await client.delete(
             f"https://neptun-webui.vercel.app/api/users/{user_id}",
@@ -132,10 +140,10 @@ curl -X DELETE \
   "https://neptun-webui.vercel.app/api/users/your-user-id"
 ```
 
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
-async function deleteUser(userId: string): Promise<boolean> {
+async function deleteUser(userId: number): Promise<boolean> {
   const response = await fetch(
     `https://neptun-webui.vercel.app/api/users/${userId}`,
     {
@@ -151,16 +159,6 @@ async function deleteUser(userId: string): Promise<boolean> {
   return await response.json()
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | User successfully deleted                 |
-| 400         | Invalid user ID format                    |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | User not found                            |
-| 500         | Server error during deletion              |
 
 ## Notes
 

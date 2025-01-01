@@ -16,10 +16,10 @@ GET
 
 ### Route Parameters
 
-| Parameter | Type   | Required | Description                   |
-| --------- | ------ | -------- | ----------------------------- |
-| user_id   | string | Yes      | Unique identifier of the user |
-| chat_id   | number | Yes      | Unique identifier of the chat |
+| Parameter | Type    | Required | Description                   |
+| --------- | ------- | -------- | ----------------------------- |
+| user_id   | integer | Yes      | Unique identifier of the user |
+| chat_id   | integer | Yes      | Unique identifier of the chat |
 
 ### Headers
 
@@ -36,6 +36,15 @@ No query parameters required.
 No request body required.
 
 ## Response Format
+
+### Response Status Codes
+
+| Status Code | Description                               |
+| ----------- | ----------------------------------------- |
+| 200         | Request successful                        |
+| 401         | Unauthorized (invalid or missing session) |
+| 404         | Chat or user not found                    |
+| 500         | Server error                              |
 
 ### Success Response (200 OK)
 
@@ -65,7 +74,7 @@ null
 }
 ```
 
-#### TypeScript Interface
+### TypeScript Interface
 
 ```typescript
 interface ChatShareResponse {
@@ -81,7 +90,7 @@ interface ChatShareError {
 }
 ```
 
-#### Python Model
+### Python Model
 
 ```python
 from pydantic import BaseModel
@@ -102,7 +111,7 @@ class ChatShareError(BaseModel):
 
 ## Code Examples
 
-### Python Example (using httpx)
+### Python Example
 
 ```python
 from uuid import UUID
@@ -110,7 +119,7 @@ import httpx
 from typing import Optional
 
 async def get_chat_share(
-    user_id: str,
+    user_id: int,
     chat_id: int,
     session_cookie: str
 ) -> Optional[UUID]:
@@ -132,11 +141,11 @@ curl -X GET \
   "https://neptun-webui.vercel.app/api/users/your-user-id/chats/123/shares"
 ```
 
-### TypeScript/JavaScript Example (using fetch)
+### TypeScript/JavaScript Example
 
 ```typescript
 async function getChatShare(
-  userId: string,
+  userId: number,
   chatId: number
 ): Promise<string | null> {
   const response = await fetch(
@@ -154,15 +163,6 @@ async function getChatShare(
   return data ? data.uuid : null
 }
 ```
-
-### Response Status Codes
-
-| Status Code | Description                               |
-| ----------- | ----------------------------------------- |
-| 200         | Request successful                        |
-| 401         | Unauthorized (invalid or missing session) |
-| 404         | Chat or user not found                    |
-| 500         | Server error                              |
 
 ## Notes
 
