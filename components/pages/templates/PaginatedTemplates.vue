@@ -6,9 +6,16 @@ const data = ref<TemplateData[]>([])
 const pageSize = ref(2)
 const page = ref(1)
 
+// Watch totalItems to ensure pagination is updated when data is loaded
+watch(totalItems, (newValue) => {
+  if (newValue > 0) {
+    fetchPaginatedData(page.value, pageSize.value, data)
+  }
+})
+
 const { currentPage, pageCount, isFirstPage, isLastPage, prev, next }
   = useOffsetPagination({
-    total: totalItems.value,
+    total: computed(() => totalItems.value),
     page,
     pageSize,
     onPageChange: ({ currentPage, currentPageSize }) => {
