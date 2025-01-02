@@ -62,7 +62,7 @@ async function signIn() {
         </ShadcnCardDescription>
       </ShadcnCardHeader>
       <ShadcnCardContent>
-        <form>
+        <form @submit.prevent>
           <div class="grid gap-4">
             <div>
               <div class="grid gap-2 mb-1">
