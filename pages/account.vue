@@ -63,19 +63,19 @@ async function signOut() {
 </script>
 
 <template>
-  <div class="mx-8 max-w-[calc(100vw-4rem-30px)] overflow-hidden">
-    <h1 class="text-3xl font-bold">
+  <div class="container px-4 pt-4 mx-auto max-w-7xl">
+    <h1 class="text-2xl font-bold md:text-3xl">
       Account
     </h1>
-    <ShadcnSeparator class="my-2 h-1" />
+    <ShadcnSeparator class="h-1 my-2 md:my-4" />
     <AuthState>
       <template #default="{ loggedIn }">
-        <div class="flex flex-wrap gap-2 lg:gap-8">
-          <div>
-            <ShadcnLabel for="email">
+        <div class="flex flex-col gap-4 md:flex-row md:gap-8">
+          <div class="w-full md:w-auto">
+            <ShadcnLabel for="email" class="text-sm md:text-base">
               Email
             </ShadcnLabel>
-            <div class="flex gap-2">
+            <div class="flex flex-col gap-2 md:flex-row">
               <ShadcnInput
                 id="email"
                 v-model="updatedUser.email"
@@ -90,34 +90,37 @@ async function signOut() {
                 v-if="loggedIn"
                 :is-disabled="!emailIsNew || updatedUser.email?.trim() === ''"
                 :on-click-async="updateAccount"
+                class="w-full md:w-auto"
               >
                 Update
               </AsyncButton>
             </div>
           </div>
-          <div>
-            <ShadcnLabel for="password">
+          <div class="w-full md:w-auto">
+            <ShadcnLabel for="password" class="text-sm md:text-base">
               Password
             </ShadcnLabel>
-            <div class="flex gap-2">
-              <!-- &bull; -->
-              <ShadcnInput
-                id="password"
-                v-model="updatedUser.password"
-                type="password"
-                name="password"
-                placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                required
-              />
-              <ShadcnInput
-                id="password"
-                v-model="updatedUser.confirmPassword"
-                type="password"
-                name="password"
-                placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                required
-              />
-
+            <div class="flex flex-col gap-2 md:flex-row">
+              <div class="flex flex-col w-full gap-2 md:flex-row">
+                <ShadcnInput
+                  id="password"
+                  v-model="updatedUser.password"
+                  type="password"
+                  name="password"
+                  placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                  required
+                  class="w-full"
+                />
+                <ShadcnInput
+                  id="confirmPassword"
+                  v-model="updatedUser.confirmPassword"
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                  required
+                  class="w-full"
+                />
+              </div>
               <AsyncButton
                 v-if="loggedIn"
                 :is-disabled="
@@ -126,17 +129,14 @@ async function signOut() {
                     || updatedUser.password !== updatedUser.confirmPassword
                 "
                 :on-click-async="updateAccount"
+                class="w-full md:w-auto whitespace-nowrap"
               >
                 Update
               </AsyncButton>
             </div>
           </div>
         </div>
-        <!-- <DevOnly>
-          <ShadcnSeparator class="my-2 h-1" />
-          <b>Debug:</b> {{ session }}
-        </DevOnly> -->
-        <ShadcnSeparator class="my-2 h-1" />
+        <ShadcnSeparator class="h-1 my-2" />
 
         <AsyncButton v-if="loggedIn" class="mr-1" :on-click-async="signOut">
           Logout
@@ -174,13 +174,13 @@ async function signOut() {
       </template>
       <template #placeholder>
         <ShadcnButton disabled>
-          <Loader2 class="mr-2 w-4 h-4 animate-spin" />
+          <Loader2 class="w-4 h-4 mr-2 animate-spin" />
           Loading Account Data!
         </ShadcnButton>
       </template>
     </AuthState>
 
-    <ShadcnSeparator class="my-2 h-1" />
+    <ShadcnSeparator class="h-1 my-2" />
 
     <AccountSection>
       <template #header>
@@ -191,9 +191,9 @@ async function signOut() {
       </template>
     </AccountSection>
 
-    <AccountSection>
+    <AccountSection :is-last="true">
       <template #header>
-        Neptun (Github) App Installations
+        Neptun (GitHub) App Installations
       </template>
       <template #content>
         <Installations />

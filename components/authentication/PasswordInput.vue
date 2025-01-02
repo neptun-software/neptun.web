@@ -4,6 +4,7 @@ import { Eye, EyeOff } from 'lucide-vue-next'
 interface Props {
   onEnter: () => Promise<any>
   modelValue: string // password
+  isRequired?: boolean
 }
 
 const props = defineProps<Props>()
@@ -26,7 +27,7 @@ function togglePasswordVisibility() {
       :type="passwordIsVisible ? 'text' : 'password'"
       placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
       name="password"
-      required
+      :required="isRequired"
       autocomplete="current-password"
       @keydown.enter="props.onEnter()"
       @input="onInput($event.target.value)"

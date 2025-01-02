@@ -60,20 +60,20 @@ const onSubmit = handleSubmit(async (values) => {
     && (formValues.email_whitelist || []).length === 0
   ) {
     toast.error(
-      'Please set a password or add at least one email to the whitelist.',
+      'Please set either a password or add at least one email to the whitelist.',
       {
         description:
-          'Both fields cannot be empty when the chat is not unprotected.',
+          'At least one protection method must be chosen when the chat is not unprotected.',
       },
     )
 
     setFieldError(
       'password',
-      'Both fields cannot be empty when the chat is not unprotected. Please set a password or add at least one email to the whitelist.',
+      'Please set either a password or add at least one email to the whitelist.',
     )
     setFieldError(
       'email_whitelist',
-      'Both fields cannot be empty when the chat is not unprotected. Please set a password or add at least one email to the whitelist.',
+      'Please set either a password or add at least one email to the whitelist.',
     )
 
     isSubmitting.value = false
@@ -193,7 +193,7 @@ const url = computed(() => {
               name="is_unprotected"
             >
               <ShadcnFormItem
-                class="flex flex-row gap-x-3 items-start p-4 space-y-0 rounded-md border"
+                class="flex flex-row items-start p-4 space-y-0 border rounded-md gap-x-3"
               >
                 <ShadcnFormControl>
                   <ShadcnCheckbox
@@ -226,6 +226,7 @@ const url = computed(() => {
                       <PasswordInput
                         :model-value="value"
                         :on-enter="onSubmit"
+                        :is-required="false"
                         @update:model-value="handleChange"
                       />
                     </div>
@@ -285,14 +286,14 @@ const url = computed(() => {
           </form>
           <div v-else>
             You have already published this chat!<br>
-            <div class="flex gap-2 items-center px-2 py-1 rounded-sm border">
+            <div class="flex items-center gap-2 px-2 py-1 border rounded-sm">
               {{ url }}
               <CopyToClipboard :text="url" />
             </div>
           </div>
           <div
             v-if="error"
-            class="flex gap-2 justify-between items-center py-1 pr-1 pl-2 rounded-sm border border-destructive"
+            class="flex items-center justify-between gap-2 py-1 pl-2 pr-1 border rounded-sm border-destructive"
           >
             Failed to check if chat is published.<br>
 

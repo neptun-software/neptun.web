@@ -1,4 +1,8 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+defineProps<{
+  isLast?: boolean
+}>()
+</script>
 
 <template>
   <div class="overflow-hidden">
@@ -6,7 +10,8 @@
       <slot name="header" />
     </h2>
     <slot name="content" />
-    <ShadcnSeparator class="h-1 my-2" />
+    <ShadcnSeparator v-if="!isLast" class="h-1 my-2" />
+    <div v-if="isLast" class="h-1 my-2" />
   </div>
 </template>
 

@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-vue-next'
 const props = defineProps<{
   content: string
   uniqueKey?: string
+  useSimpleRenderer?: boolean
 }>()
 
 // TODO: only render, if not plain/text
@@ -20,23 +21,57 @@ const { data: ast, status } = await useAsyncData(
 
 <template>
   <div class="relative">
-    <div class="break-words whitespace-pre-wrap">
-      <template v-if="status === 'success' && ast">
-        <!-- MDC is too slow and offers no feedback to the user as well as no great fallback -->
-        <MDCRenderer :body="ast.body" :data="ast.data" />
-      </template>
-      <template v-else>
-        {{ content }}
-      </template>
+    <ShadcnScrollArea v-if="!useSimpleRenderer" class="w-full">
+      <div id="complex-markdown-renderer" class="w-full">
+        <div class="text-sm break-words whitespace-pre-wrap md:text-base">
+          <template v-if="status === 'success' && ast">
+            <!-- MDC is too slow and offers no feedback to the user as well as no great fallback -->
+            <MDCRenderer :body="ast.body" :data="ast.data" />
+          </template>
+          <template v-else>
+            {{ content }}
+          </template>
+        </div>
+      </div>
+      <ShadcnScrollBar orientation="horizontal" />
+    </ShadcnScrollArea>
+    <div v-else>
+      <div class="text-sm break-all whitespace-pre-wrap md:text-base">
+        <template v-if="status === 'success' && ast">
+          <!-- MDC is too slow and offers no feedback to the user as well as no great fallback -->
+          <MDCRenderer :body="ast.body" :data="ast.data" />
+        </template>
+        <template v-else>
+          {{ content }}
+        </template>
+      </div>
     </div>
 
     <div
       v-show="status === 'pending'"
-      class="absolute w-4 h-4 -translate-x-1/2 top-2 left-1/2"
+      class="absolute w-4 h-4 -translate-x-1/2 md:w-6 md:h-6 top-2 left-1/2"
     >
       <Loader2 class="w-full h-full text-blue-500 animate-spin" />
     </div>
   </div>
 </template>
 
-<style lang="postcss" scoped></style>
+<style lang="postcss" scoped>
+#complex-markdown-renderer {
+  :deep(pre) {
+    overflow-x: auto;
+    white-space: pre;
+    max-width: 100%;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    @screen md {
+      font-size: 1rem;
+      line-height: 1.5rem;
+    }
+  }
+
+  :deep(code) {
+    white-space: pre;
+  }
+}
+</style>

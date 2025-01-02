@@ -695,24 +695,4 @@ watch(
   </div>
 </template>
 
-<style scoped lang="postcss">
-/* For WebKit browsers (Chrome, Safari, Edge) */
-textarea::-webkit-scrollbar {
-  width: 4px;
-}
-
-textarea::-webkit-scrollbar-thumb {
-  @apply bg-foreground;
-  border-radius: 100px;
-}
-
-textarea::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
-/* For Firefox */
-textarea {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--foreground)) transparent;
-}
-</style>
+<style scoped lang="postcss"></style>

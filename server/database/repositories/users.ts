@@ -169,10 +169,7 @@ export async function readUserUsingGithubOauthId(github_oauth_id: ReadOauthAccou
   const fetchedUser = await db.query.neptun_user_oauth_account.findFirst({
     columns: {},
     where: and(
-      eq(
-        decryptColumn(neptun_user_oauth_account.oauth_user_id),
-        github_oauth_id,
-      ),
+      eq(neptun_user_oauth_account.oauth_user_id, encryptColumn(github_oauth_id)),
       eq(neptun_user_oauth_account.provider, 'github'),
     ),
     with: {

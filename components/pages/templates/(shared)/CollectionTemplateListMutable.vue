@@ -59,8 +59,8 @@ async function handleSave() {
 </script>
 
 <template>
-  <ShadcnScrollArea v-if="templates.length > 0" class="h-[200px] mt-4">
-    <div v-auto-animate class="space-y-2">
+  <ShadcnScrollArea v-if="templates.length > 0" class="mt-4">
+    <div v-auto-animate class="space-y-2 max-h-[33vh]">
       <div
         v-for="template in templates"
         :key="template.id"
@@ -84,11 +84,12 @@ async function handleSave() {
               :disabled="isUpdating"
               :rows="2"
             />
+            <!-- TODO: Use monaco editor here -->
             <ShadcnTextarea
               v-model="editForm.text"
               placeholder="Template content"
               :disabled="isUpdating"
-              :rows="4"
+              :rows="8"
             />
             <div class="flex items-center gap-2">
               <!-- TODO: make me a select with search -->
@@ -155,6 +156,7 @@ async function handleSave() {
         </div>
       </div>
     </div>
+    <ShadcnScrollBar orientation="vertical" />
   </ShadcnScrollArea>
   <p v-else class="text-sm text-muted-foreground">
     No templates in this collection

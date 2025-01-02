@@ -134,7 +134,7 @@ const colorMode = useColorMode()
             </template>
             <template v-else>
               <ClientOnly fallback-tag="div">
-                <MarkdownRenderer :content="selectedFileVersionMarkdown" :unique-key="`chat-${selectedAiChat.id}-message-${selectedFileVersion.chat_conversation_message_id}-file-${selectedFileVersion.id}`" />
+                <MarkdownRenderer :content="selectedFileVersionMarkdown" :unique-key="`chat-${selectedAiChat.id}-message-${selectedFileVersion.chat_conversation_message_id}-file-${selectedFileVersion.id}`" :use-simple-renderer="true" />
                 <template #fallback>
                   <ShadcnSkeleton
                     class="absolute top-0 left-0 w-full h-full bg-slate-400"
@@ -144,8 +144,8 @@ const colorMode = useColorMode()
               <span class="absolute flex items-center top-2 right-2">
                 <ShadcnDialog v-if="versionsForSelectedFileType.length > 1">
                   <ShadcnDialogTrigger as-child>
-                    <ShadcnButton variant="link" size="icon" as-child>
-                      <Diff class="w-5 h-5 cursor-pointer text-foreground" />
+                    <ShadcnButton variant="link" size="icon" class="w-6 h-6">
+                      <Diff class="cursor-pointer text-foreground" />
                     </ShadcnButton>
                   </ShadcnDialogTrigger>
                   <ShadcnDialogContent>
@@ -196,8 +196,7 @@ const colorMode = useColorMode()
               Select a file above, to view it's content.
             </p>
           </template>
-          <ShadcnScrollBar class="bg-primary" orientation="horizontal" />
-          <ShadcnScrollBar class="bg-primary" orientation="vertical" />
+          <ShadcnScrollBar class="bg-accent dark:bg-accent/10" orientation="vertical" />
         </ShadcnScrollArea>
         <fieldset
           v-if="selectedFileVersion?.text"

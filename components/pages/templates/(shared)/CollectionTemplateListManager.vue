@@ -296,7 +296,7 @@ const requestUrl = useRequestURL()
                     @click="(e) => !isUpdating && startEditing(collection, e)"
                   >
                     <div>{{ collection.name }}</div>
-                    <div class="text-sm text-muted-foreground">
+                    <div class="text-sm whitespace-pre-wrap text-muted-foreground">
                       {{ collection.description }}
                     </div>
                   </div>
@@ -331,7 +331,7 @@ const requestUrl = useRequestURL()
               </div>
             </div>
           </div>
-          <CollectionTemplateListMutatable
+          <CollectionTemplateListMutable
             :templates="collection.templates"
             :is-updating="isUpdating"
             :on-update="updateTemplate"
