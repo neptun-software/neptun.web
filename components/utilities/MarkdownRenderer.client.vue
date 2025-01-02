@@ -4,23 +4,16 @@ import { Loader2 } from 'lucide-vue-next'
 
 const props = defineProps<{
   content: string
+  uniqueKey?: string
 }>()
 
-const contentHash = computed(() => {
-  let hash = 0
-  for (let i = 0; i < props.content.length; i++) {
-    const char = props.content.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash // Convert to 32-bit integer
-  }
-  return Math.abs(hash).toString(36)
-})
-
+// TODO: only render, if not plain/text
 const { data: ast, status } = await useAsyncData(
-  `md-${contentHash.value}`,
+  `md-${props.uniqueKey ?? crypto.randomUUID()}`,
   () => parseMarkdown(props.content || 'No content'),
   {
     lazy: true,
+    watch: [() => props.content],
   },
 )
 </script>

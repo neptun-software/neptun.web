@@ -27,6 +27,8 @@ const { currentPage, pageCount, isFirstPage, isLastPage, prev, next }
   })
 
 async function refresh() {
+  data.value = []
+  page.value = 1
   return refreshData().then(() => fetchPaginatedData(page.value, pageSize.value, data))
 }
 

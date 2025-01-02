@@ -134,7 +134,7 @@ const colorMode = useColorMode()
             </template>
             <template v-else>
               <ClientOnly fallback-tag="div">
-                <MarkdownRenderer :content="selectedFileVersionMarkdown" />
+                <MarkdownRenderer :content="selectedFileVersionMarkdown" :unique-key="`chat-${selectedAiChat.id}-message-${selectedFileVersion.chat_conversation_message_id}-file-${selectedFileVersion.id}`" />
                 <template #fallback>
                   <ShadcnSkeleton
                     class="absolute top-0 left-0 w-full h-full bg-slate-400"

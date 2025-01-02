@@ -23,7 +23,7 @@ const messageContent = computed(() => props.message.content)
       :data-message-created-at="message.createdAt"
     >
       <template v-if="!message.isStreaming">
-        <DashboardChatMessageContent :content="messageContent" />
+        <DashboardChatMessageContent :content="messageContent" :unique-key="`message-${message.id}-${message.role}-${message.content.length}`" />
         <ShadcnSeparator class="my-4" label="Controls" />
         <DashboardChatMessageControls
           :key="messageContent"
@@ -41,7 +41,7 @@ const messageContent = computed(() => props.message.content)
       class="px-4 py-2 border rounded-lg bg-background border-slate-200 max-w-[80%] dark:border-border"
       :data-message-created-at="message.createdAt"
     >
-      <DashboardChatMessageContent :content="messageContent" />
+      <DashboardChatMessageContent :content="messageContent" :unique-key="`message-${message.id}-${message.role}-${message.content.length}`" />
     </div>
   </div>
 </template>

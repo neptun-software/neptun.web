@@ -58,15 +58,16 @@ const shareUrl = computed(() =>
         </ShadcnScrollArea>
 
         <ShadcnTabsContent
-          v-for="(template, templateBodyIndex) in collection.templates"
-          :key="templateBodyIndex"
+          v-for="(template, templateIndex) in collection.templates"
+          :key="templateIndex"
           class="relative"
-          :value="templateBodyIndex"
+          :value="templateIndex"
         >
           <ShadcnScrollArea class="h-screen px-2 py-1 border rounded-md bg-accent">
             <ClientOnly>
               <MarkdownRenderer
                 :content="`\`\`\`${supportedShikiLanguages.includes(template.language as BundledLanguage) ? template.language : 'text'}\n${template.text?.trim()} \n\`\`\``"
+                :unique-key="`collection-${collection.id}-template-${template.id}`"
               />
               <template #fallback>
                 <div class="overflow-x-auto break-words whitespace-pre-wrap">

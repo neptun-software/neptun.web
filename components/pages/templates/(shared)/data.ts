@@ -1,9 +1,9 @@
 import type { TemplateCollectionWithTemplatesWithoutIds } from '~/components/pages/templates/(shared)/types'
 
 const collectionBase = {
+  share_uuid: 'static-template',
   description: 'NeptunAI static template collection',
   is_shared: true,
-  share_uuid: 'static-template',
   created_at: new Date('2024-12-27T22:00'),
   updated_at: new Date('2024-12-27T22:00'),
 }
@@ -1171,10 +1171,12 @@ volumes:
 export const recommendedCollections: TemplateCollectionWithTemplatesWithoutIds[] = [
   {
     ...collectionBase,
+    id: -3,
     name: 'Full-Stack Website Starter',
     templates: [
       {
         ...template,
+        id: -3,
         file_name: 'docker-compose.yml',
         language: 'yaml',
         extension: 'yml',
@@ -1182,6 +1184,7 @@ export const recommendedCollections: TemplateCollectionWithTemplatesWithoutIds[]
       },
       {
         ...template,
+        id: -4,
         file_name: 'postgres.extensions.sql',
         language: 'sql',
         extension: 'sql',
@@ -1189,16 +1192,19 @@ export const recommendedCollections: TemplateCollectionWithTemplatesWithoutIds[]
       },
       {
         ...template,
+        id: -5,
         file_name: 'redis.conf',
         text: FULL_STACK_WEBSITE_STARTER.REDIS_CONFIGURATION,
       },
       {
         ...template,
+        id: -6,
         file_name: 'postgres.datagrip.source-config',
         text: FULL_STACK_WEBSITE_STARTER.POSTGRES_DATAGRIP_SOURCE_CONFIGURATION,
       },
       {
         ...template,
+        id: -7,
         file_name: 'redis.datagrip.source-config',
         text: FULL_STACK_WEBSITE_STARTER.REDIS_DATAGRIP_SOURCE_CONFIGURATION,
       },
@@ -1206,10 +1212,12 @@ export const recommendedCollections: TemplateCollectionWithTemplatesWithoutIds[]
   },
   {
     ...collectionBase,
+    id: -4,
     name: 'Postgres Database Starter',
     templates: [
       {
         ...template,
+        id: -8,
         file_name: 'docker-compose.yml',
         language: 'yaml',
         extension: 'yml',
@@ -1217,6 +1225,7 @@ export const recommendedCollections: TemplateCollectionWithTemplatesWithoutIds[]
       },
       {
         ...template,
+        id: -9,
         file_name: 'postgres.extensions.sql',
         language: 'sql',
         extension: 'sql',
@@ -1224,6 +1233,7 @@ export const recommendedCollections: TemplateCollectionWithTemplatesWithoutIds[]
       },
       {
         ...template,
+        id: -10,
         file_name: 'postgres.datagrip.source-config',
         text: FULL_STACK_WEBSITE_STARTER.POSTGRES_DATAGRIP_SOURCE_CONFIGURATION,
       },
@@ -1231,10 +1241,12 @@ export const recommendedCollections: TemplateCollectionWithTemplatesWithoutIds[]
   },
   {
     ...collectionBase,
+    id: -5,
     name: 'Redis (keydb) Database Starter',
     templates: [
       {
         ...template,
+        id: -11,
         file_name: 'docker-compose.yml',
         language: 'yaml',
         extension: 'yml',
@@ -1242,11 +1254,13 @@ export const recommendedCollections: TemplateCollectionWithTemplatesWithoutIds[]
       },
       {
         ...template,
+        id: -12,
         file_name: 'redis.conf',
         text: FULL_STACK_WEBSITE_STARTER.REDIS_CONFIGURATION,
       },
       {
         ...template,
+        id: -13,
         file_name: 'redis.datagrip.source-config',
         text: FULL_STACK_WEBSITE_STARTER.REDIS_DATAGRIP_SOURCE_CONFIGURATION,
       },
