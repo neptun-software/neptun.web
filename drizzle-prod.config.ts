@@ -9,5 +9,5 @@ export default defineConfig({
       process.env.PRODUCTION_DATABASE_CONNECTION_STRING
       || 'postgresql://postgres:postgres@localhost:5432/postgres',
   },
-  verbose: true,
+  verbose: false,
 })

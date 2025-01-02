@@ -6,6 +6,7 @@ import { downloadTemplateHandler } from './functions'
 const props = defineProps<{
   collection: TemplateData
   fullWidth?: boolean
+  useSimpleRenderer?: boolean
 }>()
 
 const defaultTab = ref(0)
@@ -68,6 +69,7 @@ const shareUrl = computed(() =>
               <MarkdownRenderer
                 :content="`\`\`\`${supportedShikiLanguages.includes(template.language as BundledLanguage) ? template.language : 'text'}\n${template.text?.trim()} \n\`\`\``"
                 :unique-key="`collection-${collection.id}-template-${template.id}`"
+                :use-simple-renderer="useSimpleRenderer"
               />
             </div>
             <ShadcnScrollBar orientation="vertical" />

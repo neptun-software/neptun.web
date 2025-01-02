@@ -5,6 +5,7 @@ import {
   type ChatConversationShareToCreate,
   type ReadChatConversation,
   type ReadChatConversationShare,
+  type ShareInfo,
 } from '~/lib/types/database.tables/schema'
 
 export async function createChatConversationShare(chat_share_entry: ChatConversationShareToCreate) {
@@ -12,7 +13,7 @@ export async function createChatConversationShare(chat_share_entry: ChatConversa
     .insert(chat_conversation_share)
     .values({
       ...chat_share_entry,
-      hashed_password: encryptColumn(chat_share_entry.hashed_password || ''),
+      hashed_password: (chat_share_entry.hashed_password && chat_share_entry.hashed_password.trim().length > 0) ? encryptColumn(chat_share_entry.hashed_password) : null,
     })
     .returning()
     .catch((err) => {
@@ -51,12 +52,7 @@ export async function readShareUuid(chat_id: ReadChatConversation['id']) {
 }
 
 export async function readShareInfo(chat_share_uuid: ReadChatConversationShare['share_uuid']) {
-  const shareStatus: {
-    shareExists: boolean
-    shareIsActive: boolean
-    shareIsPrivate: boolean
-    shareHasPassword: boolean
-  } = await db
+  const shareStatus: ShareInfo = await db
     .select()
     .from(chat_conversation_share)
     .where(eq(chat_conversation_share.share_uuid, chat_share_uuid))
@@ -65,8 +61,7 @@ export async function readShareInfo(chat_share_uuid: ReadChatConversationShare['
         shareExists: data.length > 0,
         shareIsActive: data[0]?.is_shared ?? false,
         shareIsPrivate: data[0]?.is_protected ?? false,
-        shareHasPassword:
-          !!(data[0]?.hashed_password && data[0]?.hashed_password.length > 0),
+        shareHasPassword: Boolean(data[0]?.hashed_password),
       }
     })
     .catch((err) => {

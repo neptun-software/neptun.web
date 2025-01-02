@@ -1,36 +1,8 @@
 <script lang="ts" setup>
-import type { AsyncDataRequestStatus } from '#app'
-import type { FetchError } from 'ofetch'
 import type { TemplateCollectionWithTemplates } from '~/components/pages/templates/(shared)/types'
+import { useFetchResource } from '~/composables/useFetchResource'
 
 const route = useRoute()
-
-function useFetchResource<T>(url: string) {
-  const data = ref<T>()
-  const error = ref<FetchError<any> | null>(null)
-  const status = ref<AsyncDataRequestStatus>('idle')
-
-  const execute = async () => {
-    status.value = 'pending'
-
-    try {
-      const response = await $fetch<T>(url)
-      data.value = response as T
-      status.value = 'success'
-      error.value = null
-    } catch (e: any) {
-      error.value = e
-      status.value = 'error'
-    }
-  }
-
-  return {
-    data,
-    error,
-    status,
-    execute,
-  }
-}
 
 const { data, error, status, execute } = useFetchResource<{
   collection: TemplateCollectionWithTemplates
@@ -66,7 +38,7 @@ useHead({
         :collection="{
           ...data.collection,
           share_uuid: route.params.uuid as string,
-        }" full-width
+        }" full-width :use-simple-renderer="true"
       />
     </div>
     <div v-else-if="status === 'success' && data?.collection && data.collection.templates.length === 0">

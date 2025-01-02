@@ -1,94 +1,19 @@
 <script lang="ts" setup>
-import type { AsyncDataRequestStatus } from '#app'
 import type { Message } from 'ai'
-import type { FetchError } from 'ofetch'
+import type { ChatMessages, ShareInfo } from '~/lib/types/database.tables/schema'
+import { useFetchResource } from '~/composables/useFetchResource'
 
 // defineOgImageComponent('NuxtSeo');
 
 const route = useRoute() // $route should work too, but most of the time it doesn't
 
-type ChatMessages = {
-  message: string
-  id: number
-  created_at: Date | null
-  updated_at: Date | null
-  actor: string
-  chat_conversation: {
-    id: number
-    chat_conversation_shares: {
-      id: number
-      created_at: Date | null
-      updated_at: Date | null
-      is_shared: boolean
-      is_protected: boolean
-    }[]
-  }
-}[]
-
-interface ShareInfo {
-  shareExists: boolean
-  shareIsActive: boolean
-  shareIsPrivate: boolean
-  shareHasPassword: boolean
-}
-
-function convertStringsToDates(data: any) {
-  if (typeof data !== 'object' || data === null) {
-    return data
-  }
-
-  for (const key in data) {
-    if (typeof data[key] === 'string' && !Number.isNaN(Date.parse(data[key]))) {
-      data[key] = new Date(data[key])
-    } else if (typeof data[key] === 'object') {
-      convertStringsToDates(data[key])
-    }
-  }
-
-  return data
-}
-
-// TODO: move to composables, if more shared resources are being introduced
-function useFetchResource<T>(url: string) {
-  const data = ref<T>()
-  const error = ref<FetchError<any> | null>(null)
-  const status = ref<AsyncDataRequestStatus>('idle')
-  const password = ref<string>('')
-
-  const credentials = computed(() => btoa(`:${password.value}`))
-
-  const execute = async () => {
-    status.value = 'pending'
-
-    try {
-      const response = await $fetch(url, {
-        headers: {
-          Authorization: `Basic ${credentials.value}`,
-        },
-      })
-
-      data.value = convertStringsToDates(response)
-      status.value = 'success'
-      error.value = null
-    } catch (e: any) {
-      error.value = e
-      status.value = 'error'
-    }
-  }
-
-  return {
-    data,
-    error,
-    status,
-    execute,
-    password,
-  }
-}
-
 const { data, error, status, password, execute } = useFetchResource<{
   chatMessages: ChatMessages
   shareInfo: ShareInfo
-}>(`/api/shared/chats/${route.params.uuid}`)
+}>(`/api/shared/chats/${route.params.uuid}`, {
+  transform: convertStringsToDates,
+  requiresAuth: true,
+})
 
 const chatMessages = computed(() => {
   return (
@@ -121,7 +46,7 @@ useHead({
     <template v-if="error">
       <p class="text-center">
         <template v-if="!error?.data?.data?.shareInfo?.shareExists">
-          Chat share does not exist.
+          Chat share does not exist. Or you are not authorized to view it.
         </template>
         <template v-else-if="!error?.data?.data?.shareInfo?.shareIsActive">
           Chat share is not active.
@@ -133,7 +58,7 @@ useHead({
 
           <template v-if="error?.data?.data?.shareInfo?.shareHasPassword">
             Please enter the password to view it: <br>
-            <div class="flex gap-1 justify-center my-2">
+            <div class="flex justify-center gap-1 my-2">
               <ShadcnInput
                 v-model="password"
                 class="w-fit"
@@ -153,7 +78,7 @@ useHead({
         </template>
         <br>
         <span>
-          {{ error?.data?.statusCode }} {{ error?.data?.statusMessage }}
+          [{{ error?.data?.statusCode }}] {{ error?.data?.statusMessage }}
         </span>
       </p>
     </template>
@@ -174,9 +99,8 @@ useHead({
     </div>
 
     <AsyncButton
-      class="sticky bottom-2 left-1/2 mx-auto mt-2 transform -translate-x-1/2"
+      class="sticky mx-auto mt-2 transform -translate-x-1/2 bottom-2 left-1/2"
       :on-click-async="execute"
-      :is-disabled="chatMessages.length === 0"
     >
       Refresh Chat
     </AsyncButton>

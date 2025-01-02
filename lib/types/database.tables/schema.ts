@@ -264,6 +264,13 @@ export const SelectChatConversationSchema
 
 /* SHARES */
 
+export interface ShareInfo {
+  shareExists: boolean
+  shareIsActive: boolean
+  shareIsPrivate: boolean
+  shareHasPassword: boolean
+}
+
 export const chat_conversation_share = pgTable('chat_conversation_share', {
   id: serial('id').primaryKey(),
   is_shared: boolean('is_shared').default(true).notNull(),
@@ -344,6 +351,22 @@ export const EmailListToCreateSchema = z
   .min(1)
 
 /* MESSAGES */
+
+export type ChatMessages = {
+  id: ReadChatConversationMessage['id']
+  message: ReadChatConversationMessage['message']
+  actor: ReadChatConversationMessage['actor']
+  chat_conversation: {
+    id: ReadChatConversation['id']
+    chat_conversation_shares: {
+      id: ReadChatConversationShare['id']
+      created_at: ReadChatConversationShare['created_at']
+      updated_at: ReadChatConversationShare['updated_at']
+      is_shared: ReadChatConversationShare['is_shared']
+      is_protected: ReadChatConversationShare['is_protected']
+    }[]
+  }
+}[]
 
 /**
  * role: 'system' | **'user'** | **'assistant'** | 'function' | 'data' | 'tool'

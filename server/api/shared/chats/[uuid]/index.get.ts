@@ -14,7 +14,7 @@ async function userIsAuthorizedToViewChat(
 
 // Read all messages of a shared chat conversation
 // Basic Auth is just base64 encoded, but we use ssl, so it should be fine, because the resource is not that important
-export default defineCachedEventHandler(async (event) => {
+export default defineEventHandler(async (event) => {
   const maybeUuid = await validateParamUuid(event)
   if (maybeUuid.statusCode !== 200) {
     return sendError(
@@ -53,12 +53,15 @@ export default defineCachedEventHandler(async (event) => {
 
   if (info.shareIsPrivate && info.shareHasPassword) {
     const authHeader = event.node.req.headers.authorization
-    if (!authHeader || !authHeader.startsWith('Basic ')) {
-      setResponseHeader(
+
+    if (!authHeader || authHeader === '' || !authHeader.startsWith('Basic ')) {
+      // causes default basic auth popup to appear
+      /* setResponseHeader(
         event,
         'WWW-Authenticate',
         'Basic realm="neptun.shared.chat"',
-      )
+      ) */
+
       return sendError(
         event,
         createError({

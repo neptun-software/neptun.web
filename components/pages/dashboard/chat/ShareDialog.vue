@@ -26,7 +26,7 @@ const {
   validationSchema: formSchema,
   initialValues: {
     is_unprotected: true,
-    password: '',
+    password: undefined,
     email_whitelist: [],
   },
 })
@@ -98,7 +98,10 @@ const onSubmit = handleSubmit(async (values) => {
       method: 'POST',
       body: {
         is_shared: true,
-        is_protected: !values.is_unprotected,
+        is_protected: !values.is_unprotected && (
+          (values.password && values.password.length > 0)
+          || (values.email_whitelist && values.email_whitelist.length > 0)
+        ),
         hashed_password: values.password,
       },
     },

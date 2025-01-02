@@ -209,6 +209,6 @@ async function createWhitelistEntries(
 - The session cookie is required for authentication
 - The requesting user is automatically added to the whitelist
 - Non-existent email addresses are silently ignored
-- Only registered users' email addresses can be whitelisted
+  - **Only registered users' email addresses can be whitelisted!**
 - Multiple entries can be created in a single request
 - Duplicate emails are handled gracefully

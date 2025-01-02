@@ -1,6 +1,6 @@
 import type { PgColumn } from 'drizzle-orm/pg-core'
 import { Client as NeonPostgres } from '@neondatabase/serverless'
-import { type ColumnBaseConfig, type ColumnDataType, sql } from 'drizzle-orm'
+import { type ColumnBaseConfig, type ColumnDataType, type Logger, sql } from 'drizzle-orm'
 import { drizzle as neonDrizzle } from 'drizzle-orm/neon-serverless'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
@@ -9,6 +9,18 @@ import * as schema from '../../lib/types/database.tables/schema'
 import { ENCRYPTION_SECRET, IS_SERVERLESS, LOG_SQL_QUERIES } from './globals' // needed for package.json script (#imports is not available outside nitro/nuxt)
 
 // TODO: set the drivers as optional dependencies and only import the needed one dynamically (might be a worse idea, than leaving it like this)
+
+class MinimalLogger implements Logger {
+  logQuery(query: string, params: unknown[]): void {
+    if (query.includes('INFO')) {
+      return
+    }
+
+    if (/^(?:select|insert|update|delete|merge|with)/i.test(query.trim())) {
+      console.info(`${query} ${JSON.stringify(params)}`)
+    }
+  }
+}
 
 export const connectionString
   = process.env.DATABASE_CONNECTION_STRING
@@ -21,11 +33,11 @@ export const databaseMap = {
 export const db = IS_SERVERLESS
   ? neonDrizzle(new NeonPostgres(connectionString), {
     schema: databaseMap,
-    logger: LOG_SQL_QUERIES,
+    logger: LOG_SQL_QUERIES ? new MinimalLogger() : false,
   })
   : drizzle(postgres(connectionString), {
     schema: databaseMap,
-    logger: LOG_SQL_QUERIES,
+    logger: LOG_SQL_QUERIES ? new MinimalLogger() : false,
   })
 
 export function encryptColumn(value: any) {
