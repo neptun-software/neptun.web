@@ -1,7 +1,7 @@
 export function getSanitizedMessageContent(content: string) {
-  const filteredMessage = content
-    .replace(/<\|start_header_id\|>[\s\S]*?<\|end_header_id\|>/g, '')
-    .replace(/<\|begin_of_text\|>\n/g, '')
-    .replace(/<\|eot_id\|>/g, '')
-  return filteredMessage.trim()
+  if (!content) return ''
+  
+  return content
+    .replace(/<\|.*?\|>.*?<\|.*?\|>\n\n/g, '') // removes <\|any_text\|>any_text<\|any_text\|>
+    .trim()
 }
