@@ -16,6 +16,7 @@ import {
   Trash2,
 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { AllowedAiModelsEnum } from '~/lib/types/models/ai'
 
 const { console } = useLogger()
@@ -239,6 +240,13 @@ const {
   capacity: 3,
 })
 
+const maxTokens = computed(() => {
+  const [publisher, model] = selectedAiChat.value.model.split('/')
+  return POSSIBLE_AI_MODELS[publisher]?.[model]?.configuration('')?.parameters?.truncate ?? 7500
+})
+
+const isOverMaxTokens = computed(() => currentChatMessage.value.length > maxTokens.value)
+
 onMounted(async () => {
   await loadChatMessages(user.value?.id ?? -1, selectedAiChat.value.id).then(
     () => {
@@ -315,6 +323,10 @@ function submitMessage() {
   if (currentChatMessage.value.trim() === '') {
     return
   }
+  if (isOverMaxTokens.value) {
+    toast.error(`Message is too long! Maximum length is ${maxTokens.value} characters.`)
+    return
+  }
   globalChatMessage.value = currentChatMessage.value
   currentChatMessageCommit()
   handleChatMessageSubmit()
@@ -338,9 +350,7 @@ async function reloadLast() {
 
 async function deleteLast() {
   await $fetch(
-    `/api/users/${user.value?.id ?? -1}/chats/${
-      selectedAiChat.value.id
-    }/messages/last`,
+    `/api/users/${user.value?.id ?? -1}/chats/${selectedAiChat.value.id}/messages/last`,
     {
       method: 'DELETE',
     },
@@ -354,7 +364,8 @@ async function deleteLast() {
 }
 
 async function downloadChatMessages(_event = null) {
-  await downloadAsFile(chatMessages.value, 'chat-messages')
+  toast.info('Currently disabled!')
+  // await downloadAsFile(chatMessages.value, 'chat-messages', 'application/json', 'json')
 }
 
 const messagesWithStreaming = computed(() => {
@@ -387,9 +398,7 @@ watch(
 </script>
 
 <template>
-  <div
-    class="relative flex flex-col h-full min-h-[60vh] max-h-[75vh] rounded-xl bg-muted/50 p-4 order-1 2xl:order-2"
-  >
+  <div class="relative flex flex-col h-full min-h-[60vh] max-h-[75vh] rounded-xl bg-muted/50 p-4 order-1 2xl:order-2">
     <div class="absolute z-10 left-3 top-3">
       <div class="flex gap-1">
         <ShadcnDrawer>
@@ -425,10 +434,7 @@ watch(
         </ShadcnDialog>
 
         <AsyncButton
-          size="icon"
-          variant="ghost"
-          :hide-loader="false"
-          :is-disabled="chatMessages.length === 0"
+          size="icon" variant="ghost" :hide-loader="false" :is-disabled="chatMessages.length === 0"
           :on-click-async="() => downloadChatMessages()"
         >
           <Download class="size-6" />
@@ -437,19 +443,13 @@ watch(
 
         <DashboardChatShareDialog />
         <ShadcnButton
-          size="icon"
-          variant="ghost"
-          :disabled="chatMessages.length === 0 || chatResponseIsLoading"
+          size="icon" variant="ghost" :disabled="chatMessages.length === 0 || chatResponseIsLoading"
           @click="scrollToBottom"
         >
           <Mouse class="size-6" />
           <span class="sr-only">Scroll to bottom</span>
         </ShadcnButton>
-        <ShadcnToggle
-          :pressed="autoScrollEnabled"
-          class="px-2"
-          @update:pressed="autoScrollEnabled = $event"
-        >
+        <ShadcnToggle :pressed="autoScrollEnabled" class="px-2" @update:pressed="autoScrollEnabled = $event">
           <Icon icon="mdi:automatic" class="size-6" />
           <span class="sr-only">
             {{ autoScrollEnabled ? 'Disable' : 'Enable' }} auto-scroll
@@ -458,12 +458,14 @@ watch(
       </div>
     </div>
 
-    <ShadcnBadge
-      variant="outline"
-      class="absolute z-10 right-3 top-3 bg-background"
-    >
-      {{ selectedAiChat.name }}
-    </ShadcnBadge>
+    <div class="absolute z-10 flex flex-col items-end right-3 top-3">
+      <ShadcnBadge variant="outline" class="transition-opacity duration-300 hover:opacity-25">
+        {{ selectedAiChat.name }}
+      </ShadcnBadge>
+      <ShadcnBadge variant="outline" class="mt-1 transition-opacity duration-300 hover:opacity-25" :class="{ 'text-destructive border-destructive': isOverMaxTokens }">
+        {{ currentChatMessage.length }}/{{ maxTokens }}
+      </ShadcnBadge>
+    </div>
 
     <div class="flex flex-col flex-grow max-w-full min-h-0 pt-10 pb-6">
       <ShadcnScrollArea ref="$scrollArea">
@@ -474,10 +476,7 @@ watch(
         </template>
 
         <!-- User Input Draft -->
-        <div
-          v-if="currentChatMessage.trim() !== ''"
-          class="flex justify-end mt-8"
-        >
+        <div v-if="currentChatMessage.trim() !== ''" class="flex justify-end mt-8">
           <div
             class="break-words whitespace-pre-wrap max-w-[80%] border border-orange-300 rounded-lg bg-background px-4 py-2"
           >
@@ -512,17 +511,15 @@ watch(
         Message
       </ShadcnLabel>
       <ShadcnTextarea
-        id="message"
-        v-model="currentChatMessage"
-        placeholder="Type your message here..."
-        class="p-3 border-0 shadow-none resize-none min-h-28 focus-visible:ring-0"
-        @keydown="handleInputFieldKeyboardEvents"
+        id="message" v-model="currentChatMessage" placeholder="Type your message here..."
+        class="p-3 overflow-y-auto break-words whitespace-pre-wrap border-0 shadow-none resize-none focus-visible:ring-0 min-h-28"
+        :class="{ 'text-destructive': isOverMaxTokens }" @keydown="handleInputFieldKeyboardEvents"
       />
       <div class="flex flex-wrap items-center p-3 pt-0">
         <ShadcnTooltipProvider>
           <ShadcnTooltip>
             <ShadcnTooltipTrigger as-child>
-              <ShadcnButton variant="ghost" size="icon" @click="openFile">
+              <ShadcnButton variant="ghost" size="icon" :disabled="isOverMaxTokens" @click="openFile">
                 <Paperclip class="size-4" />
                 <span class="sr-only">Attach file</span>
               </ShadcnButton>
@@ -535,7 +532,7 @@ watch(
             <ShadcnPopover>
               <ShadcnPopoverTrigger as-child>
                 <ShadcnTooltipTrigger as-child>
-                  <ShadcnButton variant="ghost" size="icon">
+                  <ShadcnButton variant="ghost" size="icon" :disabled="isOverMaxTokens">
                     <Link class="size-4" />
                     <span class="sr-only">URL context</span>
                   </ShadcnButton>
@@ -550,19 +547,13 @@ watch(
                     URL
                   </ShadcnLabel>
                   <ShadcnInput
-                    id="url"
-                    v-model="urlToFetchHtmlFrom"
-                    type="url"
-                    name="url"
-                    placeholder="https://example.com"
-                    required
+                    id="url" v-model="urlToFetchHtmlFrom" type="url" name="url"
+                    placeholder="https://example.com" required
                   />
                 </div>
 
                 <AsyncButton
-                  variant="outline"
-                  class="w-full"
-                  :is-disabled="urlToFetchHtmlFrom.trim() === ''"
+                  variant="outline" class="w-full" :is-disabled="urlToFetchHtmlFrom.trim() === ''"
                   :on-click-async="async () => await generateMarkdown()"
                 >
                   Add URL for further context
@@ -573,23 +564,19 @@ watch(
           <ShadcnTooltip v-if="isSpeechRecognitionSupported">
             <ShadcnTooltipTrigger as-child>
               <ShadcnButton
-                variant="ghost"
-                size="icon"
-                :class="{
+                variant="ghost" size="icon" :disabled="isOverMaxTokens" :class="{
                   'animate-pulse outline-1 outline-destructive outline-dashed':
                     isListeningToSpeech,
-                }"
-                @click="
-                  () => {
-                    if (isListeningToSpeech) {
-                      console.info('stopping listening');
-                      stopSpeechRecognition();
-                    }
-                    else {
-                      console.info('starting listening');
-                      startSpeechRecognition();
-                    }
+                }" @click="() => {
+                  if (isListeningToSpeech) {
+                    console.info('stopping listening');
+                    stopSpeechRecognition();
                   }
+                  else {
+                    console.info('starting listening');
+                    startSpeechRecognition();
+                  }
+                }
                 "
               >
                 <Mic class="size-4" />
@@ -605,12 +592,9 @@ watch(
               <ShadcnAlertDialogTrigger as-child>
                 <ShadcnTooltipTrigger as-child>
                   <ShadcnButton
-                    variant="ghost"
-                    size="icon"
-                    :disabled="
-                      chatResponseIsLoading
-                        || chatMessages.length === 0
-                        || !selectedAiChatIsPlayground
+                    variant="ghost" size="icon" :disabled="chatResponseIsLoading
+                      || chatMessages.length === 0
+                      || !selectedAiChatIsPlayground
                     "
                   >
                     <Trash2 class="size-4" />
@@ -642,13 +626,8 @@ watch(
           <ShadcnTooltip>
             <ShadcnTooltipTrigger as-child>
               <AsyncButton
-                variant="ghost"
-                size="icon"
-                :hide-loader="true"
-                :is-disabled="
-                  chatResponseIsLoading || chatMessages.length === 0
-                "
-                :on-click-async="() => reloadLast()"
+                variant="ghost" size="icon" :hide-loader="true" :is-disabled="chatResponseIsLoading || chatMessages.length === 0
+                " :on-click-async="() => reloadLast()"
               >
                 <RefreshCcw class="size-4" />
                 <span class="sr-only">Refresh Last Response</span>
@@ -664,10 +643,7 @@ watch(
             <ShadcnTooltip>
               <ShadcnTooltipTrigger as-child>
                 <ShadcnButton
-                  variant="outline"
-                  size="icon"
-                  class="px-2"
-                  :disabled="currentChatMessage.trim() === ''"
+                  variant="outline" size="icon" class="px-2" :disabled="currentChatMessage.trim() === ''"
                   @click="currentChatMessage = ''"
                 >
                   <Delete class="w-4 h-4" />
@@ -679,12 +655,7 @@ watch(
             </ShadcnTooltip>
           </ShadcnTooltipProvider>
           <ShadcnButton
-            type="submit"
-            size="sm"
-            class="gap-1.5 w-full"
-            :disabled="
-              chatResponseIsLoading || currentChatMessage.trim() === ''
-            "
+            type="submit" size="sm" class="gap-1.5 w-full" :disabled="chatResponseIsLoading || currentChatMessage.trim() === '' || isOverMaxTokens"
           >
             Send Message
             <CornerDownLeft class="size-3.5" />
