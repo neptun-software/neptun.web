@@ -148,7 +148,7 @@ const colorMode = useColorMode()
                       <Diff class="cursor-pointer text-foreground" />
                     </ShadcnButton>
                   </ShadcnDialogTrigger>
-                  <ShadcnDialogContent>
+                  <ShadcnDialogContent class="max-w-full max-h-full w-[90vw] h-[90vh] flex flex-col">
                     <ShadcnDialogHeader>
                       <ShadcnDialogTitle>Difference between versions</ShadcnDialogTitle>
                       <ShadcnDialogDescription>
@@ -160,28 +160,41 @@ const colorMode = useColorMode()
                       :is-disabled="filetypeSearchSelectedValue === ''"
                       :include-diff="true"
                     />
-                    <MonacoDiffEditor
-                      v-model="fileToCompareTo"
-                      class="h-96"
-                      :original="selectedFileVersion.text"
-                      :options="{
-                        theme:
-                          colorMode.value === 'light' ? 'vs-light' : 'vs-dark',
-                      }"
-                    >
-                      Loading...
-                    </MonacoDiffEditor>
-
-                    <ShadcnDialogFooter>
-                      <ShadcnButton
-                        variant="secondary"
-                        @click="downloadFile(fileToCompareTo)"
+                    <div class="flex-1 min-h-0 dark:bg-[#1e1e1e] light:bg-[#fffffe] p-2 rounded-lg">
+                      <MonacoDiffEditor
+                        v-model="fileToCompareTo"
+                        :lang="selectedFileVersion?.language ?? 'text'"
+                        class="h-full"
+                        :original="selectedFileVersion.text"
+                        :options="{
+                          theme: colorMode.value === 'light' ? 'vs-light' : 'vs-dark',
+                          useShadowDOM: true,
+                        }"
                       >
-                        Download modified file
-                      </ShadcnButton>
-                      <ShadcnDialogClose as-child>
-                        <ShadcnButton variant="secondary"> Close </ShadcnButton>
-                      </ShadcnDialogClose>
+                        Loading...
+                      </MonacoDiffEditor>
+                    </div>
+
+                    <ShadcnDialogFooter class="flex gap-2 mt-4">
+                      <div class="flex-shrink-0">
+                        <ThemeToggle />
+                      </div>
+
+                      <div class="flex gap-2 ml-auto flex-shrink-1">
+                        <ShadcnInput
+                          v-model="fileNameOfFileToDownload"
+                          placeholder="Enter filename"
+                        />
+                        <ShadcnButton
+                          variant="secondary"
+                          @click="downloadFile(fileToCompareTo)"
+                        >
+                          Download modified file
+                        </ShadcnButton>
+                        <ShadcnDialogClose as-child>
+                          <ShadcnButton variant="secondary">Close</ShadcnButton>
+                        </ShadcnDialogClose>
+                      </div>
                     </ShadcnDialogFooter>
                   </ShadcnDialogContent>
                 </ShadcnDialog>
