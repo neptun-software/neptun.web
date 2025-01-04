@@ -10,7 +10,7 @@ const props = defineProps<{
   variant?: ButtonVariants['variant']
 }>()
 
-// const mime = 'text/markdown'; // Unknown error (NotAllowedError: Failed to execute 'write' on 'Clipboard': Type text/markdown not supported on write.)
+// const mime = 'text/markdown'; // => Unknown error (NotAllowedError: Failed to execute 'write' on 'Clipboard': Type text/markdown not supported on write.)
 const mime = props.mime ?? 'text/plain'
 const source = computed(() => [
   new ClipboardItem({
@@ -19,11 +19,14 @@ const source = computed(() => [
 ])
 
 const {
-  // content: copiedText,
-  copy: copyToClipboard,
-  copied: isCopied,
-  isSupported: isClipboardSupported,
+  copy: copyToClipboardItems,
+  copied: isCopiedToClipboardItems,
+  isSupported: isClipboardItemsSupported,
 } = useClipboardItems({ source })
+
+function handleCopy() {
+  copyToClipboardItems(source.value)
+}
 </script>
 
 <template>
@@ -31,10 +34,10 @@ const {
     <ShadcnButton
       :variant="variant ?? 'link'"
       size="icon"
-      :disabled="!isClipboardSupported || text.trim() === '' || isCopied"
-      @click="copyToClipboard(source)"
+      :disabled="!isClipboardItemsSupported || text.trim() === '' || isCopiedToClipboardItems"
+      @click="handleCopy"
     >
-      <template v-if="isCopied">
+      <template v-if="isCopiedToClipboardItems">
         <CopyCheck class="w-5 h-5" />
       </template>
       <template v-else>
