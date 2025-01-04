@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useThrottleFn } from '@vueuse/core'
 import { CirclePause, Volume2 } from 'lucide-vue-next'
 
 const props = defineProps<{
@@ -6,26 +7,100 @@ const props = defineProps<{
 }>()
 
 const messageAsPlainText = ref(props.message)
+const isProcessing = ref(false)
 
-onMounted(async () => {
-  messageAsPlainText.value = await stripMarkdown(props.message)
+const updateMessageText = useThrottleFn(async (text: string) => {
+  if (isProcessing.value) {
+    return
+  }
+
+  isProcessing.value = true
+
+  try {
+    messageAsPlainText.value = await stripMarkdown(text)
+  } finally {
+    isProcessing.value = false
+  }
+}, 300)
+
+watch(() => props.message, (newMessage) => {
+  updateMessageText(newMessage)
+})
+
+onMounted(() => {
+  updateMessageText(props.message)
 })
 
 /* SPEECH SYNTHESIS */
-// TODO: find out, why the speaker sometimes suddenly stops
 const {
   isSupported: isSpeechSynthesisSupported,
   isPlaying: isSpeaking,
-  // status: speechSynthesisStatus,
-  // utterance: currentUtterance,
-  // error: speechSynthesisError,
+  status: speechSynthesisStatus,
+  utterance: currentUtterance,
   stop: stopSpeaking,
   speak: speakText,
+  error: speechSynthesisError,
 } = useSpeechSynthesis(messageAsPlainText, {
   lang: 'en-US',
   pitch: 1,
-  rate: 1,
+  rate: 0.9,
   volume: 1,
+})
+
+// Split text into smaller chunks to improve stability
+async function speakWithRetry() {
+  try {
+    // Cancel any ongoing speech
+    window.speechSynthesis?.cancel()
+
+    // Small delay to ensure clean state
+    await new Promise(resolve => setTimeout(resolve, 50))
+
+    // Resume synthesis to prevent auto-stopping
+    window.speechSynthesis?.resume()
+
+    speakText()
+
+    // Periodically resume to prevent auto-stopping
+    const keepAlive = setInterval(() => {
+      if (isSpeaking.value) {
+        window.speechSynthesis?.resume()
+      } else {
+        clearInterval(keepAlive)
+      }
+    }, 5000)
+
+    // Cleanup interval when component is unmounted
+    onUnmounted(() => {
+      clearInterval(keepAlive)
+    })
+  } catch (error) {
+    console.error('Speech synthesis error:', error)
+    stopSpeaking()
+    speechSynthesisStatus.value = 'init'
+  }
+}
+
+watch(currentUtterance, (utterance) => {
+  if (utterance) {
+    utterance.onend = () => {
+      stopSpeaking()
+      speechSynthesisStatus.value = 'init'
+    }
+    utterance.onerror = (event) => {
+      console.error('Utterance error:', event)
+      stopSpeaking()
+      speechSynthesisStatus.value = 'init'
+    }
+  }
+})
+
+watch(speechSynthesisError, (error) => {
+  if (error) {
+    console.error('Speech synthesis error:', error)
+    stopSpeaking()
+    speechSynthesisStatus.value = 'init'
+  }
 })
 </script>
 
@@ -42,8 +117,12 @@ const {
             "
             @click="
               () => {
-                if (!isSpeaking) speakText();
-                if (isSpeaking) stopSpeaking();
+                if (isSpeaking) {
+                  stopSpeaking()
+                }
+                else {
+                  speakWithRetry()
+                }
               }
             "
           >
