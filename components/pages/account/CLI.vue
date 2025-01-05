@@ -35,7 +35,7 @@ const textForClipboard = computed(() => {
 })
 
 async function downloadConfiguration() {
-  await downloadAsFile(cliConfigurationToCopy.value, 'neptun-config')
+  await downloadAsFile(cliConfigurationToCopy.value, 'neptun-config', 'application/json', 'json')
 }
 </script>
 

@@ -31,28 +31,21 @@ export function useFiles() {
     () => ref<string>(''),
   )
 
-  const downloadFile = (content?: string) => {
-    let fileContent = selectedFileVersion.value
-      ? selectedFileVersion.value.text
-      : ''
+  const downloadFile = async (content?: string) => {
+    let fileContent
+      = selectedFileVersion.value
+        ? selectedFileVersion.value.text
+        : 'Failed to get file content!'
     if (content) {
       fileContent = content
     }
 
-    const fileType
-      = selectedFileVersion.value?.extension
-      ?? selectedFileVersion.value?.language
-    const blob = new Blob([fileContent], {
-      type: 'text/plain',
-    })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `${fileNameOfFileToDownload.value}.${fileType}`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+    await downloadAsFile(
+      fileContent,
+      fileNameOfFileToDownload.value,
+      selectedFileVersion.value?.language ?? 'text/plain',
+      selectedFileVersion.value?.extension ?? 'txt',
+    )
   }
 
   const selectedFileVersionDate = computed(() => {

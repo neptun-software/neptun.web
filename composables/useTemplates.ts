@@ -144,6 +144,8 @@ export function useTemplateManager() {
         updated_at: newCollection.updated_at ? new Date(newCollection.updated_at) : null,
         templates: [] as TemplateCollectionWithTemplates['templates'],
       }]
+
+      return newCollection
     } catch (error) {
       console.error('Failed to create collection!')
     }

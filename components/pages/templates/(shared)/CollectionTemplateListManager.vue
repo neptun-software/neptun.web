@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import type { TemplateCollectionWithTemplates } from './types'
+import type { ImportedTemplateData, TemplateCollectionWithTemplates } from './types'
 import type { TemplateCollectionToCreate, TemplateToCreate, UserFileToCreate } from '~/lib/types/database.tables/schema'
+
 import {
   Trash2,
 } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
+import { uploadTemplateZip } from './functions'
 
 const { session } = useUserSession()
 const {
@@ -213,6 +216,52 @@ onMounted(() => {
 })
 
 const requestUrl = useRequestURL()
+
+const $uploadCollectionInput = ref<HTMLInputElement | null>(null)
+async function handleUploadCollection(data: ImportedTemplateData) {
+  try {
+    isUpdating.value = true
+    const newCollection = await createNewCollection({
+      name: data.name,
+      description: '',
+      is_shared: true,
+      neptun_user_id: session.value.user?.id ?? -1,
+    })
+
+    await nextTick()
+
+    if (!newCollection) {
+      toast.error('Failed to import collection!')
+      return
+    }
+
+    for (const template of data.templates) {
+      if (!template) {
+        continue
+      }
+
+      const fileData: UserFileToCreate = {
+        title: template.title,
+        text: template.text,
+        neptun_user_id: session.value.user?.id ?? -1,
+        language: template.language,
+        extension: template.extension,
+      }
+
+      const templateData: TemplateToCreate = {
+        file_name: template.file_name,
+        template_collection_id: newCollection.id,
+        neptun_user_id: session.value.user?.id ?? -1,
+      }
+
+      await createTemplate(newCollection.id, templateData, fileData)
+    }
+  } catch (error) {
+    console.error('Failed to upload collection:', error)
+  } finally {
+    isUpdating.value = false
+  }
+}
 </script>
 
 <template>
@@ -221,9 +270,45 @@ const requestUrl = useRequestURL()
       <h2 class="text-2xl font-bold">
         Your Template Collections
       </h2>
-      <ShadcnButton @click="showNewCollectionDialog = true">
-        New Collection
-      </ShadcnButton>
+      <div class="flex items-center gap-2">
+        <input
+          ref="$uploadCollectionInput"
+          type="file"
+          class="hidden"
+          accept=".zip"
+          @change="async (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0]
+            if (!file) return
+
+            try {
+              isUpdating = true
+              const data = await uploadTemplateZip(file)
+              await handleUploadCollection(data)
+              toast.success('Templates imported successfully!')
+            }
+            catch (error) {
+              console.error('Failed to import templates:', error)
+              toast.error('Failed to import templates!')
+            }
+            finally {
+              isUpdating = false
+              if ($uploadCollectionInput) {
+                $uploadCollectionInput.value = ''
+              }
+            }
+          }"
+        >
+        <ShadcnButton
+          variant="outline"
+          :disabled="isUpdating"
+          @click="() => { if ($uploadCollectionInput) $uploadCollectionInput.click() }"
+        >
+          Import Collection Zip
+        </ShadcnButton>
+        <ShadcnButton @click="showNewCollectionDialog = true">
+          New Collection
+        </ShadcnButton>
+      </div>
     </div>
 
     <InfoBlock

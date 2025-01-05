@@ -395,8 +395,7 @@ async function deleteLast() {
 }
 
 async function downloadChatMessages(_event = null) {
-  toast.info('Currently disabled!')
-  // await downloadAsFile(chatMessages.value, 'chat-messages', 'application/json', 'json')
+  await downloadAsFile(chatMessages.value, 'chat-messages', 'application/json', 'json')
 }
 
 const messagesWithStreaming = computed(() => {

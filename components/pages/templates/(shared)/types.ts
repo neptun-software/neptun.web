@@ -13,3 +13,13 @@ export type TemplateCollectionWithTemplatesWithoutIds = Omit<TemplateCollectionW
     FileTemplate,
     'template_collection_id' | 'user_file_id'>[]
 }
+
+export type ImportedTemplateData = Omit<
+  TemplateCollectionWithTemplatesWithoutIds,
+  'id' | 'created_at' | 'updated_at' | 'share_uuid' | 'is_shared' | 'description' | 'templates'
+> & {
+  templates: Array<Omit<
+    TemplateCollectionWithTemplatesWithoutIds['templates'][number],
+    'id' | 'created_at' | 'updated_at' | 'description'
+  >>
+}
