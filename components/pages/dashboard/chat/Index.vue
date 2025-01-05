@@ -123,8 +123,6 @@ watch(
     if (selectedAiChatIsPlayground.value && chatMessages.value.length > 0) {
       currentAiChatPlaygroundMessagesBackup.value = chatMessages.value
     }
-
-    scrollToBottom()
   },
 )
 
@@ -259,29 +257,60 @@ onMounted(async () => {
 // scroll to bottom
 const $scrollArea = ref()
 const $actualScrollArea = ref<HTMLElement | null>(null)
+
 onMounted(() => {
   $actualScrollArea.value = $scrollArea.value.$el.querySelector(
     '[data-radix-scroll-area-viewport]',
   ) as HTMLElement
-})
 
-function scrollToBottom() {
   if ($actualScrollArea.value) {
-    $actualScrollArea.value.scrollTo({
-      top: $actualScrollArea.value.scrollHeight,
-      behavior: 'smooth',
-    })
+    let lastHeight = $actualScrollArea.value.scrollHeight
+    useMutationObserver(
+      $actualScrollArea.value,
+      () => {
+        if (autoScrollEnabled.value) {
+          const currentHeight = $actualScrollArea.value!.scrollHeight
+          if (currentHeight !== lastHeight) {
+            nextTick(() => {
+              scrollToBottom('instant')
+            })
+            lastHeight = currentHeight
+          }
+        }
+      },
+      {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      },
+    )
   }
-}
-
-// TODO: find a actual solution for this
-watchOnce(isLoading, () => {
-  setTimeout(() => {
-    if ($actualScrollArea.value) {
-      scrollToBottom()
-    }
-  }, 500)
 })
+
+let lastScrollTop = 0
+useEventListener($actualScrollArea, 'scroll', () => {
+  if (!$actualScrollArea.value || !chatResponseIsLoading.value) {
+    return
+  }
+
+  const scrollTop = $actualScrollArea.value.scrollTop
+  if (scrollTop < lastScrollTop) {
+    autoScrollEnabled.value = false
+  }
+
+  lastScrollTop = scrollTop
+})
+
+function scrollToBottom(behavior: 'instant' | 'smooth' = 'smooth') {
+  if (!$actualScrollArea.value) {
+    return
+  }
+
+  $actualScrollArea.value.scrollTo({
+    top: $actualScrollArea.value.scrollHeight,
+    behavior,
+  })
+}
 
 async function generateMarkdown() {
   const updatedCurrentChatMessage = await generateMarkdownFromUrl(
@@ -333,15 +362,13 @@ function submitMessage() {
 }
 
 async function reloadLast() {
-  await deleteLast()
-    .then(async () => {
-      await reloadLastChatMessage()
-        .then(() => {
-          toast.success('Chat message reloaded!')
-        })
-        .catch(() => {
-          toast.error('Failed to reload chat message!')
-        })
+  if (!selectedAiChatIsPlayground.value) {
+    await deleteLast()
+  }
+
+  await reloadLastChatMessage()
+    .then(() => {
+      toast.success('Chat message reloaded!')
     })
     .catch(() => {
       toast.error('Failed to reload chat message!')
@@ -349,6 +376,10 @@ async function reloadLast() {
 }
 
 async function deleteLast() {
+  if (selectedAiChatIsPlayground.value) {
+    return
+  }
+
   await $fetch(
     `/api/users/${user.value?.id ?? -1}/chats/${selectedAiChat.value.id}/messages/last`,
     {
@@ -381,25 +412,11 @@ const messagesWithStreaming = computed(() => {
     return message
   })
 })
-
-watch(
-  [
-    () => chatMessages.value.length,
-    chatResponseIsLoading,
-    () => messagesWithStreaming.value[messagesWithStreaming.value.length - 1]?.content,
-  ],
-  () => {
-    if (autoScrollEnabled.value) {
-      scrollToBottom()
-    }
-  },
-  { immediate: true },
-)
 </script>
 
 <template>
   <div class="relative flex flex-col h-full min-h-[60vh] max-h-[75vh] rounded-xl bg-muted/50 p-4 order-1 2xl:order-2">
-    <div class="absolute z-10 left-3 top-3">
+    <div class="absolute z-10 pb-2 left-3 top-3">
       <div class="flex gap-1">
         <ShadcnDrawer>
           <ShadcnDrawerTrigger as-child>
@@ -444,7 +461,7 @@ watch(
         <DashboardChatShareDialog />
         <ShadcnButton
           size="icon" variant="ghost" :disabled="chatMessages.length === 0 || chatResponseIsLoading"
-          @click="scrollToBottom"
+          @click="scrollToBottom()"
         >
           <Mouse class="size-6" />
           <span class="sr-only">Scroll to bottom</span>
@@ -458,12 +475,12 @@ watch(
       </div>
     </div>
 
-    <div class="absolute z-10 flex flex-col items-end right-3 top-3">
-      <ShadcnBadge variant="outline" class="transition-opacity duration-300 hover:opacity-25">
-        {{ selectedAiChat.name }}
-      </ShadcnBadge>
-      <ShadcnBadge variant="outline" class="mt-1 transition-opacity duration-300 hover:opacity-25" :class="{ 'text-destructive border-destructive': isOverMaxTokens }">
+    <div class="absolute z-10 flex items-end bg-transparent right-3 top-3">
+      <ShadcnBadge variant="outline" :class="{ 'text-destructive border-destructive': isOverMaxTokens }">
         {{ currentChatMessage.length }}/{{ maxTokens }}
+      </ShadcnBadge>
+      <ShadcnBadge variant="outline" class="ml-1">
+        {{ selectedAiChat.name }}
       </ShadcnBadge>
     </div>
 
