@@ -423,7 +423,7 @@ export const ChatConversationMessagesToCreateSchema = z.object({
       content: z.string().trim().min(1),
       role: z.nativeEnum(Actor),
     }),
-  ),
+  ).min(1),
 })
 export const ChatConversationMessagesToCreateUniversalSchema
   = ChatConversationMessagesToCreateSchema.or(
