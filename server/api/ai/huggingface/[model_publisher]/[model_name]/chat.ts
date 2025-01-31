@@ -113,30 +113,26 @@ export default defineLazyEventHandler(async () => {
 
       let inputs = String(messages)
       const minimalMessages = messages as Pick<Message, 'content' | 'role'>[]
-      if (model_name === AllowedAiModelNamesEnum.OpenAssistant) {
-        return sendError(
-          event,
-          createError({
-            statusCode: 400,
-            statusMessage: 'Service not available anymore.',
-          }),
-        )
-      } else if (model_name === AllowedAiModelNamesEnum.Mistral) {
-        return sendError(
-          event,
-          createError({
-            statusCode: 400,
-            statusMessage: 'Service not available anymore.',
-          }),
-        )
-      } else if (model_name === AllowedAiModelNamesEnum.metaLlama) {
-        // Sanitize messages before building prompt
-        const sanitizedMessages = minimalMessages.map(msg => ({
-          ...msg,
-          content: getSanitizedMessageContent(msg.content),
-        }))
-
+      // Sanitize messages before building prompt
+      const sanitizedMessages = minimalMessages.map(msg => ({
+        ...msg,
+        content: getSanitizedMessageContent(msg.content),
+      }))
+      if (model_name === AllowedAiModelNamesEnum.Llama3) {
         inputs = buildMetaLlama3Prompt(sanitizedMessages)
+      } else if (model_name === AllowedAiModelNamesEnum.Gemma) {
+        inputs = buildGemma2Prompt(sanitizedMessages)
+      } else if (model_name === AllowedAiModelNamesEnum.Phi3) {
+        inputs = buildPhi3Prompt(sanitizedMessages)
+      } else if (model_name === AllowedAiModelNamesEnum.QwenCoder
+        || model_name === AllowedAiModelNamesEnum.Qwen72B) {
+        inputs = buildQwen25Prompt(sanitizedMessages)
+      } else if (model_name === AllowedAiModelNamesEnum.MistralNemo) {
+        inputs = buildMistralNemoPrompt(sanitizedMessages)
+      } else if (model_name === AllowedAiModelNamesEnum.Mistral7B) {
+        inputs = buildMistral7BV3Prompt(sanitizedMessages)
+      } else if (model_name === AllowedAiModelNamesEnum.DeepSeekR1) {
+        inputs = buildQwen25Prompt(sanitizedMessages) // DeepSeek uses Qwen chat template
       }
 
       // if (LOG_BACKEND) console.info('---');

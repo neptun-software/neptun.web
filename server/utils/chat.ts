@@ -16,6 +16,107 @@ export function buildMetaLlama3Prompt(
   return prompt
 }
 
+export function buildGemma2Prompt(
+  messages: Pick<Message, 'content' | 'role'>[],
+) {
+  let prompt = '<bos>'
+
+  messages.forEach((message) => {
+    const { role, content } = message
+    prompt += `<start_of_turn>${role}\n${content}<end_of_turn>\n`
+  })
+
+  // Add the final model turn marker
+  prompt += '<start_of_turn>model\n'
+
+  return prompt
+}
+
+export function buildPhi3Prompt(
+  messages: Pick<Message, 'content' | 'role'>[],
+) {
+  let prompt = ''
+
+  messages.forEach((message) => {
+    const { role, content } = message
+    if (role === 'system') {
+      prompt += `<|system|>\n${content}<|end|>\n`
+    } else if (role === 'user') {
+      prompt += `<|user|>\n${content}<|end|>\n`
+    } else if (role === 'assistant') {
+      prompt += `<|assistant|>\n${content}<|end|>\n`
+    }
+  })
+
+  // Add the assistant marker for the model's response
+  prompt += '<|assistant|>\n'
+
+  return prompt
+}
+
+export function buildQwen25Prompt(
+  messages: Pick<Message, 'content' | 'role'>[],
+) {
+  let prompt = ''
+
+  messages.forEach((message) => {
+    const { role, content } = message
+    if (role === 'system') {
+      prompt += `<|im_start|>system\n${content}<|im_end|>\n`
+    } else if (role === 'user') {
+      prompt += `<|im_start|>user\n${content}<|im_end|>\n`
+    } else if (role === 'assistant') {
+      prompt += `<|im_start|>assistant\n${content}<|im_end|>\n`
+    }
+  })
+
+  // Add the assistant marker for the model's response
+  prompt += '<|im_start|>assistant\n'
+
+  return prompt
+}
+
+export function buildMistralNemoPrompt(
+  messages: Pick<Message, 'content' | 'role'>[],
+) {
+  let prompt = ''
+
+  messages.forEach((message) => {
+    const { role, content } = message
+    if (role === 'system') {
+      prompt += `<|im_start|>system\n${content}<|im_end|>\n`
+    } else if (role === 'user') {
+      prompt += `<|im_start|>user\n${content}<|im_end|>\n`
+    } else if (role === 'assistant') {
+      prompt += `<|im_start|>assistant\n${content}<|im_end|>\n`
+    }
+  })
+
+  // Add the assistant marker for the model's response
+  prompt += '<|im_start|>assistant\n'
+
+  return prompt
+}
+
+export function buildMistral7BV3Prompt(
+  messages: Pick<Message, 'content' | 'role'>[],
+) {
+  let prompt = ''
+
+  messages.forEach((message) => {
+    const { role, content } = message
+    if (role === 'system') {
+      prompt += `<|system|>${content}</s>`
+    } else if (role === 'user') {
+      prompt += `[INST]${content}[/INST]`
+    } else if (role === 'assistant') {
+      prompt += `${content}</s>`
+    }
+  })
+
+  return prompt
+}
+
 export async function persistCodeBlocks(
   user_id: number,
   chat_id: number,
