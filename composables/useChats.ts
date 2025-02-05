@@ -32,7 +32,7 @@ export function useSelectedAiChat() {
 
   const selectedAiChatKey = computed(
     () =>
-      `${selectedAiChatApiPath.value}?chat_id=${selectedAiChat.value.id}&isPlayground=${selectedAiChatIsPlayground.value}&isRecreated=${aiChatReCreationTrigger.value}`,
+      `${selectedAiChatApiPath.value}?chat_id=${selectedAiChat.value.id}&is_playground=${selectedAiChatIsPlayground.value}&isRecreated=${aiChatReCreationTrigger.value}`,
   )
 
   function selectedAiChatDefaults(

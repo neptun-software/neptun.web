@@ -23,9 +23,10 @@ POST
 
 ### Query Parameters
 
-| Parameter | Type    | Required | Description                   |
-| --------- | ------- | -------- | ----------------------------- |
-| chat_id   | integer | Yes      | Unique identifier of the chat |
+| Parameter     | Type    | Required | Description                                |
+| ------------- | ------- | -------- | ------------------------------------------ |
+| chat_id       | integer | Yes      | Unique identifier of the chat              |
+| is_playground | boolean | No       | Indicates if the conversation is temporary |
 
 ### Headers
 

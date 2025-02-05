@@ -37,6 +37,7 @@ export default defineLazyEventHandler(async () => {
       )
     }
     const chat_id = maybeChatId.data?.chat_id
+    const is_playground = maybeChatId.data?.is_playground
 
     /* VALIDATE PARAMS */
     const maybeModelName = await validateParamAiModelName(event)
@@ -58,7 +59,6 @@ export default defineLazyEventHandler(async () => {
     }
 
     const body = await readValidatedBody(event, (body) => {
-      // complete chat history
       return ChatConversationMessagesToCreateSchema.safeParse(body)
     })
     if (!body.success || !body.data) {
@@ -85,14 +85,16 @@ export default defineLazyEventHandler(async () => {
 
       // TODO: freshly add this every time the context is truncated
       messages.unshift({
-        role: 'user' as Actor, // ERROR: AI request errored: OpenAssistant does not support system messages.
+        role: 'user' as Actor, // ERROR: AI request errored: OpenAssistant does not support system messages. => use user role instead
         content: SYSTEM_MESSAGE,
       })
     }
 
     const userMessage = messages[messages.length - 1] // { role: 'user', content: 'message' }
     // if (LOG_BACKEND) console.info("current user message", userMessage);
-    await persistUserChatMessage(user.id, chat_id, userMessage.content, event)
+    if (!is_playground) {
+      await persistUserChatMessage(user.id, chat_id, userMessage.content, event)
+    }
 
     try {
       // if (LOG_BACKEND) console.info('allowed models:', ALLOWED_AI_MODELS);
@@ -106,13 +108,14 @@ export default defineLazyEventHandler(async () => {
           event,
           createError({
             statusCode: 400,
-            statusMessage: 'Invalid model name or publisher',
+            statusMessage: 'Invalid model name- or publisher',
           }),
         )
       }
 
       let inputs = String(messages)
       const minimalMessages = messages as Pick<Message, 'content' | 'role'>[]
+
       // Sanitize messages before building prompt
       const sanitizedMessages = minimalMessages.map(msg => ({
         ...msg,
@@ -145,41 +148,14 @@ export default defineLazyEventHandler(async () => {
         ]?.configuration(inputs),
       )
 
-      // let responseToStream = response
-
-      // Sanitize Llama3 messages during streaming
-      /* if (model_name === AllowedAiModelNamesEnum.metaLlama) {
-        responseToStream = (async function* () {
-          try {
-            let accumulatedText = ''
-            for await (const chunk of response) {
-              if (chunk.token?.text) {
-                accumulatedText += chunk.token.text
-                const sanitizedText = getSanitizedMessageContent(accumulatedText)
-                yield {
-                  ...chunk,
-                  token: {
-                    ...chunk.token,
-                    text: sanitizedText.slice(accumulatedText.length - chunk.token.text.length)
-                  }
-                }
-              } else {
-                yield chunk
-              }
-            }
-          } catch (error) {
-            if (LOG_BACKEND) console.error('Streaming error:', error)
-            throw error
-          }
-        })()
-      } */
-
       // https://sdk.vercel.ai/docs/ai-sdk-ui/storing-messages
       const stream = HuggingFaceStream(response, {
         async onFinal(messageText: string) {
           // onCompletion, onFinal, onToken and onText is called for each token (word, punctuation)
           const messageContent = getSanitizedMessageContent(messageText)
-          await persistAiChatMessage(user.id, chat_id, messageContent, event)
+          if (!is_playground) {
+            await persistAiChatMessage(user.id, chat_id, messageContent, event)
+          }
         },
       }) // Converts the response into a friendly text-stream
 

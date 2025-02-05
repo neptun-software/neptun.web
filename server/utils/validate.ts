@@ -102,6 +102,7 @@ type UuidType = z.infer<typeof UuidSchema>
  */
 export const ChatIdQuerySchema = z.object({
   chat_id: z.number().int(),
+  is_playground: z.boolean().optional(),
 })
 
 type ChatIdQueryType = z.infer<typeof ChatIdQuerySchema>
@@ -252,7 +253,7 @@ async function validateParams<S, E = S>(
 }
 
 /* VALIDATE QUERY PARAMS */
-/* VALIDATE QUERY PARAMS(chat_id) */
+/* VALIDATE QUERY PARAMS(chat_id, is_playground) */
 export async function validateQueryChatId(
   event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<ChatIdQueryType>> {
@@ -263,18 +264,21 @@ export async function validateQueryChatId(
         // @ts-expect-error
         const chat_id = Number(params?.chat_id)
         event.context.validated.query.chat_id = chat_id
+        // @ts-expect-error
+        const is_playground = Boolean(params?.is_playground)
+        event.context.validated.query.is_playground = is_playground
 
-        return ChatIdQuerySchema.safeParse({ chat_id })
+        return ChatIdQuerySchema.safeParse({ chat_id, is_playground })
       })
       if (result.success) {
-        return { success: true, data: { chat_id: result.data.chat_id } }
+        return { success: true, data: { chat_id: result.data.chat_id, is_playground: result.data.is_playground } }
       } else {
         return result
       }
     },
-    'Successfully validated queryParams(chat_id).',
-    'Invalid queryParams(chat_id).',
-    'queryParams(chat_id):',
+    'Successfully validated queryParams(chat_id, is_playground).',
+    'Invalid queryParams(chat_id, is_playground).',
+    'queryParams(chat_id, is_playground):',
   )
 }
 
