@@ -111,14 +111,6 @@ watch(
       await loadFiles(user.value?.id ?? -1, selectedAiChat.value.id)
     }
 
-    // Sanitize Llama3 messages (cannot be done in backend)
-    if (selectedAiChat.value.model === AllowedAiModelsEnum.metaLlama) {
-      chatMessages.value = chatMessages.value.map(message => ({
-        ...message,
-        content: getSanitizedMessageContent(message.content),
-      }))
-    }
-
     console.info('Setting chat history messages backup...')
     if (selectedAiChatIsPlayground.value && chatMessages.value.length > 0) {
       currentAiChatPlaygroundMessagesBackup.value = chatMessages.value
