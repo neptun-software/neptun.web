@@ -1,6 +1,6 @@
+import type { Message } from 'ai'
 import type { Actor } from '~/lib/types/database.tables/schema'
 import { HfInference } from '@huggingface/inference'
-import { HuggingFaceStream, type Message, StreamingTextResponse } from 'ai'
 import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema'
 import {
@@ -142,35 +142,97 @@ export default defineLazyEventHandler(async () => {
       // if (LOG_BACKEND) console.info('AI request:', inputs);
       // if (LOG_BACKEND) console.info('---');
 
-      const response = Hf.textGenerationStream(
-        POSSIBLE_AI_MODELS?.[model_publisher ?? defaultAiModelProvider]?.[
-          model_name ?? defaultAiModel
-        ]?.configuration(inputs),
-      )
-
-      // https://sdk.vercel.ai/docs/ai-sdk-ui/storing-messages
-      const stream = HuggingFaceStream(response, {
-        async onFinal(messageText: string) {
-          // onCompletion, onFinal, onToken and onText is called for each token (word, punctuation)
-          const messageContent = getSanitizedMessageContent(messageText)
-          if (!is_playground) {
-            await persistAiChatMessage(user.id, chat_id, messageContent, event)
-          }
-        },
-      }) // Converts the response into a friendly text-stream
-
-      return new StreamingTextResponse(stream) // Respond with the stream
-    } catch (error) {
-      if (LOG_BACKEND) {
-        console.error('AI request errored:', error)
+      const modelProvider = POSSIBLE_AI_MODELS[model_publisher ?? defaultAiModelProvider]
+      if (!modelProvider) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: `Invalid model provider: ${model_publisher}`,
+        })
       }
-      sendError(
-        event,
-        createError({
+
+      const modelDefinition = modelProvider[model_name ?? defaultAiModel]
+      if (!modelDefinition) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: `Invalid model name: ${model_name}`,
+        })
+      }
+
+      const modelConfig = modelDefinition.configuration(inputs)
+      if (!modelConfig || !modelConfig.model) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Invalid model configuration',
+        })
+      }
+
+      // Call text generation with the proper parameters
+      const response = await Hf.textGeneration({
+        model: modelConfig.model,
+        inputs: modelConfig.inputs,
+        parameters: modelConfig.parameters,
+      })
+
+      if (!response || !response.generated_text) {
+        throw createError({
           statusCode: 500,
-          statusMessage: 'Internal Server Error',
-        }),
-      )
+          statusMessage: 'Invalid response from AI model',
+        })
+      }
+
+      // Convert the response to a stream in the AI SDK format
+      const encoder = new TextEncoder()
+      const stream = new ReadableStream({
+        async start(controller) {
+          // First sanitize the message content
+          const sanitizedContent = getSanitizedMessageContent(response.generated_text)
+
+          // Split into words and spaces
+          const chunks = sanitizedContent.match(/\S+|\s+/g) || []
+
+          // Stream each chunk
+          for (const chunk of chunks) {
+            controller.enqueue(encoder.encode(`0:${JSON.stringify(chunk)}\n`))
+          }
+
+          // Persist the complete message if not in playground mode
+          if (!is_playground) {
+            await persistAiChatMessage(user.id, chat_id, sanitizedContent, event)
+          }
+
+          controller.close()
+        },
+      })
+
+      // Set the appropriate headers
+      setHeader(event, 'Content-Type', 'text/plain; charset=utf-8')
+      setHeader(event, 'Transfer-Encoding', 'chunked')
+
+      return stream
+    } catch (error: unknown) {
+      // Log the error if logging is enabled
+      if (LOG_BACKEND) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+        console.error('AI request errored:', errorMessage)
+      }
+
+      // Handle different types of errors
+      if (error instanceof Error) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: error.message,
+        })
+      } else if (typeof error === 'object' && error !== null) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: String((error as { message?: string }).message || 'Unknown error occurred'),
+        })
+      } else {
+        throw createError({
+          statusCode: 500,
+          statusMessage: 'An unexpected error occurred',
+        })
+      }
     }
   })
 })
