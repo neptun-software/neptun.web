@@ -1,4 +1,4 @@
-import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
+import { POSSIBLE_AI_MODELS } from '../../../lib/data/ai.models'
 
 export interface PossibleAiModels {
   [key: string]: {
