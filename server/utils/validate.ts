@@ -136,6 +136,12 @@ export const IsSharedQuerySchema = z.object({
 
 type IsSharedQueryType = z.infer<typeof IsSharedQuerySchema>
 
+export const CollectionNameQuerySchema = z.object({
+  name: z.string().trim().min(1).optional().or(z.null()),
+})
+
+type CollectionNameQueryType = z.infer<typeof CollectionNameQuerySchema>
+
 /* BODY SCHEMAs */
 
 // Inside of schema.ts
@@ -304,6 +310,29 @@ export async function validateQueryIsShared(
     'Successfully validated queryParams(is_shared).',
     'Invalid queryParams(is_shared).',
     'queryParams(is_shared):',
+  )
+}
+
+export async function validateQueryCollectionName(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<CollectionNameQueryType>> {
+  return validateParams<CollectionNameQueryType>(
+    event,
+    async () => {
+      const query = getQuery(event)
+      const validationResult = CollectionNameQuerySchema.safeParse({
+        name: query.name,
+      })
+
+      return {
+        success: validationResult.success,
+        data: validationResult.success ? validationResult.data : undefined,
+        error: !validationResult.success ? validationResult.error : undefined,
+      }
+    },
+    `Successfully validated queryParams(name=<collection_name>).`,
+    `Invalid queryParams(name=<collection_name>).`,
+    'queryParams(name):',
   )
 }
 

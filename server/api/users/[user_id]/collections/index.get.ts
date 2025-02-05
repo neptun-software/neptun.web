@@ -1,4 +1,5 @@
 import { readAllTemplateCollections } from '~/server/database/repositories/userTemplateCollections'
+import { validateQueryCollectionName } from '~/server/utils/validate'
 
 // Read all user template collections including their files (templates)
 export default defineEventHandler(async (event) => {
@@ -15,6 +16,7 @@ export default defineEventHandler(async (event) => {
   }
   const user_id = maybeUserId.data?.user_id
 
+  /* VALIDATE QUERY PARAMS(name) */
   const maybeIsShared = await validateQueryIsShared(event)
   if (maybeIsShared.statusCode !== 200) {
     return sendError(
@@ -28,8 +30,25 @@ export default defineEventHandler(async (event) => {
   }
   const is_shared = maybeIsShared.data?.is_shared ?? null
 
+  const maybeName = await validateQueryCollectionName(event)
+  if (maybeName.statusCode !== 200) {
+    return sendError(
+      event,
+      createError({
+        statusCode: maybeName.statusCode,
+        statusMessage: maybeName.statusMessage,
+        data: maybeName.data,
+      }),
+    )
+  }
+  const name = maybeName.data?.name ?? null
+
   try {
-    const collections = await readAllTemplateCollections({ is_shared, user_id })
+    const collections = await readAllTemplateCollections({
+      is_shared,
+      user_id,
+      name,
+    })
 
     return {
       collections,

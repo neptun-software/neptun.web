@@ -20,6 +20,13 @@ GET
 | --------- | ------- | -------- | -------------------------------- |
 | user_id   | integer | Yes      | The ID of the authenticated user |
 
+### Query Parameters
+
+| Parameter | Type    | Required | Description               |
+| --------- | ------- | -------- | ------------------------- |
+| name      | string  | No       | Filter by collection name |
+| is_shared | boolean | No       | Filter by shared status   |
+
 ### Headers
 
 | Header | Value            | Required | Description                   |
