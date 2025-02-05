@@ -166,41 +166,65 @@ export default defineLazyEventHandler(async () => {
         })
       }
 
-      // Call text generation with the proper parameters
-      const response = await Hf.textGeneration({
-        model: modelConfig.model,
-        inputs: modelConfig.inputs,
-        parameters: modelConfig.parameters,
-      })
-
-      if (!response || !response.generated_text) {
-        throw createError({
-          statusCode: 500,
-          statusMessage: 'Invalid response from AI model',
-        })
-      }
-
       // Convert the response to a stream in the AI SDK format
       const encoder = new TextEncoder()
       const stream = new ReadableStream({
         async start(controller) {
-          // First sanitize the message content
-          const sanitizedContent = getSanitizedMessageContent(response.generated_text)
+          let accumulatedText = ''
+          let buffer = ''
 
-          // Split into words and spaces
-          const chunks = sanitizedContent.match(/\S+|\s+/g) || []
+          try {
+            const response = Hf.textGenerationStream({
+              model: modelConfig.model,
+              inputs: modelConfig.inputs,
+              parameters: modelConfig.parameters,
+            })
 
-          // Stream each chunk
-          for (const chunk of chunks) {
-            controller.enqueue(encoder.encode(`0:${JSON.stringify(chunk)}\n`))
+            // Process each chunk as it arrives
+            for await (const chunk of response) {
+              if (chunk.token.text) {
+                // Check if this token contains any model-specific tags
+                const hasModelTags = /<[^>]*>/.test(chunk.token.text)
+                  || /<\|.*?\|>/.test(chunk.token.text)
+
+                if (hasModelTags) {
+                  // If we have model tags, accumulate in buffer and clean when complete
+                  buffer += chunk.token.text
+                  if (buffer.includes('>')) {
+                    const cleaned = getSanitizedMessageContent(buffer)
+                    if (cleaned) {
+                      accumulatedText += cleaned
+                      controller.enqueue(encoder.encode(`0:${JSON.stringify(cleaned)}\n`))
+                    }
+                    buffer = ''
+                  }
+                } else {
+                  // No model tags, stream directly while preserving whitespace
+                  const token = chunk.token.text
+                  accumulatedText += token
+                  controller.enqueue(encoder.encode(`0:${JSON.stringify(token)}\n`))
+                }
+              }
+            }
+
+            // Handle any remaining text in the buffer
+            if (buffer) {
+              const cleaned = getSanitizedMessageContent(buffer)
+              if (cleaned) {
+                accumulatedText += cleaned
+                controller.enqueue(encoder.encode(`0:${JSON.stringify(cleaned)}\n`))
+              }
+            }
+
+            // Persist the complete message if not in playground mode
+            if (!is_playground) {
+              await persistAiChatMessage(user.id, chat_id, accumulatedText, event)
+            }
+          } catch (error) {
+            controller.error(error)
+          } finally {
+            controller.close()
           }
-
-          // Persist the complete message if not in playground mode
-          if (!is_playground) {
-            await persistAiChatMessage(user.id, chat_id, sanitizedContent, event)
-          }
-
-          controller.close()
         },
       })
 
