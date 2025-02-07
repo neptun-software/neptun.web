@@ -17,7 +17,6 @@ import {
 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
-import { AllowedAiModelsEnum } from '~/lib/types/models/ai'
 
 const { console } = useLogger()
 const isLoading = ref(true)

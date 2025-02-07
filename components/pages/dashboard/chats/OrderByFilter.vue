@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-/// <reference path="../../../lib/types/vue-dndrop.d.ts" />
+/// <reference path="../../../../lib/types/vue-dndrop.d.ts" />
 
 import { GripVertical } from 'lucide-vue-next'
 // @ts-expect-error (somehow still not recognized...)
@@ -73,7 +73,7 @@ function applyDrag(filters: Filter[], dropResult: DropResult): Filter[] {
 </script>
 
 <template>
-  <fieldset class="grid gap-2 p-4 mt-1 border rounded-lg">
+  <fieldset class="grid gap-2 p-4 mt-1 rounded-lg border">
     <legend class="px-1 -ml-1 text-sm font-medium">
       Order By Filter
     </legend>
@@ -81,9 +81,9 @@ function applyDrag(filters: Filter[], dropResult: DropResult): Filter[] {
       <Container class="flex flex-col gap-1" @drop="onDrop">
         <Draggable v-for="(filter, index) in filters" :key="index">
           <div
-            class="flex flex-wrap items-center gap-2 p-1 border rounded-md draggable-item bg-background"
+            class="flex flex-wrap gap-2 items-center p-1 rounded-md border draggable-item bg-background"
           >
-            <div class="flex items-center w-full max-w-full gap-1 xl:w-fit">
+            <div class="flex gap-1 items-center w-full max-w-full xl:w-fit">
               <GripVertical class="w-4 h-4 min-w-4 min-h-4 cursor-grabbing" />
               <ShadcnSelect v-model="filter.column">
                 <ShadcnSelectTrigger>

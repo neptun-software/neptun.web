@@ -92,6 +92,7 @@ export default defineEventHandler(async (event) => {
     const { email, otp, new_password } = body
 
     try {
+      // @ts-ignore
       return await event.$fetch(`/${email}/reset-password`, {
         method: 'POST',
         body: { otp, new_password },

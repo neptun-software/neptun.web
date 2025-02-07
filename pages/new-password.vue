@@ -150,19 +150,19 @@ function handleComplete(e: string[]) {
   otpIsValid.value = true
 }
 
-function handleModelValueUpdate(arrStr: string[]) {
+function handleModelValueUpdate(arrStr: (string | unknown)[]) {
   arrStr.forEach((val, index) => {
     if (otp.value[index] !== val) {
-      otp.value[index] = val
+      otp.value[index] = String(val || '')
     }
   })
 
   console.log('Updated model value:', otp.value)
-  setFieldValue('otp', [...otp.value])
+  setFieldValue('otp', [...(otp.value as string[])])
   validate()
 
   if (otp.value.length === 5 && !otp.value.includes('')) {
-    handleComplete(otp.value)
+    handleComplete(otp.value as string[])
   }
 }
 
@@ -210,12 +210,12 @@ const canGoNext = computed(() => {
         class="block w-full"
       >
         <form @submit.prevent>
-          <div class="flex w-full gap-2 flex-start">
+          <div class="flex gap-2 w-full flex-start">
             <ShadcnStepperItem
               v-for="step in steps"
               :key="step.step"
               v-slot="{ state }"
-              class="relative flex flex-col items-center justify-center w-full"
+              class="flex relative flex-col justify-center items-center w-full"
               :step="step.step"
             >
               <ShadcnStepperSeparator
@@ -299,13 +299,13 @@ const canGoNext = computed(() => {
                     <ShadcnFormItem>
                       <ShadcnFormLabel>OTP</ShadcnFormLabel>
                       <ShadcnFormControl>
-                        <div class="flex items-baseline gap-2">
+                        <div class="flex gap-2 items-baseline">
                           <ShadcnPinInput
                             id="otp"
                             v-model="value!"
                             :name="componentField.name"
                             placeholder="○"
-                            class="flex items-center gap-2 mt-1"
+                            class="flex gap-2 items-center mt-1"
                             :otp="true"
                             type="text"
                             @update:model-value="handleModelValueUpdate"
@@ -369,7 +369,7 @@ const canGoNext = computed(() => {
                 >
                   Back
                 </ShadcnButton>
-                <div class="flex items-center gap-3">
+                <div class="flex gap-3 items-center">
                   <ShadcnButton
                     :disabled="!canGoNext"
                     size="sm"

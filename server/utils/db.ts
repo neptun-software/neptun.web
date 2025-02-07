@@ -24,7 +24,7 @@ class MinimalLogger implements Logger {
 
 export const connectionString
   = process.env.DATABASE_CONNECTION_STRING
-  || 'postgresql://postgres:postgres@localhost:5432/postgres'
+    || 'postgresql://postgres:postgres@localhost:5432/postgres'
 export const databaseMap = {
   ...schema,
   ...relations,
