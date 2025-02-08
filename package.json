@@ -48,7 +48,7 @@
     "@neondatabase/serverless": "^0.10.1",
     "@nuxt/image": "^1.8.1",
     "@nuxtjs/device": "^3.2.4",
-    "@nuxtjs/mdc": "~0.11.1",
+    "@nuxtjs/mdc": "~0.13.0",
     "@nuxtjs/robots": "^4.1.10",
     "@radix-icons/vue": "^1.0.0",
     "@tanstack/vue-table": "^8.20.5",
