@@ -7,18 +7,18 @@ import {
   chat_conversation_share_whitelist_entry,
   github_app_installation,
   github_app_installation_repository,
+  neptun_context_file,
+  neptun_context_import,
   neptun_user,
   neptun_user_file,
   neptun_user_oauth_account,
+  neptun_user_project,
   neptun_user_template,
   neptun_user_template_collection,
-  neptun_user_project,
+  project_chat_conversation,
+  project_github_installation,
   project_template_collection,
   project_user_file,
-  project_github_installation,
-  project_chat_conversation,
-  neptun_context_file,
-  neptun_context_import,
 } from './schema'
 
 export const neptun_userRelations = relations(

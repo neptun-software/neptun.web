@@ -2,13 +2,13 @@ import type { Message } from 'ai'
 import {
   boolean,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   serial,
   text,
   timestamp,
   uuid,
-  jsonb,
 } from 'drizzle-orm/pg-core'
 // import { supportedShikiLanguages, supportedFileExtensionsMap } from '../../../utils/formatters'; // || '#imports' // causes cjs, mjs compatibility issues, thanks for nothing drizzle :|
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
@@ -704,19 +704,19 @@ export const context_file_category = pgEnum('context_file_category', [
   'runtime',
   'documentation',
   'test_tool',
-  'unknown'
+  'unknown',
 ])
 
 export const import_source_type = pgEnum('import_source_type', [
   'local_folder',
   'github_repository_installation',
-  'public_github_repository_url'
+  'public_github_repository_url',
 ])
 
 export const context_file_type = pgEnum('context_file_type', [
   'markdown',
   'pdf',
-  'text'
+  'text',
 ])
 
 export const neptun_context_import = pgTable('neptun_context_import', {
@@ -732,7 +732,7 @@ export const neptun_context_import = pgTable('neptun_context_import', {
   updated_at: timestamp('updated_at')
     .defaultNow()
     .$onUpdate(() => new Date()),
-  
+
   neptun_user_id: integer('neptun_user_id')
     .notNull()
     .references(() => neptun_user.id, { onDelete: 'cascade' }),
