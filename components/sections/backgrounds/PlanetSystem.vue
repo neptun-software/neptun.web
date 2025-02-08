@@ -58,7 +58,7 @@ function initializeStars() {
   stars.value = Array.from({ length: starCount }, (_, index) => {
     const size
       = Math.random() * (props.imageSizeMax - props.imageSizeMin)
-        + props.imageSizeMin
+      + props.imageSizeMin
     let x, y, distance
 
     do {
