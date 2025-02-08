@@ -12,6 +12,11 @@ import {
   neptun_user_oauth_account,
   neptun_user_template,
   neptun_user_template_collection,
+  neptun_user_project,
+  project_template_collection,
+  project_user_file,
+  project_github_installation,
+  project_chat_conversation,
 } from './schema'
 
 export const neptun_userRelations = relations(
@@ -27,6 +32,7 @@ export const neptun_userRelations = relations(
     chat_conversation_files: many(chat_conversation_file),
     templates: many(neptun_user_template),
     template_collections: many(neptun_user_template_collection),
+    projects: many(neptun_user_project),
   }))
 
 export const neptun_user_oauth_accountRelations = relations(
@@ -176,5 +182,78 @@ export const neptun_user_template_collectionRelations = relations(
       references: [neptun_user.id],
     }),
     templates: many(neptun_user_template),
+  }),
+)
+
+export const projectRelations = relations(
+  neptun_user_project,
+  ({ one, many }) => ({
+    neptun_user: one(neptun_user, {
+      fields: [neptun_user_project.neptun_user_id],
+      references: [neptun_user.id],
+    }),
+    template_collections: many(project_template_collection),
+    user_files: many(project_user_file),
+    github_installations: many(project_github_installation),
+    chat_conversations: many(project_chat_conversation),
+  }),
+)
+
+// Why 1:1? - Because a project can have only one template collection, but a template collection can be part of multiple projects.
+// It should be possible to remove the relations easily.
+
+export const project_template_collectionRelations = relations(
+  project_template_collection,
+  ({ one }) => ({
+    project: one(neptun_user_project, {
+      fields: [project_template_collection.project_id],
+      references: [neptun_user_project.id],
+    }),
+    template_collection: one(neptun_user_template_collection, {
+      fields: [project_template_collection.template_collection_id],
+      references: [neptun_user_template_collection.id],
+    }),
+  }),
+)
+
+export const project_user_fileRelations = relations(
+  project_user_file,
+  ({ one }) => ({
+    project: one(neptun_user_project, {
+      fields: [project_user_file.project_id],
+      references: [neptun_user_project.id],
+    }),
+    user_file: one(neptun_user_file, {
+      fields: [project_user_file.user_file_id],
+      references: [neptun_user_file.id],
+    }),
+  }),
+)
+
+export const project_github_installationRelations = relations(
+  project_github_installation,
+  ({ one }) => ({
+    project: one(neptun_user_project, {
+      fields: [project_github_installation.project_id],
+      references: [neptun_user_project.id],
+    }),
+    github_installation: one(github_app_installation, {
+      fields: [project_github_installation.github_installation_id],
+      references: [github_app_installation.id],
+    }),
+  }),
+)
+
+export const project_chat_conversationRelations = relations(
+  project_chat_conversation,
+  ({ one }) => ({
+    project: one(neptun_user_project, {
+      fields: [project_chat_conversation.project_id],
+      references: [neptun_user_project.id],
+    }),
+    chat_conversation: one(chat_conversation, {
+      fields: [project_chat_conversation.chat_conversation_id],
+      references: [chat_conversation.id],
+    }),
   }),
 )

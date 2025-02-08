@@ -90,7 +90,9 @@ export const InsertUserFileSchema = InsertUserFileSchemaBase.pick({
   extension: true,
   neptun_user_id: true,
 })
-export const SelectUserFileSchema = createSelectSchema(neptun_user_file)
+export const SelectUserFileSchema = createSelectSchema(
+  neptun_user_file,
+)
 
 /* USERS TEMPLATE COLLECTIONS */
 
@@ -599,3 +601,94 @@ export type GetGithubAppInstallationRepositoryEssentials = Omit<GetGithubAppInst
 export type NewGithubAppInstallationRepository = z.infer<
   typeof InsertGithubAppInstallationRepositorySchema
 >
+
+/* PROJECT TYPES */
+
+export const project_type = pgEnum('project_type', [
+  'web-site',
+  'web-service',
+  'web-app',
+])
+
+export const programming_language = pgEnum('programming_language', [
+  'typescript',
+  'javascript',
+  'php',
+  'go',
+  'python',
+  'java',
+  'kotlin',
+  'ruby',
+  'elixir',
+])
+
+export const neptun_user_project = pgTable('neptun_user_project', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  type: project_type('type').notNull(),
+  main_language: programming_language('main_language').notNull(),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+  neptun_user_id: integer('neptun_user_id')
+    .notNull()
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
+})
+
+export const project_template_collection = pgTable('project_template_collection', {
+  project_id: integer('project_id')
+    .notNull()
+    .references(() => neptun_user_project.id, { onDelete: 'cascade' }),
+  template_collection_id: integer('template_collection_id')
+    .notNull()
+    .references(() => neptun_user_template_collection.id, { onDelete: 'cascade' }),
+  created_at: timestamp('created_at').defaultNow(),
+})
+
+export const project_user_file = pgTable('project_user_file', {
+  project_id: integer('project_id')
+    .notNull()
+    .references(() => neptun_user_project.id, { onDelete: 'cascade' }),
+  user_file_id: integer('user_file_id')
+    .notNull()
+    .references(() => neptun_user_file.id, { onDelete: 'cascade' }),
+  created_at: timestamp('created_at').defaultNow(),
+})
+
+export const project_github_installation = pgTable('project_github_installation', {
+  project_id: integer('project_id')
+    .notNull()
+    .references(() => neptun_user_project.id, { onDelete: 'cascade' }),
+  github_installation_id: integer('github_installation_id')
+    .notNull()
+    .references(() => github_app_installation.id, { onDelete: 'cascade' }),
+  created_at: timestamp('created_at').defaultNow(),
+})
+
+export const project_chat_conversation = pgTable('project_chat_conversation', {
+  project_id: integer('project_id')
+    .notNull()
+    .references(() => neptun_user_project.id, { onDelete: 'cascade' }),
+  chat_conversation_id: integer('chat_conversation_id')
+    .notNull()
+    .references(() => chat_conversation.id, { onDelete: 'cascade' }),
+  created_at: timestamp('created_at').defaultNow(),
+})
+
+export type NewProject = typeof neptun_user_project.$inferInsert
+export type GetProject = typeof neptun_user_project.$inferSelect
+
+export type ProjectToCreate = Omit<NewProject, 'id' | 'created_at' | 'updated_at'>
+export type ReadProject = GetProject
+
+const InsertProjectSchemaBase = createInsertSchema(neptun_user_project)
+export const InsertProjectSchema = InsertProjectSchemaBase.pick({
+  name: true,
+  description: true,
+  type: true,
+  main_language: true,
+  neptun_user_id: true,
+})
+export const SelectProjectSchema = createSelectSchema(neptun_user_project)
