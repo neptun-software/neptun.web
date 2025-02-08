@@ -52,8 +52,8 @@ importers:
         specifier: ^5.1.4
         version: 5.2.1(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.2))
       '@vue-email/components':
-        specifier: ^0.0.19
-        version: 0.0.19(typescript@5.7.2)(vue@3.5.13(typescript@5.7.2))
+        specifier: ^0.0.21
+        version: 0.0.21(typescript@5.7.2)(vue@3.5.13(typescript@5.7.2))
       '@vue-email/render':
         specifier: ^0.0.9
         version: 0.0.9(typescript@5.7.2)
@@ -168,10 +168,6 @@ importers:
       zod:
         specifier: ^3.23.8
         version: 3.24.1
-    optionalDependencies:
-      '@rollup/rollup-linux-x64-gnu':
-        specifier: ^4.24.3
-        version: 4.29.1
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^3.12.0
@@ -242,6 +238,10 @@ importers:
       vue-tsc:
         specifier: ~2.1.8
         version: 2.1.10(typescript@5.7.2)
+    optionalDependencies:
+      '@rollup/rollup-linux-x64-gnu':
+        specifier: ^4.24.3
+        version: 4.29.1
 
 packages:
 
@@ -2239,8 +2239,8 @@ packages:
     peerDependencies:
       vue: ^3.4.27
 
-  '@vue-email/components@0.0.19':
-    resolution: {integrity: sha512-ZcYnZMofAOU+TiHDVoeEzrPjUjqSyDb1fsE33kro6tCvIxsIZxoa+PHEnj/DwFHnF0grv/3Dq1UDmWUE8s8QkQ==}
+  '@vue-email/components@0.0.21':
+    resolution: {integrity: sha512-xtL9vdWgBpq2B4OqbOvW9s9+5fF8bZamNHCBNYkFMzGg7Ne+SWk/vZI0LhCeMqWUkodnCvCoW/i7IYGjw5veHw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       vue: ^3.4.29
@@ -2314,8 +2314,8 @@ packages:
     peerDependencies:
       vue: ^3.4.27
 
-  '@vue-email/tailwind@0.1.9':
-    resolution: {integrity: sha512-3CH5bBAL8DTQfucWeMnM1uwE1vnnqvMvZsPMIdWnw87NQMRfj0dVkBRav7efZOrtowELM6VFHC0B1S3/rK5GPw==}
+  '@vue-email/tailwind@0.2.0':
+    resolution: {integrity: sha512-/DNEMhvEuZa9OptICLelwh4Rh4Lh54GtoTkQgCAV0/4qvAgbAmjUMr0f7GsincdxoPrFwpTofaKAxMFm6ZO0xA==}
     peerDependencies:
       vue: ^3.4.29
 
@@ -5963,6 +5963,7 @@ packages:
   rollup-plugin-visualizer@5.13.1:
     resolution: {integrity: sha512-vMg8i6BprL8aFm9DKvL2c8AwS8324EgymYQo9o6E26wgVvwMhsJxS37aNL6ZsU7X9iAcMYwdME7gItLfG5fwJg==}
     engines: {node: '>=18'}
+    deprecated: Contains unintended breaking changes
     hasBin: true
     peerDependencies:
       rolldown: 1.x
@@ -9467,7 +9468,7 @@ snapshots:
     dependencies:
       vue: 3.5.13(typescript@5.7.2)
 
-  '@vue-email/components@0.0.19(typescript@5.7.2)(vue@3.5.13(typescript@5.7.2))':
+  '@vue-email/components@0.0.21(typescript@5.7.2)(vue@3.5.13(typescript@5.7.2))':
     dependencies:
       '@vue-email/body': 0.0.3(vue@3.5.13(typescript@5.7.2))
       '@vue-email/button': 0.0.3(vue@3.5.13(typescript@5.7.2))
@@ -9488,7 +9489,7 @@ snapshots:
       '@vue-email/row': 0.0.3(vue@3.5.13(typescript@5.7.2))
       '@vue-email/section': 0.0.3(vue@3.5.13(typescript@5.7.2))
       '@vue-email/style': 0.0.3(vue@3.5.13(typescript@5.7.2))
-      '@vue-email/tailwind': 0.1.9(vue@3.5.13(typescript@5.7.2))
+      '@vue-email/tailwind': 0.2.0(vue@3.5.13(typescript@5.7.2))
       '@vue-email/text': 0.0.3(vue@3.5.13(typescript@5.7.2))
       vue: 3.5.13(typescript@5.7.2)
     transitivePeerDependencies:
@@ -9555,7 +9556,7 @@ snapshots:
     dependencies:
       vue: 3.5.13(typescript@5.7.2)
 
-  '@vue-email/tailwind@0.1.9(vue@3.5.13(typescript@5.7.2))':
+  '@vue-email/tailwind@0.2.0(vue@3.5.13(typescript@5.7.2))':
     dependencies:
       vue: 3.5.13(typescript@5.7.2)
 
