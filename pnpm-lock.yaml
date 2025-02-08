@@ -85,8 +85,8 @@ importers:
         specifier: ^3.10.1
         version: 3.10.1
       lucide-vue-next:
-        specifier: ^0.454.0
-        version: 0.454.0(vue@3.5.13(typescript@5.7.2))
+        specifier: ^0.475.0
+        version: 0.475.0(vue@3.5.13(typescript@5.7.2))
       nodemailer:
         specifier: ^6.9.16
         version: 6.9.16
@@ -168,10 +168,6 @@ importers:
       zod:
         specifier: ^3.23.8
         version: 3.24.1
-    optionalDependencies:
-      '@rollup/rollup-linux-x64-gnu':
-        specifier: ^4.24.3
-        version: 4.29.1
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^3.12.0
@@ -242,6 +238,10 @@ importers:
       vue-tsc:
         specifier: ~2.1.8
         version: 2.1.10(typescript@5.7.2)
+    optionalDependencies:
+      '@rollup/rollup-linux-x64-gnu':
+        specifier: ^4.24.3
+        version: 4.29.1
 
 packages:
 
@@ -4702,8 +4702,8 @@ packages:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
 
-  lucide-vue-next@0.454.0:
-    resolution: {integrity: sha512-UeThgLHm5sZyVTBIE1pcFn2jJsZTKe7AWo94lY2OMQAgYTKgPnrj1QLlSco2lU+kE7iFWl/stNLSsbxfoWCd6A==}
+  lucide-vue-next@0.475.0:
+    resolution: {integrity: sha512-xzotVZV7en58Gm3b60YHlxX2YGlFWSN4D5VMMhU/rC9D/pkeRqve21TPMJdHQsdqFdoRthnaB2HrzL0PQXdNeA==}
     peerDependencies:
       vue: '>=3.0.1'
 
@@ -5963,6 +5963,7 @@ packages:
   rollup-plugin-visualizer@5.13.1:
     resolution: {integrity: sha512-vMg8i6BprL8aFm9DKvL2c8AwS8324EgymYQo9o6E26wgVvwMhsJxS37aNL6ZsU7X9iAcMYwdME7gItLfG5fwJg==}
     engines: {node: '>=18'}
+    deprecated: Contains unintended breaking changes
     hasBin: true
     peerDependencies:
       rolldown: 1.x
@@ -12273,7 +12274,7 @@ snapshots:
 
   lru-cache@7.18.3: {}
 
-  lucide-vue-next@0.454.0(vue@3.5.13(typescript@5.7.2)):
+  lucide-vue-next@0.475.0(vue@3.5.13(typescript@5.7.2)):
     dependencies:
       vue: 3.5.13(typescript@5.7.2)
 
