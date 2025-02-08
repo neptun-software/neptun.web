@@ -1,44 +1,60 @@
 import type { H3Event } from 'h3'
-
 import type { FileRouter } from 'uploadthing/h3'
 import { createUploadthing } from 'uploadthing/h3'
 
 const f = createUploadthing()
 
-const auth = async (ev: H3Event) => ({ id: 'fakeId' }) // Fake auth function
-
-// FileRouter for your app, can contain multiple FileRoutes
 export const uploadRouter = {
-  // Define as many FileRoutes as you like, each with a unique routeSlug
-  imageUploader: f({
-    image: {
-      /**
-       * For full list of options and defaults, see the File Route API reference
-       * @see https://docs.uploadthing.com/file-routes#route-config
-       */
-      maxFileSize: '4MB',
-      maxFileCount: 1,
-    },
-  })
-    // Set permissions and file types for this FileRoute
-    .middleware(async ({ event }) => {
-      // This code runs on your server before upload
-      const user = await auth(event)
-
-      // If you throw, the user will not be able to upload
-      if (!user) {
-        throw new Error('Unauthorized')
-      }
-
-      // Whatever is returned here is accessible in onUploadComplete as `metadata`
-      return { userId: user.id }
+    imageUploader: f({
+        image: {
+            maxFileSize: '4MB',
+            maxFileCount: 1,
+        },
     })
-    .onUploadComplete(async ({ metadata, file }) => {
-      // This code RUNS ON YOUR SERVER after upload
-      console.log('Upload complete for userId:', metadata.userId)
+        .middleware(async ({ event }: { event: H3Event }) => {
+            // running before upload
+            const user = event.context.user
 
-      console.log('file url', file.url)
-    }),
+            if (!user) {
+                throw new Error('Unauthorized')
+            }
+
+            // accessible in onUploadComplete as `metadata`
+            return { userId: user.id }
+        })
+        .onUploadComplete(async ({ metadata, file }) => {
+            // running after upload
+            console.log('Upload complete for userId:', metadata.userId)
+            console.log('file url', file.url)
+        }),
+
+    pdfUploader: f({
+        pdf: {
+            maxFileSize: '8MB',
+            maxFileCount: 1,
+        },
+    })
+        .middleware(async ({ event }: { event: H3Event }) => {
+            const user = event.context.user
+
+            if (!user) {
+                throw new Error('Unauthorized')
+            }
+
+            return {
+                userId: user.id,
+                timestamp: new Date().toISOString()
+            }
+        })
+        .onUploadComplete(async ({ metadata, file }) => {
+            console.log('PDF upload complete:', {
+                userId: metadata.userId,
+                url: file.url,
+                timestamp: metadata.timestamp,
+            })
+
+            return { url: file.url }
+        }),
 } satisfies FileRouter
 
 export type UploadRouter = typeof uploadRouter
