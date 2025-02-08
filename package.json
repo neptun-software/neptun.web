@@ -2,6 +2,10 @@
   "name": "neptun.web",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@10.2.1",
+  "engines": {
+    "node": ">=20.18.2"
+  },
   "scripts": {
     "dev": "set EDITOR=code && nuxt dev",
     "devx": "set EDITOR=code && nuxt dev --host --https --ssl-cert ./configurations/development/ssl/server.crt --ssl-key ./configurations/development/ssl/server.key",
@@ -52,6 +56,7 @@
     "@nuxtjs/robots": "^4.1.10",
     "@radix-icons/vue": "^1.0.0",
     "@tanstack/vue-table": "^8.20.5",
+    "@uploadthing/nuxt": "^7.1.5",
     "@vee-validate/zod": "^4.14.6",
     "@vercel/kv": "^1.0.1",
     "@vitejs/plugin-vue": "^5.1.4",
@@ -86,6 +91,7 @@
     "shadcn-nuxt": "^0.10.4",
     "strip-markdown": "^6.0.0",
     "tailwind-merge": "^2.5.4",
+    "uploadthing": "^7.4.4",
     "vaul-vue": "^0.2.0",
     "vee-validate": "^4.14.6",
     "vue": "^3.5.11",
@@ -128,9 +134,5 @@
       "drizzle-kit": "0.24.2",
       "drizzle-orm": "0.33.0"
     }
-  },
-  "packageManager": "pnpm@10.2.1",
-  "engines": {
-    "node": ">=20.18.2"
   }
 }

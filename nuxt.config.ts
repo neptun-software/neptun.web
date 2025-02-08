@@ -39,6 +39,7 @@ export default defineNuxtConfig({
     'nuxt-monaco-editor',
     '@formkit/auto-animate/nuxt',
     '@nuxtjs/device',
+    '@uploadthing/nuxt',
   ],
 
   components: [
@@ -332,6 +333,14 @@ export default defineNuxtConfig({
     disabled:
       process.env.POSTHOG_ACTIVE
       === 'false', /* process.dev (deprecated), import.meta.dev (unusable in config file) (https://nuxt.com/docs/api/advanced/import-meta#runtime-app-properties) */
+  },
+
+  uploadthing: {
+    /**
+     * Path to the router definition file
+     * @default `~/server/uploadthing.ts`
+     */
+    routerPath: '~/server/uploadthing.ts',
   },
 
   robots: {
