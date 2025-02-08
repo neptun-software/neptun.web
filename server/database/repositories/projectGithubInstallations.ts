@@ -1,9 +1,10 @@
+import type { GetGithubAppInstallation, ReadProject } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
-import { GetGithubAppInstallation, project_github_installation, ReadProject } from '../../../lib/types/database.tables/schema'
+import { project_github_installation } from '../../../lib/types/database.tables/schema'
 
 export async function createProjectGithubInstallation(
   project_id: ReadProject['id'],
-  github_installation_id: GetGithubAppInstallation['id']
+  github_installation_id: GetGithubAppInstallation['id'],
 ) {
   const created = await db
     .insert(project_github_installation)
@@ -45,7 +46,7 @@ export async function readProjectGithubInstallationsByProjectId(project_id: Read
 
 export async function readProjectGithubInstallation(
   project_id: ReadProject['id'],
-  github_installation_id: GetGithubAppInstallation['id']
+  github_installation_id: GetGithubAppInstallation['id'],
 ) {
   const installation = await db
     .select()
@@ -53,8 +54,8 @@ export async function readProjectGithubInstallation(
     .where(
       and(
         eq(project_github_installation.project_id, project_id),
-        eq(project_github_installation.github_installation_id, github_installation_id)
-      )
+        eq(project_github_installation.github_installation_id, github_installation_id),
+      ),
     )
     .limit(1)
     .catch((err) => {
@@ -72,15 +73,15 @@ export async function readProjectGithubInstallation(
 
 export async function deleteProjectGithubInstallation(
   project_id: ReadProject['id'],
-  github_installation_id: GetGithubAppInstallation['id']
+  github_installation_id: GetGithubAppInstallation['id'],
 ) {
-  return await db
+  return db
     .delete(project_github_installation)
     .where(
       and(
         eq(project_github_installation.project_id, project_id),
-        eq(project_github_installation.github_installation_id, github_installation_id)
-      )
+        eq(project_github_installation.github_installation_id, github_installation_id),
+      ),
     )
     .catch((err) => {
       if (LOG_BACKEND) {

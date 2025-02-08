@@ -1,5 +1,6 @@
+import type { ContextImportToCreate, ReadContextImport, ReadProject } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
-import { neptun_context_import, ReadContextImport, ReadProject, ContextImportToCreate } from '../../../lib/types/database.tables/schema'
+import { neptun_context_import } from '../../../lib/types/database.tables/schema'
 
 export async function createContextImport(import_entry: ContextImportToCreate) {
   const created = await db
@@ -39,7 +40,7 @@ export async function readContextImportsByProjectId(project_id: ReadProject['id'
 
 export async function readContextImportsByProjectAndSourceType(
   project_id: ReadProject['id'],
-  source_type: ReadContextImport['source_type']
+  source_type: ReadContextImport['source_type'],
 ) {
   const imports = await db
     .select()
@@ -47,8 +48,8 @@ export async function readContextImportsByProjectAndSourceType(
     .where(
       and(
         eq(neptun_context_import.project_id, project_id),
-        eq(neptun_context_import.source_type, source_type)
-      )
+        eq(neptun_context_import.source_type, source_type),
+      ),
     )
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -65,7 +66,7 @@ export async function readContextImportsByProjectAndSourceType(
 
 export async function readContextImport(
   project_id: ReadProject['id'],
-  import_id: ReadContextImport['id']
+  import_id: ReadContextImport['id'],
 ) {
   const import_entry = await db
     .select()
@@ -73,8 +74,8 @@ export async function readContextImport(
     .where(
       and(
         eq(neptun_context_import.project_id, project_id),
-        eq(neptun_context_import.id, import_id)
-      )
+        eq(neptun_context_import.id, import_id),
+      ),
     )
     .limit(1)
     .catch((err) => {
@@ -92,7 +93,7 @@ export async function readContextImport(
 
 export async function updateContextImport(
   import_id: ReadContextImport['id'],
-  updates: Partial<Omit<ReadContextImport, 'id' | 'created_at' | 'updated_at'>>
+  updates: Partial<Omit<ReadContextImport, 'id' | 'created_at' | 'updated_at'>>,
 ) {
   const updated = await db
     .update(neptun_context_import)
@@ -113,7 +114,7 @@ export async function updateContextImport(
 }
 
 export async function deleteContextImport(import_id: ReadContextImport['id']) {
-  return await db
+  return db
     .delete(neptun_context_import)
     .where(eq(neptun_context_import.id, import_id))
     .catch((err) => {

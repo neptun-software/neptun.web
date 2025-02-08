@@ -1,5 +1,6 @@
+import type { ContextFileToCreate, ReadContextFile, ReadProject } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
-import { neptun_context_file, ReadContextFile, ReadProject, ContextFileToCreate } from '../../../lib/types/database.tables/schema'
+import { neptun_context_file } from '../../../lib/types/database.tables/schema'
 
 export async function createContextFile(file_entry: ContextFileToCreate) {
   const created = await db
@@ -39,7 +40,7 @@ export async function readContextFilesByProjectId(project_id: ReadProject['id'])
 
 export async function readContextFilesByProjectAndCategory(
   project_id: ReadProject['id'],
-  category: ReadContextFile['category']
+  category: ReadContextFile['category'],
 ) {
   const files = await db
     .select()
@@ -47,8 +48,8 @@ export async function readContextFilesByProjectAndCategory(
     .where(
       and(
         eq(neptun_context_file.project_id, project_id),
-        eq(neptun_context_file.category, category || 'unknown')
-      )
+        eq(neptun_context_file.category, category || 'unknown'),
+      ),
     )
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -65,7 +66,7 @@ export async function readContextFilesByProjectAndCategory(
 
 export async function readContextFilesByProjectAndType(
   project_id: ReadProject['id'],
-  file_type: ReadContextFile['file_type']
+  file_type: ReadContextFile['file_type'],
 ) {
   const files = await db
     .select()
@@ -73,8 +74,8 @@ export async function readContextFilesByProjectAndType(
     .where(
       and(
         eq(neptun_context_file.project_id, project_id),
-        eq(neptun_context_file.file_type, file_type)
-      )
+        eq(neptun_context_file.file_type, file_type),
+      ),
     )
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -91,7 +92,7 @@ export async function readContextFilesByProjectAndType(
 
 export async function readContextFile(
   project_id: ReadProject['id'],
-  file_id: ReadContextFile['id']
+  file_id: ReadContextFile['id'],
 ) {
   const file = await db
     .select()
@@ -99,8 +100,8 @@ export async function readContextFile(
     .where(
       and(
         eq(neptun_context_file.project_id, project_id),
-        eq(neptun_context_file.id, file_id)
-      )
+        eq(neptun_context_file.id, file_id),
+      ),
     )
     .limit(1)
     .catch((err) => {
@@ -118,7 +119,7 @@ export async function readContextFile(
 
 export async function updateContextFile(
   file_id: ReadContextFile['id'],
-  updates: Partial<Omit<ReadContextFile, 'id' | 'created_at' | 'updated_at'>>
+  updates: Partial<Omit<ReadContextFile, 'id' | 'created_at' | 'updated_at'>>,
 ) {
   const updated = await db
     .update(neptun_context_file)
@@ -139,7 +140,7 @@ export async function updateContextFile(
 }
 
 export async function deleteContextFile(file_id: ReadContextFile['id']) {
-  return await db
+  return db
     .delete(neptun_context_file)
     .where(eq(neptun_context_file.id, file_id))
     .catch((err) => {

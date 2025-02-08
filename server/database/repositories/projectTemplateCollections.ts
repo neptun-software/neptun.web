@@ -1,9 +1,10 @@
+import type { ReadProject, ReadTemplateCollection } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
-import { project_template_collection, ReadProject, ReadTemplateCollection } from '../../../lib/types/database.tables/schema'
+import { project_template_collection } from '../../../lib/types/database.tables/schema'
 
 export async function createProjectTemplateCollection(
   project_id: ReadProject['id'],
-  template_collection_id: ReadTemplateCollection['id']
+  template_collection_id: ReadTemplateCollection['id'],
 ) {
   const created = await db
     .insert(project_template_collection)
@@ -45,7 +46,7 @@ export async function readProjectTemplateCollectionsByProjectId(project_id: Read
 
 export async function readProjectTemplateCollection(
   project_id: ReadProject['id'],
-  template_collection_id: ReadTemplateCollection['id']
+  template_collection_id: ReadTemplateCollection['id'],
 ) {
   const collection = await db
     .select()
@@ -53,8 +54,8 @@ export async function readProjectTemplateCollection(
     .where(
       and(
         eq(project_template_collection.project_id, project_id),
-        eq(project_template_collection.template_collection_id, template_collection_id)
-      )
+        eq(project_template_collection.template_collection_id, template_collection_id),
+      ),
     )
     .limit(1)
     .catch((err) => {
@@ -72,15 +73,15 @@ export async function readProjectTemplateCollection(
 
 export async function deleteProjectTemplateCollection(
   project_id: ReadProject['id'],
-  template_collection_id: ReadTemplateCollection['id']
+  template_collection_id: ReadTemplateCollection['id'],
 ) {
-  return await db
+  return db
     .delete(project_template_collection)
     .where(
       and(
         eq(project_template_collection.project_id, project_id),
-        eq(project_template_collection.template_collection_id, template_collection_id)
-      )
+        eq(project_template_collection.template_collection_id, template_collection_id),
+      ),
     )
     .catch((err) => {
       if (LOG_BACKEND) {

@@ -1,9 +1,10 @@
+import type { ReadProject, ReadUserFile } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
-import { project_user_file, ReadProject, ReadUserFile } from '../../../lib/types/database.tables/schema'
+import { project_user_file } from '../../../lib/types/database.tables/schema'
 
 export async function createProjectUserFile(
   project_id: ReadProject['id'],
-  user_file_id: ReadUserFile['id']
+  user_file_id: ReadUserFile['id'],
 ) {
   const created = await db
     .insert(project_user_file)
@@ -45,7 +46,7 @@ export async function readProjectUserFilesByProjectId(project_id: ReadProject['i
 
 export async function readProjectUserFile(
   project_id: ReadProject['id'],
-  user_file_id: ReadUserFile['id']
+  user_file_id: ReadUserFile['id'],
 ) {
   const file = await db
     .select()
@@ -53,8 +54,8 @@ export async function readProjectUserFile(
     .where(
       and(
         eq(project_user_file.project_id, project_id),
-        eq(project_user_file.user_file_id, user_file_id)
-      )
+        eq(project_user_file.user_file_id, user_file_id),
+      ),
     )
     .limit(1)
     .catch((err) => {
@@ -72,15 +73,15 @@ export async function readProjectUserFile(
 
 export async function deleteProjectUserFile(
   project_id: ReadProject['id'],
-  user_file_id: ReadUserFile['id']
+  user_file_id: ReadUserFile['id'],
 ) {
-  return await db
+  return db
     .delete(project_user_file)
     .where(
       and(
         eq(project_user_file.project_id, project_id),
-        eq(project_user_file.user_file_id, user_file_id)
-      )
+        eq(project_user_file.user_file_id, user_file_id),
+      ),
     )
     .catch((err) => {
       if (LOG_BACKEND) {

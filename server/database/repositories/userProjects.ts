@@ -1,9 +1,9 @@
 import { and, eq } from 'drizzle-orm'
 import {
   type GetProject,
+  neptun_user_project,
   type ProjectToCreate,
   type ReadProject,
-  neptun_user_project,
 } from '../../../lib/types/database.tables/schema'
 
 export async function createProject(project: ProjectToCreate) {
@@ -62,7 +62,7 @@ export async function readAllProjects() {
 
 export async function readProjectsByTypeAndLanguage(
   project_type: ReadProject['type'],
-  main_language: ReadProject['main_language']
+  main_language: ReadProject['main_language'],
 ) {
   const projects = await db
     .select()
@@ -70,8 +70,8 @@ export async function readProjectsByTypeAndLanguage(
     .where(
       and(
         eq(neptun_user_project.type, project_type),
-        eq(neptun_user_project.main_language, main_language)
-      )
+        eq(neptun_user_project.main_language, main_language),
+      ),
     )
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -88,7 +88,7 @@ export async function readProjectsByTypeAndLanguage(
 
 export async function updateProject(
   project_id: ReadProject['id'],
-  updates: Partial<Omit<GetProject, 'id' | 'created_at' | 'updated_at'>>
+  updates: Partial<Omit<GetProject, 'id' | 'created_at' | 'updated_at'>>,
 ) {
   const updatedProject = await db
     .update(neptun_user_project)
@@ -109,7 +109,7 @@ export async function updateProject(
 }
 
 export async function deleteProject(project_id: ReadProject['id']) {
-  return await db
+  return db
     .delete(neptun_user_project)
     .where(eq(neptun_user_project.id, project_id))
     .catch((err) => {
