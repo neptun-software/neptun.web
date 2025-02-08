@@ -8,6 +8,7 @@ import {
   text,
   timestamp,
   uuid,
+  jsonb,
 } from 'drizzle-orm/pg-core'
 // import { supportedShikiLanguages, supportedFileExtensionsMap } from '../../../utils/formatters'; // || '#imports' // causes cjs, mjs compatibility issues, thanks for nothing drizzle :|
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
@@ -692,3 +693,122 @@ export const InsertProjectSchema = InsertProjectSchemaBase.pick({
   neptun_user_id: true,
 })
 export const SelectProjectSchema = createSelectSchema(neptun_user_project)
+
+/* CONTEXT FILES AND IMPORTS */
+
+export const context_file_category = pgEnum('context_file_category', [
+  'bundler',
+  'build_tool',
+  'server',
+  'package_manager',
+  'runtime',
+  'documentation',
+  'test_tool',
+  'unknown'
+])
+
+export const import_source_type = pgEnum('import_source_type', [
+  'local_folder',
+  'github_repository_installation',
+  'public_github_repository_url'
+])
+
+export const context_file_type = pgEnum('context_file_type', [
+  'markdown',
+  'pdf',
+  'text'
+])
+
+export const neptun_context_import = pgTable('neptun_context_import', {
+  id: serial('id').primaryKey(),
+  source_type: import_source_type('source_type').notNull(),
+  source_path: text('source_path').notNull(),
+  source_ref: text('source_ref'),
+  import_status: text('import_status').notNull().default('pending'),
+  error_message: text('error_message'),
+  file_tree: jsonb('file_tree'),
+  exclude_patterns: text('exclude_patterns').array(),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+  
+  neptun_user_id: integer('neptun_user_id')
+    .notNull()
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
+  project_id: integer('project_id')
+    .references(() => neptun_user_project.id, { onDelete: 'cascade' }),
+})
+
+export const neptun_context_file = pgTable('neptun_context_file', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  original_path: text('original_path').notNull(),
+  content: text('content').notNull(),
+  file_type: context_file_type('file_type').notNull(),
+  category: context_file_category('category'),
+  file_size: integer('file_size'),
+  pdf_url: text('pdf_url'),
+  language: text('language').default('text').notNull(),
+  metadata: jsonb('metadata'),
+  parent_path: text('parent_path'),
+  depth: integer('depth').default(0),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+
+  neptun_user_id: integer('neptun_user_id')
+    .notNull()
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
+  import_id: integer('import_id')
+    .notNull()
+    .references(() => neptun_context_import.id, { onDelete: 'cascade' }),
+  project_id: integer('project_id')
+    .references(() => neptun_user_project.id, { onDelete: 'cascade' }),
+})
+
+export type NewContextImport = typeof neptun_context_import.$inferInsert
+export type GetContextImport = typeof neptun_context_import.$inferSelect
+
+export type ContextImportToCreate = Omit<NewContextImport, 'id' | 'created_at' | 'updated_at'>
+export type ReadContextImport = GetContextImport
+
+const InsertContextImportSchemaBase = createInsertSchema(neptun_context_import)
+export const InsertContextImportSchema = InsertContextImportSchemaBase.pick({
+  source_type: true,
+  source_path: true,
+  source_ref: true,
+  import_status: true,
+  error_message: true,
+  file_tree: true,
+  exclude_patterns: true,
+  neptun_user_id: true,
+  project_id: true,
+})
+export const SelectContextImportSchema = createSelectSchema(neptun_context_import)
+
+export type NewContextFile = typeof neptun_context_file.$inferInsert
+export type GetContextFile = typeof neptun_context_file.$inferSelect
+
+export type ContextFileToCreate = Omit<NewContextFile, 'id' | 'created_at' | 'updated_at'>
+export type ReadContextFile = GetContextFile
+
+const InsertContextFileSchemaBase = createInsertSchema(neptun_context_file)
+export const InsertContextFileSchema = InsertContextFileSchemaBase.pick({
+  title: true,
+  original_path: true,
+  content: true,
+  file_type: true,
+  category: true,
+  file_size: true,
+  pdf_url: true,
+  language: true,
+  metadata: true,
+  parent_path: true,
+  depth: true,
+  neptun_user_id: true,
+  import_id: true,
+  project_id: true,
+})
+export const SelectContextFileSchema = createSelectSchema(neptun_context_file)
