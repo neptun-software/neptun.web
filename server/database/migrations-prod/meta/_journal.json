@@ -29,6 +29,13 @@
       "when": 1739050250334,
       "tag": "0003_natural_khan",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1739125956268,
+      "tag": "0004_uneven_nehzno",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "neptun_context_import" DROP COLUMN IF EXISTS "exclude_patterns";
