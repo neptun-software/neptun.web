@@ -694,6 +694,26 @@ export const InsertProjectSchema = InsertProjectSchemaBase.pick({
 })
 export const SelectProjectSchema = createSelectSchema(neptun_user_project)
 
+const InsertProjectChatConversationSchemaBase = createInsertSchema(project_chat_conversation)
+export const InsertProjectChatConversationSchema = InsertProjectChatConversationSchemaBase.pick({
+  chat_conversation_id: true,
+})
+
+const InsertProjectGithubInstallationSchemaBase = createInsertSchema(project_github_installation)
+export const InsertProjectGithubInstallationSchema = InsertProjectGithubInstallationSchemaBase.pick({
+  github_installation_id: true,
+})
+
+const InsertProjectTemplateCollectionSchemaBase = createInsertSchema(project_template_collection)
+export const InsertProjectTemplateCollectionSchema = InsertProjectTemplateCollectionSchemaBase.pick({
+  template_collection_id: true,
+})
+
+const InsertProjectUserFileSchemaBase = createInsertSchema(project_user_file)
+export const InsertProjectUserFileSchema = InsertProjectUserFileSchemaBase.pick({
+  user_file_id: true,
+})
+
 /* CONTEXT FILES AND IMPORTS */
 
 export const context_file_category = pgEnum('context_file_category', [

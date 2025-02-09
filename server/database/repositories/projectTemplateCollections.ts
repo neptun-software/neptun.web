@@ -1,4 +1,4 @@
-import type { ReadProject, ReadTemplateCollection } from '../../../lib/types/database.tables/schema'
+import type { ReadProject, ReadTemplateCollection, ReadUser } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
 import { project_template_collection } from '../../../lib/types/database.tables/schema'
 
@@ -26,7 +26,7 @@ export async function createProjectTemplateCollection(
   return created[0]
 }
 
-export async function readProjectTemplateCollectionsByProjectId(project_id: ReadProject['id']) {
+export async function readAllProjectTemplateCollections(project_id: ReadProject['id']) {
   const collections = await db
     .select()
     .from(project_template_collection)

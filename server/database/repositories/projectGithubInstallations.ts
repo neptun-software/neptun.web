@@ -1,4 +1,4 @@
-import type { GetGithubAppInstallation, ReadProject } from '../../../lib/types/database.tables/schema'
+import type { GetGithubAppInstallation, ReadProject, ReadUser } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
 import { project_github_installation } from '../../../lib/types/database.tables/schema'
 
@@ -26,7 +26,7 @@ export async function createProjectGithubInstallation(
   return created[0]
 }
 
-export async function readProjectGithubInstallationsByProjectId(project_id: ReadProject['id']) {
+export async function readAllProjectGithubInstallations(project_id: ReadProject['id']) {
   const installations = await db
     .select()
     .from(project_github_installation)

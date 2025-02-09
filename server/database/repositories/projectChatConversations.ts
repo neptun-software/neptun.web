@@ -26,7 +26,7 @@ export async function createProjectChatConversation(
   return created[0]
 }
 
-export async function readProjectChatConversationsByProjectId(project_id: ReadProject['id']) {
+export async function readAllProjectChatConversations(project_id: ReadProject['id']) {
   const conversations = await db
     .select()
     .from(project_chat_conversation)

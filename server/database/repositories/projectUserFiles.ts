@@ -1,4 +1,4 @@
-import type { ReadProject, ReadUserFile } from '../../../lib/types/database.tables/schema'
+import type { ReadProject, ReadUser, ReadUserFile } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
 import { project_user_file } from '../../../lib/types/database.tables/schema'
 
@@ -26,7 +26,7 @@ export async function createProjectUserFile(
   return created[0]
 }
 
-export async function readProjectUserFilesByProjectId(project_id: ReadProject['id']) {
+export async function readAllProjectUserFiles(project_id: ReadProject['id']) {
   const files = await db
     .select()
     .from(project_user_file)

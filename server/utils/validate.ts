@@ -102,6 +102,25 @@ export const ProjectIdSchema = z.object({
 
 type ProjectIdType = z.infer<typeof ProjectIdSchema>
 
+export const ResourceTypeEnumSchema = z.enum(['user-files', 'template-collections', 'github-installations', 'chat-conversations'])
+
+export const ResourceTypeSchema = z.object({
+  user_id: primaryIdSchema,
+  project_id: primaryIdSchema,
+  resource_type: ResourceTypeEnumSchema,
+})
+
+type ResourceTypeType = z.infer<typeof ResourceTypeSchema>
+
+export const ResourceIdSchema = z.object({
+  user_id: primaryIdSchema,
+  project_id: primaryIdSchema,
+  resource_type: ResourceTypeEnumSchema,
+  resource_id: primaryIdSchema,
+})
+
+type ResourceIdType = z.infer<typeof ResourceIdSchema>
+
 /* QUERY SCHEMAs */
 
 /**
@@ -875,5 +894,102 @@ export async function validateParamProjectId(
     `Invalid routeParams(user_id, project_id). The project with id=${event.context.validated.params.project_id} for user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
     'routeParams(user_id, project_id):',
     (user, data) => user.id !== data.user_id, // check if user has access to project information
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, project_id, resource_type) */
+export async function validateParamResourceType(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ResourceTypeType>> {
+  return validateParams<ResourceTypeType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const project_id = Number(params?.project_id)
+        // @ts-expect-error
+        const resource_type = params?.resource_type
+
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.project_id = project_id
+        event.context.validated.params.resource_type = resource_type
+
+        return ResourceTypeSchema.safeParse({ 
+          user_id, 
+          project_id,
+          resource_type,
+        })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: { 
+            user_id: result.data.user_id,
+            project_id: result.data.project_id,
+            resource_type: result.data.resource_type
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, project_id, resource_type).',
+    `Invalid routeParams(user_id, project_id, resource_type). The resource type=${event.context.validated.params.resource_type} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
+    'routeParams(user_id, project_id, resource_type):',
+    (user, data) => user.id !== data.user_id,
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, project_id, resource_type, resource_id) */
+export async function validateParamResourceId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ResourceIdType>> {
+  return validateParams<ResourceIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const project_id = Number(params?.project_id)
+        // @ts-expect-error
+        const resource_type = params?.resource_type
+        // @ts-expect-error
+        const resource_id = Number(params?.resource_id)
+
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.project_id = project_id
+        event.context.validated.params.resource_type = resource_type
+        event.context.validated.params.resource_id = resource_id
+
+        return ResourceIdSchema.safeParse({ 
+          user_id, 
+          project_id,
+          resource_type,
+          resource_id 
+        })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: { 
+            user_id: result.data.user_id,
+            project_id: result.data.project_id,
+            resource_type: result.data.resource_type,
+            resource_id: result.data.resource_id
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, project_id, resource_type, resource_id).',
+    `Invalid routeParams(user_id, project_id, resource_type, resource_id). The resource with id=${event.context.validated.params.resource_id} of type=${event.context.validated.params.resource_type} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
+    'routeParams(user_id, project_id, resource_type, resource_id):',
+    (user, data) => user.id !== data.user_id,
   )
 }
