@@ -4,6 +4,7 @@ import {
   neptun_user_project,
   type ProjectToCreate,
   type ReadProject,
+  ReadUser,
 } from '../../../lib/types/database.tables/schema'
 
 export async function createProject(project: ProjectToCreate) {
@@ -24,11 +25,19 @@ export async function createProject(project: ProjectToCreate) {
   return createdProject[0]
 }
 
-export async function readProject(project_id: ReadProject['id']) {
+export async function readProject(
+  user_id: ReadUser['id'],
+  project_id: ReadProject['id'],
+) {
   const project = await db
     .select()
     .from(neptun_user_project)
-    .where(eq(neptun_user_project.id, project_id))
+    .where(
+      and(
+        eq(neptun_user_project.id, project_id),
+        eq(neptun_user_project.neptun_user_id, user_id),
+      ),
+    )
     .limit(1)
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -43,10 +52,11 @@ export async function readProject(project_id: ReadProject['id']) {
   return project[0]
 }
 
-export async function readAllProjects() {
+export async function readAllProjects(user_id: ReadUser['id']) {
   const projects = await db
     .select()
     .from(neptun_user_project)
+    .where(eq(neptun_user_project.neptun_user_id, user_id))
     .catch((err) => {
       if (LOG_BACKEND) {
         console.error('Failed to read all projects:', err)
@@ -61,6 +71,7 @@ export async function readAllProjects() {
 }
 
 export async function readProjectsByTypeAndLanguage(
+  user_id: ReadUser['id'],
   project_type: ReadProject['type'],
   main_language: ReadProject['main_language'],
 ) {
@@ -69,6 +80,7 @@ export async function readProjectsByTypeAndLanguage(
     .from(neptun_user_project)
     .where(
       and(
+        eq(neptun_user_project.neptun_user_id, user_id),
         eq(neptun_user_project.type, project_type),
         eq(neptun_user_project.main_language, main_language),
       ),
@@ -87,13 +99,19 @@ export async function readProjectsByTypeAndLanguage(
 }
 
 export async function updateProject(
+  user_id: ReadUser['id'],
   project_id: ReadProject['id'],
   updates: Partial<Omit<GetProject, 'id' | 'created_at' | 'updated_at'>>,
 ) {
   const updatedProject = await db
     .update(neptun_user_project)
     .set(updates)
-    .where(eq(neptun_user_project.id, project_id))
+    .where(
+      and(
+        eq(neptun_user_project.id, project_id),
+        eq(neptun_user_project.neptun_user_id, user_id),
+      ),
+    )
     .returning()
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -108,10 +126,18 @@ export async function updateProject(
   return updatedProject[0]
 }
 
-export async function deleteProject(project_id: ReadProject['id']) {
+export async function deleteProject(
+  user_id: ReadUser['id'],
+  project_id: ReadProject['id'],
+) {
   return db
     .delete(neptun_user_project)
-    .where(eq(neptun_user_project.id, project_id))
+    .where(
+      and(
+        eq(neptun_user_project.id, project_id),
+        eq(neptun_user_project.neptun_user_id, user_id),
+      ),
+    )
     .catch((err) => {
       if (LOG_BACKEND) {
         console.error('Failed to delete project:', err)

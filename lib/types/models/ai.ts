@@ -48,7 +48,6 @@ export const allowedModelsConst = [
   'meta-llama/Llama-3.3-70B-Instruct',
   'mistralai/Mistral-Nemo-Instruct-2407',
   'mistralai/Mistral-7B-Instruct-v0.3',
-  'google/gemma-2-27b-it',
   'microsoft/Phi-3-mini-4k-instruct',
   defaultAiModelDomain,
 ] as const

@@ -2,7 +2,7 @@ import type { User } from '#auth-utils'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import type { ZodError } from 'zod'
 import { z } from 'zod'
-import { primaryIdSchema } from '~/lib/types/database.tables/schema'
+import { primaryIdSchema, programming_language, project_type } from '~/lib/types/database.tables/schema'
 import {
   AllowedAiModelNamesEnum,
   AllowedAiModelPublishersEnum,
@@ -95,6 +95,13 @@ export const UuidSchema = z.object({
 
 type UuidType = z.infer<typeof UuidSchema>
 
+export const ProjectIdSchema = z.object({
+  user_id: primaryIdSchema,
+  project_id: primaryIdSchema,
+})
+
+type ProjectIdType = z.infer<typeof ProjectIdSchema>
+
 /* QUERY SCHEMAs */
 
 /**
@@ -141,6 +148,13 @@ export const CollectionNameQuerySchema = z.object({
 })
 
 type CollectionNameQueryType = z.infer<typeof CollectionNameQuerySchema>
+
+export const ProjectQuerySchema = z.object({
+  project_type: z.enum(project_type.enumValues).optional().or(z.null()),
+  programming_language: z.enum(programming_language.enumValues).optional().or(z.null()),
+})
+
+type ProjectQueryType = z.infer<typeof ProjectQuerySchema>
 
 /* BODY SCHEMAs */
 
@@ -199,8 +213,8 @@ async function validateParams<S, E = S>(
     data,
     success,
   } = secondValidationStep
-    ? secondValidationStep(maybeValidatedParams.data!)
-    : { success: true, data: null, validationErrorMessage: '' }
+      ? secondValidationStep(maybeValidatedParams.data!)
+      : { success: true, data: null, validationErrorMessage: '' }
   if (secondValidationStep) {
     if (!success || !data) {
       return {
@@ -296,7 +310,7 @@ export async function validateQueryIsShared(
     async () => {
       const result = await getValidatedQuery(event, (params) => {
         // @ts-expect-error
-        const is_shared = params?.is_shared
+        const is_shared = Boolean(params?.is_shared)
         event.context.validated.query.is_shared = is_shared
 
         return IsSharedQuerySchema.safeParse({ is_shared })
@@ -320,15 +334,16 @@ export async function validateQueryCollectionName(
     event,
     async () => {
       const query = getQuery(event)
-      const validationResult = CollectionNameQuerySchema.safeParse({
+      const result = CollectionNameQuerySchema.safeParse({
         name: query.name,
       })
 
-      return {
-        success: validationResult.success,
-        data: validationResult.success ? validationResult.data : undefined,
-        error: !validationResult.success ? validationResult.error : undefined,
+      if (!result.success) {
+        return result
       }
+
+      event.context.validated.query.name = result.data.name
+      return { success: true, data: { name: result.data.name } }
     },
     `Successfully validated queryParams(name=<collection_name>).`,
     `Invalid queryParams(name=<collection_name>).`,
@@ -362,6 +377,38 @@ export async function validateQueryOrderBy(
     `Successfully validated queryParams(order_by=<column(${orderByColumnsString}):direction(${orderByDirectionsString})>).`,
     `Invalid queryParams(order_by=<column(${orderByColumnsString}):direction(${orderByDirectionsString})>).`,
     'queryParams(order_by):',
+  )
+}
+
+/* VALIDATE QUERY PARAMS(type, main_language) */
+export async function validateQueryProject(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ProjectQueryType>> {
+  return validateParams<ProjectQueryType>(
+    event,
+    async () => {
+      const result = await getValidatedQuery(event, (query) => {
+        // @ts-expect-error
+        const type = query.project_type
+        event.context.validated.query.project_type = type
+        // @ts-expect-error
+        const main_language = query.programming_language
+        event.context.validated.query.programming_language = main_language
+
+        return ProjectQuerySchema.safeParse({
+          project_type: type,
+          programming_language: main_language,
+        })
+      })
+      if (result.success) {
+        return { success: true, data: { project_type: result.data.project_type, programming_language: result.data.programming_language } }
+      } else {
+        return result
+      }
+    },
+    `Successfully validated queryParams(project_type=<${project_type.enumValues.join(', ')}>, programming_language=<${programming_language.enumValues.join(', ')}>).`,
+    `Invalid queryParams(project_type=<${project_type.enumValues.join(', ')}>, programming_language=<${programming_language.enumValues.join(', ')}>).`,
+    'queryParams(project_type, programming_language):',
   )
 }
 
@@ -790,5 +837,43 @@ export async function validateParamUuid(
     'Successfully validated routeParams(uuid).',
     `Invalid routeParams(uuid). The resource with uuid=${event.context.validated.params.uuid} does not exist or you do not have access to it.`,
     'queryParams(uuid):',
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, project_id) */
+export async function validateParamProjectId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ProjectIdType>> {
+  return validateParams<ProjectIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const project_id = Number(params?.project_id)
+
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.project_id = project_id
+
+        return ProjectIdSchema.safeParse({ user_id, project_id })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: { 
+            user_id: result.data.user_id,
+            project_id: result.data.project_id 
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, project_id).',
+    `Invalid routeParams(user_id, project_id). The project with id=${event.context.validated.params.project_id} for user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
+    'routeParams(user_id, project_id):',
+    (user, data) => user.id !== data.user_id, // check if user has access to project information
   )
 }
