@@ -90,6 +90,34 @@ export async function readContextFilesByProjectAndType(
   return files
 }
 
+export async function readContextFilesByCategoryAndType(
+  project_id: ReadProject['id'],
+  category: ReadContextFile['category'],
+  file_type: ReadContextFile['file_type'],
+) {
+  const files = await db
+    .select()
+    .from(neptun_context_file)
+    .where(
+      and(
+        eq(neptun_context_file.project_id, project_id),
+        eq(neptun_context_file.category, category || 'unknown'),
+        eq(neptun_context_file.file_type, file_type),
+      ),
+    )
+    .catch((err) => {
+      if (LOG_BACKEND) {
+        console.error('Failed to read context files by category and type:', err)
+      }
+      return null
+    })
+
+  if (!files) {
+    return null
+  }
+  return files
+}
+
 export async function readContextFile(
   project_id: ReadProject['id'],
   file_id: ReadContextFile['id'],

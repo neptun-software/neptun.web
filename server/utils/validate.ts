@@ -2,7 +2,7 @@ import type { User } from '#auth-utils'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import type { ZodError } from 'zod'
 import { z } from 'zod'
-import { primaryIdSchema, programming_language, project_type } from '~/lib/types/database.tables/schema'
+import { context_file_category, context_file_type, import_source_type, primaryIdSchema, programming_language, project_type } from '~/lib/types/database.tables/schema'
 import {
   AllowedAiModelNamesEnum,
   AllowedAiModelPublishersEnum,
@@ -121,6 +121,22 @@ export const ResourceIdSchema = z.object({
 
 type ResourceIdType = z.infer<typeof ResourceIdSchema>
 
+export const ImportIdSchema = z.object({
+  user_id: primaryIdSchema,
+  project_id: primaryIdSchema,
+  import_id: primaryIdSchema,
+})
+
+type ImportIdType = z.infer<typeof ImportIdSchema>
+
+export const ContextFileIdSchema = z.object({
+  user_id: primaryIdSchema,
+  project_id: primaryIdSchema,
+  context_file_id: primaryIdSchema,
+})
+
+type ContextFileIdType = z.infer<typeof ContextFileIdSchema>
+
 /* QUERY SCHEMAs */
 
 /**
@@ -174,6 +190,19 @@ export const ProjectQuerySchema = z.object({
 })
 
 type ProjectQueryType = z.infer<typeof ProjectQuerySchema>
+
+export const ImportQuerySchema = z.object({
+  import_source_type: z.enum(import_source_type.enumValues).optional().or(z.null()),
+})
+
+type ImportQueryType = z.infer<typeof ImportQuerySchema>
+
+export const ContextFileQuerySchema = z.object({
+  context_file_category: z.enum(context_file_category.enumValues).optional().or(z.null()),
+  context_file_type: z.enum(context_file_type.enumValues).optional().or(z.null()),
+})
+
+type ContextFileQueryType = z.infer<typeof ContextFileQuerySchema>
 
 /* BODY SCHEMAs */
 
@@ -428,6 +457,76 @@ export async function validateQueryProject(
     `Successfully validated queryParams(project_type=<${project_type.enumValues.join(', ')}>, programming_language=<${programming_language.enumValues.join(', ')}>).`,
     `Invalid queryParams(project_type=<${project_type.enumValues.join(', ')}>, programming_language=<${programming_language.enumValues.join(', ')}>).`,
     'queryParams(project_type, programming_language):',
+  )
+}
+
+/* VALIDATE QUERY PARAMS(import_source_type) */
+export async function validateQueryImport(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ImportQueryType>> {
+  return validateParams<ImportQueryType>(
+    event,
+    async () => {
+      const result = await getValidatedQuery(event, (query) => {
+        // @ts-expect-error
+        const import_source_type = query?.import_source_type
+        event.context.validated.query.import_source_type = import_source_type
+
+        return ImportQuerySchema.safeParse({ import_source_type })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: { import_source_type: result.data.import_source_type }
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated queryParams(import_source_type).',
+    'Invalid queryParams(import_source_type).',
+    'queryParams(import_source_type):',
+  )
+}
+
+/* VALIDATE QUERY PARAMS(context_file_category, context_file_type) */
+export async function validateQueryContextFile(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ContextFileQueryType>> {
+  return validateParams<ContextFileQueryType>(
+    event,
+    async () => {
+      const result = await getValidatedQuery(event, (query) => {
+        // @ts-expect-error
+        const context_file_category = query?.context_file_category
+        // @ts-expect-error
+        const context_file_type = query?.context_file_type
+        
+        event.context.validated.query.context_file_category = context_file_category
+        event.context.validated.query.context_file_type = context_file_type
+
+        return ContextFileQuerySchema.safeParse({ 
+          context_file_category,
+          context_file_type
+        })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: { 
+            context_file_category: result.data.context_file_category,
+            context_file_type: result.data.context_file_type
+          }
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated queryParams(context_file_category, context_file_type).',
+    'Invalid queryParams(context_file_category, context_file_type).',
+    'queryParams(context_file_category, context_file_type):',
   )
 }
 
@@ -990,6 +1089,98 @@ export async function validateParamResourceId(
     'Successfully validated routeParams(user_id, project_id, resource_type, resource_id).',
     `Invalid routeParams(user_id, project_id, resource_type, resource_id). The resource with id=${event.context.validated.params.resource_id} of type=${event.context.validated.params.resource_type} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
     'routeParams(user_id, project_id, resource_type, resource_id):',
+    (user, data) => user.id !== data.user_id,
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, project_id, import_id) */
+export async function validateParamImportId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ImportIdType>> {
+  return validateParams<ImportIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const project_id = Number(params?.project_id)
+        // @ts-expect-error
+        const import_id = Number(params?.import_id)
+
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.project_id = project_id
+        event.context.validated.params.import_id = import_id
+
+        return ImportIdSchema.safeParse({ 
+          user_id, 
+          project_id,
+          import_id 
+        })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: { 
+            user_id: result.data.user_id,
+            project_id: result.data.project_id,
+            import_id: result.data.import_id
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, project_id, import_id).',
+    `Invalid routeParams(user_id, project_id, import_id). The import with id=${event.context.validated.params.import_id} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
+    'routeParams(user_id, project_id, import_id):',
+    (user, data) => user.id !== data.user_id,
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, project_id, context_file_id) */
+export async function validateParamContextFileId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ContextFileIdType>> {
+  return validateParams<ContextFileIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const project_id = Number(params?.project_id)
+        // @ts-expect-error
+        const context_file_id = Number(params?.context_file_id)
+
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.project_id = project_id
+        event.context.validated.params.context_file_id = context_file_id
+
+        return ContextFileIdSchema.safeParse({ 
+          user_id, 
+          project_id,
+          context_file_id 
+        })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: { 
+            user_id: result.data.user_id,
+            project_id: result.data.project_id,
+            context_file_id: result.data.context_file_id
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, project_id, context_file_id).',
+    `Invalid routeParams(user_id, project_id, context_file_id). The context file with id=${event.context.validated.params.context_file_id} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
+    'routeParams(user_id, project_id, context_file_id):',
     (user, data) => user.id !== data.user_id,
   )
 }

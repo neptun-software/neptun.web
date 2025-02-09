@@ -747,7 +747,6 @@ export const neptun_context_import = pgTable('neptun_context_import', {
   import_status: text('import_status').notNull().default('pending'),
   error_message: text('error_message'),
   file_tree: jsonb('file_tree'),
-  exclude_patterns: text('exclude_patterns').array(),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at')
     .defaultNow()
@@ -802,10 +801,10 @@ export const InsertContextImportSchema = InsertContextImportSchemaBase.pick({
   import_status: true,
   error_message: true,
   file_tree: true,
-  exclude_patterns: true,
   neptun_user_id: true,
   project_id: true,
 })
+export const UpdateContextImportSchema = InsertContextImportSchema.partial()
 export const SelectContextImportSchema = createSelectSchema(neptun_context_import)
 
 export type NewContextFile = typeof neptun_context_file.$inferInsert
@@ -831,4 +830,5 @@ export const InsertContextFileSchema = InsertContextFileSchemaBase.pick({
   import_id: true,
   project_id: true,
 })
+export const UpdateContextFileSchema = InsertContextFileSchema.partial()
 export const SelectContextFileSchema = createSelectSchema(neptun_context_file)
