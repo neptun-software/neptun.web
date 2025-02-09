@@ -1,4 +1,4 @@
-import type { GetGithubAppInstallation, ReadProject, ReadUser } from '../../../lib/types/database.tables/schema'
+import type { GetGithubAppInstallation, ReadProject } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
 import { project_github_installation } from '../../../lib/types/database.tables/schema'
 

@@ -1,4 +1,4 @@
-import type { ReadProject, ReadTemplateCollection, ReadUser } from '../../../lib/types/database.tables/schema'
+import type { ReadProject, ReadTemplateCollection } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
 import { project_template_collection } from '../../../lib/types/database.tables/schema'
 

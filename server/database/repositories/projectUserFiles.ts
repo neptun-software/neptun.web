@@ -1,4 +1,4 @@
-import type { ReadProject, ReadUser, ReadUserFile } from '../../../lib/types/database.tables/schema'
+import type { ReadProject, ReadUserFile } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
 import { project_user_file } from '../../../lib/types/database.tables/schema'
 

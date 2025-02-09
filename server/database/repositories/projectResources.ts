@@ -1,26 +1,26 @@
 import {
   createProjectChatConversation,
+  deleteProjectChatConversation,
   readAllProjectChatConversations,
   readProjectChatConversation,
-  deleteProjectChatConversation,
 } from './projectChatConversations'
 import {
   createProjectGithubInstallation,
+  deleteProjectGithubInstallation,
   readAllProjectGithubInstallations,
   readProjectGithubInstallation,
-  deleteProjectGithubInstallation,
 } from './projectGithubInstallations'
 import {
   createProjectTemplateCollection,
+  deleteProjectTemplateCollection,
   readAllProjectTemplateCollections,
   readProjectTemplateCollection,
-  deleteProjectTemplateCollection,
 } from './projectTemplateCollections'
 import {
   createProjectUserFile,
+  deleteProjectUserFile,
   readAllProjectUserFiles,
   readProjectUserFile,
-  deleteProjectUserFile,
 } from './projectUserFiles'
 
 type ResourceType = 'user-files' | 'template-collections' | 'github-installations' | 'chat-conversations'
@@ -33,15 +33,15 @@ export async function createResource(
 ) {
   switch (resource_type) {
     case 'user-files':
-      return await createProjectUserFile(project_id, resource_id)
+      return createProjectUserFile(project_id, resource_id)
     case 'template-collections':
-      return await createProjectTemplateCollection(project_id, resource_id)
+      return createProjectTemplateCollection(project_id, resource_id)
     case 'github-installations':
-      return await createProjectGithubInstallation(project_id, resource_id)
+      return createProjectGithubInstallation(project_id, resource_id)
     case 'chat-conversations':
-      return await createProjectChatConversation(project_id, resource_id)
+      return createProjectChatConversation(project_id, resource_id)
     default:
-      throw new Error(`Invalid resource type: ${resource_type}`)
+      throw new Error(`Invalid resource type: ${resource_type as ResourceType}`)
   }
 }
 
@@ -52,15 +52,15 @@ export async function readAllResources(
 ) {
   switch (resource_type) {
     case 'user-files':
-      return await readAllProjectUserFiles(project_id)
+      return readAllProjectUserFiles(project_id)
     case 'template-collections':
-      return await readAllProjectTemplateCollections(project_id)
+      return readAllProjectTemplateCollections(project_id)
     case 'github-installations':
-      return await readAllProjectGithubInstallations(project_id)
+      return readAllProjectGithubInstallations(project_id)
     case 'chat-conversations':
-      return await readAllProjectChatConversations(project_id)
+      return readAllProjectChatConversations(project_id)
     default:
-      throw new Error(`Invalid resource type: ${resource_type}`)
+      throw new Error(`Invalid resource type: ${resource_type as ResourceType}`)
   }
 }
 
@@ -72,15 +72,15 @@ export async function readResource(
 ) {
   switch (resource_type) {
     case 'user-files':
-      return await readProjectUserFile(project_id, resource_id)
+      return readProjectUserFile(project_id, resource_id)
     case 'template-collections':
-      return await readProjectTemplateCollection(project_id, resource_id)
+      return readProjectTemplateCollection(project_id, resource_id)
     case 'github-installations':
-      return await readProjectGithubInstallation(project_id, resource_id)
+      return readProjectGithubInstallation(project_id, resource_id)
     case 'chat-conversations':
-      return await readProjectChatConversation(project_id, resource_id)
+      return readProjectChatConversation(project_id, resource_id)
     default:
-      throw new Error(`Invalid resource type: ${resource_type}`)
+      throw new Error(`Invalid resource type: ${resource_type as ResourceType}`)
   }
 }
 
@@ -92,14 +92,14 @@ export async function deleteResource(
 ) {
   switch (resource_type) {
     case 'user-files':
-      return await deleteProjectUserFile(project_id, resource_id)
+      return deleteProjectUserFile(project_id, resource_id)
     case 'template-collections':
-      return await deleteProjectTemplateCollection(project_id, resource_id)
+      return deleteProjectTemplateCollection(project_id, resource_id)
     case 'github-installations':
-      return await deleteProjectGithubInstallation(project_id, resource_id)
+      return deleteProjectGithubInstallation(project_id, resource_id)
     case 'chat-conversations':
-      return await deleteProjectChatConversation(project_id, resource_id)
+      return deleteProjectChatConversation(project_id, resource_id)
     default:
-      throw new Error(`Invalid resource type: ${resource_type}`)
+      throw new Error(`Invalid resource type: ${resource_type as ResourceType}`)
   }
 }

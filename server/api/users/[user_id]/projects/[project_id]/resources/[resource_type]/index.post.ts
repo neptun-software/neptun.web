@@ -1,20 +1,22 @@
-import { createResource } from '~/server/database/repositories/projectResources'
-import { validateParamResourceType } from '~/server/utils/validate'
 import {
   InsertProjectChatConversationSchema,
   InsertProjectGithubInstallationSchema,
   InsertProjectTemplateCollectionSchema,
   InsertProjectUserFileSchema,
 } from '~/lib/types/database.tables/schema'
+import { createResource } from '~/server/database/repositories/projectResources'
+import { validateParamResourceType } from '~/server/utils/validate'
 
-type ResourceData = {
+type ResourceType = 'user-files' | 'template-collections' | 'github-installations' | 'chat-conversations'
+
+interface ResourceData {
   chat_conversation_id?: number
   github_installation_id?: number
   template_collection_id?: number
   user_file_id?: number
 }
 
-const getResourceId = (data: ResourceData) => {
+function getResourceId(data: ResourceData) {
   return data.chat_conversation_id ?? data.github_installation_id ?? data.template_collection_id ?? data.user_file_id
 }
 
@@ -45,14 +47,7 @@ export default defineEventHandler(async (event) => {
       case 'chat-conversations':
         return InsertProjectChatConversationSchema.safeParse(body)
       default:
-        return sendError(
-          event,
-          createError({
-            statusCode: 400,
-            statusMessage: 'Bad Request',
-            message: `Invalid resource type: ${resource_type}`,
-          }),
-        )
+        throw new Error(`Invalid resource type: ${resource_type as ResourceType}`)
     }
   })
   if (!body.success || !body.data) {
@@ -61,7 +56,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
-        message: `Invalid body for resource type: ${resource_type}`,
+        message: `Invalid body for resource type: ${resource_type as ResourceType}`,
         data: body.error,
       }),
     )
@@ -75,7 +70,7 @@ export default defineEventHandler(async (event) => {
       createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
-        message: `Invalid body for resource type: ${resource_type}`,
+        message: `Invalid body for resource type: ${resource_type as ResourceType}`,
         data: body.error,
       }),
     )
@@ -101,7 +96,8 @@ export default defineEventHandler(async (event) => {
       event,
       createError({
         statusCode: 500,
-        statusMessage: 'Internal Server Error. Failed to create resource.',
+        statusMessage: 'Internal Server Error.',
+        message: 'Failed to create resource.',
         data: error,
       }),
     )

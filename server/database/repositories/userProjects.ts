@@ -4,7 +4,7 @@ import {
   neptun_user_project,
   type ProjectToCreate,
   type ReadProject,
-  ReadUser,
+  type ReadUser,
 } from '../../../lib/types/database.tables/schema'
 
 export async function createProject(project: ProjectToCreate) {

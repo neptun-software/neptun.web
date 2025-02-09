@@ -261,8 +261,8 @@ async function validateParams<S, E = S>(
     data,
     success,
   } = secondValidationStep
-      ? secondValidationStep(maybeValidatedParams.data!)
-      : { success: true, data: null, validationErrorMessage: '' }
+    ? secondValidationStep(maybeValidatedParams.data!)
+    : { success: true, data: null, validationErrorMessage: '' }
   if (secondValidationStep) {
     if (!success || !data) {
       return {
@@ -478,7 +478,7 @@ export async function validateQueryImport(
       if (result.success) {
         return {
           success: true,
-          data: { import_source_type: result.data.import_source_type }
+          data: { import_source_type: result.data.import_source_type },
         }
       } else {
         return result
@@ -502,23 +502,23 @@ export async function validateQueryContextFile(
         const context_file_category = query?.context_file_category
         // @ts-expect-error
         const context_file_type = query?.context_file_type
-        
+
         event.context.validated.query.context_file_category = context_file_category
         event.context.validated.query.context_file_type = context_file_type
 
-        return ContextFileQuerySchema.safeParse({ 
+        return ContextFileQuerySchema.safeParse({
           context_file_category,
-          context_file_type
+          context_file_type,
         })
       })
 
       if (result.success) {
         return {
           success: true,
-          data: { 
+          data: {
             context_file_category: result.data.context_file_category,
-            context_file_type: result.data.context_file_type
-          }
+            context_file_type: result.data.context_file_type,
+          },
         }
       } else {
         return result
@@ -980,9 +980,9 @@ export async function validateParamProjectId(
       if (result.success) {
         return {
           success: true,
-          data: { 
+          data: {
             user_id: result.data.user_id,
-            project_id: result.data.project_id 
+            project_id: result.data.project_id,
           },
         }
       } else {
@@ -1015,8 +1015,8 @@ export async function validateParamResourceType(
         event.context.validated.params.project_id = project_id
         event.context.validated.params.resource_type = resource_type
 
-        return ResourceTypeSchema.safeParse({ 
-          user_id, 
+        return ResourceTypeSchema.safeParse({
+          user_id,
           project_id,
           resource_type,
         })
@@ -1025,10 +1025,10 @@ export async function validateParamResourceType(
       if (result.success) {
         return {
           success: true,
-          data: { 
+          data: {
             user_id: result.data.user_id,
             project_id: result.data.project_id,
-            resource_type: result.data.resource_type
+            resource_type: result.data.resource_type,
           },
         }
       } else {
@@ -1064,22 +1064,22 @@ export async function validateParamResourceId(
         event.context.validated.params.resource_type = resource_type
         event.context.validated.params.resource_id = resource_id
 
-        return ResourceIdSchema.safeParse({ 
-          user_id, 
+        return ResourceIdSchema.safeParse({
+          user_id,
           project_id,
           resource_type,
-          resource_id 
+          resource_id,
         })
       })
 
       if (result.success) {
         return {
           success: true,
-          data: { 
+          data: {
             user_id: result.data.user_id,
             project_id: result.data.project_id,
             resource_type: result.data.resource_type,
-            resource_id: result.data.resource_id
+            resource_id: result.data.resource_id,
           },
         }
       } else {
@@ -1112,20 +1112,20 @@ export async function validateParamImportId(
         event.context.validated.params.project_id = project_id
         event.context.validated.params.import_id = import_id
 
-        return ImportIdSchema.safeParse({ 
-          user_id, 
+        return ImportIdSchema.safeParse({
+          user_id,
           project_id,
-          import_id 
+          import_id,
         })
       })
 
       if (result.success) {
         return {
           success: true,
-          data: { 
+          data: {
             user_id: result.data.user_id,
             project_id: result.data.project_id,
-            import_id: result.data.import_id
+            import_id: result.data.import_id,
           },
         }
       } else {
@@ -1158,20 +1158,20 @@ export async function validateParamContextFileId(
         event.context.validated.params.project_id = project_id
         event.context.validated.params.context_file_id = context_file_id
 
-        return ContextFileIdSchema.safeParse({ 
-          user_id, 
+        return ContextFileIdSchema.safeParse({
+          user_id,
           project_id,
-          context_file_id 
+          context_file_id,
         })
       })
 
       if (result.success) {
         return {
           success: true,
-          data: { 
+          data: {
             user_id: result.data.user_id,
             project_id: result.data.project_id,
-            context_file_id: result.data.context_file_id
+            context_file_id: result.data.context_file_id,
           },
         }
       } else {
