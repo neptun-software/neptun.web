@@ -26,7 +26,7 @@ importers:
         version: 0.10.4
       '@nuxt/image':
         specifier: ^1.8.1
-        version: 1.8.1(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(magicast@0.3.5)(rollup@4.29.1)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
+        version: 1.8.1(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(magicast@0.3.5)(rollup@4.29.1)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
       '@nuxtjs/device':
         specifier: ^3.2.4
         version: 3.2.4
@@ -49,8 +49,8 @@ importers:
         specifier: ^4.14.6
         version: 4.15.0(vue@3.5.13(typescript@5.7.2))(zod@3.24.1)
       '@vercel/kv':
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: ^3.0.0
+        version: 3.0.0
       '@vitejs/plugin-vue':
         specifier: ^5.1.4
         version: 5.2.1(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.2))
@@ -95,7 +95,7 @@ importers:
         version: 6.9.16
       nuxt:
         specifier: ^3.14.1592
-        version: 3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0)
+        version: 3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0)
       nuxt-auth-utils:
         specifier: ^0.3.9
         version: 0.3.9(magicast@0.3.5)(rollup@4.29.1)
@@ -110,7 +110,7 @@ importers:
         version: 2.0.0(magicast@0.3.5)(rollup@4.29.1)
       nuxt-time:
         specifier: ^1.0.2
-        version: 1.0.3(magicast@0.3.5)(nuxt@3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0))(rollup@4.29.1)
+        version: 1.0.3(magicast@0.3.5)(nuxt@3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0))(rollup@4.29.1)
       octokit:
         specifier: ^4.0.2
         version: 4.0.3
@@ -210,7 +210,7 @@ importers:
         version: 11.3.0(vue@3.5.13(typescript@5.7.2))
       '@vueuse/nuxt':
         specifier: ^11.1.0
-        version: 11.3.0(magicast@0.3.5)(nuxt@3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0))(rollup@4.29.1)(vue@3.5.13(typescript@5.7.2))
+        version: 11.3.0(magicast@0.3.5)(nuxt@3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0))(rollup@4.29.1)(vue@3.5.13(typescript@5.7.2))
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.49)
@@ -2186,16 +2186,16 @@ packages:
       uploadthing: ^7.2.0
       vue: ^3.4.0
 
-  '@upstash/redis@1.25.1':
-    resolution: {integrity: sha512-ACj0GhJ4qrQyBshwFgPod6XufVEfKX2wcaihsEvSdLYnY+m+pa13kGt1RXm/yTHKf4TQi/Dy2A8z/y6WUEOmlg==}
+  '@upstash/redis@1.34.4':
+    resolution: {integrity: sha512-AZx2iD5s1Pu/KCrRA7KVCffu3NSoaYnNY7N9YI7aLAYhcJfsriQKTe+8OxQWJqGqFbrvm17Lyr9HFnDLvqNpfA==}
 
   '@vee-validate/zod@4.15.0':
     resolution: {integrity: sha512-MpvIKiyg9X5yD8bJW0no2AU7wtR2T5mrvD9tuPRiie951sU2n6QKgMV38qKKOiqFBCxsMSjIuLLLV3V5kVE4nQ==}
     peerDependencies:
       zod: ^3.24.0
 
-  '@vercel/kv@1.0.1':
-    resolution: {integrity: sha512-uTKddsqVYS2GRAM/QMNNXCTuw9N742mLoGRXoNDcyECaxEXvIHG0dEY+ZnYISV4Vz534VwJO+64fd9XeSggSKw==}
+  '@vercel/kv@3.0.0':
+    resolution: {integrity: sha512-pKT8fRnfyYk2MgvyB6fn6ipJPCdfZwiKDdw7vB+HL50rjboEBHDVBEcnwfkEpVSp2AjNtoaOUH7zG+bVC/rvSg==}
     engines: {node: '>=14.6'}
 
   '@vercel/nft@0.27.10':
@@ -8421,7 +8421,7 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@nuxt/image@1.8.1(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(magicast@0.3.5)(rollup@4.29.1)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))':
+  '@nuxt/image@1.8.1(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(magicast@0.3.5)(rollup@4.29.1)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))':
     dependencies:
       '@nuxt/kit': 3.15.0(magicast@0.3.5)(rollup@4.29.1)
       consola: 3.3.3
@@ -8434,7 +8434,7 @@ snapshots:
       std-env: 3.8.0
       ufo: 1.5.4
     optionalDependencies:
-      ipx: 2.1.0(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
+      ipx: 2.1.0(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -9487,7 +9487,7 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
 
-  '@upstash/redis@1.25.1':
+  '@upstash/redis@1.34.4':
     dependencies:
       crypto-js: 4.2.0
 
@@ -9499,9 +9499,9 @@ snapshots:
     transitivePeerDependencies:
       - vue
 
-  '@vercel/kv@1.0.1':
+  '@vercel/kv@3.0.0':
     dependencies:
-      '@upstash/redis': 1.25.1
+      '@upstash/redis': 1.34.4
 
   '@vercel/nft@0.27.10(rollup@4.29.1)':
     dependencies:
@@ -9856,13 +9856,13 @@ snapshots:
 
   '@vueuse/metadata@11.3.0': {}
 
-  '@vueuse/nuxt@11.3.0(magicast@0.3.5)(nuxt@3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0))(rollup@4.29.1)(vue@3.5.13(typescript@5.7.2))':
+  '@vueuse/nuxt@11.3.0(magicast@0.3.5)(nuxt@3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0))(rollup@4.29.1)(vue@3.5.13(typescript@5.7.2))':
     dependencies:
       '@nuxt/kit': 3.15.0(magicast@0.3.5)(rollup@4.29.1)
       '@vueuse/core': 11.3.0(vue@3.5.13(typescript@5.7.2))
       '@vueuse/metadata': 11.3.0
       local-pkg: 0.5.1
-      nuxt: 3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0)
+      nuxt: 3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0)
       vue-demi: 0.14.10(vue@3.5.13(typescript@5.7.2))
     transitivePeerDependencies:
       - '@vue/composition-api'
@@ -12008,7 +12008,7 @@ snapshots:
       jsbn: 1.1.0
       sprintf-js: 1.1.3
 
-  ipx@2.1.0(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17)):
+  ipx@2.1.0(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17)):
     dependencies:
       '@fastify/accept-negotiator': 1.1.0
       citty: 0.1.6
@@ -12024,7 +12024,7 @@ snapshots:
       sharp: 0.32.6
       svgo: 3.3.2
       ufo: 1.5.4
-      unstorage: 1.14.4(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
+      unstorage: 1.14.4(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
       xss: 1.0.15
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -12885,7 +12885,7 @@ snapshots:
 
   netmask@2.0.2: {}
 
-  nitropack@2.10.4(@vercel/kv@1.0.1)(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17)):
+  nitropack@2.10.4(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17)):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
       '@netlify/functions': 2.8.2
@@ -12952,7 +12952,7 @@ snapshots:
       unctx: 2.4.1
       unenv: 1.10.0
       unimport: 3.14.5(rollup@4.29.1)
-      unstorage: 1.14.4(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
+      unstorage: 1.14.4(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
       untyped: 1.5.2
       unwasm: 0.3.9
     transitivePeerDependencies:
@@ -13141,16 +13141,16 @@ snapshots:
       - vite
       - vue
 
-  nuxt-time@1.0.3(magicast@0.3.5)(nuxt@3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0))(rollup@4.29.1):
+  nuxt-time@1.0.3(magicast@0.3.5)(nuxt@3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0))(rollup@4.29.1):
     dependencies:
       '@nuxt/kit': 3.15.0(magicast@0.3.5)(rollup@4.29.1)
-      nuxt: 3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0)
+      nuxt: 3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0)
     transitivePeerDependencies:
       - magicast
       - rollup
       - supports-color
 
-  nuxt@3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0):
+  nuxt@3.15.0(@parcel/watcher@2.5.0)(@types/node@22.10.2)(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(eslint@9.17.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.29.1)(sass-embedded@1.83.0)(terser@5.37.0)(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.1.10(typescript@5.7.2))(yaml@2.7.0):
     dependencies:
       '@nuxt/devalue': 2.0.2
       '@nuxt/devtools': 1.7.0(rollup@4.29.1)(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.2))
@@ -13187,7 +13187,7 @@ snapshots:
       magic-string: 0.30.17
       mlly: 1.7.3
       nanotar: 0.1.1
-      nitropack: 2.10.4(@vercel/kv@1.0.1)(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
+      nitropack: 2.10.4(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))(typescript@5.7.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
       nuxi: 3.17.2
       nypm: 0.4.1
       ofetch: 1.4.1
@@ -13210,7 +13210,7 @@ snapshots:
       unimport: 3.14.5(rollup@4.29.1)
       unplugin: 2.1.2
       unplugin-vue-router: 0.10.9(rollup@4.29.1)(vue-router@4.5.0(vue@3.5.13(typescript@5.7.2)))(vue@3.5.13(typescript@5.7.2))
-      unstorage: 1.14.4(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
+      unstorage: 1.14.4(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17))
       untyped: 1.5.2
       vue: 3.5.13(typescript@5.7.2)
       vue-bundle-renderer: 2.1.1
@@ -15078,7 +15078,7 @@ snapshots:
       acorn: 8.14.0
       webpack-virtual-modules: 0.6.2
 
-  unstorage@1.14.4(@vercel/kv@1.0.1)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17)):
+  unstorage@1.14.4(@upstash/redis@1.34.4)(@vercel/kv@3.0.0)(db0@0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0)))(ioredis@5.4.2)(uploadthing@7.4.4(h3@1.13.0)(tailwindcss@3.4.17)):
     dependencies:
       anymatch: 3.1.3
       chokidar: 3.6.0
@@ -15089,7 +15089,8 @@ snapshots:
       ofetch: 1.4.1
       ufo: 1.5.4
     optionalDependencies:
-      '@vercel/kv': 1.0.1
+      '@upstash/redis': 1.34.4
+      '@vercel/kv': 3.0.0
       db0: 0.2.1(drizzle-orm@0.33.0(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(postgres@3.4.5)(react@19.0.0))
       ioredis: 5.4.2
       uploadthing: 7.4.4(h3@1.13.0)(tailwindcss@3.4.17)
