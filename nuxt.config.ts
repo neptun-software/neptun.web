@@ -357,8 +357,7 @@ export default defineNuxtConfig({
   security: {
     rateLimiter: false,
     headers: {
-      crossOriginEmbedderPolicy:
-        NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp', // to allow devtools
+      crossOriginEmbedderPolicy: NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp',
       contentSecurityPolicy: {
         'img-src': [
           'http://localhost:42124',
@@ -366,6 +365,10 @@ export default defineNuxtConfig({
           'https://eu.i.posthog.com',
           productionURL,
         ],
+        'frame-src': ['https://neptun-software.github.io'],
+      },
+      permissionsPolicy: {
+        fullscreen: ["'self'", 'https://neptun-software.github.io'],
       },
     },
   },
