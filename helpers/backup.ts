@@ -45,7 +45,9 @@ async function backupDatabase() {
     console.log(`  • Schema file: ${path.relative('.', schemaFilepath)}`)
 
     console.log('\n🚀 Preparing pg_dump command...')
-    const command = `pg_dump -h ${url.hostname} -p ${port} -U ${username} -d ${database} ${schemaOnlyFlag} -F p > "${filepath}"`
+    // -x to skip built-in objects
+    // -O to skip ownership commands
+    const command = `pg_dump -h ${url.hostname} -p ${port} -U ${username} -d ${database} ${schemaOnlyFlag} -x -O --schema=public > "${filepath}"`
     console.log('📝 Command:', command.replace(password || '', '********'))
 
     console.log('\n⏳ Executing backup...')

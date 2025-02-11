@@ -59,6 +59,7 @@ export const github_app_installationRelations = relations(
     github_app_installation_repositories: many(
       github_app_installation_repository,
     ),
+    project_github_installations: many(project_github_installation),
   }),
 )
 
@@ -82,6 +83,7 @@ export const chat_conversationRelations = relations(
       fields: [chat_conversation.neptun_user_id],
       references: [neptun_user.id],
     }),
+    project_chat_conversations: many(project_chat_conversation),
   }),
 )
 
@@ -186,6 +188,7 @@ export const neptun_user_template_collectionRelations = relations(
       references: [neptun_user.id],
     }),
     templates: many(neptun_user_template),
+    project_template_collections: many(project_template_collection),
   }),
 )
 

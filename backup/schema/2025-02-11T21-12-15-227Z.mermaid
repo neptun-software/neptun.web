@@ -183,6 +183,7 @@ erDiagram
 
     %% Relationships
     chat_conversation }o--|| neptun_user : "references"
+    chat_conversation }|--|| project_chat_conversation : "references"
     chat_conversation_file }o--|| neptun_user : "references"
     chat_conversation_file }o--|| chat_conversation : "references"
     chat_conversation_file }o--|| chat_conversation_message : "references"
