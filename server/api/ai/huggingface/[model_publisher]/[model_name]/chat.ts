@@ -92,7 +92,9 @@ export default defineLazyEventHandler(async () => {
 
     const userMessage = messages[messages.length - 1] // { role: 'user', content: 'message' }
     // if (LOG_BACKEND) console.info("current user message", userMessage);
-    if (!is_playground) {
+    
+    // always persist user message if we have a valid chat_id and are not in playground mode
+    if (chat_id !== -1 && !is_playground) {
       await persistUserChatMessage(user.id, chat_id, userMessage.content, event)
     }
 
@@ -194,6 +196,7 @@ export default defineLazyEventHandler(async () => {
                     const cleaned = getSanitizedMessageContent(buffer)
                     if (cleaned) {
                       accumulatedText += cleaned
+                      // if (LOG_BACKEND) console.info('Accumulated cleaned text:', cleaned)
                       controller.enqueue(encoder.encode(`0:${JSON.stringify(cleaned)}\n`))
                     }
                     buffer = ''
@@ -202,6 +205,7 @@ export default defineLazyEventHandler(async () => {
                   // No model tags, stream directly while preserving whitespace
                   const token = chunk.token.text
                   accumulatedText += token
+                  // if (LOG_BACKEND) console.info('Accumulated token:', token)
                   controller.enqueue(encoder.encode(`0:${JSON.stringify(token)}\n`))
                 }
               }
@@ -212,13 +216,21 @@ export default defineLazyEventHandler(async () => {
               const cleaned = getSanitizedMessageContent(buffer)
               if (cleaned) {
                 accumulatedText += cleaned
+                // if (LOG_BACKEND) console.info('Accumulated final cleaned text:', cleaned)
                 controller.enqueue(encoder.encode(`0:${JSON.stringify(cleaned)}\n`))
               }
             }
 
-            // Persist the complete message if not in playground mode
-            if (!is_playground) {
-              await persistAiChatMessage(user.id, chat_id, accumulatedText, event)
+            // persist the complete message if we have a valid chat_id and are not in playground mode
+            if (chat_id !== -1 && !is_playground) {
+              if (LOG_BACKEND) {
+                console.info('Final accumulated text to persist:', accumulatedText)
+                console.info('Persisting AI message for user:', user.id, 'chat:', chat_id)
+              }
+              const result = await persistAiChatMessage(user.id, chat_id, accumulatedText, event)
+              if (LOG_BACKEND) {
+                console.info('Persistence result:', result)
+              }
             }
           } catch (error) {
             controller.error(error)

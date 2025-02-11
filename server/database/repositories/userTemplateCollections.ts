@@ -13,22 +13,17 @@ export async function readTemplateCollection(chat_collection_share_uuid: ReadTem
   is_shared?: boolean | null
   user_id?: number | null
 }) {
+  const conditions = [eq(neptun_user_template_collection.share_uuid, chat_collection_share_uuid)]
+
+  if (is_shared !== null) {
+    conditions.push(eq(neptun_user_template_collection.is_shared, is_shared))
+  }
+  if (user_id !== null) {
+    conditions.push(eq(neptun_user_template_collection.neptun_user_id, user_id))
+  }
+
   const collection = await db.query.neptun_user_template_collection.findFirst({
-    where: and(
-      eq(neptun_user_template_collection.share_uuid, chat_collection_share_uuid),
-      (() => {
-        const conditions = []
-
-        if (is_shared !== null) {
-          conditions.push(eq(neptun_user_template_collection.is_shared, is_shared))
-        }
-        if (user_id !== null) {
-          conditions.push(eq(neptun_user_template_collection.neptun_user_id, user_id))
-        }
-
-        return conditions.length > 0 ? and(...conditions) : undefined
-      })(),
-    ),
+    where: conditions.length > 0 ? and(...conditions) : undefined,
     with: {
       templates: {
         with: {
@@ -79,22 +74,20 @@ export async function readAllTemplateCollections({
   user_id?: number | null
   name?: string | null
 }) {
+  const conditions = []
+
+  if (is_shared !== null) {
+    conditions.push(eq(neptun_user_template_collection.is_shared, is_shared))
+  }
+  if (user_id !== null) {
+    conditions.push(eq(neptun_user_template_collection.neptun_user_id, user_id))
+  }
+  if (name !== null) {
+    conditions.push(sql`LOWER(${neptun_user_template_collection.name}) LIKE LOWER(${`%${name}%`})`)
+  }
+
   const collections = await db.query.neptun_user_template_collection.findMany({
-    where: (() => {
-      const conditions = []
-
-      if (is_shared !== null) {
-        conditions.push(eq(neptun_user_template_collection.is_shared, is_shared))
-      }
-      if (user_id !== null) {
-        conditions.push(eq(neptun_user_template_collection.neptun_user_id, user_id))
-      }
-      if (name !== null) {
-        conditions.push(sql`LOWER(${neptun_user_template_collection.name}) LIKE LOWER(${`%${name}%`})`)
-      }
-
-      return conditions.length > 0 ? and(...conditions) : undefined
-    })(),
+    where: conditions.length > 0 ? and(...conditions) : undefined,
     with: {
       templates: {
         with: {

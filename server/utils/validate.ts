@@ -333,7 +333,7 @@ export async function validateQueryChatId(
         const chat_id = Number(params?.chat_id)
         event.context.validated.query.chat_id = chat_id
         // @ts-expect-error
-        const is_playground = Boolean(params?.is_playground)
+        const is_playground = params?.is_playground === undefined ? null : params?.is_playground === 'true'
         event.context.validated.query.is_playground = is_playground
 
         return ChatIdQuerySchema.safeParse({ chat_id, is_playground })
@@ -358,7 +358,7 @@ export async function validateQueryIsShared(
     async () => {
       const result = await getValidatedQuery(event, (params) => {
         // @ts-expect-error
-        const is_shared = Boolean(params?.is_shared)
+        const is_shared = params?.is_shared === undefined ? null : params?.is_shared === 'true'
         event.context.validated.query.is_shared = is_shared
 
         return IsSharedQuerySchema.safeParse({ is_shared })
