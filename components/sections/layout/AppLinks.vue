@@ -9,7 +9,7 @@ const { loggedIn } = useUserSession()
 const router = useRouter()
 const routes = router.options.routes
 
-const hiddenRoutes = ['/new-password', '/shared/chats/:uuid()', '/shared/collections/:uuid()']
+const hiddenRoutes = ['/new-password', '/presentation', '/shared/chats/:uuid()', '/shared/collections/:uuid()']
 const hiddenRoutesIfLoggedIn = hiddenRoutes.concat(['/log-in', '/sign-up'])
 const hiddenRoutesIfLoggedOut = hiddenRoutes.concat([
   '/',
@@ -69,7 +69,7 @@ const isNavigationLayout = computed(() => props.layout === 'navigation')
     <!-- Desktop Navigation (also displayed in footer on mobile) -->
     <ul
       v-else
-      class="flex flex-wrap items-center justify-center gap-2"
+      class="flex flex-wrap gap-2 justify-center items-center"
       :class="isNavigationLayout ? 'navigation' : 'default'"
     >
       <li v-for="route in sortedRoutes" :key="route.path">

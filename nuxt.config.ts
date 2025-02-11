@@ -368,7 +368,7 @@ export default defineNuxtConfig({
         'frame-src': ['https://neptun-software.github.io'],
       },
       permissionsPolicy: {
-        fullscreen: ["'self'", 'https://neptun-software.github.io'],
+        fullscreen: ['\'self\'', 'https://neptun-software.github.io'],
       },
     },
   },
