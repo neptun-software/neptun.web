@@ -366,6 +366,10 @@ export default defineNuxtConfig({
           'https://avatars.githubusercontent.com',
           'https://eu.i.posthog.com',
           productionURL,
+          // fallback domains (no GitHub- and Google OAuth apps)
+          'https://neptunai.changeip.co',
+          'https://neptungen.ddns.info',
+          'https://neptun.jonasfroeller.online',
         ],
         'frame-src': ['https://neptun-software.github.io'],
       },
