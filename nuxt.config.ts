@@ -24,7 +24,7 @@ console.info(`NODE_ENV: ${NODE_ENV}`)
 /* 'nuxt-og-image', */
 export default defineNuxtConfig({
   modules: [
-    '@nuxt/eslint',
+    /* '@nuxt/eslint', */
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
     '@nuxtjs/color-mode',
@@ -132,6 +132,7 @@ export default defineNuxtConfig({
   mdc: {
     remarkPlugins: {
       'remark-flexible-code-titles': {},
+      'remark-gfm': {},
     },
     // see https://github.com/nuxt-modules/mdc/issues/315
     /* rehypePlugins: {
@@ -147,12 +148,13 @@ export default defineNuxtConfig({
       },
     }, */
     highlight: {
-      highlighter: 'shiki',
+      shikiEngine: 'javascript',
       theme: {
-        dark: 'github-dark',
         default: 'github-light',
+        dark: 'github-dark'
       },
       langs: supportedShikiLanguages,
+      preload: supportedShikiLanguages,
     },
   },
 
@@ -203,7 +205,7 @@ export default defineNuxtConfig({
     /* session persists for 7 days */
     session: {
       name: 'neptun-session',
-      password: process.env.NUXT_SESSION_PASSWORD,
+      password: process.env.NUXT_SESSION_PASSWORD ?? '',
       cookie: {
         sameSite: 'lax',
       },
@@ -318,21 +320,21 @@ export default defineNuxtConfig({
     },
   },
 
-  eslint: {
+  /* eslint: {
     checker: true,
     config: {
       standalone: false,
     },
-  },
+  }, */
 
   posthog: {
-    /* https://nuxt-posthog.cmitjans.dev/configuration */
+    // https://nuxt-posthog.cmitjans.dev/configuration
     publicKey: process.env.POSTHOG_API_KEY,
     host: process.env.POSTHOG_HOST,
     capturePageViews: true,
     disabled:
       process.env.POSTHOG_ACTIVE
-      === 'false', /* process.dev (deprecated), import.meta.dev (unusable in config file) (https://nuxt.com/docs/api/advanced/import-meta#runtime-app-properties) */
+      === 'false', // process.dev (deprecated), import.meta.dev (unusable in config file) (https://nuxt.com/docs/api/advanced/import-meta#runtime-app-properties)
   },
 
   uploadthing: {

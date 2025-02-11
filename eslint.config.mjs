@@ -4,6 +4,7 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 // https://antfu.me/posts/why-not-prettier
 export default withNuxt(
   antfu({
+    standalone: false,
     stylistic: {
       semi: false,
     },

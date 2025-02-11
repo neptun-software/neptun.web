@@ -12,7 +12,9 @@ export default defineEventHandler(async (event) => {
   // const host = getHeader(event, 'host'); // 'x-forwarded-for' => 127.0.0.1
   // let protocol = getHeader(event, 'x-forwarded-proto') || 'http';
   // `${protocol}://${host}:42124`
-  const url = event.context.siteConfig.get().url
+  const url = process.env.NODE_ENV === 'production' 
+    ? 'https://neptun-webui.vercel.app'
+    : `http://${getRequestHost(event)}`
 
   const CLI_CONFIGURATION = {
     utils: {
