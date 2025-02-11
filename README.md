@@ -53,23 +53,23 @@ nr find-version [package_name]
     "devx": "set EDITOR=code && nuxt dev --host --https --ssl-cert ./configurations/development/ssl/server.crt --ssl-key ./configurations/development/ssl/server.key",
     "app": "export EDITOR=code && nuxt dev",
     "appx": "export EDITOR=code && nuxt dev --host --https --ssl-cert ./configurations/development/ssl/server.crt --ssl-key ./configurations/development/ssl/server.key",
-    "preparex": "npm run types && npm run render",
-    "types": "npx nuxi prepare",
-    "render": "nuxt generate",
+    "preparex": "nr cleanup && nr types && nr render",
+    "types": "pnpx nuxi prepare",
+    "render": "pnpx nuxi generate",
     "postinstall": "nuxt prepare",
     "build": "nuxt build",
     "preview": "nuxt preview",
-    "format-and-lint": "npx prettier --plugin-search-dir . --check . && npx eslint .",
-    "format": "npx prettier --write . --single-quote --trailing-comma es5 --semi",
+    "format-and-lint": "pnpx prettier --plugin-search-dir . --check . && pnpx eslint .",
+    "format": "pnpx prettier --write . --single-quote --trailing-comma es5 --semi",
     "lint": "eslint . --fix",
-    "lint-settings": "npx @eslint/config-inspector",
-    "check": "npx nuxi typecheck",
-    "shadcn": "npx shadcn-vue@latest add",
+    "lint-settings": "pnpx @eslint/config-inspector",
+    "check": "pnpx nuxi typecheck",
+    "shadcn": "pnpx shadcn-vue@latest add",
     "cleanup": "pnpx nuxi cleanup .",
     "fresh": "npm cache verify && pnpm rebuild && pnpx nuxi cleanup",
-    "upgrade": "npx nuxi upgrade -f",
-    "statistics": "npx nuxi analyze",
-    "info": "npx nuxi info",
+    "upgrade": "pnpm dlx nuxi upgrade -f",
+    "statistics": "pnpx nuxi analyze",
+    "info": "pnpx nuxi info",
     "find-version": "node ./helpers/find-package-version.cjs",
     "db:push": "drizzle-kit push --config drizzle-dev.config.ts",
     "db:push:prod": "drizzle-kit push --config drizzle-prod.config.ts",
@@ -298,7 +298,7 @@ erDiagram
     chat_conversation {
         id integer_NOT_NULL
         name text_NOT_NULL
-        model ai_model_enum_NOT_NULL
+        model text_NOT_NULL
         created_at timestamp_without_time_zone
         updated_at timestamp_without_time_zone
         neptun_user_id integer_NOT_NULL
@@ -383,12 +383,54 @@ erDiagram
         updated_at timestamp_without_time_zone
         neptun_user_id integer_NOT_NULL
     }
+    neptun_context_file {
+        id integer_NOT_NULL
+        title text_NOT_NULL
+        original_path text_NOT_NULL
+        content text_NOT_NULL
+        file_type context_file_type_NOT_NULL
+        category context_file_category
+        file_size integer
+        pdf_url text
+        language text
+        metadata jsonb
+        parent_path text
+        depth integer
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
+        import_id integer_NOT_NULL
+        project_id integer
+    }
+    neptun_context_import {
+        id integer_NOT_NULL
+        source_type import_source_type_NOT_NULL
+        source_path text_NOT_NULL
+        source_ref text
+        import_status text
+        error_message text
+        file_tree jsonb
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
+        project_id integer
+    }
     neptun_user_file {
         id integer_NOT_NULL
         title text
         text text_NOT_NULL
         language text
         file_extension text
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
+    }
+    neptun_user_project {
+        id integer_NOT_NULL
+        name text_NOT_NULL
+        description text
+        type project_type_NOT_NULL
+        main_language programming_language_NOT_NULL
         created_at timestamp_without_time_zone
         updated_at timestamp_without_time_zone
         neptun_user_id integer_NOT_NULL
@@ -413,25 +455,59 @@ erDiagram
         updated_at timestamp_without_time_zone
         neptun_user_id integer_NOT_NULL
     }
+    project_chat_conversation {
+        project_id integer_NOT_NULL
+        chat_conversation_id integer_NOT_NULL
+        created_at timestamp_without_time_zone
+    }
+    project_github_installation {
+        project_id integer_NOT_NULL
+        github_installation_id integer_NOT_NULL
+        created_at timestamp_without_time_zone
+    }
+    project_template_collection {
+        project_id integer_NOT_NULL
+        template_collection_id integer_NOT_NULL
+        created_at timestamp_without_time_zone
+    }
+    project_user_file {
+        project_id integer_NOT_NULL
+        user_file_id integer_NOT_NULL
+        created_at timestamp_without_time_zone
+    }
 
+    %% Relationships
+    chat_conversation }o--|| neptun_user : "references"
+    chat_conversation_file }o--|| neptun_user : "references"
     chat_conversation_file }o--|| chat_conversation : "references"
     chat_conversation_file }o--|| chat_conversation_message : "references"
     chat_conversation_file }o--|| neptun_user_file : "references"
-    chat_conversation_file }o--|| neptun_user : "references"
-    chat_conversation_message }o--|| chat_conversation : "references"
     chat_conversation_message }o--|| neptun_user : "references"
-    chat_conversation }o--|| neptun_user : "references"
+    chat_conversation_message }o--|| chat_conversation : "references"
     chat_conversation_share }o--|| chat_conversation : "references"
     chat_conversation_share_whitelist_entry }o--|| chat_conversation_share : "references"
-    chat_conversation_share_whitelist_entry }o--|| neptun_user : "references"
     github_app_installation }o--|| neptun_user : "references"
     github_app_installation_repository }o--|| github_app_installation : "references"
+    neptun_context_file }o--|| neptun_user : "references"
+    neptun_context_file }o--|| neptun_context_import : "references"
+    neptun_context_file }o--|| neptun_user_project : "references"
+    neptun_context_import }o--|| neptun_user : "references"
+    neptun_context_import }o--|| neptun_user_project : "references"
     neptun_user_file }o--|| neptun_user : "references"
     neptun_user_oauth_account }o--|| neptun_user : "references"
-    neptun_user_template_collection }o--|| neptun_user : "references"
+    neptun_user_project }o--|| neptun_user : "references"
     neptun_user_template }o--|| neptun_user : "references"
-    neptun_user_template }o--|| neptun_user_template_collection : "references"
     neptun_user_template }o--|| neptun_user_file : "references"
+    neptun_user_template }o--|| neptun_user_template_collection : "references"
+    neptun_user_template_collection }o--|| neptun_user : "references"
+    project_chat_conversation }o--|| chat_conversation : "references"
+    project_chat_conversation }o--|| neptun_user_project : "references"
+    project_github_installation }o--|| github_app_installation : "references"
+    project_github_installation }o--|| neptun_user_project : "references"
+    project_template_collection }o--|| neptun_user_template_collection : "references"
+    project_template_collection }o--|| neptun_user_project : "references"
+    project_user_file }o--|| neptun_user_project : "references"
+    project_user_file }o--|| neptun_user_file : "references"
 ```
 
 ##### Exporting
@@ -454,7 +530,7 @@ That is why I wrote 3 scripts. One for generating a database schema sql-dump, on
 > The script installs all required tools and dependencies (NOT `npm`, run `ni` before executing it).
 
 ```bash
-npm run db:diagram # There is also `generate-diagram-wsl.bat`, but I did parts of it blindly and didn't test it properly, because my virtualization is broken right now. (CPU overheated and now some features do not work anymore... A new one is on the way anyway.)
+nr db:diagram # There is also `generate-diagram-wsl.bat`, but I did parts of it blindly and didn't test it properly, because my virtualization is broken right now. (CPU overheated and now some features do not work anymore... A new one is on the way anyway.)
 ```
 
 ###### Linux
