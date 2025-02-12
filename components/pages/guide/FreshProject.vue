@@ -5,6 +5,9 @@ import { Check, Circle, Dot } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import * as z from 'zod'
 
+const isLoading = ref(false)
+const { user } = useUserSession()
+
 const formSchema = [
   z.object({
     'project-type': z.union([
@@ -66,17 +69,52 @@ function goBack() {
   }
 }
 
-function onSubmit(values: any) {
-  toast('You submitted the following values:', {
-    description: h(
-      'pre',
-      {
-        class:
-          'mt-2 w-fit max-w-full overflow-x-auto rounded-md bg-slate-950 p-2',
-      },
-      h('code', { class: 'text-white' }, JSON.stringify(values, null, 2)),
-    ),
-  })
+async function createProject(data: {
+  'project-type': string
+  'project-language': string
+}) {
+  try {
+    isLoading.value = true
+    const response = await $fetch(`/api/users/${user.value?.id ?? -1}/projects`, {
+      method: 'POST',
+      body: {
+        name: `New ${data['project-type']} Project`,
+        description: `A ${data['project-type']} project created from Neptun AI`,
+        type: data['project-type'],
+        main_language: data['project-language'],
+        neptun_user_id: user.value?.id ?? -1,
+      }
+    })
+
+    toast.success('Project created successfully!', {
+      description: 'You will be redirected to your new project.'
+    })
+
+    navigateTo(`/?project_id=${response.id}`)
+  } catch (error: any) {
+    toast.error('Failed to create project', {
+      description: error?.data?.message || error.message || 'An unexpected error occurred'
+    })
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function onSubmit(values: any) {
+  if (stepIndex.value === steps.length) {
+    await createProject(values)
+  } else {
+    toast('You submitted the following values:', {
+      description: h(
+        'pre',
+        {
+          class:
+            'mt-2 w-fit max-w-full overflow-x-auto rounded-md bg-slate-950 p-2',
+        },
+        h('code', { class: 'text-white' }, JSON.stringify(values, null, 2)),
+      ),
+    })
+  }
 }
 
 const doCreateGitRepository = ref(false)
@@ -101,12 +139,12 @@ const doCreateGitRepository = ref(false)
         }
       "
     >
-      <ShadcnStepper v-model="stepIndex" class="flex items-start w-full gap-2">
+      <ShadcnStepper v-model="stepIndex" class="flex gap-2 items-start w-full">
         <ShadcnStepperItem
           v-for="step in steps"
           :key="step.step"
           v-slot="{ state }"
-          class="relative flex flex-col items-center justify-center w-full"
+          class="flex relative flex-col justify-center items-center w-full"
           :step="step.step"
         >
           <ShadcnStepperSeparator
@@ -253,6 +291,7 @@ const doCreateGitRepository = ref(false)
           </ShadcnLabel>
           <ShadcnSwitch
             id="create-git-repository"
+            disabled
             v-model:checked="doCreateGitRepository"
           />
 
@@ -260,7 +299,7 @@ const doCreateGitRepository = ref(false)
         </template>
       </div>
 
-      <div class="flex items-center justify-between mt-4">
+      <div class="flex justify-between items-center mt-4">
         <ShadcnButton
           :disabled="!canGoBack"
           variant="outline"
@@ -269,7 +308,7 @@ const doCreateGitRepository = ref(false)
         >
           Back
         </ShadcnButton>
-        <div class="flex items-center gap-3">
+        <div class="flex gap-3 items-center">
           <ShadcnButton
             v-if="stepIndex !== 3"
             :type="meta.valid ? 'button' : 'submit'"
