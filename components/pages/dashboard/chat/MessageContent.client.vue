@@ -11,4 +11,19 @@ defineProps<{
   </div>
 </template>
 
-<style lang="postcss" scoped></style>
+<style lang="postcss" scoped>
+:deep(details) {
+  @apply bg-secondary rounded-md p-2;
+}
+
+:deep(summary) {
+  @apply cursor-pointer -mb-1.5;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none;
+}
+
+:deep(details + *) {
+  @apply mt-4;
+}
+</style>

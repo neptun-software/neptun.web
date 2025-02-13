@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Import, ChevronsUpDown, Plus, Code2 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+import { buttonVariants } from '@/components/shadcn/button'
+import { cn } from '@/lib/utils'
 
 definePageMeta({
   name: 'Dashboard',
@@ -97,6 +99,21 @@ watchEffect(async () => {
                   <span class="mt-1 text-xs truncate text-muted-foreground">{{ project.type.replace('-', ' ') }}</span>
                 </div>
               </ShadcnDropdownMenuItem>
+
+              <ShadcnSeparator class="my-2" />
+
+              <ShadcnDropdownMenuItem
+                :class="cn(
+                  buttonVariants({ variant: 'secondary', size: 'sm' }),
+                  'w-full justify-center cursor-pointer'
+                )"
+                @click="() => navigateTo('/')"
+              >
+                Clear active project
+              </ShadcnDropdownMenuItem>
+              <div class="px-1.5 py-1.5 text-sm text-muted-foreground" v-if="projectsList.length === 0">
+                No projects yet.
+              </div>
               <ShadcnDropdownMenuSeparator class="my-1.5" />
               <ShadcnDropdownMenuItem 
                 class="gap-2 px-1.5 py-1.5 rounded-md cursor-pointer" 
@@ -133,7 +150,7 @@ watchEffect(async () => {
           </ShadcnButton>
         </NuxtLink>
       </header>
-      <Dashboard :selected-project-id="selectedProjectId" />
+      <Dashboard />
     </div>
   </div>
 </template>

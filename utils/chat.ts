@@ -5,61 +5,83 @@ export function getSanitizedMessageContent(content: string) {
 
   let sanitizedContent = content
 
-  // Common model markers and tags to remove
-  const tagPatterns = [
-    // Meta Llama tags
-    /<\|begin_of_text\|>/g,
+  // Remove any existing details/summary tags first
+  sanitizedContent = sanitizedContent.replace(/<\/?(?:details|summary)[^>]*>/g, '')
+
+  // Handle thinking pattern
+  if (sanitizedContent.includes('</think>') || sanitizedContent.includes('<think>')) {
+    // Add missing start tag if needed
+    if (!sanitizedContent.includes('<think>') && sanitizedContent.includes('</think>')) {
+      sanitizedContent = '<think>' + sanitizedContent
+    }
+    if (sanitizedContent.includes('<think>') && !sanitizedContent.includes('</think>')) {
+      sanitizedContent += '</think>'
+    }
+
+    const thinkMatch = /<think>([\s\S]*?)<\/think>/g.exec(sanitizedContent)
+    if (thinkMatch && thinkMatch[1].trim()) {
+      const thinkContent = thinkMatch[1].trim()
+      // Remove the matched think block from the content
+      sanitizedContent = sanitizedContent.replace(/<think>[\s\S]*?<\/think>/, '')
+      
+      // Only wrap in details if not already wrapped
+      if (!thinkContent.startsWith('<details>')) {
+        sanitizedContent = `<details>
+<summary>AI Thinking Process</summary>
+${thinkContent}
+</details>
+
+${sanitizedContent.trim()}`
+      } else {
+        // If already wrapped in details, just prepend it
+        sanitizedContent = `${thinkContent}
+
+${sanitizedContent.trim()}`
+      }
+    } else {
+      // No valid think content, remove the tags
+      sanitizedContent = sanitizedContent.replace(/<\/?think>/g, '')
+    }
+  }
+
+  const modelTags = [
+    // Model tags with exact patterns
+    /<\|im_end\|>/g,
+    /\|im_end\|?/g,
+    /<\|end\|>/g,
+    /<\|assistant\|>/g,
+    /<\|user\|>/g,
+    /<\|system\|>/g,
     /<\|start_header_id\|>.*?<\|end_header_id\|>/g,
+    /<\|begin_of_text\|>/g,
     /<\|eot_id\|>/g,
+    /<\|.*?\|>/g,
+    /<｜end▁of▁sentence｜>/g,
 
     // Gemma tags
     /<bos>/g,
-    /<start_of_turn>.*\n/g,
+    /<eos>/g,
+    /<start_of_turn>/g,
     /<end_of_turn>/g,
 
-    // Phi tags
-    /<\|system\|>\n/g,
-    /<\|user\|>\n/g,
-    /<\|assistant\|>\n/g,
-    /<\|end\|>/g,
-
-    // Qwen and Mistral tags
-    /<\|im_start\|>.*\n/g,
-    /<\|im_end\|>/g,
+    // Instruction tags
     /\[INST\]/g,
     /\[\/INST\]/g,
     /<\/s>/g,
-
-    // Remove any other model-specific tags that might appear
-    /<\|.*?\|>/g,
   ]
 
-  // Apply all tag patterns
-  tagPatterns.forEach((pattern) => {
+  modelTags.forEach((pattern) => {
     sanitizedContent = sanitizedContent.replace(pattern, '')
   })
 
-  // Handle incomplete or malformed tags in streaming chunks
+  // Clean up whitespace while preserving newlines and indentation
   sanitizedContent = sanitizedContent
-    // Remove incomplete tags at the start of a chunk
-    .replace(/^[^<]*>/g, '')
-    // Remove incomplete tags at the end of a chunk
-    .replace(/<[^>]*$/g, '')
-    // Remove any remaining malformed tags
-    .replace(/<[^>]*>/g, '')
-    // Remove any leftover square brackets from instruction tags
-    .replace(/\[(?![\w\s]*\])|(?<!\[[\w\s]*)\]/g, '')
-
-  // Clean up whitespace
-  sanitizedContent = sanitizedContent
-    // Replace multiple newlines with double newlines
-    .replace(/\n{3,}/g, '\n\n')
-    // Remove leading/trailing whitespace
-    .trim()
     // Remove any zero-width spaces that might appear in streams
-    .replace(/\u200B/g, '')
-    // Normalize other whitespace characters
-    .replace(/[\u2028\u2029\v\f\u0085]/g, ' ')
+    .replace(/\u200B/g, ' ')
+    // Normalize other whitespace characters but preserve newlines
+    .replace(/[\u2028\u2029\v\f\u0085]/g, '\n')
+    // Clean up excessive newlines (more than 2)
+    .replace(/\n{3,}/g, '\n\n')
 
   return sanitizedContent
 }

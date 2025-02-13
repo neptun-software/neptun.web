@@ -10,7 +10,7 @@ const messageContent = computed(() => props.message.content)
 
 <template>
   <div
-    class="flex max-w-full my-2 prose dark:prose-invert text-foreground"
+    class="flex my-2 max-w-full prose dark:prose-invert text-foreground"
     :class="{
       'justify-start': message.role === 'assistant',
       'justify-end': message.role === 'user',
@@ -19,7 +19,7 @@ const messageContent = computed(() => props.message.content)
     <div
       v-if="message.role === 'assistant'"
       :id="`message-${message.id}-assistant`"
-      class="px-4 py-2 border rounded-lg bg-background border-slate-200 max-w-[80%] relative dark:border-border"
+      class="px-4 pb-2 pt-4 border rounded-lg bg-background border-slate-200 max-w-[80%] relative dark:border-border"
       :data-message-created-at="message.createdAt"
     >
       <template v-if="!message.isStreaming">
@@ -30,7 +30,7 @@ const messageContent = computed(() => props.message.content)
           :message="messageContent"
         />
       </template>
-      <div v-else class="break-words whitespace-pre-wrap">
+      <div v-else class="whitespace-pre-wrap break-words">
         {{ messageContent }}
       </div>
     </div>

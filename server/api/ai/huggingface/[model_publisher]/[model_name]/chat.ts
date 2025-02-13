@@ -106,7 +106,7 @@ export default defineLazyEventHandler(async () => {
         || !ALLOWED_AI_MODELS.includes(`${model_publisher}/${model_name}`)
       ) {
         // if (LOG_BACKEND) console.warn(`Invalid model name or publisher: ${model_publisher}/${model_name}. Allowed are '${ALLOWED_AI_MODELS.join(', ')}'`);
-        sendError(
+        return sendError(
           event,
           createError({
             statusCode: 400,
@@ -174,6 +174,29 @@ export default defineLazyEventHandler(async () => {
         async start(controller) {
           let accumulatedText = ''
           let buffer = ''
+          let tagBuffer = ''
+          let isInTag = false
+          let lastCleanedText = ''
+          let isFirstChunk = true
+          const isDeepSeek = model_name === AllowedAiModelNamesEnum.DeepSeekR1
+
+          const sendChunk = (text: string) => {
+            if (text && text !== lastCleanedText) {
+              lastCleanedText = text
+              accumulatedText += text
+              controller.enqueue(encoder.encode(`0:${JSON.stringify(text)}\n`))
+            }
+          }
+
+          const flushBuffer = () => {
+            if (buffer) {
+              const cleaned = getSanitizedMessageContent(buffer)
+              if (cleaned !== lastCleanedText) {
+                sendChunk(cleaned)
+              }
+              buffer = ''
+            }
+          }
 
           try {
             const response = Hf.textGenerationStream({
@@ -185,41 +208,94 @@ export default defineLazyEventHandler(async () => {
             // Process each chunk as it arrives
             for await (const chunk of response) {
               if (chunk.token.text) {
-                // Check if this token contains any model-specific tags
-                const hasModelTags = /<[^>]*>/.test(chunk.token.text)
-                  || /<\|.*?\|>/.test(chunk.token.text)
+                const token = chunk.token.text
 
-                if (hasModelTags) {
-                  // If we have model tags, accumulate in buffer and clean when complete
-                  buffer += chunk.token.text
-                  if (buffer.includes('>')) {
-                    const cleaned = getSanitizedMessageContent(buffer)
-                    if (cleaned) {
-                      accumulatedText += cleaned
-                      // if (LOG_BACKEND) console.info('Accumulated cleaned text:', cleaned)
-                      controller.enqueue(encoder.encode(`0:${JSON.stringify(cleaned)}\n`))
-                    }
-                    buffer = ''
+                // For DeepSeek, wrap first response in think tags
+                if (isDeepSeek && isFirstChunk && !token.includes('<think>')) {
+                  tagBuffer = '<think>'
+                  isInTag = true
+                }
+                isFirstChunk = false
+
+                // Check for tag boundaries
+                if (token.includes('</think>')) {
+                  // Found end tag, make sure we have a start tag
+                  if (!tagBuffer.includes('<think>')) {
+                    tagBuffer = '<think>' + tagBuffer
                   }
+                  tagBuffer += token
+                  const cleaned = getSanitizedMessageContent(tagBuffer)
+                  sendChunk(cleaned)
+                  tagBuffer = ''
+                  isInTag = false
+                  // Reset to allow new content
+                  lastCleanedText = ''
+                } else if (token.includes('<think>')) {
+                  // Start new tag
+                  isInTag = true
+                  flushBuffer()
+                  tagBuffer = token
+                } else if (isInTag) {
+                  // Inside tag, accumulate
+                  tagBuffer += token
                 } else {
-                  // No model tags, stream directly while preserving whitespace
-                  const token = chunk.token.text
-                  accumulatedText += token
-                  // if (LOG_BACKEND) console.info('Accumulated token:', token)
-                  controller.enqueue(encoder.encode(`0:${JSON.stringify(token)}\n`))
+                  // Regular text
+                  buffer += token
+
+                  // Check if we're in the middle of any Markdown construct
+                  const inMarkdown = (
+                    // Headers (# until newline)
+                    buffer.match(/^#+[^#\n]*$/) ||
+                    // Lists (-, +, *, or 1. until newline)
+                    buffer.match(/^([0-9]+\.|\+|\*|-)\s[^\n]*$/) ||
+                    // Blockquotes (can be nested with multiple >)
+                    buffer.match(/^>+\s[^\n]*$/) ||
+                    // Code blocks (between ```)
+                    (buffer.includes('```') && !buffer.match(/```.*```/s)) ||
+                    // Inline code (between single `)
+                    (buffer.match(/`[^`]*$/) && !buffer.includes('```')) ||
+                    // Tables (| until newline)
+                    (buffer.includes('|') && !buffer.endsWith('\n')) ||
+                    // Links/Images ([...] without (...))
+                    (buffer.match(/!?\[[^\]]*\]/) && !buffer.match(/\]\([^)]*\)/)) ||
+                    // Reference-style links ([...][...])
+                    buffer.match(/\[[^\]]*\]\[[^\]]*$/) ||
+                    // Link references ([...]: url)
+                    buffer.match(/^\[[^\]]*\]:\s*[^\s]*$/) ||
+                    // Emphasis/Bold (*, _, ~~ without closing)
+                    buffer.match(/(\*\*|\*|~~|_)[^*~_\n]*$/) ||
+                    // Horizontal rules (-, _, * with at least 3)
+                    buffer.match(/^(-{1,2}|_{1,2}|\*{1,2})\s*$/)
+                  )
+
+                  // Only flush if we're not in the middle of a Markdown construct
+                  // and we have a natural boundary
+                  if (!inMarkdown && (
+                    // Complete paragraph (double newline)
+                    buffer.endsWith('\n\n') ||
+                    // Complete sentence with proper punctuation, not in a URL
+                    (buffer.match(/[.!?]\s$/) && !buffer.match(/https?:\/\/[^\s]*$/))
+                  )) {
+                    flushBuffer()
+                  }
                 }
               }
             }
 
-            // Handle any remaining text in the buffer
-            if (buffer) {
-              const cleaned = getSanitizedMessageContent(buffer)
-              if (cleaned) {
-                accumulatedText += cleaned
-                // if (LOG_BACKEND) console.info('Accumulated final cleaned text:', cleaned)
-                controller.enqueue(encoder.encode(`0:${JSON.stringify(cleaned)}\n`))
+            // Handle any remaining buffers
+            if (tagBuffer) {
+              // If we have tag content but no start tag, add it
+              if (!tagBuffer.includes('<think>')) {
+                tagBuffer = '<think>' + tagBuffer
               }
+              // If we have tag content but no end tag, add it
+              if (!tagBuffer.includes('</think>')) {
+                tagBuffer += '</think>'
+              }
+              const cleaned = getSanitizedMessageContent(tagBuffer)
+              sendChunk(cleaned)
             }
+            flushBuffer()
 
             // persist the complete message if we have a valid chat_id and are not in playground mode
             if (chat_id !== -1 && !is_playground) {
@@ -254,20 +330,29 @@ export default defineLazyEventHandler(async () => {
 
       // Handle different types of errors
       if (error instanceof Error) {
-        throw createError({
-          statusCode: 500,
-          statusMessage: error.message,
-        })
+        return sendError(
+          event,
+          createError({
+            statusCode: 500,
+            statusMessage: error.message,
+          }),
+        )
       } else if (typeof error === 'object' && error !== null) {
-        throw createError({
-          statusCode: 500,
-          statusMessage: String((error as { message?: string }).message || 'Unknown error occurred'),
-        })
+        return sendError(
+          event,
+          createError({
+            statusCode: 500,
+            statusMessage: String((error as { message?: string }).message || 'Unknown error occurred'),
+          }),
+        )
       } else {
-        throw createError({
-          statusCode: 500,
-          statusMessage: 'An unexpected error occurred',
-        })
+        return sendError(
+          event,
+          createError({
+            statusCode: 500,
+            statusMessage: 'An unexpected error occurred',
+          }),
+        )
       }
     }
   })

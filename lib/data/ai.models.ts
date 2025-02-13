@@ -44,7 +44,7 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
             max_new_tokens: 512,
             typical_p: 0.2,
             repetition_penalty: 1.1,
-            truncate: 32767 - 500, // 131072 - 500, // Full context length of 131K tokens
+            truncate: 15999 - 500, // 131072 - 500, // Full context length of 131K tokens
             return_full_text: false,
           },
         }

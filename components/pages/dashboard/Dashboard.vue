@@ -8,7 +8,7 @@ const isSmScreen = useMediaQuery('(max-width: 1023px)')
   <div class="h-full">
     <ClientOnly>
       <template #fallback>
-        <div class="h-full py-2 pr-2">
+        <div class="py-2 pr-2 h-full">
           <DashboardChat :key="selectedAiChatKey" />
         </div>
       </template>
@@ -24,7 +24,7 @@ const isSmScreen = useMediaQuery('(max-width: 1023px)')
         <ShadcnResizablePanelGroup
           id="handle-group-1"
           direction="horizontal"
-          class="max-w-full mt-2 panel-group"
+          class="mt-2 max-w-full panel-group"
         >
           <ShadcnResizablePanel
             id="handle-panel-1"
