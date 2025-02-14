@@ -40,6 +40,7 @@ const {
   reload: reloadLastChatMessage,
   isLoading: chatResponseIsLoading,
   setMessages: setChatMessages,
+  stop: stopChatGeneration,
   /* append: appendChatMessage, */
 } = useChat({
   id: String(selectedAiChat.value.id),
@@ -402,6 +403,13 @@ const messagesWithStreaming = computed(() => {
     return message
   })
 })
+
+function stopGeneration() {
+  if (chatResponseIsLoading.value) {
+    stopChatGeneration()
+    toast.success('Chat generation stopped')
+  }
+}
 </script>
 
 <template>
@@ -483,7 +491,7 @@ const messagesWithStreaming = computed(() => {
         </template>
 
         <!-- User Input Draft -->
-        <div v-if="currentChatMessage.trim() !== ''" class="flex justify-end mt-8">
+        <div v-if="currentChatMessage.trim() !== ''" class="flex justify-end mt-8 mb-2">
           <div
             class="break-words whitespace-pre-wrap max-w-[80%] border border-orange-300 rounded-lg bg-background px-4 py-2"
           >
@@ -637,11 +645,11 @@ const messagesWithStreaming = computed(() => {
                 " :on-click-async="() => reloadLast()"
               >
                 <RefreshCcw class="size-4" />
-                <span class="sr-only">Refresh Last Response</span>
+                <span class="sr-only">Reload Last</span>
               </AsyncButton>
             </ShadcnTooltipTrigger>
-            <ShadcnTooltipContent side="top">
-              Refresh (needed if ai is stuck)
+            <ShadcnTooltipContent>
+              <p>Reload Last Message</p>
             </ShadcnTooltipContent>
           </ShadcnTooltip>
         </ShadcnTooltipProvider>
@@ -661,12 +669,23 @@ const messagesWithStreaming = computed(() => {
               </ShadcnTooltipContent>
             </ShadcnTooltip>
           </ShadcnTooltipProvider>
-          <ShadcnButton
-            type="submit" size="sm" class="gap-1.5 w-full" :disabled="chatResponseIsLoading || currentChatMessage.trim() === '' || isOverMaxTokens"
-          >
-            Send Message
-            <CornerDownLeft class="size-3.5" />
-          </ShadcnButton>
+          <template v-if="chatResponseIsLoading">
+            <ShadcnButton
+              type="button" size="sm" class="gap-1.5 px-2" :disabled="!chatResponseIsLoading"
+              @click="stopGeneration"
+            >
+              Stop Generating
+              <Icon icon="lsicon:stop-filled" class="size-4" />
+            </ShadcnButton>
+          </template>
+          <template v-else>
+            <ShadcnButton
+              type="submit" size="sm" class="gap-1.5 w-full" :disabled="chatResponseIsLoading || currentChatMessage.trim() === '' || isOverMaxTokens"
+            >
+              Send Message
+              <CornerDownLeft class="size-4" />
+            </ShadcnButton>
+          </template>
         </div>
       </div>
     </form>

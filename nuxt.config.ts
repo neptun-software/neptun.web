@@ -271,6 +271,7 @@ export default defineNuxtConfig({
           version: '0.0.0',
         }
       }, */
+      // websocket: true,
     },
 
     // "redis" adapter doesn't work on vercel: see https://nitro.unjs.io/deploy/workers#incompatible-libraries (ioredis is not compatible)
