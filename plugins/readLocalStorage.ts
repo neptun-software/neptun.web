@@ -1,3 +1,5 @@
+import type { AllowedAiModels } from "~/lib/types/models/ai"
+
 export default defineNuxtPlugin((nuxtApp) => {
   const { selectedAiChat } = useSelectedAiChat()
   const { user } = useUserSession()
@@ -7,7 +9,13 @@ export default defineNuxtPlugin((nuxtApp) => {
       localStorageTopicKey(`${user.value?.id ?? -1}:selected-ai-chat-id`),
       -1,
     )
+    const localStorageSelectedChatModel = useLocalStorage(
+      localStorageTopicKey(`${user.value?.id ?? -1}:selected-ai-chat-model`),
+      selectedAiChat.value.model,
+    )
 
-    selectedAiChat.value.id = localStorageSelectedChatId.value // initially set the selected chat, from local storage, on load
+    // Initially set both the ID and model from local storage
+    selectedAiChat.value.id = localStorageSelectedChatId.value
+    selectedAiChat.value.model = localStorageSelectedChatModel.value as AllowedAiModels
   })
 })

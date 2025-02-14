@@ -48,7 +48,18 @@ async function validateTag(event: KeyboardEvent) {
 
 const { data, status, error, refresh } = useFetch(
   `/api/users/${user.value?.id ?? -1}/chats/${selectedAiChatId.value}/shares`,
+  {
+    immediate: false,
+    watch: false,
+  },
 )
+
+// Only fetch when the chat is persisted
+watch(selectedAiChatId, (id) => {
+  if (id !== -1) {
+    refresh()
+  }
+}, { immediate: true })
 
 const isSubmitting = ref(false)
 const onSubmit = handleSubmit(async (values) => {
@@ -196,7 +207,7 @@ const url = computed(() => {
               name="is_unprotected"
             >
               <ShadcnFormItem
-                class="flex flex-row items-start p-4 space-y-0 border rounded-md gap-x-3"
+                class="flex flex-row gap-x-3 items-start p-4 space-y-0 rounded-md border"
               >
                 <ShadcnFormControl>
                   <ShadcnCheckbox
@@ -289,14 +300,14 @@ const url = computed(() => {
           </form>
           <div v-else>
             You have already published this chat!<br>
-            <div class="flex items-center gap-2 px-2 py-1 border rounded-sm">
+            <div class="flex gap-2 items-center px-2 py-1 rounded-sm border">
               {{ url }}
               <CopyToClipboard :text="url" />
             </div>
           </div>
           <div
             v-if="error"
-            class="flex items-center justify-between gap-2 py-1 pl-2 pr-1 border rounded-sm border-destructive"
+            class="flex gap-2 justify-between items-center py-1 pr-1 pl-2 rounded-sm border border-destructive"
           >
             Failed to check if chat is published.<br>
 

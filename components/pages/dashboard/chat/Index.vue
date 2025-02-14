@@ -48,6 +48,12 @@ const {
   keepLastMessageOnError: true,
 })
 
+watch(() => currentChatMessage.value, (newMessage) => {
+  if (newMessage !== '' && autoScrollEnabled.value) {
+    scrollToBottom('instant')
+  }
+}, { immediate: true })
+
 const autoScrollEnabled = ref(true)
 
 watch(chatError, () => {
@@ -260,7 +266,7 @@ onMounted(() => {
     useMutationObserver(
       $actualScrollArea.value,
       () => {
-        if (autoScrollEnabled.value) {
+        if (autoScrollEnabled.value && chatResponseIsLoading.value) {
           const currentHeight = $actualScrollArea.value!.scrollHeight
           if (currentHeight !== lastHeight) {
             nextTick(() => {
@@ -579,7 +585,7 @@ function stopGeneration() {
           <ShadcnTooltip v-if="isSpeechRecognitionSupported">
             <ShadcnTooltipTrigger as-child>
               <ShadcnButton
-                variant="ghost" size="icon" :disabled="isOverMaxTokens" :class="{
+                type="button" variant="ghost" size="icon" :disabled="isOverMaxTokens" :class="{
                   'animate-pulse outline-1 outline-destructive outline-dashed':
                     isListeningToSpeech,
                 }" @click="() => {
@@ -631,7 +637,7 @@ function stopGeneration() {
                 </ShadcnAlertDialogHeader>
                 <ShadcnAlertDialogFooter>
                   <ShadcnAlertDialogCancel>Cancel</ShadcnAlertDialogCancel>
-                  <ShadcnAlertDialogAction @click="resetAiPlaygroundChat()">
+                  <ShadcnAlertDialogAction @click="resetAiPlaygroundChat(selectedAiChat.model)">
                     Continue
                   </ShadcnAlertDialogAction>
                 </ShadcnAlertDialogFooter>

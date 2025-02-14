@@ -17,7 +17,7 @@ defineProps<{
 }
 
 :deep(summary) {
-  @apply cursor-pointer -mb-1.5;
+  @apply cursor-pointer;
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none;
