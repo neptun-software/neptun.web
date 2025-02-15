@@ -17,6 +17,9 @@ import {
 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
+import { AllowedAiModelsEnum } from '~/lib/types/models/ai'
+import DynamicToast from '~/components/loaders/dynamic/DynamicToast.vue'
+import { DynamicToastStates } from '~/components/loaders/dynamic/DynamicToastStates'
 
 const { console } = useLogger()
 const isLoading = ref(true)
@@ -266,7 +269,10 @@ onMounted(() => {
     useMutationObserver(
       $actualScrollArea.value,
       () => {
-        if (autoScrollEnabled.value && chatResponseIsLoading.value) {
+        if (
+          (autoScrollEnabled.value && chatResponseIsLoading.value) ||
+          (autoScrollEnabled.value && !(selectedAiChat.value.model === AllowedAiModelsEnum.DeepSeekR1)) // including DeepSeekR1 would scroll, when details is opened- or closed
+        ) {
           const currentHeight = $actualScrollArea.value!.scrollHeight
           if (currentHeight !== lastHeight) {
             nextTick(() => {
@@ -416,6 +422,49 @@ function stopGeneration() {
     toast.success('Chat generation stopped')
   }
 }
+
+function showToast() {
+  const toastId = toast.custom(
+    markRaw(defineComponent({
+      setup() {
+        return () => h(DynamicToast, 
+          { 
+            state: DynamicToastStates.LOADING,
+          }, 
+          {
+            default: () => 'Loading...'
+          }
+        )
+      }
+    })), 
+    { 
+      duration: 3000,
+      class: 'rounded-lg border border-border shadow-md'
+    }
+  )
+
+  setTimeout(() => {
+    toast.custom(
+      markRaw(defineComponent({
+        setup() {
+          return () => h(DynamicToast, 
+            { 
+              state: DynamicToastStates.SUCCESS,
+            }, 
+            {
+              default: () => 'Completed!'
+            }
+          )
+        }
+      })), 
+      { 
+        id: toastId,
+        duration: 2000,
+        class: 'rounded-lg border border-border shadow-md'
+      }
+    )
+  }, 2000)
+}
 </script>
 
 <template>
@@ -521,6 +570,13 @@ function stopGeneration() {
             Try again
           </AsyncButton>
         </div>
+
+        <ShadcnButton
+          variant="outline"
+          @click="showToast()"
+        >
+          Toast
+        </ShadcnButton>
       </ShadcnScrollArea>
     </div>
 
