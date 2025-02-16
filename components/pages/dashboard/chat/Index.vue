@@ -18,8 +18,6 @@ import {
 import { toast } from 'vue-sonner'
 import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { AllowedAiModelsEnum } from '~/lib/types/models/ai'
-import DynamicToast from '~/components/loaders/dynamic/DynamicToast.vue'
-import { DynamicToastStates } from '~/components/loaders/dynamic/DynamicToastStates'
 
 const { console } = useLogger()
 const isLoading = ref(true)
@@ -98,6 +96,9 @@ function waitForValidRef(condition: Ref<boolean | undefined>) {
 }
 
 const chatMessagesKey = ref<string>(crypto.randomUUID())
+const { setPromiseToast, cleanup: cleanupToasts } = useToastState()
+const currentPromiseToast = ref<{ requestId: string; isWaiting: ComputedRef<boolean> } | null>(null)
+
 watch(
   () => chatMessages.value.length,
   async () => {
@@ -107,10 +108,10 @@ watch(
       chatMessages.value[chatMessages.value.length - 1]?.role === 'assistant'
       && !isLoading.value // !isLoading.value needed, so that it only shows the toast, if the messages are actually new, and not onMounted (onLoaded)
     ) {
-      toast.promise(aiIsDoneResponding, {
-        loading: 'Fetching AI response...',
-        success: (_data: any) => 'AI response fetched!',
-        error: (_data: any) => 'Failed to fetch AI response!',
+      currentPromiseToast.value = setPromiseToast(aiIsDoneResponding, {
+        loadingMessage: 'Fetching AI response...',
+        successMessage: 'AI response fetched!',
+        errorMessage: 'Failed to fetch AI response!',
       })
     }
 
@@ -126,6 +127,8 @@ watch(
     }
   },
 )
+
+onUnmounted(cleanupToasts)
 
 /* SPEECH RECOGNITION */
 const {
@@ -422,49 +425,6 @@ function stopGeneration() {
     toast.success('Chat generation stopped')
   }
 }
-
-function showToast() {
-  const toastId = toast.custom(
-    markRaw(defineComponent({
-      setup() {
-        return () => h(DynamicToast, 
-          { 
-            state: DynamicToastStates.LOADING,
-          }, 
-          {
-            default: () => 'Loading...'
-          }
-        )
-      }
-    })), 
-    { 
-      duration: 3000,
-      class: 'rounded-lg border border-border shadow-md'
-    }
-  )
-
-  setTimeout(() => {
-    toast.custom(
-      markRaw(defineComponent({
-        setup() {
-          return () => h(DynamicToast, 
-            { 
-              state: DynamicToastStates.SUCCESS,
-            }, 
-            {
-              default: () => 'Completed!'
-            }
-          )
-        }
-      })), 
-      { 
-        id: toastId,
-        duration: 2000,
-        class: 'rounded-lg border border-border shadow-md'
-      }
-    )
-  }, 2000)
-}
 </script>
 
 <template>
@@ -570,13 +530,6 @@ function showToast() {
             Try again
           </AsyncButton>
         </div>
-
-        <ShadcnButton
-          variant="outline"
-          @click="showToast()"
-        >
-          Toast
-        </ShadcnButton>
       </ShadcnScrollArea>
     </div>
 

@@ -1,5 +1,5 @@
 export enum DynamicToastStates {
-    LOADING,
-    SUCCESS,
-    ERROR,
+  LOADING = 'loading',
+  SUCCESS = 'success',
+  ERROR = 'error',
 }

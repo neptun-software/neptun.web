@@ -7,6 +7,7 @@ import type {
   ReadChatConversationMessage,
 } from '~/lib/types/database.tables/schema'
 import type { FullyFeaturedChat } from '~/lib/types/models/chat'
+import { useToastState } from '~~/composables/useToastState'
 import { toast } from 'vue-sonner'
 import { getCodeBlocksFromMarkdown } from '~/utils/parse'
 
@@ -29,6 +30,8 @@ export function useDashboard() {
       error: (_data: unknown) => string
     } | null = null,
   ): Promise<T> => {
+    const { setPromiseToast } = useToastState()
+
     const fetchPromise = new Promise<T>((resolve, reject) => {
       console.info('Starting fetch request to:', url, 'with options:', options)
 
@@ -68,17 +71,17 @@ export function useDashboard() {
       })
     })
 
-    if (toastMessages) {
-      toast.promise(fetchPromise, {
-        ...toastMessages,
-        error: (error: any) => {
-          console.error('Toast error:', error)
-          return toastMessages.error(error)
-        },
-      })
+    if (!toastMessages) {
+      return fetchPromise
     }
 
-    return fetchPromise
+    const toast = setPromiseToast(fetchPromise, {
+      loadingMessage: toastMessages.loading,
+      successMessage: (data) => toastMessages.success(data as T),
+      errorMessage: (error) => toastMessages.error(error),
+    })
+
+    return toast.toastPromise as Promise<T>
   }
 
   const generateMarkdownFromUrl = async (

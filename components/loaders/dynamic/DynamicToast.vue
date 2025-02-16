@@ -1,13 +1,22 @@
 <script lang="ts" setup>
-import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
 import { Loader2, CircleCheck, CircleX } from 'lucide-vue-next'
-import { DynamicToastStates } from './DynamicToastStates';
+import { DynamicToastStates } from './DynamicToastStates'
+import type { HTMLAttributes } from 'vue'
+
+function isComputedRef(value: any): value is ComputedRef<DynamicToastStates> {
+  return value && typeof value === 'object' && 'value' in value
+}
 
 const props = defineProps<{
-  state?: DynamicToastStates
+  state?: DynamicToastStates | ComputedRef<DynamicToastStates>
   class?: HTMLAttributes['class']
 }>()
+
+const currentState = computed<DynamicToastStates | undefined>(() => {
+  if (!props.state) return undefined
+  return isComputedRef(props.state) ? props.state.value : props.state
+})
 </script>
 
 <template>
@@ -19,8 +28,8 @@ const props = defineProps<{
       )
     "
   >
-    <Loader2 v-if="state === DynamicToastStates.LOADING" class="w-4 h-4 text-blue-500 animate-spin shrink-0" />
-    <CircleCheck v-else-if="state === DynamicToastStates.SUCCESS" class="w-4 h-4 text-green-500 shrink-0" />
+    <Loader2 v-if="currentState === DynamicToastStates.LOADING" class="w-4 h-4 text-blue-500 animate-spin shrink-0" />
+    <CircleCheck v-else-if="currentState === DynamicToastStates.SUCCESS" class="w-4 h-4 text-green-500 shrink-0" />
     <CircleX v-else class="w-4 h-4 text-red-500 shrink-0" />
     <p class="flex-grow text-sm">
       <slot />
