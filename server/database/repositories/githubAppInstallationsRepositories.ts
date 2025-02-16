@@ -1,8 +1,9 @@
+import type { GetGithubAppInstallationRepository, NewGithubAppInstallationRepository } from '~/lib/types/database.tables/schema'
 import { eq } from 'drizzle-orm'
 import {
-  type GetGithubAppInstallationRepository,
+
   github_app_installation_repository,
-  type NewGithubAppInstallationRepository,
+
 } from '~/lib/types/database.tables/schema'
 
 export async function createGithubAppInstallationRepositories(installation_repository_list: NewGithubAppInstallationRepository[]) {

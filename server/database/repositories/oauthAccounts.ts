@@ -1,8 +1,9 @@
+import type { OauthAccountToCreate } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
 import {
   neptun_user,
   neptun_user_oauth_account,
-  type OauthAccountToCreate,
+
 } from '../../../lib/types/database.tables/schema'
 import { createEmptyUser } from './users'
 

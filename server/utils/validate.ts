@@ -1,6 +1,7 @@
 import type { User } from '#auth-utils'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import type { ZodError } from 'zod'
+import type { ChatConversationKeys, OrderByDirection } from '~/lib/types/models/chat'
 import { z } from 'zod'
 import { context_file_category, context_file_type, import_source_type, primaryIdSchema, programming_language, project_type } from '~/lib/types/database.tables/schema'
 import {
@@ -8,8 +9,7 @@ import {
   AllowedAiModelPublishersEnum,
 } from '~/lib/types/models/ai'
 import {
-  type ChatConversationKeys,
-  type OrderByDirection,
+
   possibleOrderByColumns,
   possibleOrderByDirections,
 } from '~/lib/types/models/chat'

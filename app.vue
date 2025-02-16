@@ -30,7 +30,7 @@ const currentRouteName = computed(() => router.currentRoute.value.name)
     -->
 
     <ConfigProvider :use-id="useSsrSaveId">
-      <ShadcnToaster 
+      <ShadcnToaster
         close-button
         position="top-center"
         offset="1.5rem"

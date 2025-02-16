@@ -7,8 +7,8 @@ import type {
   ReadChatConversationMessage,
 } from '~/lib/types/database.tables/schema'
 import type { FullyFeaturedChat } from '~/lib/types/models/chat'
-import { useToastState } from '~~/composables/useToastState'
 import { toast } from 'vue-sonner'
+import { useToastState } from '~~/composables/useToastState'
 import { getCodeBlocksFromMarkdown } from '~/utils/parse'
 
 const { console } = useLogger()
@@ -77,8 +77,8 @@ export function useDashboard() {
 
     const toast = setPromiseToast(fetchPromise, {
       loadingMessage: toastMessages.loading,
-      successMessage: (data) => toastMessages.success(data as T),
-      errorMessage: (error) => toastMessages.error(error),
+      successMessage: data => toastMessages.success(data as T),
+      errorMessage: error => toastMessages.error(error),
     })
 
     return toast.toastPromise as Promise<T>

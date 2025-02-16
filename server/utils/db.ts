@@ -1,6 +1,7 @@
+import type { ColumnBaseConfig, ColumnDataType, Logger } from 'drizzle-orm'
 import type { PgColumn } from 'drizzle-orm/pg-core'
 import { Client as NeonPostgres } from '@neondatabase/serverless'
-import { type ColumnBaseConfig, type ColumnDataType, type Logger, sql } from 'drizzle-orm'
+import { sql } from 'drizzle-orm'
 import { drizzle as neonDrizzle } from 'drizzle-orm/neon-serverless'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
@@ -24,7 +25,7 @@ class MinimalLogger implements Logger {
 
 export const connectionString
   = process.env.DATABASE_CONNECTION_STRING
-  || 'postgresql://postgres:postgres@localhost:5432/postgres'
+    || 'postgresql://postgres:postgres@localhost:5432/postgres'
 export const databaseMap = {
   ...schema,
   ...relations,

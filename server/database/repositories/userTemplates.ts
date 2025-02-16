@@ -1,11 +1,10 @@
-import { eq } from 'drizzle-orm'
+import type { ReadTemplate, TemplateToCreate, UserFileToCreate } from '~/lib/types/database.tables/schema'
 
+import { eq } from 'drizzle-orm'
 import {
   neptun_user_file,
   neptun_user_template,
-  type ReadTemplate,
-  type TemplateToCreate,
-  type UserFileToCreate,
+
 } from '~/lib/types/database.tables/schema'
 
 export async function createTemplate(template_entry: TemplateToCreate & { file: UserFileToCreate }) {

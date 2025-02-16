@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Import, ChevronsUpDown, Plus, Code2 } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
 import { buttonVariants } from '@/components/shadcn/button'
 import { cn } from '@/lib/utils'
+import { ChevronsUpDown, Code2, Import, Plus } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
 definePageMeta({
   name: 'Dashboard',
@@ -21,7 +21,7 @@ watch($headerNavigationElement, (new$headerNavigationElement) => {
 const route = useRoute()
 const selectedProjectId = computed(() => {
   const projectId = route.query.project_id
-  return typeof projectId === 'string' ? parseInt(projectId, 10) : undefined
+  return typeof projectId === 'string' ? Number.parseInt(projectId, 10) : undefined
 })
 
 const { activeProject, projectsList, fetchProject, fetchProjects, clearProject } = useProjects()
@@ -42,7 +42,7 @@ watchEffect(async () => {
       await fetchProject(selectedProjectId.value)
     } catch (error) {
       toast.error('Failed to load project', {
-        description: 'Failed to load project. Please try again later.'
+        description: 'Failed to load project. Please try again later.',
       })
     }
   } else {
@@ -106,18 +106,18 @@ watchEffect(async () => {
               <ShadcnDropdownMenuItem
                 :class="cn(
                   buttonVariants({ variant: 'secondary', size: 'sm' }),
-                  'w-full justify-center cursor-pointer'
+                  'w-full justify-center cursor-pointer',
                 )"
                 @click="() => navigateTo('/')"
               >
                 Clear active project
               </ShadcnDropdownMenuItem>
-              <div class="px-1.5 py-1.5 text-sm text-muted-foreground" v-if="projectsList.length === 0">
+              <div v-if="projectsList.length === 0" class="px-1.5 py-1.5 text-sm text-muted-foreground">
                 No projects yet.
               </div>
               <ShadcnDropdownMenuSeparator class="my-1.5" />
-              <ShadcnDropdownMenuItem 
-                class="gap-2 px-1.5 py-1.5 rounded-md cursor-pointer" 
+              <ShadcnDropdownMenuItem
+                class="gap-2 px-1.5 py-1.5 rounded-md cursor-pointer"
                 @click="() => navigateTo('/guide')"
               >
                 <div class="flex justify-center items-center rounded-md border size-6 bg-background/50">

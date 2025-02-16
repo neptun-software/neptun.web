@@ -12,18 +12,18 @@ export function getSanitizedMessageContent(content: string) {
   if (sanitizedContent.includes('</think>') || sanitizedContent.includes('<think>')) {
     // Add missing start tag if needed
     if (!sanitizedContent.includes('<think>') && sanitizedContent.includes('</think>')) {
-      sanitizedContent = '<think>' + sanitizedContent
+      sanitizedContent = `<think>${sanitizedContent}`
     }
     if (sanitizedContent.includes('<think>') && !sanitizedContent.includes('</think>')) {
       sanitizedContent += '</think>'
     }
 
-    const thinkMatch = /<think>([\s\S]*?)<\/think>/g.exec(sanitizedContent)
+    const thinkMatch = /<think>([\s\S]*?)<\/think>/.exec(sanitizedContent)
     if (thinkMatch && thinkMatch[1].trim()) {
       const thinkContent = thinkMatch[1].trim()
       // Remove the matched think block from the content
       sanitizedContent = sanitizedContent.replace(/<think>[\s\S]*?<\/think>/, '')
-      
+
       // Only wrap in details if not already wrapped
       if (!thinkContent.startsWith('<details>')) {
         sanitizedContent = `<details>

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { AllowedAiModels } from '~/lib/types/models/ai'
 import type { FullyFeaturedChat, MinimalChat } from '~/lib/types/models/chat'
 import {
   Bot,
@@ -11,7 +12,7 @@ import {
   Trash2,
 } from 'lucide-vue-next'
 import {
-  type AllowedAiModels,
+
   defaultAiModelDomain,
 } from '~/lib/types/models/ai'
 

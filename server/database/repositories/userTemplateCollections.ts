@@ -20,8 +20,8 @@ export async function readTemplateCollection(collection_id: ReadTemplateCollecti
     conditions.push(
       and(
         eq(neptun_user_template_collection.share_uuid, collection_id),
-        eq(neptun_user_template_collection.is_shared, true)
-      )
+        eq(neptun_user_template_collection.is_shared, true),
+      ),
     )
   } else {
     conditions.push(eq(neptun_user_template_collection.id, collection_id))

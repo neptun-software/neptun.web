@@ -1,10 +1,9 @@
+import type { GetProject, ProjectToCreate, ReadProject, ReadUser } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
 import {
-  type GetProject,
+
   neptun_user_project,
-  type ProjectToCreate,
-  type ReadProject,
-  type ReadUser,
+
 } from '../../../lib/types/database.tables/schema'
 
 export async function createProject(project: ProjectToCreate) {

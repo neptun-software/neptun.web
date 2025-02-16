@@ -7,7 +7,9 @@ export function useProjects() {
   const isLoading = useState<boolean>('projects-loading', () => false)
 
   async function fetchProject(projectId: number) {
-    if (!projectId) return
+    if (!projectId) {
+      return
+    }
 
     try {
       isLoading.value = true
@@ -46,6 +48,6 @@ export function useProjects() {
     isLoading,
     fetchProject,
     fetchProjects,
-    clearProject
+    clearProject,
   }
 }

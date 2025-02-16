@@ -97,7 +97,7 @@ function waitForValidRef(condition: Ref<boolean | undefined>) {
 
 const chatMessagesKey = ref<string>(crypto.randomUUID())
 const { setPromiseToast, cleanup: cleanupToasts } = useToastState()
-const currentPromiseToast = ref<{ requestId: string; isWaiting: ComputedRef<boolean> } | null>(null)
+const currentPromiseToast = ref<{ requestId: string, isWaiting: ComputedRef<boolean> } | null>(null)
 
 watch(
   () => chatMessages.value.length,
@@ -273,8 +273,8 @@ onMounted(() => {
       $actualScrollArea.value,
       () => {
         if (
-          (autoScrollEnabled.value && chatResponseIsLoading.value) ||
-          (autoScrollEnabled.value && !(selectedAiChat.value.model === AllowedAiModelsEnum.DeepSeekR1)) // including DeepSeekR1 would scroll, when details is opened- or closed
+          (autoScrollEnabled.value && chatResponseIsLoading.value)
+          || (autoScrollEnabled.value && !(selectedAiChat.value.model === AllowedAiModelsEnum.DeepSeekR1)) // including DeepSeekR1 would scroll, when details is opened- or closed
         ) {
           const currentHeight = $actualScrollArea.value!.scrollHeight
           if (currentHeight !== lastHeight) {

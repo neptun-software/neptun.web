@@ -1,20 +1,22 @@
 <script lang="ts" setup>
-import { cn } from '@/lib/utils'
-import { Loader2, CircleCheck, CircleX } from 'lucide-vue-next'
-import { DynamicToastStates } from './DynamicToastStates'
 import type { HTMLAttributes } from 'vue'
-
-function isComputedRef(value: any): value is ComputedRef<DynamicToastStates> {
-  return value && typeof value === 'object' && 'value' in value
-}
+import { cn } from '@/lib/utils'
+import { CircleCheck, CircleX, Loader2 } from 'lucide-vue-next'
+import { DynamicToastStates } from './DynamicToastStates'
 
 const props = defineProps<{
   state?: DynamicToastStates | ComputedRef<DynamicToastStates>
   class?: HTMLAttributes['class']
 }>()
 
+function isComputedRef(value: any): value is ComputedRef<DynamicToastStates> {
+  return value && typeof value === 'object' && 'value' in value
+}
+
 const currentState = computed<DynamicToastStates | undefined>(() => {
-  if (!props.state) return undefined
+  if (!props.state) {
+    return undefined
+  }
   return isComputedRef(props.state) ? props.state.value : props.state
 })
 </script>

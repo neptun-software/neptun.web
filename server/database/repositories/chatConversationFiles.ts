@@ -1,10 +1,11 @@
 import type { DatabaseError } from 'pg'
+import type { ChatConversationFileToCreate, ReadChatConversationFile } from '~/lib/types/database.tables/schema'
 import { eq } from 'drizzle-orm'
 import {
   chat_conversation_file,
-  type ChatConversationFileToCreate,
+
   neptun_user_file,
-  type ReadChatConversationFile,
+
 } from '~/lib/types/database.tables/schema'
 
 export async function createChatConversationFiles(

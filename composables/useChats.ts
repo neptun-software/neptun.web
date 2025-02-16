@@ -1,7 +1,7 @@
+import type { AllowedAiModelPaths, AllowedAiModels } from '~/lib/types/models/ai'
 import type { MinimalChat } from '~/lib/types/models/chat'
 import {
-  type AllowedAiModelPaths,
-  type AllowedAiModels,
+
   defaultAiModelDomain,
 } from '~/lib/types/models/ai'
 // const { console } = useLogger();

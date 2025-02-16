@@ -1,10 +1,10 @@
+import type { ChatConversationShareWhitelistToCreate, ReadChatConversationShare, ReadChatConversationShareWhitelist } from '~/lib/types/database.tables/schema'
 import { eq } from 'drizzle-orm'
 import {
   chat_conversation_share_whitelist_entry,
-  type ChatConversationShareWhitelistToCreate,
+
   neptun_user,
-  type ReadChatConversationShare,
-  type ReadChatConversationShareWhitelist,
+
 } from '~/lib/types/database.tables/schema'
 
 export async function createChatConversationShareWhitelistEntries(chat_share_whitelist_entry_list: ChatConversationShareWhitelistToCreate[]) {

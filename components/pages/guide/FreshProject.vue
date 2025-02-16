@@ -83,17 +83,17 @@ async function createProject(data: {
         type: data['project-type'],
         main_language: data['project-language'],
         neptun_user_id: user.value?.id ?? -1,
-      }
+      },
     })
 
     toast.success('Project created successfully!', {
-      description: 'You will be redirected to your new project.'
+      description: 'You will be redirected to your new project.',
     })
 
     navigateTo(`/?project_id=${response.id}`)
   } catch (error: any) {
     toast.error('Failed to create project', {
-      description: error?.data?.message || error.message || 'An unexpected error occurred'
+      description: error?.data?.message || error.message || 'An unexpected error occurred',
     })
   } finally {
     isLoading.value = false
@@ -291,8 +291,8 @@ const doCreateGitRepository = ref(false)
           </ShadcnLabel>
           <ShadcnSwitch
             id="create-git-repository"
-            disabled
             v-model:checked="doCreateGitRepository"
+            disabled
           />
 
           <ShadcnSeparator />

@@ -92,7 +92,7 @@ export default defineLazyEventHandler(async () => {
 
     const userMessage = messages[messages.length - 1] // { role: 'user', content: 'message' }
     // if (LOG_BACKEND) console.info("current user message", userMessage);
-    
+
     // always persist user message if we have a valid chat_id and are not in playground mode
     if (chat_id !== -1 && !is_playground) {
       await persistUserChatMessage(user.id, chat_id, userMessage.content, event)
@@ -223,7 +223,7 @@ export default defineLazyEventHandler(async () => {
                   if (token.includes('</think>')) {
                     // Found end tag, make sure we have a start tag
                     if (!tagBuffer.includes('<think>')) {
-                      tagBuffer = '<think>' + tagBuffer
+                      tagBuffer = `<think>${tagBuffer}`
                     }
                     tagBuffer += token
                     const cleaned = getSanitizedMessageContent(tagBuffer)
@@ -247,36 +247,36 @@ export default defineLazyEventHandler(async () => {
                     // Check if we're in the middle of any Markdown construct
                     const inMarkdown = (
                       // Headers (# until newline)
-                      buffer.match(/^#+[^#\n]*$/) ||
+                      buffer.match(/^#+[^#\n]*$/)
                       // Lists (-, +, *, or 1. until newline)
-                      buffer.match(/^([0-9]+\.|\+|\*|-)\s[^\n]*$/) ||
+                      || buffer.match(/^(\d+\.|[+*\-])\s[^\n]*$/)
                       // Blockquotes (can be nested with multiple >)
-                      buffer.match(/^>+\s[^\n]*$/) ||
+                      || buffer.match(/^>+\s[^\n]*$/)
                       // Code blocks (between ```)
-                      (buffer.includes('```') && !buffer.match(/```.*```/s)) ||
+                      || (buffer.includes('```') && !buffer.match(/```.*```/s))
                       // Inline code (between single `)
-                      (buffer.match(/`[^`]*$/) && !buffer.includes('```')) ||
+                      || (buffer.match(/`[^`]*$/) && !buffer.includes('```'))
                       // Tables (| until newline)
-                      (buffer.includes('|') && !buffer.endsWith('\n')) ||
+                      || (buffer.includes('|') && !buffer.endsWith('\n'))
                       // Links/Images ([...] without (...))
-                      (buffer.match(/!?\[[^\]]*\]/) && !buffer.match(/\]\([^)]*\)/)) ||
+                      || (buffer.match(/!?\[[^\]]*\]/) && !buffer.match(/\]\([^)]*\)/))
                       // Reference-style links ([...][...])
-                      buffer.match(/\[[^\]]*\]\[[^\]]*$/) ||
+                      || buffer.match(/\[[^\]]*\]\[[^\]]*$/)
                       // Link references ([...]: url)
-                      buffer.match(/^\[[^\]]*\]:\s*[^\s]*$/) ||
+                      || buffer.match(/^\[[^\]]*\]:\s*\S*$/)
                       // Emphasis/Bold (*, _, ~~ without closing)
-                      buffer.match(/(\*\*|\*|~~|_)[^*~_\n]*$/) ||
+                      || buffer.match(/(\*\*|\*|~~|_)[^*~_\n]*$/)
                       // Horizontal rules (-, _, * with at least 3)
-                      buffer.match(/^(-{1,2}|_{1,2}|\*{1,2})\s*$/)
+                      || buffer.match(/^(-{1,2}|_{1,2}|\*{1,2})\s*$/)
                     )
 
                     // Only flush if we're not in the middle of a Markdown construct
                     // and we have a natural boundary
                     if (!inMarkdown && (
                       // Complete paragraph (double newline)
-                      buffer.endsWith('\n\n') ||
+                      buffer.endsWith('\n\n')
                       // Complete sentence with proper punctuation, not in a URL
-                      (buffer.match(/[.!?]\s$/) && !buffer.match(/https?:\/\/[^\s]*$/))
+                      || (buffer.match(/[.!?]\s$/) && !buffer.match(/https?:\/\/\S*$/))
                     )) {
                       flushBuffer()
                     }
@@ -288,7 +288,7 @@ export default defineLazyEventHandler(async () => {
               if (tagBuffer) {
                 // If we have tag content but no start tag, add it
                 if (!tagBuffer.includes('<think>')) {
-                  tagBuffer = '<think>' + tagBuffer
+                  tagBuffer = `<think>${tagBuffer}`
                 }
                 // If we have tag content but no end tag, add it
                 if (!tagBuffer.includes('</think>')) {

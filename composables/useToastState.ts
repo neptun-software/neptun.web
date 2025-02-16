@@ -1,8 +1,8 @@
 import { DynamicToast } from '#components'
-import { DynamicToastStates } from '~/components/loaders/dynamic/DynamicToastStates'
 import { toast } from 'vue-sonner'
+import { DynamicToastStates } from '~/components/loaders/dynamic/DynamicToastStates'
 
-export const useToastState = () => {
+export function useToastState() {
   const toastIds = useState<Map<string, string | number>>('toast-ids', () => new Map())
   const toastTimeouts = useState<Map<string, NodeJS.Timeout>>('toast-timeouts', () => new Map())
   const toastPromises = useState<Map<string, Promise<unknown>>>('toast-promises', () => new Map())
@@ -36,15 +36,15 @@ export const useToastState = () => {
               state: DynamicToastStates.LOADING,
             },
             {
-              default: () => message
-            }
+              default: () => message,
+            },
           )
-        }
+        },
       })),
       {
         class: 'rounded-lg border border-border shadow-md',
-        duration: Infinity
-      }
+        duration: Infinity,
+      },
     )
 
     toastIds.value.set(requestId, toastId)
@@ -52,7 +52,9 @@ export const useToastState = () => {
     return {
       success: (successMessage?: string) => {
         const id = toastIds.value.get(requestId)
-        if (!id) return
+        if (!id) {
+          return
+        }
 
         const duration = 2000
         toast.custom(
@@ -63,25 +65,27 @@ export const useToastState = () => {
                   state: DynamicToastStates.SUCCESS,
                 },
                 {
-                  default: () => successMessage ?? message
-                }
+                  default: () => successMessage ?? message,
+                },
               )
-            }
+            },
           })),
           {
             id,
             class: 'rounded-lg border border-border shadow-md',
-            duration
-          }
+            duration,
+          },
         )
-        
+
         // Set timeout to cleanup after the toast duration
         const timeout = setTimeout(() => removeToast(requestId), duration + 100)
         toastTimeouts.value.set(requestId, timeout)
       },
       error: (errorMessage: string) => {
         const id = toastIds.value.get(requestId)
-        if (!id) return
+        if (!id) {
+          return
+        }
 
         const duration = 3000
         toast.custom(
@@ -92,33 +96,33 @@ export const useToastState = () => {
                   state: DynamicToastStates.ERROR,
                 },
                 {
-                  default: () => errorMessage
-                }
+                  default: () => errorMessage,
+                },
               )
-            }
+            },
           })),
           {
             id,
             class: 'rounded-lg border border-border shadow-md',
-            duration
-          }
+            duration,
+          },
         )
 
         // Set timeout to cleanup after the toast duration
         const timeout = setTimeout(() => removeToast(requestId), duration + 100)
         toastTimeouts.value.set(requestId, timeout)
-      }
+      },
     }
   }
 
   const setPromiseToast = (promise: Promise<unknown>, {
     loadingMessage,
     successMessage,
-    errorMessage
-  } : {
-    loadingMessage: string,
-    successMessage: string | ((data: unknown) => string),
-    errorMessage: string | ((error: unknown) => string),
+    errorMessage,
+  }: {
+    loadingMessage: string
+    successMessage: string | ((data: unknown) => string)
+    errorMessage: string | ((error: unknown) => string)
   }) => {
     // Clean up any existing state first
     cleanup()
@@ -127,7 +131,7 @@ export const useToastState = () => {
     const requestId = crypto.randomUUID()
     toastPromises.value.set(requestId, promise)
     isWaitingForResponse.value.set(requestId, true)
-    
+
     const toastHandler = showToast(requestId, loadingMessage)
 
     let resolveToastPromise: (value: unknown) => void
@@ -162,16 +166,16 @@ export const useToastState = () => {
     return {
       requestId,
       isWaiting: computed(() => isWaitingForResponse.value.get(requestId) ?? false),
-      toastPromise
+      toastPromise,
     }
   }
 
   const cleanup = () => {
     // Clear all timeouts and remove all toasts
-    toastTimeouts.value.forEach((timeout) => clearTimeout(timeout))
+    toastTimeouts.value.forEach(timeout => clearTimeout(timeout))
     toastTimeouts.value.clear()
-    
-    toastIds.value.forEach((id) => toast.dismiss(id))
+
+    toastIds.value.forEach(id => toast.dismiss(id))
     toastIds.value.clear()
 
     toastPromises.value.clear()
@@ -182,6 +186,6 @@ export const useToastState = () => {
     showToast,
     removeToast,
     setPromiseToast,
-    cleanup
+    cleanup,
   }
 }

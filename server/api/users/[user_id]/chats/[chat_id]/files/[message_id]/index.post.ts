@@ -1,5 +1,6 @@
+import type { ChatConversationFileToCreate } from '~/lib/types/database.tables/schema'
 import {
-  type ChatConversationFileToCreate,
+
   InsertFileUniversalSchema,
 } from '~/lib/types/database.tables/schema'
 import { createChatConversationFiles } from '~/server/database/repositories/chatConversationFiles'

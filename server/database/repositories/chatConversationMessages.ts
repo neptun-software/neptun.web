@@ -1,9 +1,8 @@
+import type { ChatConversationMessageToCreate, ReadChatConversation, ReadChatConversationMessage } from '../../../lib/types/database.tables/schema'
 import { asc, eq } from 'drizzle-orm'
 import {
   chat_conversation_message,
-  type ChatConversationMessageToCreate,
-  type ReadChatConversation,
-  type ReadChatConversationMessage,
+
 } from '../../../lib/types/database.tables/schema'
 
 export async function createChatConversationMessages(chat_message_list: ChatConversationMessageToCreate[]) {

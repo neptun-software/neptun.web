@@ -1,10 +1,9 @@
+import type { ChatConversationToCreate, ReadChatConversation, ReadUser } from '../../../lib/types/database.tables/schema'
 import type { OrderByQueryType } from '~/server/utils/validate'
 import { asc, desc, eq, inArray } from 'drizzle-orm'
 import {
   chat_conversation,
-  type ChatConversationToCreate,
-  type ReadChatConversation,
-  type ReadUser,
+
 } from '../../../lib/types/database.tables/schema'
 
 export async function createChatConversation(

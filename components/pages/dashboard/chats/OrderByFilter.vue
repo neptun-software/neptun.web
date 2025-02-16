@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 /// <reference path="../../../../lib/types/vue-dndrop.d.ts" />
 
+import type { DropResult } from 'vue-dndrop' // https://amendx.github.io/vue-dndrop/guide/installation.html
 import { GripVertical } from 'lucide-vue-next'
 // @ts-expect-error (somehow still not recognized...)
-import { Container, Draggable, type DropResult } from 'vue-dndrop' // https://amendx.github.io/vue-dndrop/guide/installation.html
+import { Container, Draggable } from 'vue-dndrop'
 import { possibleOrderByColumns } from '~/lib/types/models/chat'
 
 interface Filter {

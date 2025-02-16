@@ -19,7 +19,7 @@
     "preview": "nuxt preview",
     "format-and-lint": "pnpx prettier --plugin-search-dir . --check . && pnpx eslint .",
     "format": "pnpx prettier --write . --single-quote --trailing-comma es5 --semi",
-    "lint": "eslint . --fix",
+    "lint": "nr postinstall && eslint . --fix",
     "lint-settings": "pnpx @eslint/config-inspector",
     "check": "pnpx nuxi typecheck",
     "shadcn": "pnpx shadcn-vue@latest add",

@@ -1,15 +1,15 @@
 <script lang="ts" setup>
+import type { ColumnDef, ColumnFiltersState, SortingState } from '@tanstack/vue-table'
 import type { GetGithubAppInstallationRepositoryEssentials as Import } from '~/lib/types/database.tables/schema'
 import { NuxtLink } from '#components'
 import { CaretSortIcon } from '@radix-icons/vue'
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
+
   FlexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  type SortingState,
+
   useVueTable,
 } from '@tanstack/vue-table'
 import { toast } from 'vue-sonner'

@@ -1,12 +1,11 @@
+import type { GetUser, ReadOauthAccount, ReadUser, UserToCreate } from '../../../lib/types/database.tables/schema'
 import { randomUUID } from 'node:crypto'
 import { and, eq, like, sql } from 'drizzle-orm'
 import {
-  type GetUser,
+
   neptun_user,
   neptun_user_oauth_account,
-  type ReadOauthAccount,
-  type ReadUser,
-  type UserToCreate,
+
 } from '../../../lib/types/database.tables/schema'
 
 export async function validateUserCredentials(email: ReadUser['primary_email'], plain_password: GetUser['hashed_password']) {

@@ -1,4 +1,4 @@
-import type { AllowedAiModels } from "~/lib/types/models/ai"
+import type { AllowedAiModels } from '~/lib/types/models/ai'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const { selectedAiChat } = useSelectedAiChat()

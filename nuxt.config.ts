@@ -24,7 +24,7 @@ console.info(`NODE_ENV: ${NODE_ENV}`)
 /* 'nuxt-og-image', */
 export default defineNuxtConfig({
   modules: [
-    /* '@nuxt/eslint', */
+    '@nuxt/eslint',
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
     '@nuxtjs/color-mode',
@@ -151,7 +151,7 @@ export default defineNuxtConfig({
       shikiEngine: 'javascript',
       theme: {
         default: 'github-light',
-        dark: 'github-dark'
+        dark: 'github-dark',
       },
       langs: supportedShikiLanguages,
       preload: supportedShikiLanguages,
@@ -321,12 +321,12 @@ export default defineNuxtConfig({
     },
   },
 
-  /* eslint: {
+  eslint: {
     checker: true,
     config: {
       standalone: false,
     },
-  }, */
+  },
 
   posthog: {
     // https://nuxt-posthog.cmitjans.dev/configuration

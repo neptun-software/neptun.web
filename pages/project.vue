@@ -11,8 +11,8 @@ const isImportActive = ref(false)
 useMutationObserver(importTrigger, (mutations) => {
   for (const mutation of mutations) {
     if (
-      mutation.type === 'attributes' &&
-      mutation.attributeName === 'data-active'
+      mutation.type === 'attributes'
+      && mutation.attributeName === 'data-active'
     ) {
       const target = mutation.target as Element
       isImportActive.value = target.getAttribute('data-active') === 'true'
@@ -20,7 +20,7 @@ useMutationObserver(importTrigger, (mutations) => {
   }
 }, {
   attributes: true,
-  attributeFilter: ['data-active']
+  attributeFilter: ['data-active'],
 })
 </script>
 
@@ -42,11 +42,11 @@ useMutationObserver(importTrigger, (mutations) => {
             <ShadcnTabsTrigger value="create" class="tab-trigger">
               Start from Scratch
             </ShadcnTabsTrigger>
-            <ShadcnTabsTrigger value="import" class="tab-trigger" ref="importTrigger">
+            <ShadcnTabsTrigger ref="importTrigger" value="import" class="tab-trigger">
               Import Data
             </ShadcnTabsTrigger>
           </ShadcnTabsList>
-          <ShadcnTabsContent value="create" class="p-4 rounded-md border tab-content" ref="card">
+          <ShadcnTabsContent ref="card" value="create" class="p-4 rounded-md border tab-content">
             <p>
               You do not have a project yet. Do you want to start from
               scratch?<br>

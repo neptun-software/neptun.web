@@ -1,8 +1,8 @@
+import type { NewGithubAppInstallation, ReadUser } from '~/lib/types/database.tables/schema'
 import { eq } from 'drizzle-orm'
 import {
   github_app_installation,
-  type NewGithubAppInstallation,
-  type ReadUser,
+
 } from '~/lib/types/database.tables/schema'
 
 export async function createGithubAppInstallation(installation_entry: NewGithubAppInstallation) {

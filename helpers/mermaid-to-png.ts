@@ -34,9 +34,9 @@ async function convertToPng() {
   const config = {
     theme: 'default',
     backgroundColor: 'transparent',
-    width: 7680,   // 8K width
-    height: 4320,  // 8K height
-    scale: 4,      // Balanced scale for performance and quality
+    width: 7680, // 8K width
+    height: 4320, // 8K height
+    scale: 4, // Balanced scale for performance and quality
     cssFile: path.join(process.cwd(), 'server/utils/mermaid-theme.css'),
   }
 
