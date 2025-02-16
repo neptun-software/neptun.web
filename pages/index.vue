@@ -89,6 +89,7 @@ watchEffect(async () => {
                 v-for="project in projectsList"
                 :key="project.id"
                 class="gap-2 px-1.5 py-1.5 rounded-md cursor-pointer"
+                :class="project.id === activeProject?.id ? 'bg-accent/50' : ''"
                 @click="() => navigateTo(`/?project_id=${project.id}`)"
               >
                 <div class="flex justify-center items-center rounded-md border size-6 bg-primary/10">
@@ -130,7 +131,7 @@ watchEffect(async () => {
 
         <!-- Import Code Repositories From Github To Analyze -->
         <NuxtLink
-          v-if="!selectedProjectId"
+          v-if="selectedProjectId"
           class="flex gap-2 pr-5"
           target="_blank"
           :to="
@@ -149,6 +150,8 @@ watchEffect(async () => {
             <Import class="size-4" />
           </ShadcnButton>
         </NuxtLink>
+        <!-- Import Data into Project -->
+        <!-- TODO -->
       </header>
       <Dashboard />
     </div>

@@ -41,3 +41,28 @@
 - `GET` [`/api/users/{user_id}/installations/{installation_id}/imports`](../api-users-{user_id}-installations-{installation_id}-imports.get.md)
 
 - `GET` [`/api/html-to-markdown/{url}`](../api-html-to-markdown-{url}.get.md)
+
+- `POST` [`/api/users/{user_id}/projects`](../api-users-{user_id}-projects.post.md)
+- `GET` [`/api/users/{user_id}/projects?project_type=xxx&programming_language=xxx`](../api-users-{user_id}-projects.get.md)
+
+- `GET` [`/api/users/{user_id}/projects/{project_id}`](../api-users-{user_id}-projects-{project_id}.get.md)
+- `PATCH` [`/api/users/{user_id}/projects/{project_id}`](../api-users-{user_id}-projects-{project_id}.patch.md)
+- `DELETE` [`/api/users/{user_id}/projects/{project_id}`](../api-users-{user_id}-projects-{project_id}.delete.md)
+
+- `POST` [`/api/users/{user_id}/projects/{project_id}/resources/{resource_type}`](../api-users-{user_id}-projects-{project_id}-resources-{resource_type}.post.md)
+- `GET` [`/api/users/{user_id}/projects/{project_id}/resources/{resource_type}`](../api-users-{user_id}-projects-{project_id}-resources-{resource_type}.get.md)
+
+- `GET` [`/api/users/{user_id}/projects/{project_id}/resources/{resource_type}/{resource_id}`](../api-users-{user_id}-projects-{project_id}-resources-{resource_type}-{resource_id}.get.md)
+- `DELETE` [`/api/users/{user_id}/projects/{project_id}/resources/{resource_type}/{resource_id}`](../api-users-{user_id}-projects-{project_id}-resources-{resource_type}-{resource_id}.delete.md)
+
+- `POST` [`/api/users/{user_id}/projects/{project_id}/resources/imports`](../api-users-{user_id}-projects-{project_id}-resources-imports.post.md)
+- `GET` [`/api/users/{user_id}/projects/{project_id}/resources/imports?import_source_type=xxx`](../api-users-{user_id}-projects-{project_id}-resources-imports.get.md)
+
+- `PUT` [`/api/users/{user_id}/projects/{project_id}/resources/imports/{import_id}`](../api-users-{user_id}-projects-{project_id}-resources-imports-{import_id}.put.md)
+- `DELETE` [`/api/users/{user_id}/projects/{project_id}/resources/imports/{import_id}`](../api-users-{user_id}-projects-{project_id}-resources-imports-{import_id}.delete.md)
+
+- `POST` [`/api/users/{user_id}/projects/{project_id}/resources/files`](../api-users-{user_id}-projects-{project_id}-resources-files.post.md)
+- `GET` [`/api/users/{user_id}/projects/{project_id}/resources/files?context_file_category=xxx&context_file_type=xxx`](../api-users-{user_id}-projects-{project_id}-resources-files.get.md)
+
+- `PUT` [`/api/users/{user_id}/projects/{project_id}/resources/files/{context_file_id}`](../api-users-{user_id}-projects-{project_id}-resources-files-{context_file_id}.put.md)
+- `DELETE` [`/api/users/{user_id}/projects/{project_id}/resources/files/{context_file_id}`](../api-users-{user_id}-projects-{project_id}-resources-files-{context_file_id}.delete.md)
