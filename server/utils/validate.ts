@@ -81,10 +81,17 @@ export const CollectionUuidSchema = z.object({
 
 type CollectionUuidType = z.infer<typeof CollectionUuidSchema>
 
+export const CollectionIdSchema = z.object({
+  user_id: primaryIdSchema,
+  collection_id: primaryIdSchema,
+})
+
+type CollectionIdType = z.infer<typeof CollectionIdSchema>
+
 export const TemplateIdSchema = z.object({
   user_id: primaryIdSchema,
-  uuid: z.string().uuid(),
-  id: primaryIdSchema,
+  collection_id: primaryIdSchema,
+  template_id: primaryIdSchema,
 })
 
 type TemplateIdType = z.infer<typeof TemplateIdSchema>
@@ -849,6 +856,43 @@ export async function validateParamAiModelName(
   )
 }
 
+/* VALIDATE ROUTE PARAMS(user_id, collection_id) */
+export async function validateParamCollectionId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<CollectionIdType>> {
+  return validateParams<CollectionIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const collection_id = Number(params?.collection_id)
+
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.collection_id = collection_id
+
+        return CollectionIdSchema.safeParse({ user_id, collection_id })
+      })
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            user_id: result.data.user_id,
+            collection_id: result.data.collection_id,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, collection_id).',
+    `Invalid routeParams(user_id, collection_id).`,
+    'queryParams(user_id, collection_id):',
+    (user, data) => user.id !== data.user_id, // check if user has access to collection (TODO: extend in the future, to allow multiple accounts connected to one account)
+  )
+}
+
 /* VALIDATE ROUTE PARAMS(user_id, uuid) */
 export async function validateParamCollectionUuid(
   event: H3Event<EventHandlerRequest>,
@@ -883,11 +927,10 @@ export async function validateParamCollectionUuid(
     'Successfully validated routeParams(user_id, uuid).',
     `Invalid routeParams(user_id, uuid). The resource with uuid=${event.context.validated.params.uuid} does not exist or you do not have access to it.`,
     'queryParams(user_id, uuid):',
-    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
   )
 }
 
-/* VALIDATE ROUTE PARAMS(user_id, uuid, id) */
+/* VALIDATE ROUTE PARAMS(user_id, collection_id, template_id) */
 export async function validateParamTemplateId(
   event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<TemplateIdType>> {
@@ -898,15 +941,15 @@ export async function validateParamTemplateId(
         // @ts-expect-error
         const user_id = Number(params?.user_id)
         // @ts-expect-error
-        const id = Number(params?.id)
+        const collection_id = Number(params?.collection_id)
         // @ts-expect-error
-        const uuid = params?.uuid
+        const template_id = Number(params?.template_id)
 
         event.context.validated.params.user_id = user_id
-        event.context.validated.params.uuid = uuid
-        event.context.validated.params.id = id
+        event.context.validated.params.collection_id = collection_id
+        event.context.validated.params.template_id = template_id
 
-        return TemplateIdSchema.safeParse({ user_id, uuid, id })
+        return TemplateIdSchema.safeParse({ user_id, collection_id, template_id })
       })
 
       if (result.success) {
@@ -914,17 +957,17 @@ export async function validateParamTemplateId(
           success: true,
           data: {
             user_id: result.data.user_id,
-            uuid: result.data.uuid,
-            id: result.data.id,
+            collection_id: result.data.collection_id,
+            template_id: result.data.template_id,
           },
         }
       } else {
         return result
       }
     },
-    'Successfully validated routeParams(user_id, uuid, id).',
-    `Invalid routeParams(user_id, uuid, id). The resource with id=${event.context.validated.params.id} does not exist or you do not have access to it.`,
-    'queryParams(user_id, uuid, id):',
+    'Successfully validated routeParams(user_id, collection_id, template_id).',
+    `Invalid routeParams(user_id, collection_id, template_id). The resource with template_id=${event.context.validated.params.template_id} does not exist or you do not have access to it.`,
+    'queryParams(user_id, collection_id, template_id):',
     (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
   )
 }

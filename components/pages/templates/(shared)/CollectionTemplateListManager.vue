@@ -25,7 +25,7 @@ const {
 const isUpdating = ref(false)
 
 const showNewCollectionDialog = ref(false)
-const newCollection = ref<Omit<TemplateCollectionToCreate, | 'description'> & { description?: string }>({
+const newCollection = ref<Omit<TemplateCollectionToCreate, 'description'> & { description?: string }>({
   name: '',
   description: '',
   is_shared: true,
@@ -138,7 +138,7 @@ async function toggleShared(collection: TemplateCollectionWithTemplates) {
 
   isUpdating.value = true
   try {
-    await updateCollection(collection.share_uuid, {
+    await updateCollection(collection.id, {
       name: collection.name,
       description: collection.description,
       is_shared: newState,
@@ -156,7 +156,7 @@ async function handleSave(collection: TemplateCollectionWithTemplates) {
 
   isUpdating.value = true
   try {
-    await updateCollection(collection.share_uuid, {
+    await updateCollection(collection.id, {
       name: collection.name,
       description: collection.description,
       is_shared: collection.is_shared,
@@ -168,10 +168,10 @@ async function handleSave(collection: TemplateCollectionWithTemplates) {
   }
 }
 
-async function handleDelete(shareUuid: string) {
+async function handleDelete(id: number) {
   isUpdating.value = true
   try {
-    await deleteCollection(shareUuid)
+    await deleteCollection(id)
   } finally {
     isUpdating.value = false
   }
@@ -266,11 +266,11 @@ async function handleUploadCollection(data: ImportedTemplateData) {
 
 <template>
   <div class="space-y-4">
-    <div class="flex items-center justify-between">
+    <div class="flex justify-between items-center">
       <h2 class="text-2xl font-bold">
         Your Template Collections
       </h2>
-      <div class="flex items-center gap-2">
+      <div class="flex gap-2 items-center">
         <input
           ref="$uploadCollectionInput"
           type="file"
@@ -326,15 +326,15 @@ async function handleUploadCollection(data: ImportedTemplateData) {
         <div
           v-for="collection in collections"
           :key="`${collection.id}-${collection.share_uuid}`"
-          class="p-4 space-y-2 border rounded-lg"
+          class="p-4 space-y-2 rounded-lg border"
         >
-          <div class="flex items-center justify-between gap-2">
+          <div class="flex gap-2 justify-between items-center">
             <div class="flex-1 px-2 pt-2 pb-3 rounded-md bg-secondary">
               <div
                 v-if="editingCollection === collection.id"
                 class="edit-container"
               >
-                <div class="flex items-start justify-between gap-2">
+                <div class="flex gap-2 justify-between items-start">
                   <div class="flex-1">
                     <ShadcnInput
                       v-model="collection.name"
@@ -364,7 +364,7 @@ async function handleUploadCollection(data: ImportedTemplateData) {
                       variant="destructive"
                       size="icon"
                       :disabled="isUpdating"
-                      @click="() => handleDelete(collection.share_uuid)"
+                      @click="() => handleDelete(collection.id)"
                     >
                       <Trash2 class="size-3.5" />
                     </ShadcnButton>
@@ -373,7 +373,7 @@ async function handleUploadCollection(data: ImportedTemplateData) {
               </div>
               <div
                 v-else
-                class="flex items-center justify-between gap-2"
+                class="flex gap-2 justify-between items-center"
               >
                 <div class="flex-1">
                   <div
@@ -385,7 +385,7 @@ async function handleUploadCollection(data: ImportedTemplateData) {
                       {{ collection.description }}
                     </div>
                   </div>
-                  <div class="flex items-center gap-2 mt-2">
+                  <div class="flex gap-2 items-center mt-2">
                     <ShadcnCheckbox
                       :checked="sharedStates.get(collection.id) ?? collection.is_shared"
                       :disabled="isUpdating"
@@ -408,7 +408,7 @@ async function handleUploadCollection(data: ImportedTemplateData) {
                     variant="destructive"
                     size="icon"
                     :disabled="isUpdating"
-                    @click="() => handleDelete(collection.share_uuid)"
+                    @click="() => handleDelete(collection.id)"
                   >
                     <Trash2 class="size-3.5" />
                   </ShadcnButton>
@@ -422,7 +422,7 @@ async function handleUploadCollection(data: ImportedTemplateData) {
             :on-update="updateTemplate"
             :on-delete="deleteTemplate"
           />
-          <div v-if="collection.is_shared" class="flex items-center gap-2 px-2 py-1 border rounded-sm bg-accent">
+          <div v-if="collection.is_shared" class="flex gap-2 items-center px-2 py-1 rounded-sm border bg-accent">
             {{ `http${IS_DEV ? '' : 's'}://${requestUrl.host}/shared/collections/${collection.share_uuid}` }}
             <CopyToClipboard :text="`http${IS_DEV ? '' : 's'}://${requestUrl.host}/shared/collections/${collection.share_uuid}`" />
           </div>
@@ -502,17 +502,17 @@ async function handleUploadCollection(data: ImportedTemplateData) {
 
         <div class="space-y-4">
           <!-- File Upload -->
-          <div class="flex flex-col gap-2 p-4 border rounded-md">
+          <div class="flex flex-col gap-2 p-4 rounded-md border">
             <ShadcnInput
               ref="inputFileRef"
               type="file"
               multiple
-              class="flex items-center justify-center w-full h-32 p-4 border-2 border-dashed rounded-md bg-secondary text-secondary-foreground border-primary"
+              class="flex justify-center items-center p-4 w-full h-32 rounded-md border-2 border-dashed bg-secondary text-secondary-foreground border-primary"
               @change="onFileInput"
             >
               <div
                 ref="dropZoneRef"
-                class="flex items-center justify-center w-full h-full p-4 bg-secondary text-secondary-foreground"
+                class="flex justify-center items-center p-4 w-full h-full bg-secondary text-secondary-foreground"
               >
                 Drop files here... ({{ isOverDropZone }})
               </div>

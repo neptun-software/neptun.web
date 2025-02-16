@@ -1,26 +1,26 @@
-# User Template Deletion Endpoint
+# User Template Details Endpoint
 
 ## Overview
 
-This endpoint allows users to delete a specific template from a collection.
+This endpoint allows users to retrieve details of a specific template within a collection.
 
 ## Request Details
 
 ### HTTP Method
 
-DELETE
+GET
 
 ### Route
 
-`/api/users/{user_id}/collections/{uuid}/templates/{id}`
+`/api/users/{user_id}/collections/{collection_id}/templates/{template_id}`
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                                      |
-| --------- | ------- | -------- | ------------------------------------------------ |
-| user_id   | integer | Yes      | The ID of the authenticated user                 |
-| uuid      | string  | Yes      | The unique identifier of the template collection |
-| id        | integer | Yes      | The ID of the template                           |
+| Parameter     | Type    | Required | Description                       |
+| ------------- | ------- | -------- | --------------------------------- |
+| user_id       | integer | Yes      | The ID of the authenticated user  |
+| collection_id | integer | Yes      | The ID of the template collection |
+| template_id   | integer | Yes      | The ID of the template            |
 
 ### Headers
 
@@ -43,7 +43,7 @@ No request body required.
 
 | Status Code | Description                               |
 | ----------- | ----------------------------------------- |
-| 200         | Successfully deleted template             |
+| 200         | Successfully retrieved template           |
 | 401         | Unauthorized (invalid or missing session) |
 | 403         | Forbidden (user_id mismatch)              |
 | 404         | Template not found                        |
@@ -51,10 +51,19 @@ No request body required.
 
 ### Success Response (200 OK)
 
-Returns `true` on successful deletion.
-
 ```json
-true
+{
+  "template": {
+    "id": 1,
+    "description": "Basic Docker deployment script",
+    "file_name": "docker-deploy.sh",
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-01T12:00:00Z",
+    "neptun_user_id": 1,
+    "template_collection_id": 1,
+    "user_file_id": 1
+  }
+}
 ```
 
 ### Error Response (404 Not Found)
@@ -69,16 +78,49 @@ true
 ### TypeScript Interface
 
 ```typescript
-type ApiResponse = boolean
+interface Template {
+  id: number
+  description?: string
+  file_name: string
+  created_at: string
+  updated_at: string
+  neptun_user_id: number
+  template_collection_id?: number
+  user_file_id?: number
+  title?: string
+  text: string
+  language: string
+  extension: string
+}
+
+interface ApiResponse {
+  template: Template
+}
 ```
 
 ### Python Model
 
 ```python
+from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel
 
+class Template(BaseModel):
+    id: int
+    description: Optional[str]
+    file_name: str
+    created_at: datetime
+    updated_at: datetime
+    neptun_user_id: int
+    template_collection_id: Optional[int]
+    user_file_id: Optional[int]
+    title: Optional[str]
+    text: str
+    language: str
+    extension: str
+
 class ApiResponse(BaseModel):
-    success: bool
+    template: Template
 ```
 
 ## Code Examples
@@ -86,7 +128,7 @@ class ApiResponse(BaseModel):
 ### cURL Example
 
 ```bash
-curl -X DELETE "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e29b-41d4-a716-446655440000/templates/1" \
+curl -X GET "https://neptun-webui.vercel.app/api/users/1/collections/1/templates/1" \
   -H "Accept: application/json" \
   -H "Cookie: neptun-session=your-session-cookie"
 ```
@@ -95,17 +137,18 @@ curl -X DELETE "https://neptun-webui.vercel.app/api/users/1/collections/550e8400
 
 ```python
 import httpx
+from typing import Optional
 
-async def delete_template(
+async def get_template(
     user_id: int,
-    collection_uuid: str,
+    collection_id: int,
     template_id: int,
     session_cookie: str
-) -> bool:
-    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}/templates/{template_id}"
+) -> ApiResponse:
+    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_id}/templates/{template_id}"
 
     async with httpx.AsyncClient() as client:
-        response = await client.delete(
+        response = await client.get(
             url,
             headers={
                 "Accept": "application/json",
@@ -113,22 +156,21 @@ async def delete_template(
             }
         )
         response.raise_for_status()
-        return response.json()
+        return ApiResponse(**response.json())
 ```
 
 ### TypeScript/JavaScript Example
 
 ```typescript
-async function deleteTemplate(
+async function getTemplate(
   userId: number,
-  collectionUuid: string,
+  collectionId: number,
   templateId: number,
   sessionCookie: string
-): Promise<boolean> {
+): Promise<ApiResponse> {
   const response = await fetch(
-    `https://neptun-webui.vercel.app/api/users/${userId}/collections/${collectionUuid}/templates/${templateId}`,
+    `https://neptun-webui.vercel.app/api/users/${userId}/collections/${collectionId}/templates/${templateId}`,
     {
-      method: 'DELETE',
       headers: {
         Accept: 'application/json',
         Cookie: `neptun-session=${sessionCookie}`,
@@ -149,4 +191,3 @@ async function deleteTemplate(
 - The session cookie is required for authentication
 - The template must belong to the specified collection
 - The collection must belong to the specified user
-- This operation cannot be undone

@@ -94,18 +94,18 @@ export function useTemplateManager() {
     }
   }
 
-  async function updateCollection(share_uuid: string, data: TemplateCollectionToCreate) {
-    if (!share_uuid) {
+  async function updateCollection(id: number, data: TemplateCollectionToCreate) {
+    if (!id) {
       return
     }
 
     try {
-      const updatedCollection = await $fetch(`/api/users/${user.value?.id}/collections/${share_uuid}`, {
+      const updatedCollection = await $fetch(`/api/users/${user.value?.id}/collections/${id}`, {
         method: 'PATCH',
         body: data,
       })
 
-      const index = collections.value.findIndex(c => c.share_uuid === share_uuid)
+      const index = collections.value.findIndex(c => c.id === id)
       if (index !== -1) {
         collections.value[index] = {
           ...collections.value[index],
@@ -117,13 +117,13 @@ export function useTemplateManager() {
     }
   }
 
-  async function deleteCollection(share_uuid: string) {
+  async function deleteCollection(id: number) {
     try {
-      await $fetch(`/api/users/${user.value?.id}/collections/${share_uuid}`, {
+      await $fetch(`/api/users/${user.value?.id}/collections/${id}`, {
         method: 'DELETE',
       })
 
-      collections.value = collections.value.filter(c => c.share_uuid !== share_uuid)
+      collections.value = collections.value.filter(c => c.id !== id)
     } catch (error) {
       console.error('Failed to delete collection!')
     }
@@ -154,7 +154,7 @@ export function useTemplateManager() {
   async function createTemplate(collectionId: number, templateData: TemplateToCreate, fileData: UserFileToCreate) {
     try {
       const collection = collections.value.find(c => c.id === collectionId)
-      if (!collection?.share_uuid) {
+      if (!collection) {
         console.error('Collection not found!')
         return
       }
@@ -178,7 +178,7 @@ export function useTemplateManager() {
         extension: fileData.extension || 'txt',
       }
 
-      const response = await $fetch(`/api/users/${user.value?.id}/collections/${collection.share_uuid}/templates`, {
+      const response = await $fetch(`/api/users/${user.value?.id}/collections/${collection.id}/templates`, {
         method: 'POST',
         body: {
           template,
@@ -187,7 +187,7 @@ export function useTemplateManager() {
       })
 
       if (response?.template) {
-        const collectionIndex = collections.value.findIndex(c => c.id === collectionId)
+        const collectionIndex = collections.value.findIndex(c => c.id === collection.id)
         if (collectionIndex !== -1) {
           collections.value[collectionIndex].templates.push({
             ...response.template,
@@ -202,25 +202,25 @@ export function useTemplateManager() {
     }
   }
 
-  async function updateTemplate(templateId: number, data: Partial<TemplateToCreate>) {
+  async function updateTemplate(id: number, data: Partial<TemplateToCreate>) {
     try {
       const collection = collections.value.find(c =>
-        c.templates.some(t => t.id === templateId),
+        c.templates.some(t => t.id === id),
       )
 
-      if (!collection?.share_uuid) {
+      if (!collection) {
         console.error('Collection not found!')
         return
       }
 
-      const response = await $fetch(`/api/users/${user.value?.id}/collections/${collection.share_uuid}/templates/${templateId}`, {
+      const response = await $fetch(`/api/users/${user.value?.id}/collections/${collection.id}/templates/${id}`, {
         method: 'PATCH',
         body: data,
       })
 
       if (response?.template) {
         const collectionIndex = collections.value.findIndex(c => c.id === collection.id)
-        const templateIndex = collections.value[collectionIndex].templates.findIndex(t => t.id === templateId)
+        const templateIndex = collections.value[collectionIndex].templates.findIndex(t => t.id === id)
 
         if (templateIndex !== -1) {
           collections.value[collectionIndex].templates[templateIndex] = {
@@ -236,24 +236,24 @@ export function useTemplateManager() {
     }
   }
 
-  async function deleteTemplate(templateId: number) {
+  async function deleteTemplate(id: number) {
     try {
       const collection = collections.value.find(c =>
-        c.templates.some(t => t.id === templateId),
+        c.templates.some(t => t.id === id),
       )
 
-      if (!collection?.share_uuid) {
+      if (!collection) {
         console.error('Collection not found!')
         return
       }
 
-      await $fetch(`/api/users/${user.value?.id}/collections/${collection.share_uuid}/templates/${templateId}`, {
+      await $fetch(`/api/users/${user.value?.id}/collections/${collection.id}/templates/${id}`, {
         method: 'DELETE',
       })
 
       const collectionIndex = collections.value.findIndex(c => c.id === collection.id)
       collections.value[collectionIndex].templates = collections.value[collectionIndex].templates
-        .filter(t => t.id !== templateId)
+        .filter(t => t.id !== id)
     } catch (error) {
       console.error('Failed to delete template!')
     }

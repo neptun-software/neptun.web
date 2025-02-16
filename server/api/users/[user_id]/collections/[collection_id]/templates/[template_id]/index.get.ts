@@ -1,4 +1,4 @@
-import { deleteTemplate } from '~/server/database/repositories/userTemplates'
+import { readTemplate } from '~/server/database/repositories/userTemplates'
 
 export default defineEventHandler(async (event) => {
   const maybeTemplateId = await validateParamTemplateId(event)
@@ -12,19 +12,20 @@ export default defineEventHandler(async (event) => {
       }),
     )
   }
-  const { id } = maybeTemplateId.data
+  const { template_id } = maybeTemplateId.data
 
-  try {
-    return await deleteTemplate(id)
-  } catch (error) {
+  const template = await readTemplate(template_id)
+
+  if (!template) {
     return sendError(
       event,
       createError({
-        statusCode: 500,
-        statusMessage: 'Internal Server Error',
-        message: 'Failed to delete template',
-        data: error,
+        statusCode: 404,
+        statusMessage: 'Not Found',
+        message: 'Template not found',
       }),
     )
   }
+
+  return { template }
 })

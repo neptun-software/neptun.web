@@ -545,7 +545,7 @@
         }
       }
     },
-    "/api/users/{user_id}/collections/{uuid}": {
+    "/api/users/{user_id}/collections/{collection_id}": {
       "delete": {
         "tags": [
           "API Routes"
@@ -560,7 +560,7 @@
             }
           },
           {
-            "name": "uuid",
+            "name": "collection_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -588,7 +588,7 @@
             }
           },
           {
-            "name": "uuid",
+            "name": "collection_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -603,7 +603,7 @@
         }
       }
     },
-    "/api/users/{user_id}/collections/{uuid}/templates/{id}": {
+    "/api/users/{user_id}/collections/{collection_id}/templates/{template_id}": {
       "delete": {
         "tags": [
           "API Routes"
@@ -618,7 +618,7 @@
             }
           },
           {
-            "name": "uuid",
+            "name": "collection_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -626,7 +626,7 @@
             }
           },
           {
-            "name": "id",
+            "name": "template_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -654,7 +654,7 @@
             }
           },
           {
-            "name": "uuid",
+            "name": "collection_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -662,7 +662,7 @@
             }
           },
           {
-            "name": "id",
+            "name": "template_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -690,7 +690,7 @@
             }
           },
           {
-            "name": "uuid",
+            "name": "collection_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -698,7 +698,7 @@
             }
           },
           {
-            "name": "id",
+            "name": "template_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -713,7 +713,7 @@
         }
       }
     },
-    "/api/users/{user_id}/collections/{uuid}/templates": {
+    "/api/users/{user_id}/collections/{collection_id}/templates": {
       "post": {
         "tags": [
           "API Routes"
@@ -728,7 +728,7 @@
             }
           },
           {
-            "name": "uuid",
+            "name": "collection_id",
             "in": "path",
             "required": true,
             "schema": {

@@ -1,8 +1,8 @@
-# User Template Update Endpoint
+# User Template Collection Update Endpoint
 
 ## Overview
 
-This endpoint allows users to update a specific template's details within a collection.
+This endpoint allows users to update a specific template collection's details.
 
 ## Request Details
 
@@ -12,15 +12,14 @@ PATCH
 
 ### Route
 
-`/api/users/{user_id}/collections/{uuid}/templates/{id}`
+`/api/users/{user_id}/collections/{collection_id}`
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                                      |
-| --------- | ------- | -------- | ------------------------------------------------ |
-| user_id   | integer | Yes      | The ID of the authenticated user                 |
-| uuid      | string  | Yes      | The unique identifier of the template collection |
-| id        | integer | Yes      | The ID of the template                           |
+| Parameter     | Type    | Required | Description                      |
+| ------------- | ------- | -------- | -------------------------------- |
+| user_id       | integer | Yes      | The ID of the authenticated user |
+| collection_id | integer | Yes      | The ID of the collection         |
 
 ### Headers
 
@@ -36,10 +35,11 @@ No query parameters required.
 
 ### Request Body
 
-| Field       | Type   | Required | Description                     |
-| ----------- | ------ | -------- | ------------------------------- |
-| description | string | No       | New description of the template |
-| file_name   | string | No       | New file name of the template   |
+| Field       | Type    | Required | Description                       |
+| ----------- | ------- | -------- | --------------------------------- |
+| name        | string  | No       | New name of the collection        |
+| description | string  | No       | New description of the collection |
+| is_shared   | boolean | No       | Whether the collection is shared  |
 
 ## Response Format
 
@@ -47,26 +47,38 @@ No query parameters required.
 
 | Status Code | Description                               |
 | ----------- | ----------------------------------------- |
-| 200         | Successfully updated template             |
+| 200         | Successfully updated collection           |
 | 400         | Bad Request (invalid request body)        |
 | 401         | Unauthorized (invalid or missing session) |
 | 403         | Forbidden (user_id mismatch)              |
-| 404         | Template not found                        |
+| 404         | Collection not found                      |
 | 500         | Server error                              |
 
 ### Success Response (200 OK)
 
 ```json
 {
-  "template": {
+  "collection": {
     "id": 1,
-    "description": "Updated Docker deployment script",
-    "file_name": "docker-deploy-v2.sh",
+    "name": "Updated Templates",
+    "description": "Updated collection description",
+    "is_shared": true,
+    "share_uuid": "550e8400-e29b-41d4-a716-446655440000",
     "created_at": "2024-01-01T12:00:00Z",
     "updated_at": "2024-01-01T12:30:00Z",
     "neptun_user_id": 1,
-    "template_collection_id": 1,
-    "user_file_id": 1
+    "templates": [
+      {
+        "id": 1,
+        "description": "Basic Docker deployment script",
+        "file_name": "docker-deploy.sh",
+        "created_at": "2024-01-01T12:00:00Z",
+        "updated_at": "2024-01-01T12:00:00Z",
+        "neptun_user_id": 1,
+        "template_collection_id": 1,
+        "user_file_id": 1
+      }
+    ]
   }
 }
 ```
@@ -76,7 +88,7 @@ No query parameters required.
 ```json
 {
   "statusCode": 400,
-  "message": "Invalid template data"
+  "message": "Invalid body({ name?, description?, is_shared? })"
 }
 ```
 
@@ -98,19 +110,26 @@ interface Template {
   extension: string
 }
 
-interface UpdateTemplateRequest {
+interface TemplateCollection {
+  id: number
+  name: string
   description?: string
-  file_name?: string
-  file?: {
-    title?: string
-    text?: string
-    language?: string
-    extension?: string
-  }
+  is_shared: boolean
+  share_uuid: string
+  created_at: string
+  updated_at: string
+  neptun_user_id: number
+  templates: Template[]
+}
+
+interface UpdateCollectionRequest {
+  name?: string
+  description?: string
+  is_shared?: boolean
 }
 
 interface ApiResponse {
-  template: Template
+  collection: TemplateCollection
 }
 ```
 
@@ -118,19 +137,8 @@ interface ApiResponse {
 
 ```python
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
-
-class UpdateFileData(BaseModel):
-    title: Optional[str]
-    text: Optional[str]
-    language: Optional[str]
-    extension: Optional[str]
-
-class UpdateTemplateRequest(BaseModel):
-    description: Optional[str]
-    file_name: Optional[str]
-    file: Optional[UpdateFileData]
 
 class Template(BaseModel):
     id: int
@@ -146,8 +154,24 @@ class Template(BaseModel):
     language: str
     extension: str
 
+class TemplateCollection(BaseModel):
+    id: int
+    name: str
+    description: Optional[str]
+    is_shared: bool
+    share_uuid: str
+    created_at: datetime
+    updated_at: datetime
+    neptun_user_id: int
+    templates: List[Template]
+
+class UpdateCollectionRequest(BaseModel):
+    name: Optional[str]
+    description: Optional[str]
+    is_shared: Optional[bool]
+
 class ApiResponse(BaseModel):
-    template: Template
+    collection: TemplateCollection
 ```
 
 ## Code Examples
@@ -155,13 +179,14 @@ class ApiResponse(BaseModel):
 ### cURL Example
 
 ```bash
-curl -X PATCH "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e29b-41d4-a716-446655440000/templates/1" \
+curl -X PATCH "https://neptun-webui.vercel.app/api/users/1/collections/1" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -H "Cookie: neptun-session=your-session-cookie" \
   -d '{
-    "description": "Updated Docker deployment script",
-    "file_name": "docker-deploy-v2.sh"
+    "name": "Updated Templates",
+    "description": "Updated collection description",
+    "is_shared": true
   }'
 ```
 
@@ -171,21 +196,23 @@ curl -X PATCH "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-
 import httpx
 from typing import Optional
 
-async def update_template(
+async def update_user_collection(
     user_id: int,
-    collection_uuid: str,
-    template_id: int,
+    collection_id: int,
+    name: Optional[str] = None,
     description: Optional[str] = None,
-    file_name: Optional[str] = None,
+    is_shared: Optional[bool] = None,
     session_cookie: str = None
 ) -> ApiResponse:
-    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}/templates/{template_id}"
+    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_id}"
 
     data = {}
+    if name is not None:
+        data["name"] = name
     if description is not None:
         data["description"] = description
-    if file_name is not None:
-        data["file_name"] = file_name
+    if is_shared is not None:
+        data["is_shared"] = is_shared
 
     async with httpx.AsyncClient() as client:
         response = await client.patch(
@@ -204,15 +231,14 @@ async def update_template(
 ### TypeScript/JavaScript Example
 
 ```typescript
-async function updateTemplate(
+async function updateUserCollection(
   userId: number,
-  collectionUuid: string,
-  templateId: number,
-  data: UpdateTemplateRequest,
+  collectionId: number,
+  data: UpdateCollectionRequest,
   sessionCookie: string
 ): Promise<ApiResponse> {
   const response = await fetch(
-    `https://neptun-webui.vercel.app/api/users/${userId}/collections/${collectionUuid}/templates/${templateId}`,
+    `https://neptun-webui.vercel.app/api/users/${userId}/collections/${collectionId}`,
     {
       method: 'PATCH',
       headers: {
@@ -235,6 +261,6 @@ async function updateTemplate(
 ## Notes
 
 - The session cookie is required for authentication
-- At least one of description or file_name must be provided
-- The template must belong to the specified collection
+- At least one of name, description, or is_shared must be provided
 - The collection must belong to the specified user
+- When is_shared is set to true, a share_uuid will be generated if not already present

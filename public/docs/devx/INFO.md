@@ -30,13 +30,12 @@
 - `GET` && `POST` `/api/users/{user_id}/chats/{chat_id}/shares` [read](../api-users-{user_id}-chats-{chat_id}-shares.get.md) | [create](../api-users-{user_id}-chats-{chat_id}-shares.post.md)
 - `POST` [`/api/users/{user_id}/chats/{chat_id}/shares/{share_id}/whitelist-entries`](../api-users-{user_id}-chats-{chat_id}-shares-{share_id}-whitelist-entries.post.md)
 
-- `GET` [`/api/shared/collections`](../api-shared-collections.get.md)
-- `GET` [`/api/shared/collections/{uuid}`](../api-shared-collections-{uuid}.get.md)
+- `GET` [`/api/shared/collections/{collection_id}`](../api-shared-collections-{collection_id}.get.md)
 - `GET` [`/api/users/{user_id}/collections`](../api-users-{user_id}-collections.get.md)
 - `POST` [`/api/users/{user_id}/collections`](../api-users-{user_id}-collections.post.md)
-- `PATCH` && `DELETE` `/api/users/{user_id}/collections/{uuid}` [update](../api-users-{user_id}-collections-{uuid}.patch.md) | [delete](../api-users-{user_id}-collections-{uuid}.delete.md)
-- `POST` [`/api/users/{user_id}/collections/{uuid}/templates`](../api-users-{user_id}-collections-{uuid}-templates.post.md)
-- `GET` && `PATCH` && `DELETE` `/api/users/{user_id}/collections/{uuid}/templates/{id}` [read](../api-users-{user_id}-collections-{uuid}-templates-{id}.get.md) | [update](../api-users-{user_id}-collections-{uuid}-templates-{id}.patch.md) | [delete](../api-users-{user_id}-collections-{uuid}-templates-{id}.delete.md)
+- `PATCH` && `DELETE` `/api/users/{user_id}/collections/{collection_id}` [update](../api-users-{user_id}-collections-{collection_id}.patch.md) | [delete](../api-users-{user_id}-collections-{collection_id}.delete.md)
+- `POST` [`/api/users/{user_id}/collections/{collection_id}/templates`](../api-users-{user_id}-collections-{collection_id}-templates.post.md)
+- `GET` && `PATCH` && `DELETE` `/api/users/{user_id}/collections/{collection_id}/templates/{template_id}` [read](../api-users-{user_id}-collections-{collection_id}-templates-{template_id}.get.md) | [update](../api-users-{user_id}-collections-{collection_id}-templates-{template_id}.patch.md) | [delete](../api-users-{user_id}-collections-{collection_id}-templates-{template_id}.delete.md)
 
 - `GET` [`/api/users/{user_id}/installations`](../api-users-{user_id}-installations.get.md)
 - `GET` [`/api/users/{user_id}/installations/{installation_id}/imports`](../api-users-{user_id}-installations-{installation_id}-imports.get.md)

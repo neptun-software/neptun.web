@@ -12,14 +12,14 @@ POST
 
 ### Route
 
-`/api/users/{user_id}/collections/{uuid}/templates`
+`/api/users/{user_id}/collections/{collection_id}/templates`
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                                      |
-| --------- | ------- | -------- | ------------------------------------------------ |
-| user_id   | integer | Yes      | The ID of the authenticated user                 |
-| uuid      | string  | Yes      | The unique identifier of the template collection |
+| Parameter     | Type    | Required | Description                       |
+| ------------- | ------- | -------- | --------------------------------- |
+| user_id       | integer | Yes      | The ID of the authenticated user  |
+| collection_id | integer | Yes      | The ID of the template collection |
 
 ### Headers
 
@@ -159,7 +159,7 @@ class Template(BaseModel):
 ### cURL Example
 
 ```bash
-curl -X POST "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e29b-41d4-a716-446655440000/templates" \
+curl -X POST "https://neptun-webui.vercel.app/api/users/1/collections/1/templates" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -H "Cookie: neptun-session=your-session-cookie" \
@@ -180,13 +180,13 @@ from typing import Optional
 
 async def create_template(
     user_id: int,
-    collection_uuid: str,
+    collection_id: int,
     file_name: str,
     file_content: str,
     description: Optional[str] = None,
     session_cookie: str = None
 ) -> ApiResponse:
-    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}/templates"
+    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_id}/templates"
 
     data = {
         "template": {
@@ -215,12 +215,12 @@ async def create_template(
 ```typescript
 async function createTemplate(
   userId: number,
-  collectionUuid: string,
+  collectionId: number,
   data: CreateTemplateRequest,
   sessionCookie: string
 ): Promise<ApiResponse> {
   const response = await fetch(
-    `https://neptun-webui.vercel.app/api/users/${userId}/collections/${collectionUuid}/templates`,
+    `https://neptun-webui.vercel.app/api/users/${userId}/collections/${collectionId}/templates`,
     {
       method: 'POST',
       headers: {

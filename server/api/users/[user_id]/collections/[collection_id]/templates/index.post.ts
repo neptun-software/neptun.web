@@ -1,21 +1,22 @@
 import { InsertTemplateSchema, InsertUserFileSchema } from '~/lib/types/database.tables/schema'
 import { readTemplateCollection } from '~/server/database/repositories/userTemplateCollections'
 import { createTemplate } from '~/server/database/repositories/userTemplates'
+import { validateParamCollectionId } from '~/server/utils/validate'
 
 export default defineEventHandler(async (event) => {
   /* VALIDATE PARAMS */
-  const maybeCollectionUuid = await validateParamCollectionUuid(event)
-  if (maybeCollectionUuid.statusCode !== 200) {
+  const maybeCollectionId = await validateParamCollectionId(event)
+  if (maybeCollectionId.statusCode !== 200) {
     return sendError(
       event,
       createError({
-        statusCode: maybeCollectionUuid.statusCode,
-        statusMessage: maybeCollectionUuid.statusMessage,
-        data: maybeCollectionUuid.data,
+        statusCode: maybeCollectionId.statusCode,
+        statusMessage: maybeCollectionId.statusMessage,
+        data: maybeCollectionId.data,
       }),
     )
   }
-  const { user_id, uuid } = maybeCollectionUuid.data
+  const { user_id, collection_id } = maybeCollectionId.data
 
   /* VALIDATE BODY */
   const body = await readValidatedBody(event, (body) => {
@@ -55,7 +56,7 @@ export default defineEventHandler(async (event) => {
   })
 
   // Verify collection exists
-  const collection = await readTemplateCollection(uuid, {
+  const collection = await readTemplateCollection(collection_id, {
     user_id,
   })
   if (!collection) {

@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
       }),
     )
   }
-  const { id } = maybeTemplateId.data
+  const { template_id } = maybeTemplateId.data
 
   /* VALIDATE BODY */
   const body = await readValidatedBody(event, (body) => {
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
   })
 
   try {
-    const template = await updateTemplate(id, body)
+    const template = await updateTemplate(template_id, body)
     return { template }
   } catch (error) {
     return sendError(
