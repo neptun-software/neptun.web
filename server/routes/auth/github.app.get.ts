@@ -1,20 +1,33 @@
 import type { GetResponseTypeFromEndpointMethod } from '@octokit/types'
 import { App } from 'octokit'
+import { z } from 'zod'
 import { createGithubAppInstallation } from '~/server/database/repositories/githubAppInstallations'
 import { createGithubAppInstallationRepositories } from '~/server/database/repositories/githubAppInstallationsRepositories'
 import { readUserUsingGithubOauthId } from '~/server/database/repositories/users'
 
+const GithubAppConfigSchema = z.object({
+  app: z.object({
+    webhookSecret: z.string(),
+    appId: z.string(),
+    clientId: z.string(),
+    clientSecret: z.string(),
+    privateKey: z.string(),
+  }),
+})
+
 export default defineEventHandler(async (event) => {
   const runtimeConfig = useRuntimeConfig(event)
+  const { app } = GithubAppConfigSchema.parse(runtimeConfig?.github)
+
   const octokitApp = new App({
-    appId: runtimeConfig.github.app.appId,
-    privateKey: runtimeConfig.github.app.privateKey,
+    appId: app.appId,
+    privateKey: app.privateKey,
     oauth: {
-      clientId: runtimeConfig.github.app.clientId,
-      clientSecret: runtimeConfig.github.app.clientSecret,
+      clientId: app.clientId,
+      clientSecret: app.clientSecret,
     },
     webhooks: {
-      secret: runtimeConfig.github.app.webhookSecret,
+      secret: app.webhookSecret,
     },
   })
 

@@ -30,13 +30,13 @@ async function convertToPng() {
   const schemaPngFile = path.join(schemaDir, 'schema.png')
   const configFile = path.join(schemaDir, 'mermaid.json')
 
-  // 8K resolution with balanced scaling
+  // 16K resolution with high-quality scaling
   const config = {
     theme: 'default',
     backgroundColor: 'transparent',
-    width: 7680, // 8K width
-    height: 4320, // 8K height
-    scale: 4, // Balanced scale for performance and quality
+    width: 15360, // 16K width
+    height: 8640, // 16K height
+    scale: 10, // High scale factor for crisp text and smooth lines
     cssFile: path.join(process.cwd(), 'server/utils/mermaid-theme.css'),
   }
 

@@ -20,8 +20,6 @@ import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { AllowedAiModelsEnum } from '~/lib/types/models/ai'
 
 const { console } = useLogger()
-const isLoading = ref(true)
-
 const { loadFiles } = useFetchFiles()
 const { user } = useUserSession()
 const {
@@ -49,13 +47,14 @@ const {
   keepLastMessageOnError: true,
 })
 
+const isLoading = ref(true)
+const autoScrollEnabled = ref(true)
+
 watch(() => currentChatMessage.value, (newMessage) => {
   if (newMessage !== '' && autoScrollEnabled.value) {
     scrollToBottom('instant')
   }
 }, { immediate: true })
-
-const autoScrollEnabled = ref(true)
 
 watch(chatError, () => {
   if (chatError.value) {
@@ -429,7 +428,7 @@ function stopGeneration() {
 
 <template>
   <div class="relative flex flex-col h-full min-h-[60vh] max-h-[75vh] rounded-xl bg-muted/50 p-4 order-1 2xl:order-2">
-    <div class="absolute top-3 left-3 z-10 pb-2">
+    <div class="absolute z-10 pb-2 top-3 left-3">
       <div class="flex gap-1">
         <ShadcnDrawer>
           <ShadcnDrawerTrigger as-child>
@@ -488,7 +487,7 @@ function stopGeneration() {
       </div>
     </div>
 
-    <div class="flex absolute top-3 right-3 z-10 items-end bg-transparent">
+    <div class="absolute z-10 flex items-end bg-transparent top-3 right-3">
       <ShadcnBadge variant="outline" :class="{ 'text-destructive border-destructive': isOverMaxTokens }">
         {{ currentChatMessage.length }}/{{ maxTokens }}
       </ShadcnBadge>
@@ -497,7 +496,7 @@ function stopGeneration() {
       </ShadcnBadge>
     </div>
 
-    <div class="flex flex-col flex-grow pt-10 pb-6 max-w-full min-h-0">
+    <div class="flex flex-col flex-grow max-w-full min-h-0 pt-10 pb-6">
       <ShadcnScrollArea ref="$scrollArea">
         <DashboardChatMessages :key="chatMessagesKey" :messages="messagesWithStreaming" />
 
@@ -520,7 +519,7 @@ function stopGeneration() {
 
         <div
           v-if="chatError"
-          class="flex flex-wrap items-center p-4 mt-8 w-full font-black uppercase rounded-md border-2 text-ellipsis border-destructive"
+          class="flex flex-wrap items-center w-full p-4 mt-8 font-black uppercase border-2 rounded-md text-ellipsis border-destructive"
         >
           <p class="flex-grow">
             Something went wrong!
@@ -534,7 +533,7 @@ function stopGeneration() {
     </div>
 
     <form
-      class="overflow-hidden relative flex-shrink-0 rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
+      class="relative flex-shrink-0 overflow-hidden border rounded-lg bg-background focus-within:ring-1 focus-within:ring-ring"
       @submit.prevent="submitMessage"
     >
       <ShadcnLabel for="message" class="sr-only">
@@ -542,7 +541,7 @@ function stopGeneration() {
       </ShadcnLabel>
       <ShadcnTextarea
         id="message" v-model="currentChatMessage" placeholder="Type your message here..."
-        class="overflow-y-auto p-3 whitespace-pre-wrap break-words border-0 shadow-none resize-none focus-visible:ring-0 min-h-28"
+        class="p-3 overflow-y-auto break-words whitespace-pre-wrap border-0 shadow-none resize-none focus-visible:ring-0 min-h-28"
         :class="{ 'text-destructive': isOverMaxTokens }" @keydown="handleInputFieldKeyboardEvents"
       />
       <div class="flex flex-wrap items-center p-3 pt-0">
@@ -668,7 +667,7 @@ function stopGeneration() {
             </ShadcnTooltipContent>
           </ShadcnTooltip>
         </ShadcnTooltipProvider>
-        <div class="flex gap-1 items-center w-full sm:ml-auto sm:w-fit">
+        <div class="flex items-center w-full gap-1 sm:ml-auto sm:w-fit">
           <ShadcnTooltipProvider>
             <ShadcnTooltip>
               <ShadcnTooltipTrigger as-child>

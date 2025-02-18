@@ -97,14 +97,14 @@ async function convertToMermaid(): Promise<{ timestampMermaidPath: string, schem
   const tableConnections = new Map<string, Set<string>>()
 
   // find all table definitions to understand their structure
-  const columnRegex = /\s*["']?(\w+)["']?\s+(\w+)(?:\(.*?\))?\s*(?:NOT NULL)?/g
+  const tableColumnRegex = /\s*["']?(\w+)["']?\s+\w+(?:\(.*?\))?\s*(?:NOT NULL)?/g
   const tableColumns = new Map<string, Set<string>>()
 
   for (const tableMatch of sqlContent.matchAll(tableRegex)) {
     const [, tableName, columnsContent] = tableMatch
     const columns = new Set<string>()
 
-    for (const columnMatch of columnsContent.matchAll(columnRegex)) {
+    for (const columnMatch of columnsContent.matchAll(tableColumnRegex)) {
       const [, columnName] = columnMatch
       columns.add(columnName.replace(/"/g, ''))
     }
@@ -181,13 +181,13 @@ async function convertToMermaid(): Promise<{ timestampMermaidPath: string, schem
   const relationsContent = await readFile(relationsPath, 'utf-8')
 
   // match relations definitions
-  const relationsRegex = /export const (\w+)Relations\s*=\s*relations\(\s*(\w+)\s*,\s*\(\{\s*([\s\S]*?)\s*\}\)\s*=>\s*\(\{([\s\S]*?)\}\s*\)\s*(?:,\s*)?\)/g
+  const relationsRegex = /export const (\w+)Relations\s*=\s*relations\(\s*(\w+)\s*,\s*\(\{[^}]*\}\)\s*=>\s*\(\{([\s\S]*?)\}\s*\)\s*(?:,\s*)?\)/g
   const fieldRegex = /(\w+):\s*(one|many)\(\s*(\w+)\s*(?:,\s*\{\s*fields:\s*\[([^.\]]+)\.([^\]]+)\](?:\s*,\s*references:\s*\[([^.\]]+)\.([^\]]+)\])?\s*\}\s*(?:,\s*)?)?\)/g
 
   // process each relation definition
   console.log('\n🔍 Processing TypeScript relations...')
   for (const relationMatch of relationsContent.matchAll(relationsRegex)) {
-    const [, relationName, tableName, relationTypes, fieldsContent] = relationMatch
+    const [, relationName, tableName, fieldsContent] = relationMatch
     console.log(`  Found relation: ${relationName} for table ${tableName}`)
 
     // process each field in the relation
@@ -199,7 +199,7 @@ async function convertToMermaid(): Promise<{ timestampMermaidPath: string, schem
       if (!sourceField) {
         // handle implicit field mapping based on field name and table name
         let impliedSourceField: string
-        let impliedTargetField = 'id'
+        const impliedTargetField = 'id'
 
         // handle plural field names for many relations
         const singularTargetTable = targetTable.endsWith('s') ? targetTable.slice(0, -1) : targetTable

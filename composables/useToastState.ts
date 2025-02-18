@@ -8,6 +8,18 @@ export function useToastState() {
   const toastPromises = useState<Map<string, Promise<unknown>>>('toast-promises', () => new Map())
   const isWaitingForResponse = useState<Map<string, boolean>>('is-waiting-for-response', () => new Map())
 
+  const cleanup = () => {
+    // Clear all timeouts and remove all toasts
+    toastTimeouts.value.forEach(timeout => clearTimeout(timeout))
+    toastTimeouts.value.clear()
+
+    toastIds.value.forEach(id => toast.dismiss(id))
+    toastIds.value.clear()
+
+    toastPromises.value.clear()
+    isWaitingForResponse.value.clear()
+  }
+
   const removeToast = (requestId: string) => {
     if (toastIds.value.has(requestId)) {
       // Clear any existing timeout
@@ -168,18 +180,6 @@ export function useToastState() {
       isWaiting: computed(() => isWaitingForResponse.value.get(requestId) ?? false),
       toastPromise,
     }
-  }
-
-  const cleanup = () => {
-    // Clear all timeouts and remove all toasts
-    toastTimeouts.value.forEach(timeout => clearTimeout(timeout))
-    toastTimeouts.value.clear()
-
-    toastIds.value.forEach(id => toast.dismiss(id))
-    toastIds.value.clear()
-
-    toastPromises.value.clear()
-    isWaitingForResponse.value.clear()
   }
 
   return {

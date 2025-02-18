@@ -26,7 +26,7 @@ useMutationObserver(importTrigger, (mutations) => {
 
 <template>
   <div class="flex justify-center card" :data-state="isImportActive ? 'import' : 'create'">
-    <ShadcnCard class="m-2 max-w-full w-fit">
+    <ShadcnCard class="max-w-full m-2 w-fit">
       <ShadcnCardHeader>
         <ShadcnCardTitle class="text-4xl">
           Guide - {{ isImportActive ? 'Import' : 'Create' }}
@@ -38,7 +38,7 @@ useMutationObserver(importTrigger, (mutations) => {
       <ShadcnSeparator class="my-2" />
       <ShadcnCardContent>
         <ShadcnTabs default-value="create" class="w-full">
-          <ShadcnTabsList class="flex flex-grow justify-start">
+          <ShadcnTabsList class="flex justify-start flex-grow">
             <ShadcnTabsTrigger value="create" class="tab-trigger">
               Start from Scratch
             </ShadcnTabsTrigger>
@@ -46,7 +46,7 @@ useMutationObserver(importTrigger, (mutations) => {
               Import Data
             </ShadcnTabsTrigger>
           </ShadcnTabsList>
-          <ShadcnTabsContent ref="card" value="create" class="p-4 rounded-md border tab-content">
+          <ShadcnTabsContent value="create" class="p-4 border rounded-md tab-content">
             <p>
               You do not have a project yet. Do you want to start from
               scratch?<br>
@@ -57,7 +57,7 @@ useMutationObserver(importTrigger, (mutations) => {
               <FreshProject />
             </div>
           </ShadcnTabsContent>
-          <ShadcnTabsContent value="import" class="p-4 rounded-md border tab-content">
+          <ShadcnTabsContent value="import" class="p-4 border rounded-md tab-content">
             <p>
               You already have a project. Do you want to import it's data?<br>
               If so, you can import data here.

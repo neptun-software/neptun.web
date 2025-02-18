@@ -16,7 +16,7 @@ import {
 import { getSanitizedMessageContent } from '~/utils/chat'
 
 export default defineLazyEventHandler(async () => {
-  const apiKey = useRuntimeConfig().huggingfaceApiKey
+  const apiKey = useRuntimeConfig().huggingfaceApiKey as string
   const Hf = new HfInference(apiKey)
 
   return defineEventHandler(async (event) => {

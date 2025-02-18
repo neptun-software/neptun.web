@@ -1,21 +1,36 @@
 import crypto from 'node:crypto'
 import { render } from '@vue-email/render'
 import nodemailer from 'nodemailer'
+import { z } from 'zod'
 import Otp from '~/components/emails/otp.vue'
 
+const MailConfigSchema = z.object({
+  mail: z.object({
+    smtp: z.object({
+      host: z.string(),
+      port: z.number(),
+    }),
+    secure: z.boolean(),
+    username: z.string(),
+    password: z.string(),
+  }),
+})
+
 async function sendMail({ to, subject, html, text }: { to: string, subject: string, html: string, text: string }) {
-  const config = useRuntimeConfig()
+  const runtimeConfig = useRuntimeConfig()
+  const { mail } = MailConfigSchema.parse(runtimeConfig)
+
   const transporter = nodemailer.createTransport({
-    host: config.mail.smtp.host,
-    port: config.mail.smtp.port,
-    secure: config.mail.secure,
+    host: mail.smtp.host,
+    port: mail.smtp.port,
+    secure: mail.secure,
     auth: {
-      user: config.mail.username,
-      pass: config.mail.password,
+      user: mail.username,
+      pass: mail.password,
     },
     tls: {
       // must provide server name, otherwise TLS certificate check will fail
-      servername: config.mail.smtp.host,
+      servername: mail.smtp.host,
     },
   })
 
@@ -92,7 +107,7 @@ export default defineEventHandler(async (event) => {
     const { email, otp, new_password } = body
 
     try {
-      // @ts-ignore
+      // @ts-ignore: sometimes not inferrable
       return await event.$fetch(`/${email}/reset-password`, {
         method: 'POST',
         body: { otp, new_password },

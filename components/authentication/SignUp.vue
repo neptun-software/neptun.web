@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ZodIssue } from 'zod'
+import type { ApiValidationError } from '~/lib/types/api'
 import { Icon } from '@iconify/vue'
 import { toast } from 'vue-sonner'
 import {
@@ -27,19 +29,16 @@ async function signUp() {
   const { error } = await auth.signUp(email.value, password.value)
 
   if (error) {
-    // @ts-expect-error
-    console.info('error:', error?.message, error?.data)
-    // @ts-expect-error
-    emailErrors.value = error?.data?.data?.issues
-      .filter((issue: any) => issue.path[0] === 'email')
-      .map((issue: any) => issue.message)
-    // @ts-expect-error
-    passwordErrors.value = error?.data?.data?.issues
-      .filter((issue: any) => issue.path[0] === 'password')
-      .map((issue: any) => issue.message)
+    console.info('error:', error.message, error.data)
+    const signUpError = error as ApiValidationError
+    emailErrors.value = signUpError?.data?.data?.issues
+      ?.filter((issue: ZodIssue) => issue.path[0] === 'email')
+      .map((issue: ZodIssue) => issue.message) || []
+    passwordErrors.value = signUpError?.data?.data?.issues
+      ?.filter((issue: ZodIssue) => issue.path[0] === 'password')
+      .map((issue: ZodIssue) => issue.message) || []
 
-    // @ts-expect-error
-    toast.error(error?.message)
+    toast.error(signUpError.message)
     return
   }
 
