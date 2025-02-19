@@ -20,7 +20,7 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
             max_new_tokens: 512,
             typical_p: 0.2,
             repetition_penalty: 1.1,
-            truncate: 32767 - 500, // 131072 - 512, // Full context length of 131,072 tokens
+            truncate: 32_767 - 500, // 131072 - 512, Full context length of 131,072 tokens
             return_full_text: false,
           },
         }
@@ -44,7 +44,7 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
             max_new_tokens: 512,
             typical_p: 0.2,
             repetition_penalty: 1.1,
-            truncate: 15999 - 500, // 131072 - 500, // Full context length of 131K tokens
+            truncate: 15_999 - 500, // 131072 - 500, Full context length of 131K tokens
             return_full_text: false,
           },
         }
@@ -71,7 +71,7 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
             typical_p: 0.2,
             repetition_penalty: 1.1,
             temperature: 0.6, // Recommended temperature from model card
-            truncate: 12999 - 500, // 128000 - 512, // Context length of 128K tokens
+            truncate: 12_999 - 500, // 128000 - 512, Context length of 128K tokens
             return_full_text: false,
           },
         }
@@ -98,7 +98,7 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
             typical_p: 0.2,
             repetition_penalty: 1.1,
             temperature: 0.35, // Recommended lower temperature for this model
-            truncate: 128000 - 500, // Context length of 128K tokens
+            truncate: 128_000 - 500,
             return_full_text: false,
           },
         }
@@ -122,7 +122,7 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
             max_new_tokens: 500,
             typical_p: 0.2,
             repetition_penalty: 1.1,
-            truncate: 32768 - 500, // Extended vocabulary size
+            truncate: 32_768 - 500,
             return_full_text: false,
           },
         }
@@ -148,7 +148,7 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
             max_new_tokens: 500,
             typical_p: 0.2,
             repetition_penalty: 1.1,
-            truncate: 8192 - 500, // Context length of 8K tokens
+            truncate: 8_192 - 500,
             return_full_text: false,
           },
         }
@@ -170,10 +170,10 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
           model: 'google/gemini-2.0-pro-exp-02-05:free',
           inputs,
           parameters: {
-            max_new_tokens: -1,
+            max_new_tokens: 8_192,
             typical_p: -1,
             repetition_penalty: -1,
-            truncate: -1,
+            truncate: 2_000_000 - 8_192,
             return_full_text: false,
           },
         }
@@ -193,10 +193,10 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
           model: 'deepseek/deepseek-chat:free',
           inputs,
           parameters: {
-            max_new_tokens: -1,
+            max_new_tokens: 128_000,
             typical_p: -1,
             repetition_penalty: -1,
-            truncate: -1,
+            truncate: 128_000,
             return_full_text: false,
           },
         }
@@ -216,10 +216,10 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
           model: 'meta-llama/llama-3.3-70b-instruct:free',
           inputs,
           parameters: {
-            max_new_tokens: -1,
+            max_new_tokens: 2_048,
             typical_p: -1,
             repetition_penalty: -1,
-            truncate: -1,
+            truncate: 131_072 - 2_048,
             return_full_text: false,
           },
         }
@@ -245,7 +245,7 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
             max_new_tokens: 256,
             typical_p: 0.2,
             repetition_penalty: 1.1,
-            truncate: 131072 - 500,
+            truncate: 131_072 - 256,
             return_full_text: false,
           },
         }
@@ -271,7 +271,7 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
             max_new_tokens: 500,
             typical_p: 0.2,
             repetition_penalty: 1.1,
-            truncate: 4096 - 500, // Context length of 4K tokens
+            truncate: 4_096 - 500,
             return_full_text: false,
           },
         }
