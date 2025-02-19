@@ -36,6 +36,20 @@
       "when": 1739125956268,
       "tag": "0004_uneven_nehzno",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1739985508297,
+      "tag": "0005_luxuriant_timeslip",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1739986307746,
+      "tag": "0006_update_ai_model_enum",
+      "breakpoints": true
     }
   ]
 }

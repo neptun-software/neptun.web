@@ -155,6 +155,32 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
       },
     },
   },
+  'cloudflare': {
+    'llama-3.3-70b-instruct-fp8-fast': {
+      publisher: 'cloudflare',
+      name: 'llama-3.3-70b-instruct-fp8-fast',
+      description: `<strong>Llama 3.3 70B quantized to fp8 precision, optimized to be faster</strong><br>
+            Powerful model with 70B parameters optimized for instruction following.<br>
+            Excels at text generation, reasoning, and structured data handling.<br>
+            (Llama 3.3 Community License)`,
+      icon: 'simple-icons:cloudflare',
+      type: 'instruct',
+      configuration: (inputs: string) => {
+        return {
+          // https://developers.cloudflare.com/workers-ai/models/llama-3.3-70b-instruct-fp8-fast
+          model: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+          inputs,
+          parameters: {
+            max_new_tokens: 256,
+            typical_p: 0.2,
+            repetition_penalty: 1.1,
+            truncate: 131072 - 500,
+            return_full_text: false,
+          },
+        }
+      },
+    },
+  },
   'microsoft': {
     'Phi-3-mini-4k-instruct': {
       publisher: 'microsoft',
@@ -237,8 +263,8 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
     },
   },
 }, */
+// Model requires a Pro subscription; check out hf.co/pricing to learn more. Make sure to include your HF token in your query.
 /* 'meta-llama': {
-  // Model requires a Pro subscription; check out hf.co/pricing to learn more. Make sure to include your HF token in your query.
   'Llama-3.3-70B-Instruct': {
     publisher: 'meta-llama',
     name: 'Llama-3.3-70B-Instruct',
@@ -258,35 +284,6 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
           typical_p: 0.2,
           repetition_penalty: 1.1,
           truncate: 128000 - 500, // Context length of 128K tokens
-          return_full_text: false,
-        },
-      }
-    },
-  },
-  // Errors
-  'Meta-Llama-3-8B-Instruct': {
-    publisher: 'meta-llama',
-    name: 'Meta-Llama-3-8B-Instruct',
-    description: `<strong>Meta Llama is a large language model trained by Meta.</strong><br>
-          <strong>META LLAMA 3 COMMUNITY LICENSE AGREEMENT</strong>:<br>
-          Meta Llama 3 can be used, reproduced, modified, and redistributed for free under a non-exclusive, worldwide, royalty-free license.<br>
-          When redistributing, Meta must be credited, and the phrase "Built with Meta Llama 3" must be displayed.<br>
-          Companies with over 700 million monthly active users must request a separate license from Meta.<br>
-          Meta provides no warranties and is not liable for indirect damages.<br>
-          The agreement is governed by California law, and Meta retains ownership of the original materials.<br>
-          https://www.llama.com/llama3/license`,
-    icon: 'bi:meta',
-    type: 'instruct',
-    configuration: (inputs: string) => {
-      return {
-        // https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct
-        model: 'meta-llama/Meta-Llama-3-8B-Instruct',
-        inputs,
-        parameters: {
-          max_new_tokens: 500,
-          typical_p: 0.2, // higher means, more creative
-          repetition_penalty: 1.1, // repetition is less likely because the model receives penalty
-          truncate: 8000 - 500, // max_new_tokens of this model is 8000
           return_full_text: false,
         },
       }

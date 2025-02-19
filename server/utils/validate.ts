@@ -829,6 +829,21 @@ export async function validateParamAiModelName(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
+        // For Cloudflare endpoint, we only have model_name
+        const isCloudflareEndpoint = event.path.startsWith('/api/ai/cloudflare/')
+        if (isCloudflareEndpoint) {
+          // @ts-expect-error
+          const model_name = params?.model_name
+          event.context.validated.params.model_publisher = 'cloudflare'
+          event.context.validated.params.model_name = model_name
+
+          return ModelSchema.safeParse({ 
+            model_publisher: 'cloudflare',
+            model_name,
+          })
+        }
+
+        // For other endpoints (Hugging Face), we have both publisher and name
         // @ts-expect-error
         const model_publisher = params?.model_publisher
         // @ts-expect-error

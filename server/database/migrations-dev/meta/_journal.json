@@ -29,6 +29,20 @@
       "when": 1739125950962,
       "tag": "0003_wild_sugar_man",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1739985497113,
+      "tag": "0004_glamorous_madelyne_pryor",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1739986209872,
+      "tag": "0005_update_ai_model_enum",
+      "breakpoints": true
     }
   ]
 }

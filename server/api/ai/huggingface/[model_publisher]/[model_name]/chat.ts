@@ -123,9 +123,7 @@ export default defineLazyEventHandler(async () => {
         ...msg,
         content: getSanitizedMessageContent(msg.content),
       }))
-      if (model_name === AllowedAiModelNamesEnum.Llama3) {
-        inputs = buildMetaLlama3Prompt(sanitizedMessages)
-      } else if (model_name === AllowedAiModelNamesEnum.Gemma) {
+      if (model_name === AllowedAiModelNamesEnum.Gemma) {
         inputs = buildGemma2Prompt(sanitizedMessages)
       } else if (model_name === AllowedAiModelNamesEnum.Phi3) {
         inputs = buildPhi3Prompt(sanitizedMessages)
@@ -373,13 +371,11 @@ export default defineLazyEventHandler(async () => {
 
       return stream
     } catch (error: unknown) {
-      // Log the error if logging is enabled
       if (LOG_BACKEND) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
         console.error('AI request errored:', errorMessage)
       }
 
-      // Handle different types of errors
       if (error instanceof Error) {
         return sendError(
           event,

@@ -214,6 +214,10 @@ SELECT unnest(enum_range(NULL::<enum_name>));
 
 Update enum values (if the migration get's messed up somehow):
 
+```bash
+nr db:generate --custom --name=update_ai_model_enum
+```
+
 ```sql
 ALTER TYPE <enum_name> RENAME TO <enum_name>_old;
 CREATE TYPE <enum_name> AS ENUM (
