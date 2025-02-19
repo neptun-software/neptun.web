@@ -2,6 +2,8 @@ import type {
   AllowedAiModelPaths,
   AllowedAiModels,
   CloudflareModelPath,
+  OpenRouterModelPath,
+  HuggingFaceModelPath,
 } from '~/lib/types/models/ai'
 import type { MinimalChat } from '~/lib/types/models/chat'
 import {
@@ -32,10 +34,16 @@ export function useSelectedAiChat() {
   const selectedAiChatApiPath = computed<AllowedAiModelPaths>(() => {
     const model = selectedAiChat.value.model
     const [publisher, modelName] = model.split('/')
+
     if (publisher === 'cloudflare') {
       return `/api/ai/cloudflare/${modelName}/chat` as CloudflareModelPath
     }
-    return `/api/ai/huggingface/${model}/chat`
+
+    if (publisher === 'openrouter') {
+      return `/api/ai/openrouter/${modelName}/chat` as OpenRouterModelPath
+    }
+
+    return `/api/ai/huggingface/${model}/chat` as HuggingFaceModelPath
   })
 
   const selectedAiChatKey = computed(

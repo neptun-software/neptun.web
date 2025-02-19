@@ -268,8 +268,8 @@ async function validateParams<S, E = S>(
     data,
     success,
   } = secondValidationStep
-    ? secondValidationStep(maybeValidatedParams.data!)
-    : { success: true, data: null, validationErrorMessage: '' }
+      ? secondValidationStep(maybeValidatedParams.data!)
+      : { success: true, data: null, validationErrorMessage: '' }
   if (secondValidationStep) {
     if (!success || !data) {
       return {
@@ -831,14 +831,28 @@ export async function validateParamAiModelName(
       const result = await getValidatedRouterParams(event, (params) => {
         // For Cloudflare endpoint, we only have model_name
         const isCloudflareEndpoint = event.path.startsWith('/api/ai/cloudflare/')
+        const isOpenRouterEndpoint = event.path.startsWith('/api/ai/openrouter/')
+
         if (isCloudflareEndpoint) {
           // @ts-expect-error
           const model_name = params?.model_name
           event.context.validated.params.model_publisher = 'cloudflare'
           event.context.validated.params.model_name = model_name
 
-          return ModelSchema.safeParse({ 
+          return ModelSchema.safeParse({
             model_publisher: 'cloudflare',
+            model_name,
+          })
+        }
+
+        if (isOpenRouterEndpoint) {
+          // @ts-expect-error
+          const model_name = params?.model_name
+          event.context.validated.params.model_publisher = 'openrouter'
+          event.context.validated.params.model_name = model_name
+
+          return ModelSchema.safeParse({
+            model_publisher: 'openrouter',
             model_name,
           })
         }

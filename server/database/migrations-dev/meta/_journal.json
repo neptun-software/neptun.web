@@ -50,6 +50,20 @@
       "when": 1739987926855,
       "tag": "0006_true_may_parker",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1739994393761,
+      "tag": "0007_mighty_cerebro",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1739997770614,
+      "tag": "0008_silly_madrox",
+      "breakpoints": true
     }
   ]
 }

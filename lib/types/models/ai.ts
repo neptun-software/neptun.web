@@ -50,13 +50,32 @@ export const allowedModelsConst = [
   'mistralai/Mistral-7B-Instruct-v0.3',
   'microsoft/Phi-3-mini-4k-instruct',
   'cloudflare/llama-3.3-70b-instruct-fp8-fast',
+  'openrouter/gemini-2.0-pro-exp-02-05',
+  'openrouter/deepseek-chat',
+  'openrouter/llama-3.3-70b-instruct',
 ] as const
 
 export type AllowedAiModels = `${(typeof allowedModelsConst)[number]}`
 
-export type HuggingFaceModelPath = `/api/ai/huggingface/${(typeof allowedModelsConst)[number]}/chat`
+export type HuggingFaceModelPath = `/api/ai/huggingface/${
+  | AllowedAiModelNamesEnum.Qwen72B
+  | AllowedAiModelNamesEnum.QwenCoder
+  | AllowedAiModelNamesEnum.DeepSeekR1
+  | AllowedAiModelNamesEnum.MistralNemo
+  | AllowedAiModelNamesEnum.Mistral7B
+  | AllowedAiModelNamesEnum.Gemma
+  | AllowedAiModelNamesEnum.Phi3
+}/chat`
+
 export type CloudflareModelPath = `/api/ai/cloudflare/${AllowedAiModelNamesEnum.CloudflareLlama}/chat`
-export type AllowedAiModelPaths = HuggingFaceModelPath | CloudflareModelPath
+
+export type OpenRouterModelPath = `/api/ai/openrouter/${
+  | AllowedAiModelNamesEnum.OpenRouterGemini
+  | AllowedAiModelNamesEnum.OpenRouterDeepseek
+  | AllowedAiModelNamesEnum.OpenRouterLlama33
+}/chat`
+
+export type AllowedAiModelPaths = HuggingFaceModelPath | CloudflareModelPath | OpenRouterModelPath
 
 export enum AllowedAiModelPublishersEnum {
   Qwen = 'qwen',
@@ -65,6 +84,7 @@ export enum AllowedAiModelPublishersEnum {
   Google = 'google',
   Microsoft = 'microsoft',
   Cloudflare = 'cloudflare',
+  OpenRouter = 'openrouter',
 }
 
 export enum AllowedAiModelNamesEnum {
@@ -76,6 +96,9 @@ export enum AllowedAiModelNamesEnum {
   Gemma = 'gemma-2-27b-it',
   Phi3 = 'Phi-3-mini-4k-instruct',
   CloudflareLlama = 'llama-3.3-70b-instruct-fp8-fast',
+  OpenRouterGemini = 'gemini-2.0-pro-exp-02-05',
+  OpenRouterDeepseek = 'deepseek-chat',
+  OpenRouterLlama33 = 'llama-3.3-70b-instruct',
 }
 
 export enum AllowedAiModelsEnum {
@@ -87,4 +110,7 @@ export enum AllowedAiModelsEnum {
   Gemma = 'google/gemma-2-27b-it',
   Phi3 = 'microsoft/Phi-3-mini-4k-instruct',
   CloudflareLlama = 'cloudflare/llama-3.3-70b-instruct-fp8-fast',
+  OpenRouterGemini = 'openrouter/gemini-2.0-pro-exp-02-05',
+  OpenRouterDeepseek = 'openrouter/deepseek-chat',
+  OpenRouterLlama33 = 'openrouter/llama-3.3-70b-instruct',
 }

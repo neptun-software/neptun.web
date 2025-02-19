@@ -57,6 +57,20 @@
       "when": 1739987932987,
       "tag": "0007_nappy_leopardon",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1739994399709,
+      "tag": "0008_jittery_kang",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1739997775093,
+      "tag": "0009_black_starjammers",
+      "breakpoints": true
     }
   ]
 }

@@ -155,6 +155,77 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
       },
     },
   },
+  'openrouter': {
+    'gemini-2.0-pro-exp-02-05': {
+      publisher: 'openrouter',
+      name: 'gemini-2.0-pro-exp-02-05',
+      description: `<strong>Google's Gemini 2.0 Pro Experimental Model</strong><br>
+            Latest experimental version of Gemini with enhanced capabilities.<br>
+            Excellent at reasoning, coding, and creative tasks.`,
+      icon: 'simple-icons:google',
+      type: 'chat',
+      configuration: (inputs: string) => {
+        return {
+          // https://openrouter.ai/google/gemini-2.0-pro-exp-02-05:free
+          model: 'google/gemini-2.0-pro-exp-02-05:free',
+          inputs,
+          parameters: {
+            max_new_tokens: -1,
+            typical_p: -1,
+            repetition_penalty: -1,
+            truncate: -1,
+            return_full_text: false,
+          },
+        }
+      },
+    },
+    'deepseek-chat': {
+      publisher: 'openrouter',
+      name: 'deepseek-chat',
+      description: `<strong>DeepSeek's Chat Model</strong><br>
+            Powerful model optimized for natural conversations and reasoning.<br>
+            Strong performance across various tasks including coding.`,
+      icon: 'game-icons:angler-fish',
+      type: 'chat',
+      configuration: (inputs: string) => {
+        return {
+          // https://openrouter.ai/deepseek/deepseek-chat:free
+          model: 'deepseek/deepseek-chat:free',
+          inputs,
+          parameters: {
+            max_new_tokens: -1,
+            typical_p: -1,
+            repetition_penalty: -1,
+            truncate: -1,
+            return_full_text: false,
+          },
+        }
+      },
+    },
+    'llama-3.3-70b-instruct': {
+      publisher: 'openrouter',
+      name: 'llama-3.3-70b-instruct',
+      description: `<strong>Meta's Llama 3.3 70B Instruct Model</strong><br>
+            Latest version of Llama optimized for instruction following.<br>
+            Excellent performance across multiple languages and tasks.`,
+      icon: 'simple-icons:meta',
+      type: 'chat',
+      configuration: (inputs: string) => {
+        return {
+          // https://openrouter.ai/meta-llama/llama-3.3-70b-instruct:free
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          inputs,
+          parameters: {
+            max_new_tokens: -1,
+            typical_p: -1,
+            repetition_penalty: -1,
+            truncate: -1,
+            return_full_text: false,
+          },
+        }
+      },
+    },
+  },
   'cloudflare': {
     'llama-3.3-70b-instruct-fp8-fast': {
       publisher: 'cloudflare',
