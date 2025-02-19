@@ -2,8 +2,8 @@ import type {
   AllowedAiModelPaths,
   AllowedAiModels,
   CloudflareModelPath,
-  OpenRouterModelPath,
   HuggingFaceModelPath,
+  OpenRouterModelPath,
 } from '~/lib/types/models/ai'
 import type { MinimalChat } from '~/lib/types/models/chat'
 import {

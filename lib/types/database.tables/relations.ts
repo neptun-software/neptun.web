@@ -156,11 +156,14 @@ export const chat_conversation_fileRelations = relations(
 
 export const neptun_user_fileRelations = relations(
   neptun_user_file,
-  ({ one }) => ({
+  ({ one, many }) => ({
     neptun_user: one(neptun_user, {
       fields: [neptun_user_file.neptun_user_id],
       references: [neptun_user.id],
     }),
+    chat_conversation_files: many(chat_conversation_file),
+    templates: many(neptun_user_template),
+    project_user_files: many(project_user_file)
   }))
 
 export const neptun_user_templateRelations = relations(
