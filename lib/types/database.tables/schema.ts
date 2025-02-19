@@ -226,7 +226,7 @@ export const POSSIBLE_AI_MODELS = pgEnum('ai_model_enum', allowedModelsConst) //
 export const chat_conversation = pgTable('chat_conversation', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
-  model: POSSIBLE_AI_MODELS('model_name').notNull(), // TODO: fix this being TEXT now...
+  model: POSSIBLE_AI_MODELS('model').notNull(), // TODO: fix this being TEXT now...
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at')
     .defaultNow()

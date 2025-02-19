@@ -43,6 +43,13 @@
       "when": 1739986209872,
       "tag": "0005_update_ai_model_enum",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1739987926855,
+      "tag": "0006_true_may_parker",
+      "breakpoints": true
     }
   ]
 }

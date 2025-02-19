@@ -50,6 +50,13 @@
       "when": 1739986307746,
       "tag": "0006_update_ai_model_enum",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1739987932987,
+      "tag": "0007_nappy_leopardon",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "chat_conversation" RENAME COLUMN "model_name" TO "model";
