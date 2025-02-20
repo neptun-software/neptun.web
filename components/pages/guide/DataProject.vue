@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { useProjectResources } from '@/composables/useProjectResources'
+import { useProjects } from '@/composables/useProjects'
 import { get, set, useDropZone } from '@vueuse/core'
-import { Check, Circle, Dot } from 'lucide-vue-next'
+import { Check, Circle, Dot, Import, Info, X } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+
+const IS_DEV = process.env.NODE_ENV === 'development'
 
 const stepIndex = ref(1)
 const steps = [
@@ -68,9 +72,82 @@ function updateInputFileValue() {
 const allowedToGoNext = ref(true)
 const doCreateFilesInGitRepository = ref(false)
 
-async function generateConfigurationFiles() {
-  toast.error('Coming Soon...')
+const projectContext = ref('')
+const isUploading = ref(false)
+
+const { uploadFiles } = useProjectResources()
+const { createProject } = useProjects()
+const { user } = useUserSession()
+
+function removeFile(index: number) {
+  files.value.splice(index, 1)
+  updateInputFileValue()
 }
+
+async function generateConfigurationFiles() {
+  try {
+    isUploading.value = true
+
+    if (files.value.length === 0) {
+      toast.error('Please upload at least one file')
+      return
+    }
+
+    if (!projectContext.value.trim()) {
+      toast.error('Please provide project context')
+      return
+    }
+
+    const userId = user.value?.id
+    if (!userId) {
+      toast.error('User not found')
+      return
+    }
+
+    const project = await createProject({
+      name: 'New Project',
+      description: projectContext.value,
+      type: 'web-app',
+      main_language: 'typescript',
+      neptun_user_id: userId,
+    })
+
+    await uploadFiles(project.id, {
+      files: files.value,
+      category: 'documentation',
+      file_type: 'text',
+    })
+
+    toast.success('Project created successfully')
+
+    await new Promise(resolve => setTimeout(resolve, 250))
+    navigateTo(`/?project_id=${project.id}`)
+  } catch (error) {
+    console.error('Failed to generate project:', error)
+    if (error instanceof Error) {
+      toast.error(`Failed to generate project: ${error.message}`)
+    } else {
+      toast.error('Failed to generate project')
+    }
+  } finally {
+    isUploading.value = false
+  }
+}
+
+const isStepValid = computed(() => {
+  switch (stepIndex.value) {
+    case 1:
+      return files.value.length > 0
+    case 2:
+      return projectContext.value.trim().length > 0
+    default:
+      return true
+  }
+})
+
+watch(isStepValid, (valid) => {
+  allowedToGoNext.value = valid
+})
 </script>
 
 <template>
@@ -125,14 +202,16 @@ async function generateConfigurationFiles() {
 
   <div class="flex flex-col gap-4 mt-4">
     <template v-if="stepIndex === 1">
-      <p>Import Data</p>
+      <p class="mb-4 text-sm text-muted-foreground">
+        Upload your project files or import them from GitHub to get started.
+      </p>
       <ShadcnTabs default-value="local" class="w-full">
         <ShadcnTabsList class="flex justify-start flex-grow">
           <ShadcnTabsTrigger value="local">
-            Local
+            Local Files
           </ShadcnTabsTrigger>
           <ShadcnTabsTrigger value="github">
-            Github
+            GitHub Repository
           </ShadcnTabsTrigger>
         </ShadcnTabsList>
         <ShadcnTabsContent value="local">
@@ -141,67 +220,131 @@ async function generateConfigurationFiles() {
               ref="inputFileRef"
               type="file"
               multiple
-              class="flex items-center justify-center w-full h-32 p-4 border-2 border-dashed rounded-md bg-secondary text-secondary-foreground border-primary"
+              class="flex items-center justify-center w-full h-32 p-4 border-2 border-dashed rounded-md bg-secondary text-secondary-foreground"
+              :class="[
+                isOverDropZone ? 'border-primary bg-primary/5' : 'border-primary/50',
+              ]"
               @change="onFileInput"
             >
               <div
                 ref="dropZoneRef"
-                class="flex items-center justify-center w-full h-full p-4 bg-secondary text-secondary-foreground"
+                class="flex flex-col items-center justify-center w-full h-full p-4 bg-secondary text-secondary-foreground"
+                :class="{ 'drop-active': isOverDropZone }"
               >
-                Drop files here... ({{ isOverDropZone }})
+                <p class="mb-2 font-medium">
+                  {{ isOverDropZone ? 'Drop files here...' : 'Drop files here or click to select' }}
+                </p>
+                <p class="text-sm text-muted-foreground">
+                  Upload your project files to get started
+                </p>
               </div>
             </ShadcnInput>
-            <div>
-              <strong>Uploaded Files:</strong>
-              <ShadcnScrollArea class="h-36">
-                <div v-for="(file, index) in files" :key="index">
-                  <p>Name: {{ file.name }}</p>
-                  <p>Size: {{ file.size }}</p>
-                  <p>Type: {{ file.type || 'Unknown' }}</p>
-                  <p>Last modified: {{ file.lastModified }}</p>
+            <div v-if="files.length > 0" class="mt-4">
+              <div class="flex items-center justify-between mb-2">
+                <strong class="text-sm">Uploaded Files:</strong>
+                <ShadcnButton variant="ghost" size="sm" @click="files = []">
+                  Clear All
+                </ShadcnButton>
+              </div>
+              <ShadcnScrollArea class="w-full p-2 border rounded-md h-36">
+                <div class="space-y-2">
+                  <div v-for="(file, index) in files" :key="index" class="flex items-center justify-between p-2 rounded-md bg-muted">
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium truncate">
+                        {{ file.name }}
+                      </p>
+                      <p class="text-xs text-muted-foreground">
+                        {{ (file.size / 1024).toFixed(1) }} KB
+                      </p>
+                    </div>
+                    <ShadcnButton variant="ghost" size="icon" @click="removeFile(index)">
+                      <span class="sr-only">Remove file</span>
+                      <X class="w-4 h-4" />
+                    </ShadcnButton>
+                  </div>
                 </div>
-                <p v-if="files.length === 0">
-                  No files uploaded yet...
-                </p>
               </ShadcnScrollArea>
             </div>
+            <InfoBlock v-else :is-visible="true" :show-loader="false" :show-dots="false">
+              No files uploaded yet
+            </InfoBlock>
           </div>
         </ShadcnTabsContent>
         <ShadcnTabsContent value="github">
-          <div class="flex flex-col gap-2 p-4 border rounded-md">
-            <p>
-              Coming Soon. See
-              <NuxtLink
-                class="underline hover:no-underline"
-                target="_blank"
-                :external="true"
-                to="https://github.com/neptun-software/neptun.github.app"
-              >
-                here
-              </NuxtLink>
-              for more information.
-            </p>
+          <div class="p-4 border rounded-md">
+            <NuxtLink
+              target="_blank"
+              :to="IS_DEV ? 'https://github.com/apps/neptun-github-app-dev' : 'https://github.com/apps/neptun-github-app'"
+              :external="true"
+            >
+              <ShadcnButton variant="outline" size="sm" :disabled="true" class="gap-1.5 text-sm truncate w-full">
+                Import GitHub Repository
+                <Import class="size-4" />
+              </ShadcnButton>
+            </NuxtLink>
           </div>
         </ShadcnTabsContent>
       </ShadcnTabs>
     </template>
 
     <template v-if="stepIndex === 2">
-      Provide More Context
-
-      <ShadcnTextarea placeholder="Provide more context about the project" />
+      <div class="space-y-4">
+        <div>
+          <p class="mb-2 text-sm font-medium">
+            Project Context
+          </p>
+          <p class="mb-4 text-sm text-muted-foreground">
+            Provide additional context about your project to help us better understand its requirements.
+          </p>
+          <ShadcnTextarea
+            v-model="projectContext"
+            placeholder="Describe your project, its goals, and any specific requirements..."
+            :rows="6"
+          />
+        </div>
+      </div>
     </template>
 
     <template v-if="stepIndex === 3">
-      <ShadcnLabel for="create-files-in-git-repository">
-        Would you like me to add the generated files to your github repository?
-      </ShadcnLabel>
-      <ShadcnSwitch
-        id="create-files-in-git-repository"
-        v-model:checked="doCreateFilesInGitRepository"
-      />
+      <div class="space-y-4">
+        <div class="p-4 rounded-lg bg-blue-50">
+          <h3 class="mb-2 font-medium">
+            Configuration Summary
+          </h3>
+          <div class="space-y-1">
+            <p>Files to process: {{ files.length }}</p>
+            <p>Context provided: {{ projectContext ? 'Yes' : 'No' }}</p>
+          </div>
+        </div>
 
-      <ShadcnSeparator />
+        <div class="flex items-center justify-between">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span>Add generated files to GitHub repository</span>
+              <ShadcnTooltipProvider>
+                <ShadcnTooltip>
+                  <ShadcnTooltipTrigger as-child>
+                    <button type="button" class="cursor-help">
+                      <Info class="w-4 h-4 text-muted-foreground" />
+                    </button>
+                  </ShadcnTooltipTrigger>
+                  <ShadcnTooltipContent side="top" align="center" class="max-w-[300px]">
+                    <p>We'll create a pull request with the generated configuration files in your GitHub repository.</p>
+                  </ShadcnTooltipContent>
+                </ShadcnTooltip>
+              </ShadcnTooltipProvider>
+            </div>
+            <p class="text-sm text-muted-foreground">
+              If enabled, we'll create a pull request with the generated configuration files in your GitHub repository.
+            </p>
+          </div>
+          <ShadcnSwitch
+            id="create-files-in-git-repository"
+            v-model:checked="doCreateFilesInGitRepository"
+            :disabled="true"
+          />
+        </div>
+      </div>
     </template>
   </div>
 
@@ -215,24 +358,30 @@ async function generateConfigurationFiles() {
       Back
     </ShadcnButton>
     <div class="flex items-center gap-3">
-      <ShadcnButton
+      <AsyncButton
         v-if="stepIndex !== 3"
-        :disabled="!canGoNext"
+        :disabled="!canGoNext || !isStepValid"
         size="sm"
+        :loading="isUploading"
         @click="allowedToGoNext && goNext()"
       >
         Next
-      </ShadcnButton>
+      </AsyncButton>
 
       <AsyncButton
         v-if="stepIndex === 3"
         size="sm"
+        :loading="isUploading"
         :on-click-async="generateConfigurationFiles"
       >
-        Generate Configuration Files
+        Generate Project
       </AsyncButton>
     </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.drop-active {
+  @apply border-primary/50 bg-primary/5;
+}
+</style>

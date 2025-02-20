@@ -1,4 +1,4 @@
-import type { GetProject } from '~/lib/types/database.tables/schema'
+import type { GetProject, ProjectToCreate } from '~/lib/types/database.tables/schema'
 import { convertStringsToDates } from '~/utils/formatters'
 
 export function useProjects() {
@@ -38,6 +38,75 @@ export function useProjects() {
     }
   }
 
+  async function createProject(project: ProjectToCreate) {
+    try {
+      isLoading.value = true
+      const { user } = useUserSession()
+      const response = await $fetch<GetProject>(`/api/users/${user.value?.id}/projects`, {
+        method: 'POST',
+        body: project,
+      })
+      const newProject = convertStringsToDates(response)
+      projectsList.value.push(newProject)
+      return newProject
+    } catch (error) {
+      console.error('Failed to create project:', error)
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function updateProject(projectId: number, updates: Partial<GetProject>) {
+    try {
+      isLoading.value = true
+      const { user } = useUserSession()
+      const response = await $fetch<GetProject>(`/api/users/${user.value?.id}/projects/${projectId}`, {
+        method: 'PATCH',
+        body: updates,
+      })
+      const updatedProject = convertStringsToDates(response)
+
+      // Update in lists if present
+      const index = projectsList.value.findIndex(p => p.id === projectId)
+      if (index !== -1) {
+        projectsList.value[index] = updatedProject
+      }
+
+      // Update active project if it's the current one
+      if (activeProject.value?.id === projectId) {
+        activeProject.value = updatedProject
+      }
+
+      return updatedProject
+    } catch (error) {
+      console.error('Failed to update project:', error)
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function deleteProject(projectId: number) {
+    try {
+      isLoading.value = true
+      const { user } = useUserSession()
+      await $fetch(`/api/users/${user.value?.id}/projects/${projectId}`, {
+        method: 'DELETE',
+      })
+
+      projectsList.value = projectsList.value.filter(p => p.id !== projectId)
+      if (activeProject.value?.id === projectId) {
+        activeProject.value = undefined
+      }
+    } catch (error) {
+      console.error('Failed to delete project:', error)
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   function clearProject() {
     activeProject.value = undefined
   }
@@ -48,6 +117,9 @@ export function useProjects() {
     isLoading,
     fetchProject,
     fetchProjects,
+    createProject,
+    updateProject,
+    deleteProject,
     clearProject,
   }
 }

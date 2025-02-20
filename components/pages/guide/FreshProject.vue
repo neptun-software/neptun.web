@@ -90,10 +90,12 @@ async function createProject(data: {
       description: 'You will be redirected to your new project.',
     })
 
+    await new Promise(resolve => setTimeout(resolve, 250))
     navigateTo(`/?project_id=${response.id}`)
   } catch (error: any) {
+    console.error('Failed to create project:', error)
     toast.error('Failed to create project', {
-      description: error?.data?.message || error.message || 'An unexpected error occurred',
+      description: error?.data?.message || error?.message || 'An unexpected error occurred',
     })
   } finally {
     isLoading.value = false
@@ -139,12 +141,12 @@ const doCreateGitRepository = ref(false)
         }
       "
     >
-      <ShadcnStepper v-model="stepIndex" class="flex gap-2 items-start w-full">
+      <ShadcnStepper v-model="stepIndex" class="flex items-start w-full gap-2">
         <ShadcnStepperItem
           v-for="step in steps"
           :key="step.step"
           v-slot="{ state }"
-          class="flex relative flex-col justify-center items-center w-full"
+          class="relative flex flex-col items-center justify-center w-full"
           :step="step.step"
         >
           <ShadcnStepperSeparator
@@ -299,7 +301,7 @@ const doCreateGitRepository = ref(false)
         </template>
       </div>
 
-      <div class="flex justify-between items-center mt-4">
+      <div class="flex items-center justify-between mt-4">
         <ShadcnButton
           :disabled="!canGoBack"
           variant="outline"
@@ -308,18 +310,28 @@ const doCreateGitRepository = ref(false)
         >
           Back
         </ShadcnButton>
-        <div class="flex gap-3 items-center">
+        <div class="flex items-center gap-3">
           <ShadcnButton
             v-if="stepIndex !== 3"
             :type="meta.valid ? 'button' : 'submit'"
-            :disabled="!canGoNext"
+            :disabled="!canGoNext || isLoading"
             size="sm"
             @click="meta.valid && goNext()"
           >
             Next
           </ShadcnButton>
-          <ShadcnButton v-if="stepIndex === 3" size="sm" type="submit">
-            Generate Project
+          <ShadcnButton
+            v-if="stepIndex === 3"
+            size="sm"
+            type="submit"
+            :disabled="isLoading"
+          >
+            <template v-if="isLoading">
+              Creating Project...
+            </template>
+            <template v-else>
+              Generate Project
+            </template>
           </ShadcnButton>
         </div>
       </div>

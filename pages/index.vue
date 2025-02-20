@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { buttonVariants } from '@/components/shadcn/button'
 import { cn } from '@/lib/utils'
-import { ChevronsUpDown, Code2, Import, Plus } from 'lucide-vue-next'
+import { ChevronsUpDown, Code2, Plus } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 
 definePageMeta({
@@ -52,13 +52,13 @@ watchEffect(async () => {
 </script>
 
 <template>
-  <div class="grid pl-2 w-full">
+  <div class="grid w-full pl-2">
     <div class="flex flex-col">
       <header
-        class="flex sticky left-0 z-20 gap-1 justify-between items-center py-2 pt-4 border-b bg-background"
+        class="sticky left-0 z-20 flex items-center justify-between gap-1 py-2 pt-4 border-b bg-background"
         :style="{ top: `${headerNavigationHeight}px` }"
       >
-        <div class="flex gap-2 items-center">
+        <div class="flex items-center gap-2">
           <ShadcnDropdownMenu>
             <ShadcnDropdownMenuTrigger as-child>
               <ShadcnButton
@@ -66,7 +66,7 @@ watchEffect(async () => {
                 size="lg"
                 class="h-auto py-2 px-2 bg-accent/50 hover:bg-accent/75 data-[state=open]:bg-accent/75"
               >
-                <div class="flex justify-center items-center rounded-md aspect-square size-8 bg-primary/10 text-primary">
+                <div class="flex items-center justify-center rounded-md aspect-square size-8 bg-primary/10 text-primary">
                   <Code2 class="size-4" />
                 </div>
                 <div class="grid flex-1 ml-2 text-sm leading-tight text-left">
@@ -92,7 +92,7 @@ watchEffect(async () => {
                 :class="project.id === activeProject?.id ? 'bg-accent/50' : ''"
                 @click="() => navigateTo(`/?project_id=${project.id}`)"
               >
-                <div class="flex justify-center items-center rounded-md border size-6 bg-primary/10">
+                <div class="flex items-center justify-center border rounded-md size-6 bg-primary/10">
                   <Code2 class="size-4 shrink-0 text-primary" />
                 </div>
                 <div class="grid flex-1 text-sm leading-none">
@@ -120,7 +120,7 @@ watchEffect(async () => {
                 class="gap-2 px-1.5 py-1.5 rounded-md cursor-pointer"
                 @click="() => navigateTo('/guide')"
               >
-                <div class="flex justify-center items-center rounded-md border size-6 bg-background/50">
+                <div class="flex items-center justify-center border rounded-md size-6 bg-background/50">
                   <Plus class="size-4 shrink-0 text-foreground/70" />
                 </div>
                 <span class="text-sm text-muted-foreground">New Project</span>
@@ -129,27 +129,6 @@ watchEffect(async () => {
           </ShadcnDropdownMenu>
         </div>
 
-        <!-- Import Code Repositories From Github To Analyze -->
-        <NuxtLink
-          v-if="selectedProjectId"
-          class="flex gap-2 pr-5"
-          target="_blank"
-          :to="
-            IS_DEV
-              ? 'https://github.com/apps/neptun-github-app-dev'
-              : 'https://github.com/apps/neptun-github-app'
-          "
-          :external="true"
-        >
-          <ShadcnButton
-            variant="outline"
-            size="sm"
-            class="gap-1.5 ml-auto text-sm truncate"
-          >
-            Import Github Repository
-            <Import class="size-4" />
-          </ShadcnButton>
-        </NuxtLink>
         <!-- Import Data into Project -->
         <!-- TODO -->
       </header>

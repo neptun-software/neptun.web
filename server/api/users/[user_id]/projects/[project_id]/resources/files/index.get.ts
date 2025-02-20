@@ -1,4 +1,4 @@
-import { readContextFilesByCategoryAndType } from '~/server/database/repositories/projectContextFiles'
+import { readContextFilesByCategoryAndType, readContextFilesByProjectId } from '~/server/database/repositories/projectContextFiles'
 import { validateParamProjectId, validateQueryContextFile } from '~/server/utils/validate'
 
 export default defineEventHandler(async (event) => {
@@ -32,6 +32,23 @@ export default defineEventHandler(async (event) => {
 
   /* READ CONTEXT FILES */
   try {
+    // If no filters provided, return all files
+    if (!context_file_category && !context_file_type) {
+      const allFiles = await readContextFilesByProjectId(project_id)
+      if (!allFiles) {
+        return sendError(
+          event,
+          createError({
+            statusCode: 404,
+            statusMessage: 'Not Found.',
+            message: 'Context files not found.',
+          }),
+        )
+      }
+      return allFiles
+    }
+
+    // If filters provided, use the filtered query
     const contextFiles = await readContextFilesByCategoryAndType(
       project_id,
       context_file_category || 'unknown',

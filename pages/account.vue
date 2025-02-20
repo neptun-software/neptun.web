@@ -191,6 +191,8 @@ async function signOut() {
       </template>
     </AccountSection>
 
+    <ProjectList />
+
     <AccountSection :is-last="true">
       <template #header>
         Neptun (GitHub) App Installations

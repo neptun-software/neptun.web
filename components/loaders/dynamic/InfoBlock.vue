@@ -18,7 +18,7 @@ const props = defineProps<{
     v-show="isVisible"
     :class="
       cn(
-        'flex items-center justify-center gap-2 px-3 py-2 mb-2 border border-blue-200 rounded-lg bg-background',
+        'flex items-center justify-center gap-2 px-3 pr-2 py-2 mb-2 min-h-[50px] border border-blue-200 rounded-lg bg-background',
         props.class,
       )
     "
@@ -27,6 +27,7 @@ const props = defineProps<{
     <p class="flex-grow">
       <slot /><LoadingDots v-if="showDots" />
     </p>
+    <slot name="action" />
   </div>
 </template>
 

@@ -163,7 +163,7 @@ export const neptun_user_fileRelations = relations(
     }),
     chat_conversation_files: many(chat_conversation_file),
     templates: many(neptun_user_template),
-    project_user_files: many(project_user_file)
+    project_user_files: many(project_user_file),
   }))
 
 export const neptun_user_templateRelations = relations(
