@@ -20,14 +20,27 @@ class Dot {
   constructor(index = 0) {
     this.index = index
     this.angleSpeed = 0.05
-    this.x = 0
-    this.y = 0
+    this.x = mouseX.value - width / 2 - (scrollX.value || 0) // Initialize at current mouse position
+    this.y = mouseY.value - width / 2 - (scrollY.value || 0)
     this.scale = 1 - 0.05 * index
     this.range = width / 2 - (width / 2) * this.scale + 2
     this.limit = width * 0.75 * this.scale
     this.element = document.createElement('span')
+    this.idleProgress = 0
 
-    gsap.set(this.element, { scale: this.scale })
+    // Add initial fade-in animation
+    gsap.set(this.element, {
+      scale: this.scale,
+      opacity: 0,
+      x: this.x,
+      y: this.y,
+    })
+    gsap.to(this.element, {
+      opacity: 1,
+      duration: 0.3,
+      delay: index * 0.02, // Stagger the fade-in of dots
+      ease: 'power2.out',
+    })
     cursor.value.appendChild(this.element)
   }
 
@@ -39,21 +52,39 @@ class Dot {
   }
 
   draw() {
-    if (!idle || this.index <= sineDots) {
+    if (this.index <= sineDots) {
+      // First few dots always follow cursor directly
       gsap.set(this.element, { x: this.x, y: this.y })
-    } else {
-      this.angleX += this.angleSpeed
-      this.angleY += this.angleSpeed
-      this.y = this.lockY + Math.sin(this.angleY) * this.range
-      this.x = this.lockX + Math.sin(this.angleX) * this.range
-      gsap.set(this.element, { x: this.x, y: this.y })
+      return
     }
+
+    // Calculate idle position
+    const idleX = this.lockX + Math.sin(this.angleX) * this.range
+    const idleY = this.lockY + Math.sin(this.angleY) * this.range
+
+    // Transition between direct and idle positions
+    const finalX = gsap.utils.interpolate(this.x, idleX, this.idleProgress)
+    const finalY = gsap.utils.interpolate(this.y, idleY, this.idleProgress)
+
+    gsap.set(this.element, { x: finalX, y: finalY })
+
+    // Update angles for next frame
+    this.angleX += this.angleSpeed
+    this.angleY += this.angleSpeed
   }
 }
 
 function startIdleTimer() {
   timeoutID = setTimeout(goInactive, idleTimeout)
   idle = false
+  // Animate back to non-idle state
+  dots.forEach((dot) => {
+    gsap.to(dot, {
+      idleProgress: 0,
+      duration: 0.4,
+      ease: 'power2.out',
+    })
+  })
 }
 
 function resetIdleTimer() {
@@ -63,7 +94,15 @@ function resetIdleTimer() {
 
 function goInactive() {
   idle = true
-  dots.forEach(dot => dot.lock())
+  dots.forEach((dot) => {
+    dot.lock()
+    // Animate the transition to idle state
+    gsap.to(dot, {
+      idleProgress: 1,
+      duration: 0.8,
+      ease: 'power2.inOut',
+    })
+  })
 }
 
 function buildDots() {
@@ -74,12 +113,13 @@ function buildDots() {
 }
 
 function positionCursor(delta) {
-  if (isScrolling.value) {
-    return
-  } // skip animation while scrolling
+  let x = mouseX.value - width / 2
+  let y = mouseY.value - width / 2
 
-  let x = mouseX.value - width / 2 - scrollX.value
-  let y = mouseY.value - width / 2 - scrollY.value
+  const currentScrollX = scrollX.value || 0
+  const currentScrollY = scrollY.value || 0
+  x -= currentScrollX
+  y -= currentScrollY
 
   dots.forEach((dot, index) => {
     const nextDot = dots[index + 1] || dots[0]
@@ -104,29 +144,51 @@ function render(timestamp) {
 }
 
 onMounted(() => {
-  buildDots()
-  lastFrame = performance.now()
-  requestAnimationFrame(render)
+  // Add a small delay to ensure mouse position is captured
+  setTimeout(() => {
+    buildDots()
+    lastFrame = performance.now()
+    requestAnimationFrame(render)
+  }, 50)
 
   document.getElementById('home').style.cursor = 'none'
 
   scrollElement.value = window
   if (scrollElement.value) {
-    const { isScrolling: scrollStatus } = useScroll(scrollElement.value)
+    const { isScrolling: scrollStatus } = useScroll(scrollElement.value, {
+      throttle: 16,
+    })
 
     watch(scrollStatus, (scrolling) => {
       isScrolling.value = scrolling
-      if (scrolling) {
-        idle = true // lock animations while scrolling
-      } else {
-        resetIdleTimer() // resume animations after scrolling stops
+      if (!scrolling) {
+        resetIdleTimer()
       }
     })
   }
+
+  const resizeObserver = new ResizeObserver(() => {
+    resetIdleTimer()
+  })
+  resizeObserver.observe(document.documentElement)
+
+  onUnmounted(() => {
+    clearTimeout(timeoutID)
+    resizeObserver.disconnect()
+  })
 })
 
-onUnmounted(() => {
-  clearTimeout(timeoutID)
+// Add cleanup for page transitions
+onBeforeUnmount(() => {
+  // Fade out dots before removal
+  dots.forEach((dot, index) => {
+    gsap.to(dot.element, {
+      opacity: 0,
+      duration: 0.2,
+      delay: index * 0.01,
+      ease: 'power2.in',
+    })
+  })
 })
 
 watch([mouseX, mouseY, scrollX, scrollY], resetIdleTimer)

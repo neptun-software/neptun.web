@@ -130,7 +130,7 @@ const handleError = (error: unknown) => {
       </AsyncButton>
     </div> -->
 
-    <!-- <Cursor /> -->
+    <Cursor />
     <!-- <SimpleCursor /> -->
   </section>
 </template>
