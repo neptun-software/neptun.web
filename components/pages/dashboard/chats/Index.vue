@@ -444,8 +444,8 @@ const calculatedChatsListHeight = computed(() => {
         <template
           v-if="
             fetchedChatsStatus !== 'pending'
-            && Array.isArray(fetchedChats?.chats)
-            && fetchedChats?.chats?.length === 0
+              && Array.isArray(fetchedChats?.chats)
+              && fetchedChats?.chats?.length === 0
           "
         >
           <InfoBlock :is-visible="true" variant="info">
