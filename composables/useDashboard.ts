@@ -8,6 +8,7 @@ import type {
 } from '~/lib/types/database.tables/schema'
 import type { FullyFeaturedChat } from '~/lib/types/models/chat'
 import { toast } from 'vue-sonner'
+import { useProjects } from '~~/composables/useProjects'
 import { useToastState } from '~~/composables/useToastState'
 import { getCodeBlocksFromMarkdown } from '~/utils/parse'
 
@@ -363,6 +364,8 @@ export function useDashboard() {
 
 // Pilot Composable for extended opportunities
 export function useFetchChats(user_id: number) {
+  const { activeProject } = useProjects()
+
   const fetchedChats = useState<{ chats: FullyFeaturedChat[] } | null>(
     'fetched-chats',
     () => null,
@@ -382,6 +385,9 @@ export function useFetchChats(user_id: number) {
 
   const chatsFilters = useChatsFilter()
   const fetchChatsUrl = computed(() => {
+    if (activeProject.value?.id) {
+      return `/api/users/${user_id}/chats/${activeProject.value.id}?${chatsFilters.value}`
+    }
     return `/api/users/${user_id}/chats?${chatsFilters.value}`
   })
 

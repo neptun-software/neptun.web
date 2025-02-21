@@ -1,6 +1,6 @@
 import type { ReadChatConversation, ReadProject } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
-import { project_chat_conversation } from '../../../lib/types/database.tables/schema'
+import { chat_conversation, project_chat_conversation } from '../../../lib/types/database.tables/schema'
 
 export async function createProjectChatConversation(
   project_id: ReadProject['id'],
@@ -23,13 +23,40 @@ export async function createProjectChatConversation(
   if (!created) {
     return null
   }
-  return created[0]
+
+  const conversation = await db
+    .select()
+    .from(chat_conversation)
+    .where(eq(chat_conversation.id, chat_conversation_id))
+    .limit(1)
+    .catch((err) => {
+      if (LOG_BACKEND) {
+        console.error('Failed to read chat conversation:', err)
+      }
+      return null
+    })
+
+  if (!conversation) {
+    return null
+  }
+  return conversation[0]
 }
 
 export async function readAllProjectChatConversations(project_id: ReadProject['id']) {
   const conversations = await db
-    .select()
+    .select({
+      id: chat_conversation.id,
+      name: chat_conversation.name,
+      model: chat_conversation.model,
+      created_at: chat_conversation.created_at,
+      updated_at: chat_conversation.updated_at,
+      neptun_user_id: chat_conversation.neptun_user_id,
+    })
     .from(project_chat_conversation)
+    .innerJoin(
+      chat_conversation,
+      eq(project_chat_conversation.chat_conversation_id, chat_conversation.id),
+    )
     .where(eq(project_chat_conversation.project_id, project_id))
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -49,8 +76,19 @@ export async function readProjectChatConversation(
   chat_conversation_id: ReadChatConversation['id'],
 ) {
   const conversation = await db
-    .select()
+    .select({
+      id: chat_conversation.id,
+      name: chat_conversation.name,
+      model: chat_conversation.model,
+      created_at: chat_conversation.created_at,
+      updated_at: chat_conversation.updated_at,
+      neptun_user_id: chat_conversation.neptun_user_id,
+    })
     .from(project_chat_conversation)
+    .innerJoin(
+      chat_conversation,
+      eq(project_chat_conversation.chat_conversation_id, chat_conversation.id),
+    )
     .where(
       and(
         eq(project_chat_conversation.project_id, project_id),

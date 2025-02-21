@@ -23,6 +23,8 @@ const props = defineProps<{
 const { persistChatConversationEdit, persistChatConversationDelete } = useDashboard()
 const { user } = useUserSession()
 const { selectedAiChat, resetSelectedAiChatToDefaults } = useSelectedAiChat()
+const { activeProject } = useProjects()
+
 const chatToEdit = ref<MinimalChat>({
   id: -1,
   name: `chat-${Date.now()}`,

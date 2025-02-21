@@ -77,7 +77,8 @@ Response varies based on the resource type:
     "language": "typescript",
     "extension": "ts",
     "created_at": "2025-02-16T17:42:11.000Z",
-    "updated_at": "2025-02-16T17:42:11.000Z"
+    "updated_at": "2025-02-16T17:42:11.000Z",
+    "neptun_user_id": 456
   }
 ]
 ```
@@ -93,7 +94,8 @@ Response varies based on the resource type:
     "is_shared": false,
     "share_uuid": "550e8400-e29b-41d4-a716-446655440000",
     "created_at": "2025-02-16T17:42:11.000Z",
-    "updated_at": "2025-02-16T17:42:11.000Z"
+    "updated_at": "2025-02-16T17:42:11.000Z",
+    "neptun_user_id": 456
   }
 ]
 ```
@@ -104,11 +106,13 @@ Response varies based on the resource type:
 [
   {
     "id": 123,
-    "installation_id": "12345",
-    "account_name": "username",
-    "repository_selection": "selected",
+    "github_account_type": "User",
+    "github_account_avatar_url": "https://avatars.githubusercontent.com/u/123?v=4",
+    "github_account_id": "12345",
+    "github_account_name": "username",
     "created_at": "2025-02-16T17:42:11.000Z",
-    "updated_at": "2025-02-16T17:42:11.000Z"
+    "updated_at": "2025-02-16T17:42:11.000Z",
+    "neptun_user_id": 456
   }
 ]
 ```
@@ -120,11 +124,10 @@ Response varies based on the resource type:
   {
     "id": 123,
     "name": "My Chat",
-    "description": "Chat description",
-    "model_publisher": "openai",
-    "model_name": "gpt-4",
+    "model": "google/gemma-2-7b-it",
     "created_at": "2025-02-16T17:42:11.000Z",
-    "updated_at": "2025-02-16T17:42:11.000Z"
+    "updated_at": "2025-02-16T17:42:11.000Z",
+    "neptun_user_id": 456
   }
 ]
 ```

@@ -1,4 +1,34 @@
-import type { context_file_category, context_file_type, ContextFileToCreate, ReadContextFile, ReadContextImport } from '~/lib/types/database.tables/schema'
+import type {
+  context_file_category,
+  context_file_type,
+  ContextFileToCreate,
+  GetGithubAppInstallation,
+  ProjectChatConversationToCreate,
+  ProjectGithubInstallationToCreate,
+  ProjectTemplateCollectionToCreate,
+  ProjectUserFileToCreate,
+  ReadChatConversation,
+  ReadContextFile,
+  ReadContextImport,
+  ReadTemplateCollection,
+  ReadUserFile,
+} from '~/lib/types/database.tables/schema'
+
+export type ResourceType = 'user-files' | 'template-collections' | 'github-installations' | 'chat-conversations'
+export type Resource = ReadUserFile | ReadTemplateCollection | GetGithubAppInstallation | ReadChatConversation
+export type ResourceToCreate = {
+  'user-files': ProjectUserFileToCreate
+  'template-collections': ProjectTemplateCollectionToCreate
+  'github-installations': ProjectGithubInstallationToCreate
+  'chat-conversations': ProjectChatConversationToCreate
+}[ResourceType]
+
+export interface ResourceMap {
+  'user-files': ReadUserFile[]
+  'template-collections': ReadTemplateCollection[]
+  'github-installations': GetGithubAppInstallation[]
+  'chat-conversations': ReadChatConversation[]
+}
 
 interface FileUploadData {
   files: File[]
@@ -22,10 +52,122 @@ interface ApiError {
 }
 
 export function useProjectResources() {
+  const { user } = useUserSession()
   const isLoading = ref(false)
   const imports = ref<ProjectImport[]>([])
+  const resources = ref<ResourceMap>({
+    'user-files': [] as ReadUserFile[],
+    'template-collections': [] as ReadTemplateCollection[],
+    'github-installations': [] as GetGithubAppInstallation[],
+    'chat-conversations': [] as ReadChatConversation[],
+  })
+  const availableResources = ref<ResourceMap>({
+    'user-files': [] as ReadUserFile[],
+    'template-collections': [] as ReadTemplateCollection[],
+    'github-installations': [] as GetGithubAppInstallation[],
+    'chat-conversations': [] as ReadChatConversation[],
+  })
 
-  const { user } = useUserSession()
+  const resourceEndpoints: Record<ResourceType, string> = {
+    'user-files': 'files',
+    'template-collections': 'collections',
+    'github-installations': 'installations',
+    'chat-conversations': 'chats',
+  }
+
+  function handleError(error: ApiError) {
+    console.error('API Error:', error)
+    const message = error.response?._data?.message || error.response?._data?.error || 'An error occurred'
+    throw new Error(message)
+  }
+
+  async function fetchResources(projectId: number, resourceType: ResourceType): Promise<void> {
+    try {
+      isLoading.value = true
+      const response = await $fetch<ResourceMap[typeof resourceType]>(
+        `/api/users/${user.value?.id}/projects/${projectId}/resources/${resourceType}`,
+      )
+      if (Array.isArray(response)) {
+        switch (resourceType) {
+          case 'user-files':
+            resources.value['user-files'] = response as ReadUserFile[]
+            break
+          case 'template-collections':
+            resources.value['template-collections'] = response as ReadTemplateCollection[]
+            break
+          case 'github-installations':
+            resources.value['github-installations'] = response as GetGithubAppInstallation[]
+            break
+          case 'chat-conversations':
+            resources.value['chat-conversations'] = response as ReadChatConversation[]
+            break
+        }
+      }
+    } catch (error) {
+      handleError(error as ApiError)
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function getResource(projectId: number, resourceType: ResourceType, resourceId: number): Promise<ResourceMap[typeof resourceType][number] | null> {
+    try {
+      const response = await $fetch<ResourceMap[typeof resourceType][number]>(
+        `/api/users/${user.value?.id}/projects/${projectId}/resources/${resourceType}/${resourceId}`,
+      )
+      return response
+    } catch (error) {
+      handleError(error as ApiError)
+      throw error
+    }
+  }
+
+  async function linkResource(
+    projectId: number,
+    resourceType: ResourceType,
+    data: ResourceToCreate,
+  ): Promise<void> {
+    try {
+      await $fetch(`/api/users/${user.value?.id}/projects/${projectId}/resources/${resourceType}`, {
+        method: 'POST',
+        body: data,
+      })
+      await fetchResources(projectId, resourceType)
+    } catch (error) {
+      handleError(error as ApiError)
+      throw error
+    }
+  }
+
+  async function unlinkResource(
+    projectId: number,
+    resourceType: ResourceType,
+    resourceId: number,
+  ): Promise<void> {
+    try {
+      await $fetch(`/api/users/${user.value?.id}/projects/${projectId}/resources/${resourceType}/${resourceId}`, {
+        method: 'DELETE',
+      })
+      switch (resourceType) {
+        case 'user-files':
+          resources.value['user-files'] = resources.value['user-files'].filter(r => r.id !== resourceId)
+          break
+        case 'template-collections':
+          resources.value['template-collections'] = resources.value['template-collections'].filter(r => r.id !== resourceId)
+          break
+        case 'github-installations':
+          resources.value['github-installations'] = resources.value['github-installations'].filter(r => r.id !== resourceId)
+          break
+        case 'chat-conversations':
+          resources.value['chat-conversations'] = resources.value['chat-conversations'].filter(r => r.id !== resourceId)
+          break
+      }
+    } catch (error) {
+      handleError(error as ApiError)
+      throw error
+    }
+  }
 
   async function fetchImportsWithFiles(projectId: number) {
     try {
@@ -236,15 +378,62 @@ export function useProjectResources() {
     }
   }
 
+  async function fetchAvailableResources(resourceType: ResourceType): Promise<void> {
+    try {
+      isLoading.value = true
+      const response = await $fetch<
+        | ResourceMap[typeof resourceType]
+        | { chats: ReadChatConversation[] }
+        | { collections: ReadTemplateCollection[] }
+      >(
+        `/api/users/${user.value?.id}/${resourceEndpoints[resourceType]}`,
+      )
+
+      const data = resourceType === 'chat-conversations' && 'chats' in response
+        ? response.chats
+        : resourceType === 'template-collections' && 'collections' in response
+          ? response.collections
+          : response as ResourceMap[typeof resourceType]
+
+      if (Array.isArray(data)) {
+        switch (resourceType) {
+          case 'user-files':
+            availableResources.value['user-files'] = data as ReadUserFile[]
+            break
+          case 'template-collections':
+            availableResources.value['template-collections'] = data as ReadTemplateCollection[]
+            break
+          case 'github-installations':
+            availableResources.value['github-installations'] = data as GetGithubAppInstallation[]
+            break
+          case 'chat-conversations':
+            availableResources.value['chat-conversations'] = data as ReadChatConversation[]
+            break
+        }
+      }
+    } catch (error) {
+      handleError(error as ApiError)
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     isLoading,
     imports,
+    resources,
+    availableResources,
     fetchImportsWithFiles,
-    uploadFiles,
-    createImport,
     unlinkFile,
     updateFile,
+    uploadFiles,
     deleteImport,
-    updateImport,
+    createImport,
+    fetchResources,
+    fetchAvailableResources,
+    getResource,
+    linkResource,
+    unlinkResource,
   }
 }

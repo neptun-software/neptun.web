@@ -1,3 +1,9 @@
+import type {
+  GetGithubAppInstallation,
+  ReadChatConversation,
+  ReadTemplateCollection,
+  ReadUserFile,
+} from '../../../lib/types/database.tables/schema'
 import {
   createProjectChatConversation,
   deleteProjectChatConversation,
@@ -23,14 +29,14 @@ import {
   readProjectUserFile,
 } from './projectUserFiles'
 
-type ResourceType = 'user-files' | 'template-collections' | 'github-installations' | 'chat-conversations'
+export type ResourceType = 'user-files' | 'template-collections' | 'github-installations' | 'chat-conversations'
 
 /* CREATE RESOURCE */
 export async function createResource(
   project_id: number,
   resource_type: ResourceType,
   resource_id: number,
-) {
+): Promise<ReadUserFile | ReadTemplateCollection | GetGithubAppInstallation | ReadChatConversation | null> {
   switch (resource_type) {
     case 'user-files':
       return createProjectUserFile(project_id, resource_id)
@@ -49,7 +55,7 @@ export async function createResource(
 export async function readAllResources(
   project_id: number,
   resource_type: ResourceType,
-) {
+): Promise<(ReadUserFile | ReadTemplateCollection | GetGithubAppInstallation | ReadChatConversation)[] | null> {
   switch (resource_type) {
     case 'user-files':
       return readAllProjectUserFiles(project_id)
@@ -69,7 +75,7 @@ export async function readResource(
   project_id: number,
   resource_type: ResourceType,
   resource_id: number,
-) {
+): Promise<ReadUserFile | ReadTemplateCollection | GetGithubAppInstallation | ReadChatConversation | null> {
   switch (resource_type) {
     case 'user-files':
       return readProjectUserFile(project_id, resource_id)
@@ -89,17 +95,21 @@ export async function deleteResource(
   project_id: number,
   resource_type: ResourceType,
   resource_id: number,
-) {
-  switch (resource_type) {
-    case 'user-files':
-      return deleteProjectUserFile(project_id, resource_id)
-    case 'template-collections':
-      return deleteProjectTemplateCollection(project_id, resource_id)
-    case 'github-installations':
-      return deleteProjectGithubInstallation(project_id, resource_id)
-    case 'chat-conversations':
-      return deleteProjectChatConversation(project_id, resource_id)
-    default:
-      throw new Error(`Invalid resource type: ${resource_type as ResourceType}`)
-  }
+): Promise<boolean> {
+  const result = await (async () => {
+    switch (resource_type) {
+      case 'user-files':
+        return deleteProjectUserFile(project_id, resource_id)
+      case 'template-collections':
+        return deleteProjectTemplateCollection(project_id, resource_id)
+      case 'github-installations':
+        return deleteProjectGithubInstallation(project_id, resource_id)
+      case 'chat-conversations':
+        return deleteProjectChatConversation(project_id, resource_id)
+      default:
+        throw new Error(`Invalid resource type: ${resource_type as ResourceType}`)
+    }
+  })()
+
+  return Boolean(result)
 }

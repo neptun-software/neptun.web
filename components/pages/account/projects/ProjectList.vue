@@ -1,8 +1,20 @@
 <script setup lang="ts">
-import type { GetProject, ReadContextFile } from '~/lib/types/database.tables/schema'
+import type {
+  GetGithubAppInstallation,
+  GetProject,
+  ReadChatConversation,
+  ReadContextFile,
+  ReadTemplateCollection,
+  ReadUserFile,
+} from '~/lib/types/database.tables/schema'
 import { MoreVertical, Plus } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
-import { context_file_category, context_file_type, programming_language, project_type } from '~/lib/types/database.tables/schema'
+import {
+  context_file_category,
+  context_file_type,
+  programming_language,
+  project_type,
+} from '~/lib/types/database.tables/schema'
 
 interface FileUploadData {
   files: File[]
@@ -19,6 +31,23 @@ interface FileFormData {
 }
 
 const { projectsList, isLoading, fetchProjects, deleteProject, updateProject } = useProjects()
+const {
+  isLoading: isLoadingResources,
+  imports,
+  resources,
+  availableResources,
+  fetchImportsWithFiles,
+  unlinkFile,
+  updateFile,
+  uploadFiles,
+  deleteImport,
+  createImport,
+  fetchResources,
+  fetchAvailableResources,
+  getResource,
+  linkResource,
+  unlinkResource,
+} = useProjectResources()
 const showFreshProjectDialog = ref(false)
 const route = useRoute()
 const router = useRouter()
@@ -45,17 +74,6 @@ watch(selectedProject, (newProject) => {
   }
 })
 
-const {
-  isLoading: isLoadingResources,
-  imports,
-  fetchImportsWithFiles,
-  unlinkFile,
-  updateFile,
-  uploadFiles,
-  deleteImport,
-  createImport,
-} = useProjectResources()
-
 const newFileForm = ref({
   files: [] as FileFormData[],
   category: 'documentation' as typeof context_file_category.enumValues[number],
@@ -76,10 +94,19 @@ const editFileForm = ref({
   file_type: '' as typeof context_file_type.enumValues[number],
 })
 
+const showLinkResourceDialog = ref(false)
+const selectedResourceType = ref<Parameters<typeof linkResource>[1] | null>(null)
+
 async function openProjectDetails(project: GetProject) {
   router.push({ query: { project_id: project.id } })
   if (project.id) {
-    await fetchImportsWithFiles(project.id)
+    await Promise.all([
+      fetchImportsWithFiles(project.id),
+      fetchResources(project.id, 'user-files'),
+      fetchResources(project.id, 'template-collections'),
+      fetchResources(project.id, 'github-installations'),
+      fetchResources(project.id, 'chat-conversations'),
+    ])
   }
 }
 
@@ -258,6 +285,58 @@ async function handleProjectDelete(event: MouseEvent): Promise<void> {
   }
 }
 
+async function handleShowLinkResourceDialog(resourceType: Parameters<typeof linkResource>[1]) {
+  try {
+    selectedResourceType.value = resourceType
+    await fetchAvailableResources(resourceType)
+    showLinkResourceDialog.value = true
+  } catch (error) {
+    console.error('Error fetching available resources:', error)
+    toast.error('Failed to fetch available resources')
+  }
+}
+
+async function handleLinkResource(resourceId: number) {
+  if (!selectedProjectId.value || !selectedResourceType.value) {
+    return
+  }
+
+  try {
+    const resourceData = {
+      [selectedResourceType.value === 'user-files'
+        ? 'user_file_id'
+        : selectedResourceType.value === 'template-collections'
+          ? 'template_collection_id'
+          : selectedResourceType.value === 'github-installations'
+            ? 'github_installation_id'
+            : 'chat_conversation_id']: resourceId,
+    } as ResourceToCreate
+
+    await linkResource(selectedProjectId.value, selectedResourceType.value, resourceData)
+    await fetchResources(selectedProjectId.value, selectedResourceType.value)
+    toast.success('Resource linked successfully')
+    showLinkResourceDialog.value = false
+  } catch (error) {
+    console.error('Error linking resource:', error)
+    toast.error('Failed to link resource')
+  }
+}
+
+async function handleUnlinkResource(resourceType: Parameters<typeof linkResource>[1], resourceId: number) {
+  if (!selectedProjectId.value) {
+    return
+  }
+
+  try {
+    await unlinkResource(selectedProjectId.value, resourceType, resourceId)
+    await fetchResources(selectedProjectId.value, resourceType)
+    toast.success('Resource unlinked successfully')
+  } catch (error) {
+    console.error('Error unlinking resource:', error)
+    toast.error('Failed to unlink resource')
+  }
+}
+
 onMounted(() => {
   fetchProjects()
 })
@@ -266,10 +345,10 @@ onMounted(() => {
 <template>
   <AccountSection>
     <template #header>
-      <div class="flex items-center justify-between">
+      <div class="flex justify-between items-center">
         <span>Projects</span>
         <ShadcnButton size="sm" @click="showFreshProjectDialog = true">
-          <Plus class="w-4 h-4 mr-2" />
+          <Plus class="mr-2 w-4 h-4" />
           New Project
         </ShadcnButton>
       </div>
@@ -296,9 +375,9 @@ onMounted(() => {
           <div
             v-for="project in projectsList"
             :key="project.id"
-            class="p-4 space-y-2 border rounded-lg"
+            class="p-4 space-y-2 rounded-lg border"
           >
-            <div class="flex items-start justify-between">
+            <div class="flex justify-between items-start">
               <div>
                 <h3 class="font-medium">
                   {{ project.name }}
@@ -314,6 +393,9 @@ onMounted(() => {
                   </ShadcnButton>
                 </ShadcnDropdownMenuTrigger>
                 <ShadcnDropdownMenuContent>
+                  <ShadcnDropdownMenuItem @click="navigateTo(`/?project_id=${project.id}`)">
+                    View Project
+                  </ShadcnDropdownMenuItem>
                   <ShadcnDropdownMenuItem @click="openProjectDetails(project)">
                     View Details
                   </ShadcnDropdownMenuItem>
@@ -371,7 +453,7 @@ onMounted(() => {
 
       <ShadcnScrollArea class="px-6 py-4">
         <div v-if="editedProject" class="space-y-4">
-          <div class="grid items-center gap-2">
+          <div class="grid gap-2 items-center">
             <ShadcnLabel for="name">
               Name
             </ShadcnLabel>
@@ -382,7 +464,7 @@ onMounted(() => {
             />
           </div>
 
-          <div class="grid items-center gap-2">
+          <div class="grid gap-2 items-center">
             <ShadcnLabel for="description">
               Description
             </ShadcnLabel>
@@ -402,7 +484,7 @@ onMounted(() => {
             </InfoBlock>
           </div>
 
-          <div class="grid items-center gap-2">
+          <div class="grid gap-2 items-center">
             <ShadcnLabel for="type">
               Project Type
             </ShadcnLabel>
@@ -424,7 +506,7 @@ onMounted(() => {
             </ShadcnSelect>
           </div>
 
-          <div class="grid items-center gap-2">
+          <div class="grid gap-2 items-center">
             <ShadcnLabel for="language">
               Main Language
             </ShadcnLabel>
@@ -464,12 +546,12 @@ onMounted(() => {
           </div>
 
           <div class="pt-6 border-t">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex justify-between items-center mb-4">
               <h3 class="text-lg font-medium">
                 Project Context Imports
               </h3>
               <ShadcnButton size="sm" @click="showNewFileDialog = true">
-                <Plus class="w-4 h-4 mr-2" />
+                <Plus class="mr-2 w-4 h-4" />
                 Import
               </ShadcnButton>
             </div>
@@ -481,7 +563,7 @@ onMounted(() => {
                   :key="import_.id"
                   class="space-y-2"
                 >
-                  <div class="flex items-center justify-between p-2 rounded-lg bg-muted">
+                  <div class="flex justify-between items-center p-2 rounded-lg bg-muted">
                     <div>
                       <p class="font-medium">
                         {{ import_.source_path || 'Untitled Import' }}
@@ -503,7 +585,7 @@ onMounted(() => {
                     <div
                       v-for="file in import_.files"
                       :key="file.id"
-                      class="flex items-center justify-between p-2 border rounded-lg"
+                      class="flex justify-between items-center p-2 rounded-lg border"
                     >
                       <div>
                         <p class="font-medium">
@@ -561,6 +643,190 @@ onMounted(() => {
               </InfoBlock>
             </div>
           </div>
+
+          <!-- User Files -->
+          <div class="pt-6 border-t">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-medium">
+                User Files
+              </h3>
+              <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('user-files')">
+                <Plus class="mr-2 w-4 h-4" />
+                Link File
+              </ShadcnButton>
+            </div>
+
+            <div class="space-y-4">
+              <div v-if="resources['user-files'].length > 0" class="space-y-2">
+                <div
+                  v-for="file in resources['user-files']"
+                  :key="file.id"
+                  class="flex justify-between items-center p-2 rounded-lg border"
+                >
+                  <div>
+                    <p class="font-medium">
+                      {{ file.title }}
+                    </p>
+                    <p class="text-sm text-muted-foreground">
+                      {{ file.language }} · {{ file.extension }}
+                    </p>
+                  </div>
+                  <AsyncButton
+                    size="sm"
+                    variant="destructive"
+                    :on-click-async="() => handleUnlinkResource('user-files', file.id)"
+                  >
+                    Unlink
+                  </AsyncButton>
+                </div>
+              </div>
+              <InfoBlock
+                :is-visible="resources['user-files'].length === 0"
+                :show-loader="isLoadingResources"
+                :show-dots="isLoadingResources"
+              >
+                {{ isLoadingResources ? 'Loading files...' : 'No files linked to this project.' }}
+              </InfoBlock>
+            </div>
+          </div>
+
+          <!-- Template Collections -->
+          <div class="pt-6 border-t">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-medium">
+                Template Collections
+              </h3>
+              <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('template-collections')">
+                <Plus class="mr-2 w-4 h-4" />
+                Link Collection
+              </ShadcnButton>
+            </div>
+
+            <div class="space-y-4">
+              <div v-if="resources['template-collections'].length > 0" class="space-y-2">
+                <div
+                  v-for="collection in resources['template-collections']"
+                  :key="collection.id"
+                  class="flex justify-between items-center p-2 rounded-lg border"
+                >
+                  <div>
+                    <p class="font-medium">
+                      {{ collection.name }}
+                    </p>
+                    <p class="text-sm text-muted-foreground">
+                      {{ collection.description }}
+                    </p>
+                  </div>
+                  <AsyncButton
+                    size="sm"
+                    variant="destructive"
+                    :on-click-async="() => handleUnlinkResource('template-collections', collection.id)"
+                  >
+                    Unlink
+                  </AsyncButton>
+                </div>
+              </div>
+              <InfoBlock
+                :is-visible="resources['template-collections'].length === 0"
+                :show-loader="isLoadingResources"
+                :show-dots="isLoadingResources"
+              >
+                {{ isLoadingResources ? 'Loading collections...' : 'No template collections linked to this project.' }}
+              </InfoBlock>
+            </div>
+          </div>
+
+          <!-- GitHub Installations -->
+          <div class="pt-6 border-t">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-medium">
+                GitHub Installations
+              </h3>
+              <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('github-installations')">
+                <Plus class="mr-2 w-4 h-4" />
+                Link Installation
+              </ShadcnButton>
+            </div>
+
+            <div class="space-y-4">
+              <div v-if="resources['github-installations'].length > 0" class="space-y-2">
+                <div
+                  v-for="installation in resources['github-installations']"
+                  :key="installation.id"
+                  class="flex justify-between items-center p-2 rounded-lg border"
+                >
+                  <div>
+                    <p class="font-medium">
+                      {{ installation.github_account_name }}
+                    </p>
+                    <p class="text-sm text-muted-foreground">
+                      {{ installation.github_account_type }}
+                    </p>
+                  </div>
+                  <AsyncButton
+                    size="sm"
+                    variant="destructive"
+                    :on-click-async="() => handleUnlinkResource('github-installations', installation.id)"
+                  >
+                    Unlink
+                  </AsyncButton>
+                </div>
+              </div>
+              <InfoBlock
+                :is-visible="resources['github-installations'].length === 0"
+                :show-loader="isLoadingResources"
+                :show-dots="isLoadingResources"
+              >
+                {{ isLoadingResources ? 'Loading installations...' : 'No GitHub installations linked to this project.' }}
+              </InfoBlock>
+            </div>
+          </div>
+
+          <!-- Chat Conversations -->
+          <div class="pt-6 border-t">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-medium">
+                Chat Conversations
+              </h3>
+              <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('chat-conversations')">
+                <Plus class="mr-2 w-4 h-4" />
+                Link Conversation
+              </ShadcnButton>
+            </div>
+
+            <div class="space-y-4">
+              <div v-if="resources['chat-conversations'].length > 0" class="space-y-2">
+                <div
+                  v-for="conversation in resources['chat-conversations']"
+                  :key="conversation.id"
+                  class="flex justify-between items-center p-2 rounded-lg border"
+                >
+                  <div>
+                    <p class="font-medium">
+                      {{ conversation.name }}
+                    </p>
+                    <p class="text-sm text-muted-foreground">
+                      {{ conversation.model }}
+                    </p>
+                  </div>
+                  <AsyncButton
+                    size="sm"
+                    variant="destructive"
+                    :on-click-async="() => handleUnlinkResource('chat-conversations', conversation.id)"
+                  >
+                    Unlink
+                  </AsyncButton>
+                </div>
+              </div>
+              <InfoBlock
+                :is-visible="resources['chat-conversations'].length === 0"
+                :show-loader="isLoadingResources"
+                :show-dots="isLoadingResources"
+              >
+                {{ isLoadingResources ? 'Loading conversations...' : 'No chat conversations linked to this project.' }}
+              </InfoBlock>
+            </div>
+          </div>
         </div>
       </ShadcnScrollArea>
 
@@ -596,7 +862,7 @@ onMounted(() => {
       </ShadcnDialogHeader>
 
       <div class="py-4 space-y-4">
-        <div class="grid items-center gap-2">
+        <div class="grid gap-2 items-center">
           <ShadcnLabel for="files">
             Files
           </ShadcnLabel>
@@ -604,17 +870,17 @@ onMounted(() => {
             id="files"
             type="file"
             multiple
-            class="flex items-center justify-center w-full h-32 p-4 border-2 border-dashed rounded-md bg-secondary text-secondary-foreground border-primary"
+            class="flex justify-center items-center p-4 w-full h-32 rounded-md border-2 border-dashed bg-secondary text-secondary-foreground border-primary"
             @change="handleFileInput"
           >
-            <div class="flex items-center justify-center w-full h-full p-4 bg-secondary text-secondary-foreground">
+            <div class="flex justify-center items-center p-4 w-full h-full bg-secondary text-secondary-foreground">
               Drop files here or click to select...
             </div>
           </ShadcnInput>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
-          <div class="grid items-center gap-2">
+          <div class="grid gap-2 items-center">
             <ShadcnLabel for="category">
               Category
             </ShadcnLabel>
@@ -634,7 +900,7 @@ onMounted(() => {
             </ShadcnSelect>
           </div>
 
-          <div class="grid items-center gap-2">
+          <div class="grid gap-2 items-center">
             <ShadcnLabel for="type">
               File Type
             </ShadcnLabel>
@@ -660,14 +926,14 @@ onMounted(() => {
           <ShadcnLabel>Files to Upload</ShadcnLabel>
           <ShadcnScrollArea class="h-[400px] pr-4">
             <div class="space-y-4">
-              <div v-for="(fileData, index) in newFileForm.files" :key="fileData.file.name" class="p-4 space-y-4 border rounded-lg">
-                <div class="flex items-center justify-between">
+              <div v-for="(fileData, index) in newFileForm.files" :key="fileData.file.name" class="p-4 space-y-4 rounded-lg border">
+                <div class="flex justify-between items-center">
                   <span class="text-sm text-muted-foreground">
                     Original: {{ fileData.file.name }} ({{ Math.round(fileData.file.size / 1024) }}KB)
                   </span>
                 </div>
 
-                <div class="grid items-center gap-2">
+                <div class="grid gap-2 items-center">
                   <ShadcnLabel :for="`file-${index}-title`">
                     Title
                   </ShadcnLabel>
@@ -679,7 +945,7 @@ onMounted(() => {
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                  <div class="grid items-center gap-2">
+                  <div class="grid gap-2 items-center">
                     <ShadcnLabel :for="`file-${index}-category`">
                       Category
                     </ShadcnLabel>
@@ -699,7 +965,7 @@ onMounted(() => {
                     </ShadcnSelect>
                   </div>
 
-                  <div class="grid items-center gap-2">
+                  <div class="grid gap-2 items-center">
                     <ShadcnLabel :for="`file-${index}-type`">
                       File Type
                     </ShadcnLabel>
@@ -720,7 +986,7 @@ onMounted(() => {
                   </div>
                 </div>
 
-                <div class="grid items-center gap-2">
+                <div class="grid gap-2 items-center">
                   <ShadcnLabel :for="`file-${index}-content`">
                     Content
                   </ShadcnLabel>
@@ -765,7 +1031,7 @@ onMounted(() => {
       </ShadcnDialogHeader>
 
       <div v-if="editingFile" class="py-4 space-y-4">
-        <div class="grid items-center gap-2">
+        <div class="grid gap-2 items-center">
           <ShadcnLabel for="edit-title">
             Title
           </ShadcnLabel>
@@ -777,7 +1043,7 @@ onMounted(() => {
         </div>
 
         <div class="grid grid-cols-2 gap-4">
-          <div class="grid items-center gap-2">
+          <div class="grid gap-2 items-center">
             <ShadcnLabel for="edit-category">
               Category
             </ShadcnLabel>
@@ -797,7 +1063,7 @@ onMounted(() => {
             </ShadcnSelect>
           </div>
 
-          <div class="grid items-center gap-2">
+          <div class="grid gap-2 items-center">
             <ShadcnLabel for="edit-type">
               File Type
             </ShadcnLabel>
@@ -818,7 +1084,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="grid items-center gap-2">
+        <div class="grid gap-2 items-center">
           <ShadcnLabel for="edit-content">
             Content
           </ShadcnLabel>
@@ -843,6 +1109,112 @@ onMounted(() => {
         >
           Save Changes
         </AsyncButton>
+      </ShadcnDialogFooter>
+    </ShadcnDialogContent>
+  </ShadcnDialog>
+
+  <!-- Link Resource Dialog -->
+  <ShadcnDialog v-model:open="showLinkResourceDialog">
+    <ShadcnDialogContent class="grid grid-rows-[auto_1fr_auto] p-0 h-[90dvh]">
+      <ShadcnDialogHeader class="p-6 pb-0">
+        <ShadcnDialogTitle>Link {{ selectedResourceType?.replace('-', ' ') }}</ShadcnDialogTitle>
+        <ShadcnDialogDescription>
+          Select {{ selectedResourceType?.slice(0, -1).replace('-', ' ') }} to link to this project.
+        </ShadcnDialogDescription>
+      </ShadcnDialogHeader>
+
+      <ShadcnScrollArea class="px-6 py-4">
+        <div v-if="selectedResourceType && availableResources[selectedResourceType].length > 0" class="space-y-2">
+          <div
+            v-for="resource in availableResources[selectedResourceType]"
+            :key="resource.id"
+            class="flex justify-between items-center p-2 rounded-lg border"
+          >
+            <div>
+              <!-- User Files -->
+              <template v-if="selectedResourceType === 'user-files'">
+                <p class="font-medium">
+                  {{ (resource as ReadUserFile).title }}
+                </p>
+                <p class="text-sm text-muted-foreground">
+                  {{ (resource as ReadUserFile).language }} · {{ (resource as ReadUserFile).extension }}
+                </p>
+              </template>
+
+              <!-- Template Collections -->
+              <template v-if="selectedResourceType === 'template-collections'">
+                <p class="font-medium">
+                  {{ (resource as ReadTemplateCollection).name }}
+                </p>
+                <p class="text-sm text-muted-foreground">
+                  {{ (resource as ReadTemplateCollection).description }}
+                </p>
+              </template>
+
+              <!-- GitHub Installations -->
+              <template v-if="selectedResourceType === 'github-installations'">
+                <p class="font-medium">
+                  {{ (resource as GetGithubAppInstallation).github_account_name }}
+                </p>
+                <p class="text-sm text-muted-foreground">
+                  {{ (resource as GetGithubAppInstallation).github_account_type }}
+                </p>
+              </template>
+
+              <!-- Chat Conversations -->
+              <template v-if="selectedResourceType === 'chat-conversations'">
+                <p class="font-medium">
+                  {{ (resource as ReadChatConversation).name }}
+                </p>
+                <p class="text-sm text-muted-foreground">
+                  {{ (resource as ReadChatConversation).model }}
+                </p>
+              </template>
+            </div>
+
+            <AsyncButton
+              size="sm"
+              :disabled="resources[selectedResourceType].some(r => r.id === resource.id)"
+              :on-click-async="async () => {
+                if (selectedProjectId && selectedResourceType) {
+                  const resourceId = (() => {
+                    switch (selectedResourceType) {
+                    case 'user-files':
+                      return (resource as ReadUserFile).id
+                    case 'template-collections':
+                      return (resource as ReadTemplateCollection).id
+                    case 'github-installations':
+                      return (resource as GetGithubAppInstallation).id
+                    case 'chat-conversations':
+                      return (resource as ReadChatConversation).id
+                    }
+                  })()
+                  await handleLinkResource(resourceId)
+                  showLinkResourceDialog = false
+                }
+              }"
+            >
+              {{ resources[selectedResourceType].some(r => r.id === resource.id) ? 'Already Linked' : 'Link' }}
+            </AsyncButton>
+          </div>
+        </div>
+
+        <InfoBlock
+          :is-visible="!selectedResourceType || availableResources[selectedResourceType].length === 0"
+          :show-loader="isLoadingResources"
+          :show-dots="isLoadingResources"
+        >
+          {{ isLoadingResources ? 'Loading resources...' : 'No resources available to link.' }}
+        </InfoBlock>
+      </ShadcnScrollArea>
+
+      <ShadcnDialogFooter class="p-6 pt-0">
+        <ShadcnButton
+          variant="outline"
+          @click="showLinkResourceDialog = false"
+        >
+          Close
+        </ShadcnButton>
       </ShadcnDialogFooter>
     </ShadcnDialogContent>
   </ShadcnDialog>

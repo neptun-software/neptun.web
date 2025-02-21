@@ -3,7 +3,7 @@ import type { OrderByQueryType } from '~/server/utils/validate'
 import { asc, desc, eq, inArray } from 'drizzle-orm'
 import {
   chat_conversation,
-
+  project_chat_conversation,
 } from '../../../lib/types/database.tables/schema'
 
 export async function createChatConversation(
@@ -34,12 +34,29 @@ export async function createChatConversation(
 export async function readAllChatConversationsOfUser(
   user_id: ReadUser['id'],
   order_by?: OrderByQueryType['order_by'],
+  project_id?: number,
 ) {
   let query = db
-    .select()
+    .select({
+      id: chat_conversation.id,
+      name: chat_conversation.name,
+      model: chat_conversation.model,
+      created_at: chat_conversation.created_at,
+      updated_at: chat_conversation.updated_at,
+      neptun_user_id: chat_conversation.neptun_user_id,
+    })
     .from(chat_conversation)
     .where(eq(chat_conversation.neptun_user_id, user_id))
     .$dynamic()
+
+  if (project_id) {
+    query = query
+      .innerJoin(
+        project_chat_conversation,
+        eq(project_chat_conversation.chat_conversation_id, chat_conversation.id),
+      )
+      .where(eq(project_chat_conversation.project_id, project_id))
+  }
 
   if (order_by) {
     const orders = parseOrderByString(order_by)

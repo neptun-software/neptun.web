@@ -1,6 +1,6 @@
 import type { ReadProject, ReadTemplateCollection } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
-import { project_template_collection } from '../../../lib/types/database.tables/schema'
+import { neptun_user_template_collection, project_template_collection } from '../../../lib/types/database.tables/schema'
 
 export async function createProjectTemplateCollection(
   project_id: ReadProject['id'],
@@ -23,13 +23,42 @@ export async function createProjectTemplateCollection(
   if (!created) {
     return null
   }
-  return created[0]
+
+  const collection = await db
+    .select()
+    .from(neptun_user_template_collection)
+    .where(eq(neptun_user_template_collection.id, template_collection_id))
+    .limit(1)
+    .catch((err) => {
+      if (LOG_BACKEND) {
+        console.error('Failed to read template collection:', err)
+      }
+      return null
+    })
+
+  if (!collection) {
+    return null
+  }
+  return collection[0]
 }
 
 export async function readAllProjectTemplateCollections(project_id: ReadProject['id']) {
   const collections = await db
-    .select()
+    .select({
+      id: neptun_user_template_collection.id,
+      name: neptun_user_template_collection.name,
+      description: neptun_user_template_collection.description,
+      is_shared: neptun_user_template_collection.is_shared,
+      share_uuid: neptun_user_template_collection.share_uuid,
+      created_at: neptun_user_template_collection.created_at,
+      updated_at: neptun_user_template_collection.updated_at,
+      neptun_user_id: neptun_user_template_collection.neptun_user_id,
+    })
     .from(project_template_collection)
+    .innerJoin(
+      neptun_user_template_collection,
+      eq(project_template_collection.template_collection_id, neptun_user_template_collection.id),
+    )
     .where(eq(project_template_collection.project_id, project_id))
     .catch((err) => {
       if (LOG_BACKEND) {
@@ -49,8 +78,21 @@ export async function readProjectTemplateCollection(
   template_collection_id: ReadTemplateCollection['id'],
 ) {
   const collection = await db
-    .select()
+    .select({
+      id: neptun_user_template_collection.id,
+      name: neptun_user_template_collection.name,
+      description: neptun_user_template_collection.description,
+      is_shared: neptun_user_template_collection.is_shared,
+      share_uuid: neptun_user_template_collection.share_uuid,
+      created_at: neptun_user_template_collection.created_at,
+      updated_at: neptun_user_template_collection.updated_at,
+      neptun_user_id: neptun_user_template_collection.neptun_user_id,
+    })
     .from(project_template_collection)
+    .innerJoin(
+      neptun_user_template_collection,
+      eq(project_template_collection.template_collection_id, neptun_user_template_collection.id),
+    )
     .where(
       and(
         eq(project_template_collection.project_id, project_id),

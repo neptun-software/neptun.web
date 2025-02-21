@@ -38,10 +38,7 @@ The request body varies depending on the resource type:
 
 ```json
 {
-  "title": "My File",
-  "text": "File content",
-  "language": "typescript",
-  "extension": "ts"
+  "user_file_id": 123
 }
 ```
 
@@ -49,9 +46,7 @@ The request body varies depending on the resource type:
 
 ```json
 {
-  "name": "My Template Collection",
-  "description": "Collection description",
-  "is_shared": false
+  "template_collection_id": 123
 }
 ```
 
@@ -59,9 +54,7 @@ The request body varies depending on the resource type:
 
 ```json
 {
-  "installation_id": "12345",
-  "account_name": "username",
-  "repository_selection": "selected"
+  "github_installation_id": 123
 }
 ```
 
@@ -69,10 +62,7 @@ The request body varies depending on the resource type:
 
 ```json
 {
-  "name": "My Chat",
-  "description": "Chat description",
-  "model_publisher": "openai",
-  "model_name": "gpt-4"
+  "chat_conversation_id": 123
 }
 ```
 
@@ -112,10 +102,7 @@ curl -X POST "https://neptun-webui.vercel.app/api/users/1/projects/789/resources
   -H "Content-Type: application/json" \
   -H "Cookie: neptun-session=your-session-cookie" \
   -d '{
-    "title": "My File",
-    "text": "File content",
-    "language": "typescript",
-    "extension": "ts"
+    "user_file_id": 123
   }'
 ```
 
@@ -128,29 +115,19 @@ from datetime import datetime
 
 ResourceType = Literal['user-files', 'template-collections', 'github-installations', 'chat-conversations']
 
-class UserFileRequest(TypedDict):
-    title: str
-    text: str
-    language: str
-    extension: str
+class ProjectUserFileRequest(TypedDict):
+    user_file_id: int
 
-class TemplateCollectionRequest(TypedDict):
-    name: str
-    description: str
-    is_shared: bool
+class ProjectTemplateCollectionRequest(TypedDict):
+    template_collection_id: int
 
-class GithubInstallationRequest(TypedDict):
-    installation_id: str
-    account_name: str
-    repository_selection: str
+class ProjectGithubInstallationRequest(TypedDict):
+    github_installation_id: int
 
-class ChatConversationRequest(TypedDict):
-    name: str
-    description: str
-    model_publisher: str
-    model_name: str
+class ProjectChatConversationRequest(TypedDict):
+    chat_conversation_id: int
 
-ResourceRequest = Union[UserFileRequest, TemplateCollectionRequest, GithubInstallationRequest, ChatConversationRequest]
+ResourceRequest = Union[ProjectUserFileRequest, ProjectTemplateCollectionRequest, ProjectGithubInstallationRequest, ProjectChatConversationRequest]
 
 async def create_project_resource(
     user_id: int,
@@ -180,33 +157,23 @@ async def create_project_resource(
 ```typescript
 type ResourceType = 'user-files' | 'template-collections' | 'github-installations' | 'chat-conversations'
 
-interface UserFileRequest {
-  title: string
-  text: string
-  language: string
-  extension: string
+interface ProjectUserFileRequest {
+  user_file_id: number
 }
 
-interface TemplateCollectionRequest {
-  name: string
-  description: string
-  is_shared: boolean
+interface ProjectTemplateCollectionRequest {
+  template_collection_id: number
 }
 
-interface GithubInstallationRequest {
-  installation_id: string
-  account_name: string
-  repository_selection: string
+interface ProjectGithubInstallationRequest {
+  github_installation_id: number
 }
 
-interface ChatConversationRequest {
-  name: string
-  description: string
-  model_publisher: string
-  model_name: string
+interface ProjectChatConversationRequest {
+  chat_conversation_id: number
 }
 
-type ResourceRequest = UserFileRequest | TemplateCollectionRequest | GithubInstallationRequest | ChatConversationRequest
+type ResourceRequest = ProjectUserFileRequest | ProjectTemplateCollectionRequest | ProjectGithubInstallationRequest | ProjectChatConversationRequest
 
 async function createProjectResource(
   userId: number,

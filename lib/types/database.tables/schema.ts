@@ -698,21 +698,33 @@ const InsertProjectChatConversationSchemaBase = createInsertSchema(project_chat_
 export const InsertProjectChatConversationSchema = InsertProjectChatConversationSchemaBase.pick({
   chat_conversation_id: true,
 })
+export const SelectProjectChatConversationSchema = createSelectSchema(project_chat_conversation)
+export type ProjectChatConversationToCreate = z.infer<typeof InsertProjectChatConversationSchema>
+export type ReadProjectChatConversation = z.infer<typeof SelectProjectChatConversationSchema>
 
 const InsertProjectGithubInstallationSchemaBase = createInsertSchema(project_github_installation)
 export const InsertProjectGithubInstallationSchema = InsertProjectGithubInstallationSchemaBase.pick({
   github_installation_id: true,
 })
+export const SelectProjectGithubInstallationSchema = createSelectSchema(project_github_installation)
+export type ProjectGithubInstallationToCreate = z.infer<typeof InsertProjectGithubInstallationSchema>
+export type ReadProjectGithubInstallation = z.infer<typeof SelectProjectGithubInstallationSchema>
 
 const InsertProjectTemplateCollectionSchemaBase = createInsertSchema(project_template_collection)
 export const InsertProjectTemplateCollectionSchema = InsertProjectTemplateCollectionSchemaBase.pick({
   template_collection_id: true,
 })
+export const SelectProjectTemplateCollectionSchema = createSelectSchema(project_template_collection)
+export type ProjectTemplateCollectionToCreate = z.infer<typeof InsertProjectTemplateCollectionSchema>
+export type ReadProjectTemplateCollection = z.infer<typeof SelectProjectTemplateCollectionSchema>
 
 const InsertProjectUserFileSchemaBase = createInsertSchema(project_user_file)
 export const InsertProjectUserFileSchema = InsertProjectUserFileSchemaBase.pick({
   user_file_id: true,
 })
+export const SelectProjectUserFileSchema = createSelectSchema(project_user_file)
+export type ProjectUserFileToCreate = z.infer<typeof InsertProjectUserFileSchema>
+export type ReadProjectUserFile = z.infer<typeof SelectProjectUserFileSchema>
 
 /* CONTEXT FILES AND IMPORTS */
 
