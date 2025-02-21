@@ -29,7 +29,7 @@
 
 ### Collection Routes
 
-- `GET` [`/api/shared/collections/{collection_id}`](../api-shared-collections-{collection_id}.get.md)
+- `GET` [`/api/shared/collections/{uuid}`](../api-shared-collections-{uuid}.get.md)
 - `GET` [`/api/users/{user_id}/collections`](../api-users-{user_id}-collections.get.md)
 - `POST` [`/api/users/{user_id}/collections`](../api-users-{user_id}-collections.post.md)
 - `PATCH` && `DELETE` `/api/users/{user_id}/collections/{collection_id}` [update](../api-users-{user_id}-collections-{collection_id}.patch.md) | [delete](../api-users-{user_id}-collections-{collection_id}.delete.md)
