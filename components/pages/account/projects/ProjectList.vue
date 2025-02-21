@@ -259,7 +259,7 @@ async function handleUnlinkFile(fileId: number): Promise<void> {
   }
 }
 
-async function handleRefreshImports(event: MouseEvent): Promise<void> {
+async function handleRefreshImports(): Promise<void> {
   const projectId = selectedProjectId.value
   if (!projectId) {
     return Promise.resolve()
@@ -337,8 +337,64 @@ async function handleUnlinkResource(resourceType: Parameters<typeof linkResource
   }
 }
 
+async function handleRefreshUserFiles(): Promise<void> {
+  const projectId = selectedProjectId.value;
+  if (!projectId) {
+    return;
+  }
+  try {
+    await fetchResources(projectId, 'user-files');
+  } catch (error) {
+    toast.error('Failed to refresh user files');
+  }
+}
+
+async function handleRefreshTemplateCollections(): Promise<void> {
+  const projectId = selectedProjectId.value;
+  if (!projectId) {
+    return;
+  }
+  try {
+    await fetchResources(projectId, 'template-collections');
+  } catch (error) {
+    toast.error('Failed to refresh template collections');
+  }
+}
+
+async function handleRefreshGithubInstallations(): Promise<void> {
+  const projectId = selectedProjectId.value;
+  if (!projectId) {
+    return;
+  }
+  try {
+    await fetchResources(projectId, 'github-installations');
+  } catch (error) {
+    toast.error('Failed to refresh GitHub installations');
+  }
+}
+
+async function handleRefreshChatConversations(): Promise<void> {
+  const projectId = selectedProjectId.value;
+  if (!projectId) {
+    return;
+  }
+  try {
+    await fetchResources(projectId, 'chat-conversations');
+  } catch (error) {
+    toast.error('Failed to refresh chat conversations');
+  }
+}
+
 onMounted(() => {
   fetchProjects()
+
+  if (selectedProjectId.value) {
+    handleRefreshImports()
+    handleRefreshUserFiles()
+    handleRefreshTemplateCollections()
+    handleRefreshGithubInstallations()
+    handleRefreshChatConversations()
+  }
 })
 </script>
 
@@ -664,7 +720,6 @@ onMounted(() => {
                       Link File
                     </ShadcnButton>
                   </div>
-
                   <div class="space-y-4">
                     <div v-if="resources['user-files'].length > 0" class="space-y-2">
                       <div
@@ -695,6 +750,16 @@ onMounted(() => {
                       :show-dots="isLoadingResources"
                     >
                       {{ isLoadingResources ? 'Loading files...' : 'No files linked to this project.' }}
+                      <template #action>
+                        <AsyncButton
+                          v-if="!isLoadingResources && selectedProjectId"
+                          size="sm"
+                          variant="outline"
+                          :on-click-async="handleRefreshUserFiles"
+                        >
+                          Refresh
+                        </AsyncButton>
+                      </template>
                     </InfoBlock>
                   </div>
                 </div>
@@ -710,7 +775,6 @@ onMounted(() => {
                       Link Collection
                     </ShadcnButton>
                   </div>
-
                   <div class="space-y-4">
                     <div v-if="resources['template-collections'].length > 0" class="space-y-2">
                       <div
@@ -741,6 +805,16 @@ onMounted(() => {
                       :show-dots="isLoadingResources"
                     >
                       {{ isLoadingResources ? 'Loading collections...' : 'No template collections linked to this project.' }}
+                      <template #action>
+                        <AsyncButton
+                          v-if="!isLoadingResources && selectedProjectId"
+                          size="sm"
+                          variant="outline"
+                          :on-click-async="handleRefreshTemplateCollections"
+                        >
+                          Refresh
+                        </AsyncButton>
+                      </template>
                     </InfoBlock>
                   </div>
                 </div>
@@ -756,7 +830,6 @@ onMounted(() => {
                       Link Installation
                     </ShadcnButton>
                   </div>
-
                   <div class="space-y-4">
                     <div v-if="resources['github-installations'].length > 0" class="space-y-2">
                       <div
@@ -787,6 +860,16 @@ onMounted(() => {
                       :show-dots="isLoadingResources"
                     >
                       {{ isLoadingResources ? 'Loading installations...' : 'No GitHub installations linked to this project.' }}
+                      <template #action>
+                        <AsyncButton
+                          v-if="!isLoadingResources && selectedProjectId"
+                          size="sm"
+                          variant="outline"
+                          :on-click-async="handleRefreshGithubInstallations"
+                        >
+                          Refresh
+                        </AsyncButton>
+                      </template>
                     </InfoBlock>
                   </div>
                 </div>
@@ -802,7 +885,6 @@ onMounted(() => {
                       Link Conversation
                     </ShadcnButton>
                   </div>
-
                   <div class="space-y-4">
                     <div v-if="resources['chat-conversations'].length > 0" class="space-y-2">
                       <div
@@ -833,6 +915,16 @@ onMounted(() => {
                       :show-dots="isLoadingResources"
                     >
                       {{ isLoadingResources ? 'Loading conversations...' : 'No chat conversations linked to this project.' }}
+                      <template #action>
+                        <AsyncButton
+                          v-if="!isLoadingResources && selectedProjectId"
+                          size="sm"
+                          variant="outline"
+                          :on-click-async="handleRefreshChatConversations"
+                        >
+                          Refresh
+                        </AsyncButton>
+                      </template>
                     </InfoBlock>
                   </div>
                 </div>
