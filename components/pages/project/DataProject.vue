@@ -151,12 +151,12 @@ watch(isStepValid, (valid) => {
 </script>
 
 <template>
-  <ShadcnStepper v-model="stepIndex" class="flex items-start w-full gap-2">
+  <ShadcnStepper v-model="stepIndex" class="flex gap-2 items-start w-full">
     <ShadcnStepperItem
       v-for="step in steps"
       :key="step.step"
       v-slot="{ state }"
-      class="relative flex flex-col items-center justify-center w-full"
+      class="flex relative flex-col justify-center items-center w-full"
       :step="step.step"
     >
       <ShadcnStepperSeparator
@@ -202,11 +202,11 @@ watch(isStepValid, (valid) => {
 
   <div class="flex flex-col gap-4 mt-4">
     <template v-if="stepIndex === 1">
-      <p class="mb-4 text-sm text-muted-foreground">
+      <p class="my-2 text-sm text-center text-muted-foreground">
         Upload your project files or import them from GitHub to get started.
       </p>
       <ShadcnTabs default-value="local" class="w-full">
-        <ShadcnTabsList class="flex justify-start flex-grow">
+        <ShadcnTabsList class="flex flex-grow justify-start">
           <ShadcnTabsTrigger value="local">
             Local Files
           </ShadcnTabsTrigger>
@@ -215,12 +215,12 @@ watch(isStepValid, (valid) => {
           </ShadcnTabsTrigger>
         </ShadcnTabsList>
         <ShadcnTabsContent value="local">
-          <div class="flex flex-col gap-2 p-4 border rounded-md">
+          <div class="flex flex-col gap-2 p-4 rounded-md border">
             <ShadcnInput
               ref="inputFileRef"
               type="file"
               multiple
-              class="flex items-center justify-center w-full h-32 p-4 border-2 border-dashed rounded-md bg-secondary text-secondary-foreground"
+              class="flex justify-center items-center p-4 w-full h-32 rounded-md border-2 border-dashed bg-secondary text-secondary-foreground"
               :class="[
                 isOverDropZone ? 'border-primary bg-primary/5' : 'border-primary/50',
               ]"
@@ -228,7 +228,7 @@ watch(isStepValid, (valid) => {
             >
               <div
                 ref="dropZoneRef"
-                class="flex flex-col items-center justify-center w-full h-full p-4 bg-secondary text-secondary-foreground"
+                class="flex flex-col justify-center items-center p-4 w-full h-full bg-secondary text-secondary-foreground"
                 :class="{ 'drop-active': isOverDropZone }"
               >
                 <p class="mb-2 font-medium">
@@ -240,15 +240,15 @@ watch(isStepValid, (valid) => {
               </div>
             </ShadcnInput>
             <div v-if="files.length > 0" class="mt-4">
-              <div class="flex items-center justify-between mb-2">
+              <div class="flex justify-between items-center mb-2">
                 <strong class="text-sm">Uploaded Files:</strong>
                 <ShadcnButton variant="ghost" size="sm" @click="files = []">
                   Clear All
                 </ShadcnButton>
               </div>
-              <ShadcnScrollArea class="w-full p-2 border rounded-md h-36">
+              <ShadcnScrollArea class="p-2 w-full h-36 rounded-md border">
                 <div class="space-y-2">
-                  <div v-for="(file, index) in files" :key="index" class="flex items-center justify-between p-2 rounded-md bg-muted">
+                  <div v-for="(file, index) in files" :key="index" class="flex justify-between items-center p-2 rounded-md bg-muted">
                     <div class="flex-1 min-w-0">
                       <p class="text-sm font-medium truncate">
                         {{ file.name }}
@@ -271,13 +271,13 @@ watch(isStepValid, (valid) => {
           </div>
         </ShadcnTabsContent>
         <ShadcnTabsContent value="github">
-          <div class="p-4 border rounded-md">
+          <div class="p-4 rounded-md border">
             <NuxtLink
               target="_blank"
               :to="IS_DEV ? 'https://github.com/apps/neptun-github-app-dev' : 'https://github.com/apps/neptun-github-app'"
               :external="true"
             >
-              <ShadcnButton variant="outline" size="sm" :disabled="true" class="gap-1.5 text-sm truncate w-full">
+              <ShadcnButton variant="outline" size="sm" :disabled="true" class="gap-1.5 w-full text-sm truncate">
                 Import GitHub Repository
                 <Import class="size-4" />
               </ShadcnButton>
@@ -307,7 +307,7 @@ watch(isStepValid, (valid) => {
 
     <template v-if="stepIndex === 3">
       <div class="space-y-4">
-        <div class="p-4 rounded-lg bg-blue-50">
+        <div class="p-4 bg-blue-50 rounded-lg">
           <h3 class="mb-2 font-medium">
             Configuration Summary
           </h3>
@@ -317,9 +317,9 @@ watch(isStepValid, (valid) => {
           </div>
         </div>
 
-        <div class="flex items-center justify-between">
+        <div class="flex justify-between items-center">
           <div class="space-y-1">
-            <div class="flex items-center gap-2">
+            <div class="flex gap-2 items-center">
               <span>Add generated files to GitHub repository</span>
               <ShadcnTooltipProvider>
                 <ShadcnTooltip>
@@ -348,7 +348,7 @@ watch(isStepValid, (valid) => {
     </template>
   </div>
 
-  <div class="flex items-center justify-between mt-4">
+  <div class="flex justify-between items-center mt-4">
     <ShadcnButton
       :disabled="!canGoBack"
       variant="outline"
@@ -357,7 +357,7 @@ watch(isStepValid, (valid) => {
     >
       Back
     </ShadcnButton>
-    <div class="flex items-center gap-3">
+    <div class="flex gap-3 items-center">
       <AsyncButton
         v-if="stepIndex !== 3"
         :disabled="!canGoNext || !isStepValid"

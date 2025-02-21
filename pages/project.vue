@@ -25,8 +25,8 @@ useMutationObserver(importTrigger, (mutations) => {
 </script>
 
 <template>
-  <div class="flex justify-center card" :data-state="isImportActive ? 'import' : 'create'">
-    <ShadcnCard class="m-2">
+  <div class="flex justify-center card-container">
+    <ShadcnCard class="m-2 card" :data-state="isImportActive ? 'import' : 'create'">
       <ShadcnCardHeader>
         <ShadcnCardTitle class="text-4xl">
           Guide - {{ isImportActive ? 'Import' : 'Create' }}
@@ -81,20 +81,40 @@ useMutationObserver(importTrigger, (mutations) => {
 </template>
 
 <style scoped>
-/* TODO: find a solution to animate the card */
-
-:deep(.card[data-state='create']) {
-  width: 0;
-  overflow: hidden;
-  transition: width 0.2s ease-in-out;
+.card-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
 }
 
-:deep(.card[data-state='import']) {
-  width: auto;
-  width: calc-size(auto, size);
+.card {
+  width: 100%;
+  max-width: min(90vw, 1000px);
+  transition: all 0.3s ease;
+}
+
+:deep(.tab-content) {
+  transition: opacity 0.3s ease;
 }
 
 :deep(.tab-trigger) {
   flex: 1;
+}
+
+:deep(.tabs-list) {
+  width: 100%;
+  display: flex;
+}
+
+@media (max-width: 640px) {
+  .card-container {
+    padding: 0.5rem;
+  }
+
+  :deep(.tab-trigger) {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
 }
 </style>

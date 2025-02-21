@@ -141,12 +141,12 @@ const doCreateGitRepository = ref(false)
         }
       "
     >
-      <ShadcnStepper v-model="stepIndex" class="flex items-start w-full gap-2">
+      <ShadcnStepper v-model="stepIndex" class="flex gap-2 items-start w-full">
         <ShadcnStepperItem
           v-for="step in steps"
           :key="step.step"
           v-slot="{ state }"
-          class="relative flex flex-col items-center justify-center w-full"
+          class="flex relative flex-col justify-center items-center w-full"
           :step="step.step"
         >
           <ShadcnStepperSeparator
@@ -301,7 +301,7 @@ const doCreateGitRepository = ref(false)
         </template>
       </div>
 
-      <div class="flex items-center justify-between mt-4">
+      <div class="flex justify-between items-center mt-4">
         <ShadcnButton
           :disabled="!canGoBack"
           variant="outline"
@@ -310,7 +310,7 @@ const doCreateGitRepository = ref(false)
         >
           Back
         </ShadcnButton>
-        <div class="flex items-center gap-3">
+        <div class="flex gap-3 items-center">
           <ShadcnButton
             v-if="stepIndex !== 3"
             :type="meta.valid ? 'button' : 'submit'"
