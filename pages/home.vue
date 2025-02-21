@@ -32,7 +32,7 @@ const handleError = (error: unknown) => {
 </script>
 
 <template>
-  <section id="home" class="relative overflow-x-hidden">
+  <section id="home" class="overflow-x-hidden relative">
     <!-- <PlanetSystem
       :imagePaths="[
         '/assets/icons/docker-icon.svg',
@@ -130,7 +130,7 @@ const handleError = (error: unknown) => {
       </AsyncButton>
     </div> -->
 
-    <Cursor />
+    <Cursor v-if="$device.isDesktop" />
     <!-- <SimpleCursor /> -->
   </section>
 </template>
