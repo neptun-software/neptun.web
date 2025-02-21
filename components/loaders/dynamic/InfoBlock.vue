@@ -1,15 +1,41 @@
 <script lang="ts" setup>
 import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
-import { Loader2 } from 'lucide-vue-next'
+import { AlertCircle, CheckCircle2, CircleX, Info, Loader2 } from 'lucide-vue-next'
+import { computed } from 'vue'
 
-// TODO: add variants: success, error, info...
+type Variant = 'info' | 'success' | 'error' | 'warning'
+
 const props = defineProps<{
   isVisible?: boolean
   showLoader?: boolean
   showDots?: boolean
+  variant?: Variant
   class?: HTMLAttributes['class']
 }>()
+
+const variantStyles = {
+  info: 'border-blue-200',
+  success: 'border-green-200',
+  error: 'border-red-200',
+  warning: 'border-yellow-200',
+}
+
+const variantIcons = {
+  info: Info,
+  success: CheckCircle2,
+  error: CircleX,
+  warning: AlertCircle,
+}
+
+const variantIconColors = {
+  info: 'text-blue-400',
+  success: 'text-green-400',
+  error: 'text-red-400',
+  warning: 'text-yellow-400',
+}
+
+const currentVariant = computed(() => props.variant || 'info')
 </script>
 
 <template>
@@ -18,12 +44,18 @@ const props = defineProps<{
     v-show="isVisible"
     :class="
       cn(
-        'flex items-center justify-center gap-2 px-3 pr-2 py-2 mb-2 min-h-[50px] border border-blue-200 rounded-lg bg-background',
+        'flex items-center justify-center gap-2 px-3 pr-2 py-2 mb-2 min-h-[50px] border rounded-lg bg-background',
+        variantStyles[currentVariant],
         props.class,
       )
     "
   >
-    <Loader2 v-if="showLoader" class="w-4 h-4 mr-1 text-blue-500 animate-spin" />
+    <Loader2 v-if="showLoader" class="mr-1 w-6 h-6 animate-spin" :class="[variantIconColors[currentVariant]]" />
+    <component
+      :is="variantIcons[currentVariant]"
+      v-if="!showLoader"
+      class="mr-1 w-6 h-6" :class="[variantIconColors[currentVariant]]"
+    />
     <p class="flex-grow">
       <slot /><LoadingDots v-if="showDots" />
     </p>

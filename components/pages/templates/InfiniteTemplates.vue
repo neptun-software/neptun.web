@@ -30,15 +30,21 @@ useInfiniteScroll(document, loadMore, {
   <div v-if="data.length > 0">
     <CollectionTemplateList :collections="data" :is-loading="isLoading" />
 
-    <div
-      v-if="!isLoading && data.length > 0 && data.length === totalItems"
-      class="flex items-center justify-center gap-2 px-3 py-2 mt-2 border border-blue-200 rounded-lg bg-background"
-    >
-      <p>You scrolled to the bottom. No more templates to load...</p>
+    <div class="mt-2">
+      <InfoBlock :is-visible="isLoading" show-loader show-dots class="mb-0">
+        Loading more templates
+      </InfoBlock>
+
+      <InfoBlock :is-visible="!isLoading && data.length > 0 && data.length === totalItems" class="mb-0">
+        You scrolled to the bottom. No more templates to load...
+      </InfoBlock>
     </div>
   </div>
-  <div v-else>
-    <p>No templates found</p>
+
+  <div v-else class="mt-2">
+    <InfoBlock :is-visible="true" class="mb-0">
+      No templates found
+    </InfoBlock>
   </div>
 </template>
 

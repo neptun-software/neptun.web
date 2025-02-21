@@ -40,7 +40,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="data.length > 0">
+  <div v-if="isLoading && data.length === 0">
+    <InfoBlock :is-visible="true" show-loader show-dots>
+      Loading templates
+    </InfoBlock>
+  </div>
+
+  <div v-else-if="data.length > 0">
     <div class="flex gap-1 mb-2">
       <ShadcnButton :disabled="isFirstPage" @click="prev">
         prev
@@ -59,9 +65,20 @@ onMounted(async () => {
     </div>
 
     <CollectionTemplateList :collections="data" :is-loading="isLoading" />
+
+    <InfoBlock
+      :is-visible="isLoading"
+      show-loader
+      show-dots
+    >
+      Loading templates
+    </InfoBlock>
   </div>
+
   <div v-else>
-    <p>No templates found</p>
+    <InfoBlock :is-visible="true">
+      No templates found
+    </InfoBlock>
   </div>
 </template>
 

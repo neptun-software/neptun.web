@@ -12,7 +12,6 @@ import {
   Trash2,
 } from 'lucide-vue-next'
 import {
-
   defaultAiModelDomain,
 } from '~/lib/types/models/ai'
 
@@ -158,7 +157,7 @@ const calculatedChatsListHeight = computed(() => {
 <template>
   <div class="h-[calc(100%-2.75rem-0.5rem)] p-2 border rounded-md">
     <div ref="controlsRef" class="sticky top-0 left-0 z-10 pb-2 bg-background">
-      <div class="flex flex-wrap items-center w-full gap-1">
+      <div class="flex flex-wrap gap-1 items-center w-full">
         <div class="relative w-full">
           <ShadcnInput
             id="search"
@@ -169,7 +168,7 @@ const calculatedChatsListHeight = computed(() => {
             :disabled="fetchedChatsStatus === 'pending'"
           />
           <span
-            class="absolute inset-y-0 flex items-center justify-center px-2 start-0"
+            class="flex absolute inset-y-0 justify-center items-center px-2 start-0"
           >
             <Search class="size-6 text-muted-foreground" />
           </span>
@@ -183,7 +182,7 @@ const calculatedChatsListHeight = computed(() => {
             <div class="flex gap-1">
               <ShadcnAlertDialogTrigger as-child>
                 <ShadcnButton variant="destructive" class="w-full">
-                  Delete<Trash2 class="w-4 h-4 ml-1" />
+                  Delete<Trash2 class="ml-1 w-4 h-4" />
                 </ShadcnButton>
               </ShadcnAlertDialogTrigger>
             </div>
@@ -211,7 +210,7 @@ const calculatedChatsListHeight = computed(() => {
                     "
                     :on-click-async="batchDeleteChats"
                   >
-                    Delete<Trash2 class="w-4 h-4 ml-1" />
+                    Delete<Trash2 class="ml-1 w-4 h-4" />
                   </AsyncButton>
                 </ShadcnAlertDialogAction>
               </ShadcnAlertDialogFooter>
@@ -230,7 +229,7 @@ const calculatedChatsListHeight = computed(() => {
               }
             "
           >
-            Delete<Trash2 class="w-4 h-4 ml-1" />
+            Delete<Trash2 class="ml-1 w-4 h-4" />
           </ShadcnButton>
         </template>
         <ShadcnButton
@@ -240,10 +239,10 @@ const calculatedChatsListHeight = computed(() => {
         >
           Filter
           <template v-if="filterVisible">
-            <FilterX class="w-4 h-4 ml-1" />
+            <FilterX class="ml-1 w-4 h-4" />
           </template>
           <template v-else>
-            <Filter class="w-4 h-4 ml-1" />
+            <Filter class="ml-1 w-4 h-4" />
           </template>
         </ShadcnButton>
 
@@ -272,7 +271,7 @@ const calculatedChatsListHeight = computed(() => {
 
       <fieldset
         v-if="batchDeleteSelectorIsActive"
-        class="grid gap-6 p-4 mt-1 border rounded-lg"
+        class="grid gap-6 p-4 mt-1 rounded-lg border"
       >
         <legend class="px-1 -ml-1 text-sm font-medium">
           Batch Delete Options
@@ -308,20 +307,20 @@ const calculatedChatsListHeight = computed(() => {
             && filteredChats?.length !== 0
         "
       >
-        <div v-auto-animate class="flex flex-col h-full gap-1">
+        <div v-auto-animate class="flex flex-col gap-1 h-full">
           <div
             v-for="chat in filteredChats"
             :id="String(chat?.id)"
             :key="chat?.id"
             nuxt-client
-            class="flex flex-wrap justify-between flex-grow w-full gap-3 p-4 border rounded-sm border-border bg-background"
+            class="flex flex-wrap flex-grow gap-3 justify-between p-4 w-full rounded-sm border border-border bg-background"
             :class="{
               'border border-green-600': selectedAiChat?.id === chat?.id,
             }"
           >
             <div class="hidden border-green-600" />
             <div class="flex flex-col flex-grow gap-1">
-              <div class="flex items-center gap-1">
+              <div class="flex gap-1 items-center">
                 <template v-if="chatToEdit.id === chat.id">
                   <ShadcnInput
                     v-model="chatToEdit.name"
@@ -360,7 +359,7 @@ const calculatedChatsListHeight = computed(() => {
                 <div class="flex gap-1">
                   <ShadcnAlertDialogTrigger as-child>
                     <ShadcnButton variant="destructive" class="w-full">
-                      Delete<Trash2 class="w-4 h-4 ml-1" />
+                      Delete<Trash2 class="ml-1 w-4 h-4" />
                     </ShadcnButton>
                   </ShadcnAlertDialogTrigger>
                   <ShadcnCheckbox
@@ -386,7 +385,7 @@ const calculatedChatsListHeight = computed(() => {
                         variant="destructive"
                         :on-click-async="() => deleteChat(chat?.id)"
                       >
-                        Delete<Trash2 class="w-4 h-4 ml-1" />
+                        Delete<Trash2 class="ml-1 w-4 h-4" />
                       </AsyncButton>
                     </ShadcnAlertDialogAction>
                   </ShadcnAlertDialogFooter>
@@ -401,7 +400,7 @@ const calculatedChatsListHeight = computed(() => {
             >
               <ShadcnScrollBar orientation="horizontal" />
               <div
-                class="flex h-full gap-1 p-1 border border-b-0 rounded-md rounded-b-none text-muted-foreground"
+                class="flex gap-1 p-1 h-full rounded-md rounded-b-none border border-b-0 text-muted-foreground"
               >
                 <Bot />
                 <span class="truncate">
@@ -409,9 +408,9 @@ const calculatedChatsListHeight = computed(() => {
                 </span>
               </div>
               <div
-                class="flex flex-wrap gap-2 p-1 border border-t-0 rounded-md rounded-t-none"
+                class="flex flex-wrap gap-2 p-1 rounded-md rounded-t-none border border-t-0"
               >
-                <div class="flex items-center gap-2">
+                <div class="flex gap-2 items-center">
                   <CalendarArrowUp class="w-5 h-5 text-muted-foreground" />
                   <NuxtTime
                     class="text-muted-foreground"
@@ -424,7 +423,7 @@ const calculatedChatsListHeight = computed(() => {
                   />
                 </div>
                 <br>
-                <div class="flex items-center gap-2">
+                <div class="flex gap-2 items-center">
                   <CalendarClock class="w-5 h-5 text-muted-foreground" />
                   <NuxtTime
                     class="text-muted-foreground"
@@ -441,24 +440,39 @@ const calculatedChatsListHeight = computed(() => {
           </div>
         </div>
       </div>
-      <div v-else class="h-full pt-2 text-center">
-        <p
+      <div v-else class="h-full">
+        <template
           v-if="
-            Array.isArray(fetchedChats?.chats)
-              && fetchedChats?.chats?.length === 0
+            fetchedChatsStatus !== 'pending'
+            && Array.isArray(fetchedChats?.chats)
+            && fetchedChats?.chats?.length === 0
           "
         >
-          No Chats yet... <DevOnly>({{ fetchedChatsStatus }})</DevOnly>
-        </p>
-        <p v-else>
-          No search results... <DevOnly>({{ fetchedChatsStatus }})</DevOnly>
-        </p>
-        <p v-if="fetchedChatsError">
-          Something went wrong...
-          <DevOnly>
-            {{ fetchedChatsError.message }} ({{ fetchedChatsError.data?.data }})
-          </DevOnly>
-        </p>
+          <InfoBlock :is-visible="true" variant="info">
+            <span class="flex gap-2 items-center">
+              No Chats yet
+              <DevOnly>({{ fetchedChatsStatus }})</DevOnly>
+            </span>
+          </InfoBlock>
+        </template>
+        <template v-else-if="fetchedChatsStatus !== 'pending' && !fetchedChatsError && fetchedChats?.chats?.length === 0">
+          <InfoBlock :is-visible="true" variant="warning">
+            <span class="flex gap-2 items-center">
+              No search results
+              <DevOnly>({{ fetchedChatsStatus }})</DevOnly>
+            </span>
+          </InfoBlock>
+        </template>
+        <template v-if="fetchedChatsError">
+          <InfoBlock :is-visible="true" variant="error" class="mt-2">
+            <span class="flex gap-2 items-center">
+              Something went wrong...
+              <DevOnly>
+                {{ fetchedChatsError.message }} ({{ fetchedChatsError.data?.data }})
+              </DevOnly>
+            </span>
+          </InfoBlock>
+        </template>
       </div>
     </ShadcnScrollArea>
   </div>

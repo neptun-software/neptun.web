@@ -4,15 +4,14 @@ import type { GetGithubAppInstallationRepositoryEssentials as Import } from '~/l
 import { NuxtImg } from '#components'
 import { CaretSortIcon } from '@radix-icons/vue'
 import {
-
   FlexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-
   useVueTable,
 } from '@tanstack/vue-table'
 import { toast } from 'vue-sonner'
+import InfoBlock from '~/components/loaders/dynamic/InfoBlock.vue'
 import Button from '~/components/shadcn/button/Button.vue'
 import { Input } from '~/components/shadcn/input'
 import {
@@ -176,20 +175,22 @@ watch(selectedInstallationId, async (newValue) => {
 <template>
   <div class="overflow-hidden">
     <div v-if="error">
-      <p class="text-red-500">
+      <InfoBlock :is-visible="true" variant="error" class="text-red-500">
         Failed to fetch imports.
-      </p>
+      </InfoBlock>
     </div>
     <div v-else>
       <template v-if="selectedInstallationId === -1">
         <template v-if="!data || (Array.isArray(data) && data?.length === 0)">
-          No imports found.
+          <InfoBlock :is-visible="true" variant="info">
+            No imports found.
+          </InfoBlock>
         </template>
         <template v-else>
-          <div class="border rounded-md">
+          <div class="rounded-md border">
             <div class="flex items-center py-4">
               <Input
-                class="max-w-sm mx-4"
+                class="mx-4 max-w-sm"
                 placeholder="Filter by account name..."
                 :model-value="
                   table
