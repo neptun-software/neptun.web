@@ -443,394 +443,406 @@ onMounted(() => {
 
   <!-- Project Details Dialog -->
   <ShadcnDialog :open="!!selectedProjectId" @update:open="(open) => !open && closeProjectDetails()">
-    <ShadcnDialogContent class="sm:max-w-[500px] grid grid-rows-[auto_1fr_auto] p-0 h-[90dvh]">
-      <ShadcnDialogHeader class="p-6 pb-0">
+    <ShadcnDialogContent class="max-w-[1000px] h-[90vh] flex flex-col">
+      <ShadcnDialogHeader class="flex-none px-2 pt-2">
         <ShadcnDialogTitle>Project Details</ShadcnDialogTitle>
         <ShadcnDialogDescription>
           View and edit your project details. Click save when you're done.
         </ShadcnDialogDescription>
       </ShadcnDialogHeader>
 
-      <ShadcnScrollArea class="px-6 py-4">
-        <div v-if="editedProject" class="space-y-4">
-          <div class="grid gap-2 items-center">
-            <ShadcnLabel for="name">
-              Name
-            </ShadcnLabel>
-            <ShadcnInput
-              id="name"
-              v-model="editedProject.name"
-              placeholder="Project name"
-            />
-          </div>
+      <div class="flex flex-1 gap-6 py-4 min-h-0">
+        <div v-if="editedProject" class="space-y-4 w-[320px]">
+          <ShadcnScrollArea class="h-[calc(90vh-200px)]">
+            <div class="flex flex-col gap-2 px-2">
+              <div class="grid gap-2 items-center">
+                <ShadcnLabel for="name">
+                  Name
+                </ShadcnLabel>
+                <ShadcnInput
+                  id="name"
+                  v-model="editedProject.name"
+                  placeholder="Project name"
+                />
+              </div>
 
-          <div class="grid gap-2 items-center">
-            <ShadcnLabel for="description">
-              Description
-            </ShadcnLabel>
-            <ShadcnTextarea
-              v-if="editedProject.description"
-              id="description"
-              v-model="editedProject.description"
-              placeholder="Project description"
-              rows="3"
-            />
-            <InfoBlock
-              :is-visible="!editedProject.description"
-              :show-loader="false"
-              :show-dots="false"
-            >
-              No description yet.
-            </InfoBlock>
-          </div>
-
-          <div class="grid gap-2 items-center">
-            <ShadcnLabel for="type">
-              Project Type
-            </ShadcnLabel>
-            <ShadcnSelect v-model="editedProject.type">
-              <ShadcnSelectTrigger>
-                <ShadcnSelectValue placeholder="Select project type..." />
-              </ShadcnSelectTrigger>
-              <ShadcnSelectContent>
-                <ShadcnSelectItem
-                  v-for="type in projectTypes"
-                  :key="type"
-                  :value="type"
+              <div class="grid gap-2 items-center">
+                <ShadcnLabel for="description">
+                  Description
+                </ShadcnLabel>
+                <ShadcnTextarea
+                  v-if="editedProject.description"
+                  id="description"
+                  v-model="editedProject.description"
+                  placeholder="Project description"
+                  rows="3"
+                />
+                <InfoBlock
+                  :is-visible="!editedProject.description"
+                  :show-loader="false"
+                  :show-dots="false"
                 >
-                  {{ type === 'web-site' ? 'Website'
-                    : type === 'web-service' ? 'Web Service'
-                      : type === 'web-app' ? 'Web Application' : type }}
-                </ShadcnSelectItem>
-              </ShadcnSelectContent>
-            </ShadcnSelect>
-          </div>
+                  No description yet.
+                </InfoBlock>
+              </div>
 
-          <div class="grid gap-2 items-center">
-            <ShadcnLabel for="language">
-              Main Language
-            </ShadcnLabel>
-            <ShadcnSelect v-model="editedProject.main_language">
-              <ShadcnSelectTrigger>
-                <ShadcnSelectValue placeholder="Select programming language..." />
-              </ShadcnSelectTrigger>
-              <ShadcnSelectContent>
-                <ShadcnSelectItem
-                  v-for="lang in programmingLanguages"
-                  :key="lang"
-                  :value="lang"
-                >
-                  {{ lang.charAt(0).toUpperCase() + lang.slice(1) }}
-                </ShadcnSelectItem>
-              </ShadcnSelectContent>
-            </ShadcnSelect>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4 pt-2">
-            <div class="space-y-1">
-              <p class="text-sm font-medium text-muted-foreground">
-                Created
-              </p>
-              <p class="text-sm">
-                {{ new Date(editedProject.created_at ?? '').toLocaleString() }}
-              </p>
-            </div>
-            <div class="space-y-1">
-              <p class="text-sm font-medium text-muted-foreground">
-                Last Updated
-              </p>
-              <p class="text-sm">
-                {{ new Date(editedProject.updated_at ?? '').toLocaleString() }}
-              </p>
-            </div>
-          </div>
-
-          <div class="pt-6 border-t">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-medium">
-                Project Context Imports
-              </h3>
-              <ShadcnButton size="sm" @click="showNewFileDialog = true">
-                <Plus class="mr-2 w-4 h-4" />
-                Import
-              </ShadcnButton>
-            </div>
-
-            <div class="space-y-4">
-              <div v-if="imports && imports.length > 0" class="space-y-4">
-                <div
-                  v-for="import_ in imports"
-                  :key="import_.id"
-                  class="space-y-2"
-                >
-                  <div class="flex justify-between items-center p-2 rounded-lg bg-muted">
-                    <div>
-                      <p class="font-medium">
-                        {{ import_.source_path || 'Untitled Import' }}
-                      </p>
-                      <p class="text-sm text-muted-foreground">
-                        {{ import_.source_type }} · {{ import_.created_at ? new Date(import_.created_at).toLocaleString() : 'Unknown date' }}
-                      </p>
-                    </div>
-                    <AsyncButton
-                      size="sm"
-                      variant="destructive"
-                      :on-click-async="(event: MouseEvent) => handleDeleteImport(import_.id)"
+              <div class="grid gap-2 items-center">
+                <ShadcnLabel for="type">
+                  Project Type
+                </ShadcnLabel>
+                <ShadcnSelect v-model="editedProject.type">
+                  <ShadcnSelectTrigger>
+                    <ShadcnSelectValue placeholder="Select project type..." />
+                  </ShadcnSelectTrigger>
+                  <ShadcnSelectContent>
+                    <ShadcnSelectItem
+                      v-for="type in projectTypes"
+                      :key="type"
+                      :value="type"
                     >
-                      Delete Import
-                    </AsyncButton>
+                      {{ type === 'web-site' ? 'Website'
+                        : type === 'web-service' ? 'Web Service'
+                          : type === 'web-app' ? 'Web Application' : type }}
+                    </ShadcnSelectItem>
+                  </ShadcnSelectContent>
+                </ShadcnSelect>
+              </div>
+
+              <div class="grid gap-2 items-center">
+                <ShadcnLabel for="language">
+                  Main Language
+                </ShadcnLabel>
+                <ShadcnSelect v-model="editedProject.main_language">
+                  <ShadcnSelectTrigger>
+                    <ShadcnSelectValue placeholder="Select programming language..." />
+                  </ShadcnSelectTrigger>
+                  <ShadcnSelectContent>
+                    <ShadcnSelectItem
+                      v-for="lang in programmingLanguages"
+                      :key="lang"
+                      :value="lang"
+                    >
+                      {{ lang.charAt(0).toUpperCase() + lang.slice(1) }}
+                    </ShadcnSelectItem>
+                  </ShadcnSelectContent>
+                </ShadcnSelect>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4 pt-2">
+                <div class="space-y-1">
+                  <p class="text-sm font-medium text-muted-foreground">
+                    Created
+                  </p>
+                  <p class="text-sm">
+                    {{ new Date(editedProject.created_at ?? '').toLocaleString() }}
+                  </p>
+                </div>
+                <div class="space-y-1">
+                  <p class="text-sm font-medium text-muted-foreground">
+                    Last Updated
+                  </p>
+                  <p class="text-sm">
+                    {{ new Date(editedProject.updated_at ?? '').toLocaleString() }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </ShadcnScrollArea>
+        </div>
+
+        <div class="flex-1">
+          <ShadcnScrollArea class="h-[calc(90vh-200px)]">
+            <div class="pr-4">
+              <div class="space-y-6">
+                <div class="pt-6 pb-4">
+                  <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium">
+                      Project Context Imports
+                    </h3>
+                    <ShadcnButton size="sm" @click="showNewFileDialog = true">
+                      <Plus class="mr-2 w-4 h-4" />
+                      Import
+                    </ShadcnButton>
                   </div>
 
-                  <div v-if="import_.files && import_.files.length > 0" class="pl-4 space-y-2">
-                    <div
-                      v-for="file in import_.files"
-                      :key="file.id"
-                      class="flex justify-between items-center p-2 rounded-lg border"
-                    >
-                      <div>
-                        <p class="font-medium">
-                          {{ file.title }}
-                        </p>
-                        <p class="text-sm text-muted-foreground">
-                          {{ file.category }} · {{ file.file_type }}
-                          <span v-if="file.language">({{ file.language }})</span>
-                        </p>
+                  <div class="space-y-4">
+                    <div v-if="imports && imports.length > 0" class="space-y-4">
+                      <div
+                        v-for="import_ in imports"
+                        :key="import_.id"
+                        class="space-y-2"
+                      >
+                        <div class="flex justify-between items-center p-2 rounded-lg bg-muted">
+                          <div>
+                            <p class="font-medium">
+                              {{ import_.source_path || 'Untitled Import' }}
+                            </p>
+                            <p class="text-sm text-muted-foreground">
+                              {{ import_.source_type }} · {{ import_.created_at ? new Date(import_.created_at).toLocaleString() : 'Unknown date' }}
+                            </p>
+                          </div>
+                          <AsyncButton
+                            size="sm"
+                            variant="destructive"
+                            :on-click-async="(event: MouseEvent) => handleDeleteImport(import_.id)"
+                          >
+                            Delete Import
+                          </AsyncButton>
+                        </div>
+
+                        <div v-if="import_.files && import_.files.length > 0" class="pl-4 space-y-2">
+                          <div
+                            v-for="file in import_.files"
+                            :key="file.id"
+                            class="flex justify-between items-center p-2 rounded-lg border"
+                          >
+                            <div>
+                              <p class="font-medium">
+                                {{ file.title }}
+                              </p>
+                              <p class="text-sm text-muted-foreground">
+                                {{ file.category }} · {{ file.file_type }}
+                                <span v-if="file.language">({{ file.language }})</span>
+                              </p>
+                            </div>
+                            <div class="flex gap-2">
+                              <AsyncButton
+                                size="sm"
+                                variant="outline"
+                                :on-click-async="(event: MouseEvent) => handleEditFile(file)"
+                              >
+                                Edit
+                              </AsyncButton>
+                              <AsyncButton
+                                size="sm"
+                                variant="destructive"
+                                :on-click-async="(event: MouseEvent) => handleUnlinkFile(file.id)"
+                              >
+                                Delete
+                              </AsyncButton>
+                            </div>
+                          </div>
+                        </div>
+                        <InfoBlock
+                          :is-visible="!import_.files?.length"
+                          :show-loader="false"
+                          :show-dots="false"
+                        >
+                          No files in this import.
+                        </InfoBlock>
                       </div>
-                      <div class="flex gap-2">
+                    </div>
+
+                    <InfoBlock
+                      :is-visible="!imports || imports.length === 0"
+                      :show-loader="isLoadingResources"
+                      :show-dots="isLoadingResources"
+                    >
+                      {{ isLoadingResources ? 'Loading imports...' : 'No imports in this project yet.' }}
+                      <template #action>
                         <AsyncButton
+                          v-if="!isLoadingResources && selectedProjectId"
                           size="sm"
                           variant="outline"
-                          :on-click-async="(event: MouseEvent) => handleEditFile(file)"
+                          :on-click-async="handleRefreshImports"
                         >
-                          Edit
+                          Refresh
                         </AsyncButton>
+                      </template>
+                    </InfoBlock>
+                  </div>
+                </div>
+
+                <!-- User Files -->
+                <div class="pt-6 pb-4 border-t">
+                  <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium">
+                      User Files
+                    </h3>
+                    <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('user-files')">
+                      <Plus class="mr-2 w-4 h-4" />
+                      Link File
+                    </ShadcnButton>
+                  </div>
+
+                  <div class="space-y-4">
+                    <div v-if="resources['user-files'].length > 0" class="space-y-2">
+                      <div
+                        v-for="file in resources['user-files']"
+                        :key="file.id"
+                        class="flex justify-between items-center p-2 rounded-lg border"
+                      >
+                        <div>
+                          <p class="font-medium">
+                            {{ file.title }}
+                          </p>
+                          <p class="text-sm text-muted-foreground">
+                            {{ file.language }} · {{ file.extension }}
+                          </p>
+                        </div>
                         <AsyncButton
                           size="sm"
                           variant="destructive"
-                          :on-click-async="(event: MouseEvent) => handleUnlinkFile(file.id)"
+                          :on-click-async="() => handleUnlinkResource('user-files', file.id)"
                         >
-                          Delete
+                          Unlink
                         </AsyncButton>
                       </div>
                     </div>
+                    <InfoBlock
+                      :is-visible="resources['user-files'].length === 0"
+                      :show-loader="isLoadingResources"
+                      :show-dots="isLoadingResources"
+                    >
+                      {{ isLoadingResources ? 'Loading files...' : 'No files linked to this project.' }}
+                    </InfoBlock>
                   </div>
-                  <InfoBlock
-                    :is-visible="!import_.files?.length"
-                    :show-loader="false"
-                    :show-dots="false"
-                  >
-                    No files in this import.
-                  </InfoBlock>
+                </div>
+
+                <!-- Template Collections -->
+                <div class="pt-6 pb-4 border-t">
+                  <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium">
+                      Template Collections
+                    </h3>
+                    <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('template-collections')">
+                      <Plus class="mr-2 w-4 h-4" />
+                      Link Collection
+                    </ShadcnButton>
+                  </div>
+
+                  <div class="space-y-4">
+                    <div v-if="resources['template-collections'].length > 0" class="space-y-2">
+                      <div
+                        v-for="collection in resources['template-collections']"
+                        :key="collection.id"
+                        class="flex justify-between items-center p-2 rounded-lg border"
+                      >
+                        <div>
+                          <p class="font-medium">
+                            {{ collection.name }}
+                          </p>
+                          <p class="text-sm text-muted-foreground">
+                            {{ collection.description }}
+                          </p>
+                        </div>
+                        <AsyncButton
+                          size="sm"
+                          variant="destructive"
+                          :on-click-async="() => handleUnlinkResource('template-collections', collection.id)"
+                        >
+                          Unlink
+                        </AsyncButton>
+                      </div>
+                    </div>
+                    <InfoBlock
+                      :is-visible="resources['template-collections'].length === 0"
+                      :show-loader="isLoadingResources"
+                      :show-dots="isLoadingResources"
+                    >
+                      {{ isLoadingResources ? 'Loading collections...' : 'No template collections linked to this project.' }}
+                    </InfoBlock>
+                  </div>
+                </div>
+
+                <!-- GitHub Installations -->
+                <div class="pt-6 pb-4 border-t">
+                  <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium">
+                      GitHub Installations
+                    </h3>
+                    <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('github-installations')">
+                      <Plus class="mr-2 w-4 h-4" />
+                      Link Installation
+                    </ShadcnButton>
+                  </div>
+
+                  <div class="space-y-4">
+                    <div v-if="resources['github-installations'].length > 0" class="space-y-2">
+                      <div
+                        v-for="installation in resources['github-installations']"
+                        :key="installation.id"
+                        class="flex justify-between items-center p-2 rounded-lg border"
+                      >
+                        <div>
+                          <p class="font-medium">
+                            {{ installation.github_account_name }}
+                          </p>
+                          <p class="text-sm text-muted-foreground">
+                            {{ installation.github_account_type }}
+                          </p>
+                        </div>
+                        <AsyncButton
+                          size="sm"
+                          variant="destructive"
+                          :on-click-async="() => handleUnlinkResource('github-installations', installation.id)"
+                        >
+                          Unlink
+                        </AsyncButton>
+                      </div>
+                    </div>
+                    <InfoBlock
+                      :is-visible="resources['github-installations'].length === 0"
+                      :show-loader="isLoadingResources"
+                      :show-dots="isLoadingResources"
+                    >
+                      {{ isLoadingResources ? 'Loading installations...' : 'No GitHub installations linked to this project.' }}
+                    </InfoBlock>
+                  </div>
+                </div>
+
+                <!-- Chat Conversations -->
+                <div class="pt-6 pb-4 border-t">
+                  <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium">
+                      Chat Conversations
+                    </h3>
+                    <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('chat-conversations')">
+                      <Plus class="mr-2 w-4 h-4" />
+                      Link Conversation
+                    </ShadcnButton>
+                  </div>
+
+                  <div class="space-y-4">
+                    <div v-if="resources['chat-conversations'].length > 0" class="space-y-2">
+                      <div
+                        v-for="conversation in resources['chat-conversations']"
+                        :key="conversation.id"
+                        class="flex justify-between items-center p-2 rounded-lg border"
+                      >
+                        <div>
+                          <p class="font-medium">
+                            {{ conversation.name }}
+                          </p>
+                          <p class="text-sm text-muted-foreground">
+                            {{ conversation.model }}
+                          </p>
+                        </div>
+                        <AsyncButton
+                          size="sm"
+                          variant="destructive"
+                          :on-click-async="() => handleUnlinkResource('chat-conversations', conversation.id)"
+                        >
+                          Unlink
+                        </AsyncButton>
+                      </div>
+                    </div>
+                    <InfoBlock
+                      :is-visible="resources['chat-conversations'].length === 0"
+                      :show-loader="isLoadingResources"
+                      :show-dots="isLoadingResources"
+                    >
+                      {{ isLoadingResources ? 'Loading conversations...' : 'No chat conversations linked to this project.' }}
+                    </InfoBlock>
+                  </div>
                 </div>
               </div>
-
-              <InfoBlock
-                :is-visible="!imports || imports.length === 0"
-                :show-loader="isLoadingResources"
-                :show-dots="isLoadingResources"
-              >
-                {{ isLoadingResources ? 'Loading imports...' : 'No imports in this project yet.' }}
-                <template #action>
-                  <AsyncButton
-                    v-if="!isLoadingResources && selectedProjectId"
-                    size="sm"
-                    variant="outline"
-                    :on-click-async="handleRefreshImports"
-                  >
-                    Refresh
-                  </AsyncButton>
-                </template>
-              </InfoBlock>
             </div>
-          </div>
-
-          <!-- User Files -->
-          <div class="pt-6 border-t">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-medium">
-                User Files
-              </h3>
-              <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('user-files')">
-                <Plus class="mr-2 w-4 h-4" />
-                Link File
-              </ShadcnButton>
-            </div>
-
-            <div class="space-y-4">
-              <div v-if="resources['user-files'].length > 0" class="space-y-2">
-                <div
-                  v-for="file in resources['user-files']"
-                  :key="file.id"
-                  class="flex justify-between items-center p-2 rounded-lg border"
-                >
-                  <div>
-                    <p class="font-medium">
-                      {{ file.title }}
-                    </p>
-                    <p class="text-sm text-muted-foreground">
-                      {{ file.language }} · {{ file.extension }}
-                    </p>
-                  </div>
-                  <AsyncButton
-                    size="sm"
-                    variant="destructive"
-                    :on-click-async="() => handleUnlinkResource('user-files', file.id)"
-                  >
-                    Unlink
-                  </AsyncButton>
-                </div>
-              </div>
-              <InfoBlock
-                :is-visible="resources['user-files'].length === 0"
-                :show-loader="isLoadingResources"
-                :show-dots="isLoadingResources"
-              >
-                {{ isLoadingResources ? 'Loading files...' : 'No files linked to this project.' }}
-              </InfoBlock>
-            </div>
-          </div>
-
-          <!-- Template Collections -->
-          <div class="pt-6 border-t">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-medium">
-                Template Collections
-              </h3>
-              <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('template-collections')">
-                <Plus class="mr-2 w-4 h-4" />
-                Link Collection
-              </ShadcnButton>
-            </div>
-
-            <div class="space-y-4">
-              <div v-if="resources['template-collections'].length > 0" class="space-y-2">
-                <div
-                  v-for="collection in resources['template-collections']"
-                  :key="collection.id"
-                  class="flex justify-between items-center p-2 rounded-lg border"
-                >
-                  <div>
-                    <p class="font-medium">
-                      {{ collection.name }}
-                    </p>
-                    <p class="text-sm text-muted-foreground">
-                      {{ collection.description }}
-                    </p>
-                  </div>
-                  <AsyncButton
-                    size="sm"
-                    variant="destructive"
-                    :on-click-async="() => handleUnlinkResource('template-collections', collection.id)"
-                  >
-                    Unlink
-                  </AsyncButton>
-                </div>
-              </div>
-              <InfoBlock
-                :is-visible="resources['template-collections'].length === 0"
-                :show-loader="isLoadingResources"
-                :show-dots="isLoadingResources"
-              >
-                {{ isLoadingResources ? 'Loading collections...' : 'No template collections linked to this project.' }}
-              </InfoBlock>
-            </div>
-          </div>
-
-          <!-- GitHub Installations -->
-          <div class="pt-6 border-t">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-medium">
-                GitHub Installations
-              </h3>
-              <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('github-installations')">
-                <Plus class="mr-2 w-4 h-4" />
-                Link Installation
-              </ShadcnButton>
-            </div>
-
-            <div class="space-y-4">
-              <div v-if="resources['github-installations'].length > 0" class="space-y-2">
-                <div
-                  v-for="installation in resources['github-installations']"
-                  :key="installation.id"
-                  class="flex justify-between items-center p-2 rounded-lg border"
-                >
-                  <div>
-                    <p class="font-medium">
-                      {{ installation.github_account_name }}
-                    </p>
-                    <p class="text-sm text-muted-foreground">
-                      {{ installation.github_account_type }}
-                    </p>
-                  </div>
-                  <AsyncButton
-                    size="sm"
-                    variant="destructive"
-                    :on-click-async="() => handleUnlinkResource('github-installations', installation.id)"
-                  >
-                    Unlink
-                  </AsyncButton>
-                </div>
-              </div>
-              <InfoBlock
-                :is-visible="resources['github-installations'].length === 0"
-                :show-loader="isLoadingResources"
-                :show-dots="isLoadingResources"
-              >
-                {{ isLoadingResources ? 'Loading installations...' : 'No GitHub installations linked to this project.' }}
-              </InfoBlock>
-            </div>
-          </div>
-
-          <!-- Chat Conversations -->
-          <div class="pt-6 border-t">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-medium">
-                Chat Conversations
-              </h3>
-              <ShadcnButton size="sm" @click="handleShowLinkResourceDialog('chat-conversations')">
-                <Plus class="mr-2 w-4 h-4" />
-                Link Conversation
-              </ShadcnButton>
-            </div>
-
-            <div class="space-y-4">
-              <div v-if="resources['chat-conversations'].length > 0" class="space-y-2">
-                <div
-                  v-for="conversation in resources['chat-conversations']"
-                  :key="conversation.id"
-                  class="flex justify-between items-center p-2 rounded-lg border"
-                >
-                  <div>
-                    <p class="font-medium">
-                      {{ conversation.name }}
-                    </p>
-                    <p class="text-sm text-muted-foreground">
-                      {{ conversation.model }}
-                    </p>
-                  </div>
-                  <AsyncButton
-                    size="sm"
-                    variant="destructive"
-                    :on-click-async="() => handleUnlinkResource('chat-conversations', conversation.id)"
-                  >
-                    Unlink
-                  </AsyncButton>
-                </div>
-              </div>
-              <InfoBlock
-                :is-visible="resources['chat-conversations'].length === 0"
-                :show-loader="isLoadingResources"
-                :show-dots="isLoadingResources"
-              >
-                {{ isLoadingResources ? 'Loading conversations...' : 'No chat conversations linked to this project.' }}
-              </InfoBlock>
-            </div>
-          </div>
+          </ShadcnScrollArea>
         </div>
-      </ShadcnScrollArea>
+      </div>
 
-      <ShadcnDialogFooter class="gap-2 p-6 pt-0 sm:gap-1">
+      <ShadcnDialogFooter class="flex-none">
         <AsyncButton
           variant="destructive"
           :on-click-async="handleProjectDelete"
