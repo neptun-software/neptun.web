@@ -338,50 +338,50 @@ async function handleUnlinkResource(resourceType: Parameters<typeof linkResource
 }
 
 async function handleRefreshUserFiles(): Promise<void> {
-  const projectId = selectedProjectId.value;
+  const projectId = selectedProjectId.value
   if (!projectId) {
-    return;
+    return
   }
   try {
-    await fetchResources(projectId, 'user-files');
+    await fetchResources(projectId, 'user-files')
   } catch (error) {
-    toast.error('Failed to refresh user files');
+    toast.error('Failed to refresh user files')
   }
 }
 
 async function handleRefreshTemplateCollections(): Promise<void> {
-  const projectId = selectedProjectId.value;
+  const projectId = selectedProjectId.value
   if (!projectId) {
-    return;
+    return
   }
   try {
-    await fetchResources(projectId, 'template-collections');
+    await fetchResources(projectId, 'template-collections')
   } catch (error) {
-    toast.error('Failed to refresh template collections');
+    toast.error('Failed to refresh template collections')
   }
 }
 
 async function handleRefreshGithubInstallations(): Promise<void> {
-  const projectId = selectedProjectId.value;
+  const projectId = selectedProjectId.value
   if (!projectId) {
-    return;
+    return
   }
   try {
-    await fetchResources(projectId, 'github-installations');
+    await fetchResources(projectId, 'github-installations')
   } catch (error) {
-    toast.error('Failed to refresh GitHub installations');
+    toast.error('Failed to refresh GitHub installations')
   }
 }
 
 async function handleRefreshChatConversations(): Promise<void> {
-  const projectId = selectedProjectId.value;
+  const projectId = selectedProjectId.value
   if (!projectId) {
-    return;
+    return
   }
   try {
-    await fetchResources(projectId, 'chat-conversations');
+    await fetchResources(projectId, 'chat-conversations')
   } catch (error) {
-    toast.error('Failed to refresh chat conversations');
+    toast.error('Failed to refresh chat conversations')
   }
 }
 

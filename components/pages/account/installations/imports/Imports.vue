@@ -4,16 +4,14 @@ import type { GetGithubAppInstallationRepositoryEssentials as Import } from '~/l
 import { NuxtLink } from '#components'
 import { CaretSortIcon } from '@radix-icons/vue'
 import {
-
   FlexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-
   useVueTable,
 } from '@tanstack/vue-table'
-import { toast } from 'vue-sonner'
 import { Button } from '~/components/shadcn/button'
+import { ScrollArea, ScrollBar } from '~/components/shadcn/scroll-area'
 import {
   Table,
   TableBody,
@@ -44,12 +42,28 @@ const columns: ColumnDef<Import>[] = [
         () => ['Repository Name', h(CaretSortIcon, { class: 'ml-2 h-4 w-4' })],
       )
     },
-    cell: ({ row }) => row.getValue('github_repository_name'),
+    cell: ({ row }) => {
+      const repositoryName = row.getValue('github_repository_name') as string
+      const repositoryUrl = props.imports[row.index].github_repository_url
+
+      return h(
+        NuxtLink,
+        {
+          to: repositoryUrl || '#',
+          target: repositoryUrl ? '_blank' : undefined,
+          external: true,
+        },
+        () => repositoryName || 'N/A',
+      )
+    },
   },
   {
     accessorKey: 'github_repository_description',
     header: 'Description',
-    cell: ({ row }) => row.getValue('github_repository_description') || 'N/A',
+    cell: ({ row }) => {
+      const description = row.getValue('github_repository_description') || 'N/A'
+      return h('div', { class: 'truncate-description' }, description as any)
+    },
   },
   {
     accessorKey: 'github_repository_size',
@@ -67,26 +81,11 @@ const columns: ColumnDef<Import>[] = [
     cell: ({ row }) => row.getValue('github_repository_license') || 'None',
   },
   {
-    accessorKey: 'github_repository_url',
-    header: 'Repository URL',
-    cell: ({ row }) => {
-      const websiteUrl = row.getValue('github_repository_url')
-      return h(
-        NuxtLink,
-        {
-          to: websiteUrl || '#',
-          target: websiteUrl ? '_blank' : undefined,
-          external: true,
-        },
-        () => websiteUrl || 'N/A',
-      )
-    },
-  },
-  {
     accessorKey: 'github_repository_website_url',
     header: 'Website URL',
     cell: ({ row }) => {
-      const websiteUrl = row.getValue('github_repository_website_url')
+      const websiteUrl = row.getValue('github_repository_website_url') as string
+      const cleanedUrl = websiteUrl ? websiteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '') : 'N/A'
       return h(
         NuxtLink,
         {
@@ -94,7 +93,7 @@ const columns: ColumnDef<Import>[] = [
           target: websiteUrl ? '_blank' : undefined,
           external: true,
         },
-        () => websiteUrl || 'N/A',
+        () => cleanedUrl || 'N/A',
       )
     },
   },
@@ -121,24 +120,6 @@ const columns: ColumnDef<Import>[] = [
     header: 'Archived',
     cell: ({ row }) =>
       row.getValue('github_repository_is_archived') ? 'Yes' : 'No',
-  },
-  {
-    id: 'actions',
-    header: 'Actions',
-    cell: ({ row }) =>
-      h(
-        Button,
-        {
-          variant: 'default',
-          size: 'sm',
-          onClick: () => {
-            toast.error(
-              `Coming Soon... Refreshing repository ${row.original.github_repository_id}...`,
-            )
-          },
-        },
-        () => 'Refresh',
-      ),
   },
 ]
 
@@ -171,8 +152,8 @@ const selectedInstallationId = useSelectedInstallation()
 
 <template>
   <div>
-    <div class="border rounded-md">
-      <div class="flex items-center gap-2 p-4">
+    <div class="rounded-md border">
+      <div class="flex gap-2 items-center p-4">
         <ShadcnButton @click="() => (selectedInstallationId = -1)">
           Back To Overview
         </ShadcnButton>
@@ -195,55 +176,65 @@ const selectedInstallationId = useSelectedInstallation()
         />
       </div>
 
-      <ShadcnScrollArea class="w-full max-w-[calc(100vw-4.4rem)]">
-        <Table>
-          <ShadcnScrollBar orientation="horizontal" />
-          <TableHeader>
-            <TableRow
-              v-for="headerGroup in table.getHeaderGroups()"
-              :key="headerGroup.id"
-            >
-              <TableHead v-for="header in headerGroup.headers" :key="header.id">
-                <component
-                  :is="header.isPlaceholder ? 'span' : 'div'"
-                  :class="{
-                    'cursor-pointer select-none': header.column.getCanSort(),
-                  }"
-                  @click="header.column.getToggleSortingHandler()"
-                >
-                  <FlexRender
-                    :render="header.column.columnDef.header"
-                    :props="header.getContext()"
-                  />
-                </component>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <template v-if="table.getRowModel().rows?.length > 0">
+      <ScrollArea class="w-full whitespace-nowrap">
+        <div class="w-max min-w-full">
+          <Table>
+            <TableHeader>
               <TableRow
-                v-for="row in table.getRowModel().rows"
-                :key="row.id"
-                :data-state="row.getIsSelected() ? 'selected' : undefined"
+                v-for="headerGroup in table.getHeaderGroups()"
+                :key="headerGroup.id"
               >
-                <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
-                  <FlexRender
-                    :render="cell.column.columnDef.cell"
-                    :props="cell.getContext()"
-                  />
+                <TableHead v-for="header in headerGroup.headers" :key="header.id">
+                  <component
+                    :is="header.isPlaceholder ? 'span' : 'div'"
+                    :class="{
+                      'cursor-pointer select-none': header.column.getCanSort(),
+                    }"
+                    @click="header.column.getToggleSortingHandler()"
+                  >
+                    <FlexRender
+                      :render="header.column.columnDef.header"
+                      :props="header.getContext()"
+                    />
+                  </component>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <template v-if="table.getRowModel().rows?.length > 0">
+                <TableRow
+                  v-for="row in table.getRowModel().rows"
+                  :key="row.id"
+                  :data-state="row.getIsSelected() ? 'selected' : undefined"
+                >
+                  <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+                    <FlexRender
+                      :render="cell.column.columnDef.cell"
+                      :props="cell.getContext()"
+                    />
+                  </TableCell>
+                </TableRow>
+              </template>
+              <TableRow v-else>
+                <TableCell :colspan="columns.length" class="h-24 text-center">
+                  No results.
                 </TableCell>
               </TableRow>
-            </template>
-            <TableRow v-else>
-              <TableCell :colspan="columns.length" class="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </ShadcnScrollArea>
+            </TableBody>
+          </Table>
+        </div>
+        <ScrollBar orientation="horizontal" :always="true" />
+      </ScrollArea>
     </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.truncate-description {
+  display: inline-block;
+  max-width: 20ch; /* Limit to 20 characters */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+</style>

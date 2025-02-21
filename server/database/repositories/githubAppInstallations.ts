@@ -1,5 +1,5 @@
 import type { NewGithubAppInstallation, ReadUser } from '~/lib/types/database.tables/schema'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import {
   github_app_installation,
 
@@ -56,4 +56,24 @@ export async function readAllGithubAppInstallationsOfUser(user_id: ReadUser['id'
   }
 
   return fetchedGithubAppInstallations
+}
+
+export async function deleteGithubAppInstallation(
+  user_id: ReadUser['id'],
+  installation_id: number,
+) {
+  return db
+    .delete(github_app_installation)
+    .where(
+      and(
+        eq(github_app_installation.id, installation_id),
+        eq(github_app_installation.neptun_user_id, user_id),
+      ),
+    )
+    .catch((err) => {
+      if (LOG_BACKEND) {
+        console.error('Failed to delete github app installation:', err)
+      }
+      return false
+    })
 }

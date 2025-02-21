@@ -26,7 +26,7 @@ import { valueUpdater } from '~/lib/utils'
 
 const { user } = useUserSession()
 
-const { data, error } = await useFetch(
+const { data, error, refresh } = await useFetch(
   `/api/users/${user.value?.id ?? -1}/installations`,
 )
 
@@ -118,10 +118,25 @@ const columns: ColumnDef<Installation>[] = [
         {
           variant: 'destructive',
           size: 'sm',
-          onClick: () => {
-            toast.error(
-              `Coming Soon... Deleting installation ${row.original.id}...`,
-            )
+          onClick: async (event: Event) => {
+            event.stopPropagation() // prevent the row from being selected causing the details to be shown
+            const installationId = row.original.id
+            const userId = user.value?.id
+
+            try {
+              const response = await $fetch(`/api/users/${userId}/installations/${installationId}`, {
+                method: 'DELETE',
+              })
+
+              if (response) {
+                toast.success(`Successfully deleted installation ${installationId}. You need to remove it from your GitHub account by yourself for now.`)
+                await refresh()
+              } else {
+                toast.error(`Failed to delete installation ${installationId}.`)
+              }
+            } catch (error: any) {
+              toast.error(`Error deleting installation: ${error?.message}`)
+            }
           },
         },
         () => 'Delete',
