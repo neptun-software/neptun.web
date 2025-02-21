@@ -18,7 +18,6 @@
 ### Chat Routes
 
 - `GET` && `POST` && `DELETE` `/api/users/{user_id}/chats` [read, create, delete](../api-users-{user_id}-chats.get.post.delete.md)
-- `GET` `/api/users/{user_id}/chats/{project_id}` [read](../api-users-{user_id}-chats-{project_id}.get.md)
 - `PATCH` && `DELETE` `/api/users/{user_id}/chats/{chat_id}` [update](../api-users-{user_id}-chats-{chat_id}.patch.md) | [delete](../api-users-{user_id}-chats-{chat_id}.delete.md)
 - `GET` && `POST` `/api/users/{user_id}/chats/{chat_id}/messages` [read](../api-users-{user_id}-chats-{chat_id}-messages.get.md) | [create](../api-users-{user_id}-chats-{chat_id}-messages.post.md)
 - `DELETE` [`/api/users/{user_id}/chats/{chat_id}/messages/last`](../api-users-{user_id}-chats-{chat_id}-messages-last.delete.md)
@@ -49,6 +48,7 @@
 - `GET` [`/api/users/{user_id}/projects/{project_id}`](../api-users-{user_id}-projects-{project_id}.get.md)
 - `PATCH` [`/api/users/{user_id}/projects/{project_id}`](../api-users-{user_id}-projects-{project_id}.patch.md)
 - `DELETE` [`/api/users/{user_id}/projects/{project_id}`](../api-users-{user_id}-projects-{project_id}.delete.md)
+- `GET` `/api/users/{user_id}/projects/{project_id}/chats` [read](../api-users-{user_id}-projects-{project_id}-chats.get.md)
 
 ### Project Resources Routes
 

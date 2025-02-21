@@ -72,7 +72,7 @@ This endpoint manages chat conversations for a specific user, supporting creatio
     {
       "id": 1,
       "neptun_user_id": 123,
-      "model": "gpt-3.5",
+      "model": "google/gemma-2-27b-it",
       "name": "Project Discussion",
       "created_at": "2024-03-20T10:00:00Z"
     }
@@ -87,7 +87,7 @@ This endpoint manages chat conversations for a specific user, supporting creatio
   "chat": {
     "id": 1,
     "neptun_user_id": 123,
-    "model": "gpt-3.5",
+    "model": "google/gemma-2-27b-it",
     "name": "New Chat",
     "created_at": "2024-03-20T10:00:00Z"
   }
@@ -203,7 +203,7 @@ curl -X POST \
   -H "Content-Type: application/json" \
   -H "Cookie: neptun-session=your-session-cookie" \
   -d '{
-    "model": "gpt-3.5",
+    "model": "google/gemma-2-27b-it",
     "name": "New Chat"
   }' \
   "https://neptun-webui.vercel.app/api/users/your-user-id/chats"

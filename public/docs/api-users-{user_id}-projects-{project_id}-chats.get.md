@@ -12,7 +12,7 @@ GET
 
 ### Route
 
-`/api/users/{user_id}/chats/{project_id}`
+`/api/users/{user_id}/projects/{project_id}/chats`
 
 ### Route Parameters
 
@@ -58,7 +58,7 @@ No request body required.
     {
       "id": 1,
       "neptun_user_id": 123,
-      "model": "gpt-3.5",
+      "model": "google/gemma-2-27b-it",
       "name": "Project Discussion",
       "created_at": "2024-03-20T10:00:00Z",
       "updated_at": "2024-03-20T10:00:00Z"
@@ -135,7 +135,7 @@ class ApiResponse(BaseModel):
 ### cURL Example
 
 ```bash
-curl -X GET "https://neptun-webui.vercel.app/api/users/1/chats/2" \
+curl -X GET "https://neptun-webui.vercel.app/api/users/1/projects/2/chats" \
   -H "Accept: application/json" \
   -H "Cookie: neptun-session=your-session-cookie"
 ```
@@ -151,7 +151,7 @@ async def get_project_chats(
     session_cookie: str,
     order_by: str = None
 ) -> ApiResponse:
-    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/chats/{project_id}"
+    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/projects/{project_id}/chats"
     params = {"order_by": order_by} if order_by else None
 
     async with httpx.AsyncClient() as client:
@@ -178,7 +178,7 @@ async function getProjectChats(
 ): Promise<ApiResponse> {
   const params = orderBy ? `?order_by=${orderBy}` : ''
   const response = await fetch(
-    `https://neptun-webui.vercel.app/api/users/${userId}/chats/${projectId}${params}`,
+    `https://neptun-webui.vercel.app/api/users/${userId}/projects/${projectId}/chats${params}`,
     {
       method: 'GET',
       headers: {

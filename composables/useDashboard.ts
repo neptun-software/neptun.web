@@ -386,7 +386,7 @@ export function useFetchChats(user_id: number) {
   const chatsFilters = useChatsFilter()
   const fetchChatsUrl = computed(() => {
     if (activeProject.value?.id) {
-      return `/api/users/${user_id}/chats/${activeProject.value.id}?${chatsFilters.value}`
+      return `/api/users/${user_id}/projects/${activeProject.value.id}/chats?${chatsFilters.value}`
     }
     return `/api/users/${user_id}/chats?${chatsFilters.value}`
   })

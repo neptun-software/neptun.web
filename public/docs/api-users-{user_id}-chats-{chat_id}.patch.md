@@ -58,7 +58,7 @@ No query parameters required.
     "id": 123,
     "neptun_user_id": "user123",
     "name": "Updated Chat Name",
-    "model": "gpt-3.5",
+    "model": "google/gemma-2-27b-it",
     "created_at": "2024-03-20T10:00:00Z"
   }
 }
