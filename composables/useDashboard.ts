@@ -7,7 +7,6 @@ import type {
   ReadChatConversationMessage,
 } from '~/lib/types/database.tables/schema'
 import type { FullyFeaturedChat } from '~/lib/types/models/chat'
-import { toast } from 'vue-sonner'
 import { useProjects } from '~~/composables/useProjects'
 import { useToastState } from '~~/composables/useToastState'
 import { getCodeBlocksFromMarkdown } from '~/utils/parse'
@@ -22,6 +21,8 @@ const { console } = useLogger()
 } */
 
 export function useDashboard() {
+  const { $toast } = useNuxtApp()
+
   const handleFetch = async <T>(
     url: string,
     options: UseFetchOptions<T> = {},
@@ -72,17 +73,25 @@ export function useDashboard() {
       })
     })
 
-    if (!toastMessages) {
-      return fetchPromise
+    if (toastMessages) {
+      $toast.promise(fetchPromise, {
+        ...toastMessages,
+        error: (error: any) => {
+          console.error('Toast error:', error)
+          return toastMessages.error(error)
+        },
+      })
     }
 
-    const toast = setPromiseToast(fetchPromise, {
+    return fetchPromise
+
+    /* const toast = setPromiseToast(fetchPromise, {
       loadingMessage: toastMessages.loading,
       successMessage: data => toastMessages.success(data as T),
       errorMessage: error => toastMessages.error(error),
     })
 
-    return toast.toastPromise as Promise<T>
+    return $toast.toastPromise as Promise<T> */
   }
 
   const generateMarkdownFromUrl = async (
@@ -97,7 +106,7 @@ export function useDashboard() {
       // eslint-disable-next-line no-new
       new URL(url)
     } catch {
-      toast.error('Invalid URL!')
+      $toast.error('Invalid URL!')
       return
     }
 

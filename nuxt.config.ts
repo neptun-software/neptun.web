@@ -40,6 +40,7 @@ export default defineNuxtConfig({
     '@formkit/auto-animate/nuxt',
     '@nuxtjs/device',
     '@uploadthing/nuxt',
+    'vue-sonner/nuxt',
   ],
 
   components: [

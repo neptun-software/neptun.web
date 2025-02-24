@@ -2,10 +2,11 @@
 import { CheckIcon, CircleIcon, DotIcon } from '@radix-icons/vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
-import { toast } from 'vue-sonner'
 import * as z from 'zod'
 import { passwordSchema } from '~/lib/validation/user'
 import { emailSchema } from '~/lib/validation/user/email'
+
+const { $toast } = useNuxtApp()
 
 // defineOgImageComponent('NuxtSeo');
 
@@ -30,12 +31,12 @@ async function validateOtpAndResetPassword(email: string, otp: string[], newPass
       return true
     }
 
-    toast.error(response.message || 'Invalid OTP')
+    $toast.error(response.message || 'Invalid OTP')
 
     return false
   } catch (error) {
     console.error('OTP validation error:', error)
-    toast.error('OTP validation failed')
+    $toast.error('OTP validation failed')
     return false
   }
 }
@@ -51,15 +52,15 @@ async function sendOtpEmail(email: string) {
     })
 
     if (response.success) {
-      toast.success('OTP sent to your email')
+      $toast.success('OTP sent to your email')
       return true
     }
 
-    toast.error(response.message || 'Failed to create OTP')
+    $toast.error(response.message || 'Failed to create OTP')
     return false
   } catch (error) {
     console.error('Error creating OTP:', error)
-    toast.error('Failed to create OTP')
+    $toast.error('Failed to create OTP')
     return false
   }
 }
@@ -139,7 +140,7 @@ const onSubmit = handleSubmit(async (values) => {
       redirectCode: 303,
     })
   } else {
-    toast.error('Failed to validate OTP.')
+    $toast.error('Failed to validate OTP.')
     submittingNewPassword.value = false
     sendingOtpEmail.value = false
   }

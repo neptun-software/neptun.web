@@ -3,7 +3,8 @@ import { useProjectResources } from '@/composables/useProjectResources'
 import { useProjects } from '@/composables/useProjects'
 import { get, set, useDropZone } from '@vueuse/core'
 import { Check, Circle, Dot, Import, Info, X } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
+
+const { $toast } = useNuxtApp()
 
 const IS_DEV = process.env.NODE_ENV === 'development'
 
@@ -89,18 +90,18 @@ async function generateConfigurationFiles() {
     isUploading.value = true
 
     if (files.value.length === 0) {
-      toast.error('Please upload at least one file')
+      $toast.error('Please upload at least one file')
       return
     }
 
     if (!projectContext.value.trim()) {
-      toast.error('Please provide project context')
+      $toast.error('Please provide project context')
       return
     }
 
     const userId = user.value?.id
     if (!userId) {
-      toast.error('User not found')
+      $toast.error('User not found')
       return
     }
 
@@ -118,16 +119,16 @@ async function generateConfigurationFiles() {
       file_type: 'text',
     })
 
-    toast.success('Project created successfully')
+    $toast.success('Project created successfully')
 
     await new Promise(resolve => setTimeout(resolve, 250))
     navigateTo(`/?project_id=${project.id}`)
   } catch (error) {
     console.error('Failed to generate project:', error)
     if (error instanceof Error) {
-      toast.error(`Failed to generate project: ${error.message}`)
+      $toast.error(`Failed to generate project: ${error.message}`)
     } else {
-      toast.error('Failed to generate project')
+      $toast.error('Failed to generate project')
     }
   } finally {
     isUploading.value = false

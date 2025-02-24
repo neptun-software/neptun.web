@@ -2,8 +2,9 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { get, set } from '@vueuse/core'
 import { Check, Circle, Dot } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
 import * as z from 'zod'
+
+const { $toast } = useNuxtApp()
 
 const isLoading = ref(false)
 const { user } = useUserSession()
@@ -86,7 +87,7 @@ async function createProject(data: {
       },
     })
 
-    toast.success('Project created successfully!', {
+    $toast.success('Project created successfully!', {
       description: 'You will be redirected to your new project.',
     })
 
@@ -94,7 +95,7 @@ async function createProject(data: {
     navigateTo(`/?project_id=${response.id}`)
   } catch (error: any) {
     console.error('Failed to create project:', error)
-    toast.error('Failed to create project', {
+    $toast.error('Failed to create project', {
       description: error?.data?.message || error?.message || 'An unexpected error occurred',
     })
   } finally {

@@ -1,6 +1,5 @@
-import { toast } from 'vue-sonner'
-
 export default defineNuxtPlugin((nuxtApp) => {
+  const { $toast } = useNuxtApp()
   const { console } = useLogger()
 
   nuxtApp.vueApp.config.errorHandler = (error, instance, info) => {
@@ -15,7 +14,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       }
     }
 
-    toast.error(errorMessage)
+    $toast.error(errorMessage)
     if (IS_DEV) {
       console.error(error, instance, info)
     }

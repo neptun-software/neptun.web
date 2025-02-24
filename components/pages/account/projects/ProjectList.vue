@@ -8,13 +8,14 @@ import type {
   ReadUserFile,
 } from '~/lib/types/database.tables/schema'
 import { MoreVertical, Plus } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
 import {
   context_file_category,
   context_file_type,
   programming_language,
   project_type,
 } from '~/lib/types/database.tables/schema'
+
+const { $toast } = useNuxtApp()
 
 interface FileUploadData {
   files: File[]
@@ -126,9 +127,9 @@ async function handleUpdateProject() {
       type: editedProject.value.type,
       main_language: editedProject.value.main_language,
     })
-    toast.success('Project updated successfully')
+    $toast.success('Project updated successfully')
   } catch (error) {
-    toast.error('Failed to update project')
+    $toast.error('Failed to update project')
   }
 }
 
@@ -136,9 +137,9 @@ async function handleDeleteProject(project: GetProject) {
   try {
     await deleteProject(project.id)
     closeProjectDetails()
-    toast.success('Project deleted successfully')
+    $toast.success('Project deleted successfully')
   } catch (error) {
-    toast.error('Failed to delete project')
+    $toast.error('Failed to delete project')
   }
 }
 
@@ -187,10 +188,10 @@ async function handleCreateFile(): Promise<void> {
       category: 'documentation',
       file_type: 'text',
     }
-    toast.success('Files uploaded successfully')
+    $toast.success('Files uploaded successfully')
   } catch (error) {
     console.error('Upload error:', error)
-    toast.error('Failed to upload files')
+    $toast.error('Failed to upload files')
     return Promise.reject(error)
   }
 }
@@ -225,10 +226,10 @@ async function handleSaveFileEdit(): Promise<void> {
     })
     showEditFileDialog.value = false
     editingFile.value = null
-    toast.success('File updated successfully')
+    $toast.success('File updated successfully')
   } catch (error) {
     console.error('Update error:', error)
-    toast.error('Failed to update file')
+    $toast.error('Failed to update file')
     return Promise.reject(error)
   }
 }
@@ -241,7 +242,7 @@ async function handleDeleteImport(importId: number): Promise<void> {
   try {
     await deleteImport(projectId, importId)
   } catch (error) {
-    toast.error('Failed to delete import')
+    $toast.error('Failed to delete import')
     return Promise.reject(error)
   }
 }
@@ -254,7 +255,7 @@ async function handleUnlinkFile(fileId: number): Promise<void> {
   try {
     await unlinkFile(projectId, fileId)
   } catch (error) {
-    toast.error('Failed to delete file')
+    $toast.error('Failed to delete file')
     return Promise.reject(error)
   }
 }
@@ -267,7 +268,7 @@ async function handleRefreshImports(): Promise<void> {
   try {
     await fetchImportsWithFiles(projectId)
   } catch (error) {
-    toast.error('Failed to refresh imports')
+    $toast.error('Failed to refresh imports')
     return Promise.reject(error)
   }
 }
@@ -280,7 +281,7 @@ async function handleProjectDelete(event: MouseEvent): Promise<void> {
   try {
     await handleDeleteProject(project)
   } catch (error) {
-    toast.error('Failed to delete project')
+    $toast.error('Failed to delete project')
     return Promise.reject(error)
   }
 }
@@ -292,7 +293,7 @@ async function handleShowLinkResourceDialog(resourceType: Parameters<typeof link
     showLinkResourceDialog.value = true
   } catch (error) {
     console.error('Error fetching available resources:', error)
-    toast.error('Failed to fetch available resources')
+    $toast.error('Failed to fetch available resources')
   }
 }
 
@@ -314,11 +315,11 @@ async function handleLinkResource(resourceId: number) {
 
     await linkResource(selectedProjectId.value, selectedResourceType.value, resourceData)
     await fetchResources(selectedProjectId.value, selectedResourceType.value)
-    toast.success('Resource linked successfully')
+    $toast.success('Resource linked successfully')
     showLinkResourceDialog.value = false
   } catch (error) {
     console.error('Error linking resource:', error)
-    toast.error('Failed to link resource')
+    $toast.error('Failed to link resource')
   }
 }
 
@@ -330,10 +331,10 @@ async function handleUnlinkResource(resourceType: Parameters<typeof linkResource
   try {
     await unlinkResource(selectedProjectId.value, resourceType, resourceId)
     await fetchResources(selectedProjectId.value, resourceType)
-    toast.success('Resource unlinked successfully')
+    $toast.success('Resource unlinked successfully')
   } catch (error) {
     console.error('Error unlinking resource:', error)
-    toast.error('Failed to unlink resource')
+    $toast.error('Failed to unlink resource')
   }
 }
 
@@ -345,7 +346,7 @@ async function handleRefreshUserFiles(): Promise<void> {
   try {
     await fetchResources(projectId, 'user-files')
   } catch (error) {
-    toast.error('Failed to refresh user files')
+    $toast.error('Failed to refresh user files')
   }
 }
 
@@ -357,7 +358,7 @@ async function handleRefreshTemplateCollections(): Promise<void> {
   try {
     await fetchResources(projectId, 'template-collections')
   } catch (error) {
-    toast.error('Failed to refresh template collections')
+    $toast.error('Failed to refresh template collections')
   }
 }
 
@@ -369,7 +370,7 @@ async function handleRefreshGithubInstallations(): Promise<void> {
   try {
     await fetchResources(projectId, 'github-installations')
   } catch (error) {
-    toast.error('Failed to refresh GitHub installations')
+    $toast.error('Failed to refresh GitHub installations')
   }
 }
 
@@ -381,7 +382,7 @@ async function handleRefreshChatConversations(): Promise<void> {
   try {
     await fetchResources(projectId, 'chat-conversations')
   } catch (error) {
-    toast.error('Failed to refresh chat conversations')
+    $toast.error('Failed to refresh chat conversations')
   }
 }
 

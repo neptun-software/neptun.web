@@ -1,8 +1,9 @@
 import { DynamicToast } from '#components'
-import { toast } from 'vue-sonner'
 import { DynamicToastStates } from '~/components/loaders/dynamic/DynamicToastStates'
 
 export function useToastState() {
+  const { $toast } = useNuxtApp()
+
   const toastIds = useState<Map<string, string | number>>('toast-ids', () => new Map())
   const toastTimeouts = useState<Map<string, NodeJS.Timeout>>('toast-timeouts', () => new Map())
   const toastPromises = useState<Map<string, Promise<unknown>>>('toast-promises', () => new Map())
@@ -13,7 +14,7 @@ export function useToastState() {
     toastTimeouts.value.forEach(timeout => clearTimeout(timeout))
     toastTimeouts.value.clear()
 
-    toastIds.value.forEach(id => toast.dismiss(id))
+    toastIds.value.forEach(id => $toast.dismiss(id))
     toastIds.value.clear()
 
     toastPromises.value.clear()
@@ -29,7 +30,7 @@ export function useToastState() {
         toastTimeouts.value.delete(requestId)
       }
 
-      toast.dismiss(toastIds.value.get(requestId))
+      $toast.dismiss(toastIds.value.get(requestId))
       toastIds.value.delete(requestId)
       toastPromises.value.delete(requestId)
       isWaitingForResponse.value.delete(requestId)
@@ -40,7 +41,7 @@ export function useToastState() {
     // Remove any existing toast with this ID first
     removeToast(requestId)
 
-    const toastId = toast.custom(
+    const toastId = $toast.custom(
       markRaw(defineComponent({
         setup() {
           return () => h(DynamicToast,
@@ -69,7 +70,7 @@ export function useToastState() {
         }
 
         const duration = 2000
-        toast.custom(
+        $toast.custom(
           markRaw(defineComponent({
             setup() {
               return () => h(DynamicToast,
@@ -100,7 +101,7 @@ export function useToastState() {
         }
 
         const duration = 3000
-        toast.custom(
+        $toast.custom(
           markRaw(defineComponent({
             setup() {
               return () => h(DynamicToast,

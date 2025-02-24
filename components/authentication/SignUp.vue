@@ -2,11 +2,12 @@
 import type { ZodIssue } from 'zod'
 import type { ApiValidationError } from '~/lib/types/api'
 import { Icon } from '@iconify/vue'
-import { toast } from 'vue-sonner'
 import {
   validateEmailInput,
   validatePasswordInput,
 } from '~/lib/validation/user'
+
+const { $toast } = useNuxtApp()
 
 const { console } = useLogger()
 
@@ -38,7 +39,7 @@ async function signUp() {
       ?.filter((issue: ZodIssue) => issue.path[0] === 'password')
       .map((issue: ZodIssue) => issue.message) || []
 
-    toast.error(signUpError.message)
+    $toast.error(signUpError.message)
     return
   }
 

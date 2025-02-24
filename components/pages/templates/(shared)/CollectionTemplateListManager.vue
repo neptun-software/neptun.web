@@ -5,8 +5,9 @@ import type { TemplateCollectionToCreate, TemplateToCreate, UserFileToCreate } f
 import {
   Trash2,
 } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
 import { uploadTemplateZip } from './functions'
+
+const { $toast } = useNuxtApp()
 
 const { session } = useUserSession()
 const {
@@ -231,7 +232,7 @@ async function handleUploadCollection(data: ImportedTemplateData) {
     await nextTick()
 
     if (!newCollection) {
-      toast.error('Failed to import collection!')
+      $toast.error('Failed to import collection!')
       return
     }
 
@@ -284,11 +285,11 @@ async function handleUploadCollection(data: ImportedTemplateData) {
               isUpdating = true
               const data = await uploadTemplateZip(file)
               await handleUploadCollection(data)
-              toast.success('Templates imported successfully!')
+              $toast.success('Templates imported successfully!')
             }
             catch (error) {
               console.error('Failed to import templates:', error)
-              toast.error('Failed to import templates!')
+              $toast.error('Failed to import templates!')
             }
             finally {
               isUpdating = false

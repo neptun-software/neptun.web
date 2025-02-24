@@ -10,7 +10,6 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
-import { toast } from 'vue-sonner'
 import InfoBlock from '~/components/loaders/dynamic/InfoBlock.vue'
 import Button from '~/components/shadcn/button/Button.vue'
 import { Input } from '~/components/shadcn/input'
@@ -23,6 +22,8 @@ import {
   TableRow,
 } from '~/components/shadcn/table'
 import { valueUpdater } from '~/lib/utils'
+
+const { $toast } = useNuxtApp()
 
 const { user } = useUserSession()
 
@@ -129,13 +130,13 @@ const columns: ColumnDef<Installation>[] = [
               })
 
               if (response) {
-                toast.success(`Successfully deleted installation ${installationId}. You need to remove it from your GitHub account by yourself for now.`)
+                $toast.success(`Successfully deleted installation ${installationId}. You need to remove it from your GitHub account by yourself for now.`)
                 await refresh()
               } else {
-                toast.error(`Failed to delete installation ${installationId}.`)
+                $toast.error(`Failed to delete installation ${installationId}.`)
               }
             } catch (error: any) {
-              toast.error(`Error deleting installation: ${error?.message}`)
+              $toast.error(`Error deleting installation: ${error?.message}`)
             }
           },
         },

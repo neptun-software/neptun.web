@@ -2,7 +2,8 @@
 import { buttonVariants } from '@/components/shadcn/button'
 import { cn } from '@/lib/utils'
 import { ChevronsUpDown, Code2, Plus } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
+
+const { $toast } = useNuxtApp()
 
 definePageMeta({
   name: 'Dashboard',
@@ -31,7 +32,7 @@ onMounted(async () => {
   try {
     await fetchProjects()
   } catch (error) {
-    toast.error('Failed to load projects')
+    $toast.error('Failed to load projects')
   }
 })
 
@@ -41,7 +42,7 @@ watchEffect(async () => {
     try {
       await fetchProject(selectedProjectId.value)
     } catch (error) {
-      toast.error('Failed to load project', {
+      $toast.error('Failed to load project', {
         description: 'Failed to load project. Please try again later.',
       })
     }

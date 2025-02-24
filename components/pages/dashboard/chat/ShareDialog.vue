@@ -2,8 +2,9 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { Share } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
-import { toast } from 'vue-sonner'
 import * as z from 'zod'
+
+const { $toast } = useNuxtApp()
 
 const { selectedAiChatId, selectedAiChatIsPlayground } = useSelectedAiChat()
 const { user } = useUserSession()
@@ -70,7 +71,7 @@ const onSubmit = handleSubmit(async (values) => {
     && (!values.password || values.password?.length === 0)
     && (formValues.email_whitelist || []).length === 0
   ) {
-    toast.error(
+    $toast.error(
       'Please set either a password or add at least one email to the whitelist.',
       {
         description:
@@ -119,15 +120,15 @@ const onSubmit = handleSubmit(async (values) => {
   )
     .then((data) => {
       if (data && data.share) {
-        toast.success('Share created!')
+        $toast.success('Share created!')
       } else {
-        toast.error('Failed to create share!')
+        $toast.error('Failed to create share!')
       }
 
       return data
     })
     .catch(() => {
-      toast.error('Failed to create share!')
+      $toast.error('Failed to create share!')
     })
 
   if (
@@ -144,15 +145,15 @@ const onSubmit = handleSubmit(async (values) => {
     )
       .then((data) => {
         if (data && data.shareWhitelistEntries) {
-          toast.success('Whitelist entries created!')
+          $toast.success('Whitelist entries created!')
         } else {
-          toast.error('Failed to create whitelist entries!')
+          $toast.error('Failed to create whitelist entries!')
         }
 
         return data
       })
       .catch(() => {
-        toast.error('Failed to create whitelist entries!')
+        $toast.error('Failed to create whitelist entries!')
       })
   }
 

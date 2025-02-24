@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Loader2 } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
+
+const { $toast } = useNuxtApp()
 
 definePageMeta({
   name: 'Account',
@@ -40,7 +41,7 @@ async function updateAccount() {
   })
 
   if (update.error) {
-    toast.error(String(update.error))
+    $toast.error(String(update.error))
   }
 }
 
