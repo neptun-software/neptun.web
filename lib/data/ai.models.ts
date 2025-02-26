@@ -278,6 +278,31 @@ export const POSSIBLE_AI_MODELS: PossibleAiModels = {
       },
     },
   },
+  'ollama': {
+    'rwkv-6-world': {
+      publisher: 'ollama',
+      name: 'rwkv-6-world',
+      description: `<strong>RWKV-6-World is an efficient 1.6B parameter model</strong><br>
+            Trained on diverse datasets with strong performance in 12 languages.<br>
+            Efficient architecture combining RNN and transformer-like capabilities.<br>
+            (Apache-2.0 License)`,
+      icon: 'simple-icons:ollama',
+      type: 'instruct',
+      configuration: (inputs: string) => {
+        return {
+          model: 'mollysama/rwkv-6-world:1.6b',
+          inputs,
+          parameters: {
+            max_new_tokens: 500,
+            typical_p: -1,
+            repetition_penalty: -1,
+            truncate: 4096 - 500,
+            return_full_text: false,
+          },
+        }
+      },
+    },
+  },
 } as const
 
 // Service not available anymore.

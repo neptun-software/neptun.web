@@ -37,6 +37,7 @@
     "nuxtjs",
     "oasst",
     "ofetch",
+    "ollama",
     "openapi",
     "OPENROUTER",
     "openssl",

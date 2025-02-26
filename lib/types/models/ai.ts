@@ -53,6 +53,7 @@ export const allowedModelsConst = [
   'openrouter/gemini-2.0-pro-exp-02-05',
   'openrouter/deepseek-chat',
   'openrouter/llama-3.3-70b-instruct',
+  'ollama/rwkv-6-world',
 ] as const
 
 export type AllowedAiModels = `${(typeof allowedModelsConst)[number]}`
@@ -75,7 +76,9 @@ export type OpenRouterModelPath = `/api/ai/openrouter/${
   | AllowedAiModelNamesEnum.OpenRouterLlama33
 }/chat`
 
-export type AllowedAiModelPaths = HuggingFaceModelPath | CloudflareModelPath | OpenRouterModelPath
+export type OllamaModelPath = `/api/ai/ollama/${AllowedAiModelNamesEnum.RwkvWorld}/chat`
+
+export type AllowedAiModelPaths = HuggingFaceModelPath | CloudflareModelPath | OpenRouterModelPath | OllamaModelPath
 
 export enum AllowedAiModelPublishersEnum {
   Qwen = 'qwen',
@@ -85,6 +88,7 @@ export enum AllowedAiModelPublishersEnum {
   Microsoft = 'microsoft',
   Cloudflare = 'cloudflare',
   OpenRouter = 'openrouter',
+  Ollama = 'ollama',
 }
 
 export enum AllowedAiModelNamesEnum {
@@ -99,6 +103,7 @@ export enum AllowedAiModelNamesEnum {
   OpenRouterGemini = 'gemini-2.0-pro-exp-02-05',
   OpenRouterDeepseek = 'deepseek-chat',
   OpenRouterLlama33 = 'llama-3.3-70b-instruct',
+  RwkvWorld = 'rwkv-6-world',
 }
 
 export enum AllowedAiModelsEnum {
@@ -113,4 +118,5 @@ export enum AllowedAiModelsEnum {
   OpenRouterGemini = 'openrouter/gemini-2.0-pro-exp-02-05',
   OpenRouterDeepseek = 'openrouter/deepseek-chat',
   OpenRouterLlama33 = 'openrouter/llama-3.3-70b-instruct',
+  RwkvWorld = 'ollama/rwkv-6-world',
 }
