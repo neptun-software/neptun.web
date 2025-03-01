@@ -108,22 +108,24 @@ interface ChatRequest {
   messages: Message[]
 }
 
+interface ModelParameters {
+  max_new_tokens: number
+  typical_p: number  // Can be -1 for some models meaning it is using defaults of the providers
+  repetition_penalty: number  // Can be -1 for some models meaning it is using defaults of the providers
+  truncate: number
+  return_full_text: boolean
+  temperature?: number
+}
+
 interface ModelConfiguration {
   publisher: string
   name: string
   description: string
   icon: string
   type: 'instruct' | 'chat'
-  configuration: (inputs: string) => {
-    inputs: string
+  configuration: {
     model: string
-    parameters: {
-      max_new_tokens: number
-      typical_p: number
-      repetition_penalty: number
-      truncate: number
-      return_full_text: boolean
-    }
+    parameters: ModelParameters
   }
 }
 
@@ -150,7 +152,7 @@ type AllowedOpenRouterModelPaths = `/api/ai/openrouter/${AllowedOpenRouterModelN
 ### Python Model
 
 ```python
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Literal, Optional
 from enum import Enum
 
@@ -164,10 +166,15 @@ class ChatRequest(BaseModel):
 
 class ModelParameters(BaseModel):
     max_new_tokens: int
-    typical_p: float
-    repetition_penalty: float
+    typical_p: float = Field(description="Can be -1 for some models meaning it is using defaults of the providers")
+    repetition_penalty: float = Field(description="Can be -1 for some models meaning it is using defaults of the providers")
     truncate: int
     return_full_text: bool
+    temperature: Optional[float] = None
+
+class ModelConfigurationData(BaseModel):
+    model: str
+    parameters: ModelParameters
 
 class ModelConfiguration(BaseModel):
     publisher: str
@@ -175,9 +182,7 @@ class ModelConfiguration(BaseModel):
     description: str
     icon: str
     type: Literal['instruct', 'chat']
-    inputs: str
-    model: str
-    parameters: ModelParameters
+    configuration: ModelConfigurationData
 
 class AllowedOpenRouterPublishers(str, Enum):
     OpenRouter = 'openrouter'

@@ -108,22 +108,24 @@ interface ChatRequest {
   messages: Message[]
 }
 
+interface ModelParameters {
+  max_new_tokens: number
+  typical_p: number  // Can be -1 for some models meaning it is using defaults of the providers
+  repetition_penalty: number  // Can be -1 for some models meaning it is using defaults of the providers
+  truncate: number
+  return_full_text: boolean
+  temperature?: number
+}
+
 interface ModelConfiguration {
   publisher: string
   name: string
   description: string
   icon: string
   type: 'instruct' | 'chat'
-  configuration: (inputs: string) => {
-    inputs: string
+  configuration: {
     model: string
-    parameters: {
-      max_new_tokens: number
-      typical_p: number
-      repetition_penalty: number
-      truncate: number
-      return_full_text: boolean
-    }
+    parameters: ModelParameters
   }
 }
 
@@ -141,6 +143,51 @@ enum AllowedOllamaModelsEnum {
 
 type AllowedOllamaModels = `${AllowedOllamaModelsEnum}`
 type AllowedOllamaModelPaths = `/api/ai/ollama/${AllowedOllamaModelNamesEnum}/chat`
+```
+
+### Python Model
+
+```python
+from pydantic import BaseModel, Field
+from typing import List, Literal, Optional
+from enum import Enum
+
+class Message(BaseModel):
+    role: Literal['user', 'assistant']
+    content: str
+    isStreaming: Optional[bool] = None
+
+class ChatRequest(BaseModel):
+    messages: List[Message]
+
+class ModelParameters(BaseModel):
+    max_new_tokens: int
+    typical_p: float = Field(description="Can be -1 for some models meaning it is using defaults of the providers")
+    repetition_penalty: float = Field(description="Can be -1 for some models meaning it is using defaults of the providers")
+    truncate: int
+    return_full_text: bool
+    temperature: Optional[float] = None
+
+class ModelConfigurationData(BaseModel):
+    model: str
+    parameters: ModelParameters
+
+class ModelConfiguration(BaseModel):
+    publisher: str
+    name: str
+    description: str
+    icon: str
+    type: Literal['instruct', 'chat']
+    configuration: ModelConfigurationData
+
+class AllowedOllamaPublishers(str, Enum):
+    Ollama = 'ollama'
+
+class AllowedOllamaModelNames(str, Enum):
+    RwkvWorld = 'rwkv-6-world'
+
+class AllowedOllamaModels(str, Enum):
+    RwkvWorld = 'ollama/rwkv-6-world'
 ```
 
 ## Code Examples

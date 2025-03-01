@@ -1,6 +1,6 @@
 import type { Actor } from '~/lib/types/database.tables/schema'
-import { createOllama } from 'ollama-ai-provider'
 import { streamText } from 'ai'
+import { createOllama } from 'ollama-ai-provider'
 import { createError } from 'h3'
 import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema'
@@ -122,8 +122,8 @@ export default defineEventHandler(async (event) => {
     const baseURL = 'http://130.61.252.184:8080/api'
     try {
       // Test the connection first
-      const version = await fetch(`${baseURL}/api/version`)
-      const tags = await fetch(`${baseURL}/api/ps`)
+      const version = await fetch(`${baseURL}/version`)
+      const tags = await fetch(`${baseURL}/tags`)
       if (!version.ok || !tags.ok) {
         throw createError({
           statusCode: 503,
