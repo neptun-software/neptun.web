@@ -1,10 +1,10 @@
 import type {
   AllowedAiModelPaths,
   AllowedAiModels,
-  CloudflareModelPath,
+  /* CloudflareModelPath,
   HuggingFaceModelPath,
   OllamaModelPath,
-  OpenRouterModelPath,
+  OpenRouterModelPath, */
 } from '~/lib/types/models/ai'
 import type { MinimalChat } from '~/lib/types/models/chat'
 import {
@@ -40,7 +40,8 @@ export function useSelectedAiChat() {
       throw new Error(`Invalid model format: ${model}. Expected format: publisher/model-name`)
     }
 
-    switch (publisher) {
+    return `/api/ai/${model}/chat` as AllowedAiModelPaths
+    /* switch (publisher) {
       case 'cloudflare':
         return `/api/ai/cloudflare/${modelName}/chat` as CloudflareModelPath
       case 'openrouter':
@@ -49,7 +50,7 @@ export function useSelectedAiChat() {
         return `/api/ai/ollama/${modelName}/chat` as OllamaModelPath
       default:
         return `/api/ai/huggingface/${model}/chat` as HuggingFaceModelPath
-    }
+    } */
   })
 
   const selectedAiChatKey = computed(
