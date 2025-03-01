@@ -6,12 +6,23 @@
 
 ## API Routes
 
+### AI Routes
+
+- `POST` [`/api/ai/{model_publisher}/{model_name}/chat`](../api-ai-{model_publisher}-{model_name}-chat.post.md)
 - `POST` [`/api/ai/huggingface/{model_publisher}/{model_name}/chat`](../api-ai-huggingface-{model_publisher}-{model_name}-chat.post.md)
+- `POST` [`/api/ai/ollama/{model_name}/chat`](../api-ai-ollama-{model_name}-chat.post.md)
+- `POST` [`/api/ai/openrouter/{model_name}/chat`](../api-ai-openrouter-{model_name}-chat.post.md)
+- `POST` [`/api/ai/cloudflare/{model_name}/chat`](../api-ai-cloudflare-{model_name}-chat.post.md)
+
+### Auth Routes
 
 - `HEAD` [`/api/auth/check`](../api-auth-check.head.md)
 - `POST` [`/api/auth/login`](../api-auth-login.post.md)
 - `POST` [`/api/auth/logout`](../api-auth-logout.post.md)
 - `POST` [`/api/auth/sign-up`](../api-auth-sign-up.post.md)
+
+### User Routes
+
 - `PATCH` && `DELETE` `/api/users/{user_id}` [update](../api-users-{user_id}.patch.md) | [delete](../api-users-{user_id}.delete.md)
 - `GET` [`/api/users/{user_id}/cli`](../api-users-{user_id}-cli.get.md)
 
@@ -29,6 +40,7 @@
 
 ### Collection Routes
 
+- `GET` [`/api/shared/collections`](../api-shared-collections.get.md)
 - `GET` [`/api/shared/collections/{uuid}`](../api-shared-collections-{uuid}.get.md)
 - `GET` [`/api/users/{user_id}/collections`](../api-users-{user_id}-collections.get.md)
 - `POST` [`/api/users/{user_id}/collections`](../api-users-{user_id}-collections.post.md)
@@ -39,6 +51,7 @@
 ### Installation Routes
 
 - `GET` [`/api/users/{user_id}/installations`](../api-users-{user_id}-installations.get.md)
+- `DELETE` [`/api/users/{user_id}/installations/{installation_id}`](../api-users-{user_id}-installations-{installation_id}.delete.md)
 - `GET` [`/api/users/{user_id}/installations/{installation_id}/imports`](../api-users-{user_id}-installations-{installation_id}-imports.get.md)
 
 ### Project Routes
@@ -70,6 +83,10 @@
 - `GET` [`/api/users/{user_id}/projects/{project_id}/resources/files?context_file_category=xxx&context_file_type=xxx`](../api-users-{user_id}-projects-{project_id}-resources-files.get.md)
 - `PUT` [`/api/users/{user_id}/projects/{project_id}/resources/files/{context_file_id}`](../api-users-{user_id}-projects-{project_id}-resources-files-{context_file_id}.put.md)
 - `DELETE` [`/api/users/{user_id}/projects/{project_id}/resources/files/{context_file_id}`](../api-users-{user_id}-projects-{project_id}-resources-files-{context_file_id}.delete.md)
+
+### Model Routes
+
+- `GET` [`/models`](../models.get.md)
 
 ### Other Routes
 
