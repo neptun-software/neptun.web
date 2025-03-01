@@ -119,7 +119,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const baseURL = 'http://130.61.252.184:8080/api'
+    const baseURL = 'http://130.61.252.184:7869/api'
     try {
       // Test the connection first
       const version = await fetch(`${baseURL}/version`)
