@@ -110,8 +110,8 @@ interface ChatRequest {
 
 interface ModelParameters {
   max_new_tokens: number
-  typical_p: number  // Can be -1 for some models meaning it is using defaults of the providers
-  repetition_penalty: number  // Can be -1 for some models meaning it is using defaults of the providers
+  typical_p: number // Can be -1 for some models meaning it is using defaults of the providers
+  repetition_penalty: number // Can be -1 for some models meaning it is using defaults of the providers
   truncate: number
   return_full_text: boolean
   temperature?: number

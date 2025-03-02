@@ -95,8 +95,8 @@ The response is a JSON object containing AI model configurations grouped by publ
 ```typescript
 export interface ModelParameters {
   max_new_tokens: number
-  typical_p: number  // Can be -1 for some models meaning it is using defaults of the providers
-  repetition_penalty: number  // Can be -1 for some models meaning it is using defaults of the providers
+  typical_p: number // Can be -1 for some models meaning it is using defaults of the providers
+  repetition_penalty: number // Can be -1 for some models meaning it is using defaults of the providers
   truncate: number
   return_full_text: boolean
   temperature?: number
@@ -138,7 +138,7 @@ from pydantic import BaseModel, Field, ConfigDict
 
 class ModelParameters(BaseModel):
     model_config = ConfigDict(extra='forbid')
-    
+
     max_new_tokens: int
     typical_p: float = Field(description="Can be -1 for some models meaning it is using defaults of the providers")
     repetition_penalty: float = Field(description="Can be -1 for some models meaning it is using defaults of the providers")
@@ -148,13 +148,13 @@ class ModelParameters(BaseModel):
 
 class ModelConfigurationData(BaseModel):
     model_config = ConfigDict(extra='forbid')
-    
+
     model: str
     parameters: ModelParameters
 
 class ModelConfiguration(BaseModel):
     model_config = ConfigDict(extra='forbid')
-    
+
     publisher: str
     name: str
     description: str
@@ -170,7 +170,7 @@ class Endpoints(TypedDict):
 
 class ModelsResponse(BaseModel):
     model_config = ConfigDict(extra='forbid')
-    
+
     configurations: Dict[str, Dict[str, ModelConfiguration]]
     models: List[str]
     endpoints: Endpoints
@@ -462,7 +462,7 @@ from typing import List
 async def get_models() -> ModelsResponse:
     """
     Fetches AI model configurations, allowed models, and API endpoints.
-    
+
     Returns:
         ModelsResponse object containing:
         - configurations: Model configurations grouped by publisher
@@ -501,7 +501,7 @@ async function getModels(): Promise<ModelsResponse> {
 }
 
 async function listOpenRouterEndpoints(): Promise<string[]> {
-  const modelsData = await getModels();
-  return modelsData.endpoints.openrouter;
+  const modelsData = await getModels()
+  return modelsData.endpoints.openrouter
 }
 ```

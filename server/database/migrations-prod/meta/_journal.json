@@ -71,6 +71,13 @@
       "when": 1739997775093,
       "tag": "0009_black_starjammers",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1740920218315,
+      "tag": "0010_broken_kulan_gath",
+      "breakpoints": true
     }
   ]
 }

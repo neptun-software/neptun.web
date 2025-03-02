@@ -1,7 +1,7 @@
 import type { Actor } from '~/lib/types/database.tables/schema'
 import { streamText } from 'ai'
-import { createOllama } from 'ollama-ai-provider'
 import { createError } from 'h3'
+import { createOllama } from 'ollama-ai-provider'
 import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema'
 import { persistAiChatMessage, persistUserChatMessage } from '~/server/utils/chat'

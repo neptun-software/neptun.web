@@ -34,39 +34,39 @@ function generateAllEndpoints(): Record<string, string[]> {
     huggingface: [],
     cloudflare: [],
     openrouter: [],
-    ollama: []
-  };
-  
-  allowedModelsConst.forEach(model => {
-    const [provider, modelName] = model.split('/');
-    
-    let endpoint: string;
-    
+    ollama: [],
+  }
+
+  allowedModelsConst.forEach((model) => {
+    const [provider, modelName] = model.split('/')
+
+    let endpoint: string
+
     switch (provider) {
       case 'cloudflare':
-        endpoint = 'cloudflare';
-        break;
+        endpoint = 'cloudflare'
+        break
       case 'openrouter':
-        endpoint = 'openrouter';
-        break;
+        endpoint = 'openrouter'
+        break
       case 'ollama':
-        endpoint = 'ollama';
-        break;
+        endpoint = 'ollama'
+        break
       default:
-        endpoint = 'huggingface';
-        break;
+        endpoint = 'huggingface'
+        break
     }
-    
-    endpoints[endpoint].push(`/api/ai/${endpoint}/${modelName}/chat`);
-  });
-  
-  return endpoints;
+
+    endpoints[endpoint].push(`/api/ai/${endpoint}/${modelName}/chat`)
+  })
+
+  return endpoints
 }
 
 export default defineEventHandler(async () => {
   return {
     configurations: convertConfigToJSON(POSSIBLE_AI_MODELS),
     models: allowedModelsConst,
-    endpoints: generateAllEndpoints()
+    endpoints: generateAllEndpoints(),
   }
 })
