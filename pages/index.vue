@@ -132,6 +132,7 @@ watchEffect(async () => {
 
         <!-- Import Data into Project -->
         <ShadcnButton
+          v-if="activeProject?.id"
           class="mr-2"
           variant="outline"
           @click="() => navigateTo(`/account?project_id=${activeProject?.id}`)"

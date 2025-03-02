@@ -2,7 +2,7 @@
 const { user } = useUserSession()
 
 type possibleDashboardTabs = 'chat' | 'chats'
-const selectedDashboardTab = ref<possibleDashboardTabs>('chat')
+const selectedDashboardTab = ref<any>('chat')
 const selectedDashboardTabFromLocalStorage
   = useLocalStorage<possibleDashboardTabs>(
     localStorageTopicKey(`${user.value?.id ?? -1}:selected-dashboard-tab`),
@@ -10,11 +10,15 @@ const selectedDashboardTabFromLocalStorage
   )
 
 watch(selectedDashboardTab, () => {
-  selectedDashboardTabFromLocalStorage.value = selectedDashboardTab.value
+  if (selectedDashboardTab.value === 'chat' || selectedDashboardTab.value === 'chats') {
+    selectedDashboardTabFromLocalStorage.value = selectedDashboardTab.value
+  }
 })
 
 onMounted(() => {
-  selectedDashboardTab.value = selectedDashboardTabFromLocalStorage.value
+  if (selectedDashboardTabFromLocalStorage.value === 'chat' || selectedDashboardTabFromLocalStorage.value === 'chats') {
+    selectedDashboardTab.value = selectedDashboardTabFromLocalStorage.value
+  }
 })
 </script>
 

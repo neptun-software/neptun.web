@@ -176,6 +176,7 @@ export default defineEventHandler(async (event) => {
       console.info('Stream started, returning response')
     }
 
+    await result.consumeStream()
     return result.toDataStreamResponse()
   } catch (error: unknown) {
     if (LOG_BACKEND) {

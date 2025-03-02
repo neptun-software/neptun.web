@@ -681,7 +681,7 @@ export const project_chat_conversation = pgTable('project_chat_conversation', {
 export type NewProject = typeof neptun_user_project.$inferInsert
 export type GetProject = typeof neptun_user_project.$inferSelect
 
-export type ProjectToCreate = Omit<NewProject, 'id' | 'created_at' | 'updated_at'>
+export type ProjectToCreate = Omit<NewProject, 'id' | 'created_at' | 'updated_at' | 'neptun_user_id'>
 export type ReadProject = GetProject
 
 const InsertProjectSchemaBase = createInsertSchema(neptun_user_project)
@@ -690,7 +690,6 @@ export const InsertProjectSchema = InsertProjectSchemaBase.pick({
   description: true,
   type: true,
   main_language: true,
-  neptun_user_id: true,
 })
 export const SelectProjectSchema = createSelectSchema(neptun_user_project)
 

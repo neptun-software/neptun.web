@@ -35,10 +35,7 @@ export default defineEventHandler(async (event) => {
 
   /* CREATE PROJECT */
   try {
-    const project = await createProject({
-      ...body.data,
-      neptun_user_id: user_id,
-    })
+    const project = await createProject(user_id, body.data)
 
     if (!project) {
       return sendError(

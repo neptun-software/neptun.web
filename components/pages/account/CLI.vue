@@ -10,34 +10,38 @@ const { data, error } = await useFetch(
 )
 
 const cookieVisible = ref(false)
-const markdownEl = ref(null)
+const markdownEl = ref<HTMLElement | null>(null)
 const cookieMask = '•'.repeat(40)
 
-const toggleCookieVisibility = () => {
+function toggleCookieVisibility() {
   cookieVisible.value = !cookieVisible.value
-  
+
   nextTick(() => {
     const lines = markdownEl.value?.querySelectorAll('.line')
-    if (!lines) return
-    
-    for (const line of lines) {
-      if (line.textContent.includes('neptun_session_cookie')) {
-        const spans = line.querySelectorAll('span')
-        for (const span of spans) {
-          if (span.textContent.includes('"neptun_session_cookie"')) {
-            let currentSpan = span.nextElementSibling
-            while (currentSpan) {
-              if (currentSpan.textContent.includes('"') && 
-                  (currentSpan.textContent.includes('•') || 
-                   currentSpan.textContent.includes(data.value?.auth?.neptun_session_cookie))) {
-                if (cookieVisible.value) {
-                  currentSpan.textContent = `"${data.value?.auth?.neptun_session_cookie}"`
-                } else {
-                  currentSpan.textContent = `"${cookieMask}"`
+    if (!lines) {
+      return
+    }
+
+    if (lines) {
+      for (const line of lines) {
+        if (line.textContent?.includes('neptun_session_cookie')) {
+          const spans = line.querySelectorAll('span')
+          for (const span of spans) {
+            if (span.textContent?.includes('"neptun_session_cookie"')) {
+              let currentSpan = span.nextElementSibling
+              while (currentSpan) {
+                if (currentSpan.textContent?.includes('"')
+                  && (currentSpan.textContent?.includes('•')
+                    || currentSpan.textContent?.includes(data.value?.auth?.neptun_session_cookie ?? ''))) {
+                  if (cookieVisible.value) {
+                    currentSpan.textContent = `"${data.value?.auth?.neptun_session_cookie}"`
+                  } else {
+                    currentSpan.textContent = `"${cookieMask}"`
+                  }
+                  return
                 }
-                return
+                currentSpan = currentSpan.nextElementSibling
               }
-              currentSpan = currentSpan.nextElementSibling
             }
           }
         }
@@ -62,11 +66,11 @@ const cliConfigurationToCopy = computed(() => {
 
 const cliConfigurationMarkdown = computed(() => {
   const configCopy = JSON.parse(JSON.stringify(cliConfigurationToCopy.value))
-  
+
   if (configCopy?.auth?.neptun_session_cookie) {
     configCopy.auth.neptun_session_cookie = cookieMask
   }
-  
+
   return `\`\`\`json\n${JSON.stringify(
     configCopy,
     null,
@@ -102,11 +106,11 @@ async function downloadConfiguration() {
               </p>
             </template>
             <span class="flex absolute top-2 right-2 gap-2 items-center">
-              <ShadcnButton 
-                size="icon" 
-                variant="ghost" 
-                @click="toggleCookieVisibility"
+              <ShadcnButton
+                size="icon"
+                variant="ghost"
                 title="Toggle session cookie visibility"
+                @click="toggleCookieVisibility"
               >
                 <span v-if="cookieVisible">
                   <EyeOff class="size-5" />
@@ -115,7 +119,7 @@ async function downloadConfiguration() {
                   <Eye class="size-5" />
                 </span>
               </ShadcnButton>
-              
+
               <AsyncButton
                 size="icon" variant="ghost" :hide-loader="true" :is-disabled="textForClipboard === ''"
                 :on-click-async="downloadConfiguration"

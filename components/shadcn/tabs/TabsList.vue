@@ -2,9 +2,9 @@
 import type { TabsListProps } from 'radix-vue'
 import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
-import { useMutationObserver, useResizeObserver } from '@vueuse/core'
+import { useMutationObserver, useResizeObserver, useTimeoutFn } from '@vueuse/core'
 import { TabsList } from 'radix-vue'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 const props = defineProps<TabsListProps & { class?: HTMLAttributes['class'] }>()
 
@@ -23,46 +23,82 @@ const indicatorStyle = ref({
   opacity: '0',
 })
 
+const { start: updateIndicatorDebounced } = useTimeoutFn(updateIndicator, 50)
+
 async function updateIndicator() {
   if (!tabsListRef.value) {
     return
   }
 
-  // Wait for next tick to ensure DOM updates are complete
-  await nextTick()
+  // Wait for two animation frames to ensure all DOM updates and style calculations are complete
+  await new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(async () => {
+        await nextTick()
 
-  const activeTab = tabsListRef.value.querySelector<HTMLElement>('[data-state="active"]')
-  if (!activeTab) {
-    // Hide indicator if no active tab
-    indicatorStyle.value.opacity = '0'
-    return
-  }
+        const activeTab = tabsListRef.value?.querySelector<HTMLElement>('[data-state="active"]')
+        if (!activeTab) {
+          indicatorStyle.value.opacity = '0'
+          return
+        }
 
-  // Show indicator
-  indicatorStyle.value.opacity = '1'
+        // Ensure the element is visible and has dimensions
+        if (activeTab.offsetWidth === 0 || activeTab.offsetHeight === 0) {
+          setTimeout(updateIndicatorDebounced, 50)
+          return
+        }
 
-  const activeRect = activeTab.getBoundingClientRect()
-  const tabsRect = tabsListRef.value.getBoundingClientRect()
+        indicatorStyle.value.opacity = '1'
 
-  requestAnimationFrame(() => {
-    indicatorStyle.value = {
-      left: `${activeRect.left - tabsRect.left}px`,
-      top: `${activeRect.top - tabsRect.top}px`,
-      width: `${activeRect.width}px`,
-      height: `${activeRect.height}px`,
-      opacity: '1',
-    }
-    // After initial render, enable transitions
-    if (isInitialRender.value) {
-      setTimeout(() => {
-        isInitialRender.value = false
-      }, 0)
-    }
+        const activeRect = activeTab.getBoundingClientRect()
+        const tabsRect = tabsListRef.value!.getBoundingClientRect()
+
+        indicatorStyle.value = {
+          left: `${activeRect.left - tabsRect.left}px`,
+          top: `${activeRect.top - tabsRect.top}px`,
+          width: `${activeRect.width}px`,
+          height: `${activeRect.height}px`,
+          opacity: '1',
+        }
+
+        if (isInitialRender.value) {
+          setTimeout(() => {
+            isInitialRender.value = false
+          }, 0)
+        }
+        resolve(null)
+      })
+    })
   })
 }
 
+// Watch for content changes that might affect sizing
+useMutationObserver(
+  tabsListRef,
+  () => {
+    updateIndicatorDebounced()
+  },
+  {
+    attributes: true,
+    childList: true,
+    subtree: true,
+    characterData: true,
+  },
+)
+
+onMounted(() => {
+  if (tabsListRef.value) {
+    updateIndicator()
+  }
+})
+
+// Watch for any changes to the active tab
+watch(() => tabsListRef.value?.querySelector('[data-state="active"]'), () => {
+  updateIndicatorDebounced()
+}, { deep: true })
+
 useResizeObserver(tabsListRef, () => {
-  updateIndicator()
+  updateIndicatorDebounced()
 })
 
 // Watch for parent size changes (up to 2 levels up)
@@ -70,30 +106,11 @@ const parentRef = computed(() => tabsListRef.value?.parentElement || null)
 const grandParentRef = computed(() => parentRef.value?.parentElement || null)
 
 useResizeObserver(parentRef, () => {
-  updateIndicator()
+  updateIndicatorDebounced()
 })
 
 useResizeObserver(grandParentRef, () => {
-  updateIndicator()
-})
-
-// Watch for attribute changes that affect the tabs
-useMutationObserver(tabsListRef, (mutations) => {
-  const shouldUpdate = mutations.some(mutation =>
-    mutation.type === 'attributes'
-    && (mutation.attributeName === 'data-state' || mutation.attributeName === 'class'),
-  )
-  if (shouldUpdate) {
-    updateIndicator()
-  }
-}, {
-  attributes: true,
-  childList: true,
-  subtree: true,
-})
-
-nextTick(() => {
-  updateIndicator()
+  updateIndicatorDebounced()
 })
 </script>
 

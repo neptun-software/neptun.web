@@ -130,6 +130,11 @@ export default defineEventHandler(async (event) => {
       apiKey,
     })
 
+    // Get the request origin and host
+    /* const requestOrigin = getHeader(event, 'origin')
+    const host = getHeader(event, 'host')
+    const isExternalRequest = !requestOrigin || (host && !requestOrigin.includes(host)) */
+
     const result = streamText({
       model: openrouter(config.model),
       messages: messages.map(msg => ({
@@ -162,8 +167,7 @@ export default defineEventHandler(async (event) => {
 
     // consume the stream to ensure it runs to completion & triggers onFinish
     // even when the client response is aborted:
-    // result.consumeStream();
-
+    await result.consumeStream()
     return result.toDataStreamResponse()
   } catch (error: unknown) {
     if (LOG_BACKEND) {

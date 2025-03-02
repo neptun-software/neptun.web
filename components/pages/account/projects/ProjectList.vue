@@ -19,16 +19,16 @@ const { $toast } = useNuxtApp()
 
 interface FileUploadData {
   files: File[]
-  category: typeof context_file_category.enumValues[number]
-  file_type: typeof context_file_type.enumValues[number]
+  category: ReadContextFile['category']
+  file_type: ReadContextFile['file_type']
 }
 
 interface FileFormData {
   file: File
-  customTitle: string
-  content: string
-  category: typeof context_file_category.enumValues[number]
-  file_type: typeof context_file_type.enumValues[number]
+  customTitle: ReadContextFile['title']
+  content: ReadContextFile['content']
+  category: ReadContextFile['category']
+  file_type: ReadContextFile['file_type']
 }
 
 const { projectsList, isLoading, fetchProjects, deleteProject, updateProject } = useProjects()
@@ -45,7 +45,6 @@ const {
   createImport,
   fetchResources,
   fetchAvailableResources,
-  getResource,
   linkResource,
   unlinkResource,
 } = useProjectResources()
@@ -75,10 +74,14 @@ watch(selectedProject, (newProject) => {
   }
 })
 
-const newFileForm = ref({
+const newFileForm = ref<{
+  files: FileFormData[]
+  category: ReadContextFile['category']
+  file_type: ReadContextFile['file_type']
+}>({
   files: [] as FileFormData[],
-  category: 'documentation' as typeof context_file_category.enumValues[number],
-  file_type: 'text' as typeof context_file_type.enumValues[number],
+  category: 'unknown',
+  file_type: 'text',
 })
 
 const showNewFileDialog = ref(false)
@@ -88,11 +91,16 @@ const fileCategories = context_file_category.enumValues
 
 const showEditFileDialog = ref(false)
 const editingFile = ref<ReadContextFile | null>(null)
-const editFileForm = ref({
+const editFileForm = ref<{
+  title: ReadContextFile['title']
+  content: ReadContextFile['content']
+  category: ReadContextFile['category']
+  file_type: ReadContextFile['file_type']
+}>({
   title: '',
   content: '',
-  category: '' as typeof context_file_category.enumValues[number],
-  file_type: '' as typeof context_file_type.enumValues[number],
+  category: 'unknown',
+  file_type: 'text',
 })
 
 const showLinkResourceDialog = ref(false)
@@ -175,10 +183,10 @@ async function handleCreateFile(): Promise<void> {
     const uploadPromises = newFileForm.value.files.map(async (fileData) => {
       const uploadData: FileUploadData = {
         files: [fileData.file],
-        category: fileData.category,
+        category: fileData.category || 'unknown',
         file_type: fileData.file_type,
       }
-      await uploadFiles(projectId, uploadData, importId)
+      await uploadFiles(projectId, uploadData as FileUploadData, importId)
     })
 
     await Promise.all(uploadPromises)
@@ -517,6 +525,7 @@ onMounted(() => {
                   Name
                 </ShadcnLabel>
                 <ShadcnInput
+                  v-if="editedProject.name"
                   id="name"
                   v-model="editedProject.name"
                   placeholder="Project name"
@@ -547,7 +556,7 @@ onMounted(() => {
                 <ShadcnLabel for="type">
                   Project Type
                 </ShadcnLabel>
-                <ShadcnSelect v-model="editedProject.type">
+                <ShadcnSelect v-if="editedProject.type" v-model="editedProject.type">
                   <ShadcnSelectTrigger>
                     <ShadcnSelectValue placeholder="Select project type..." />
                   </ShadcnSelectTrigger>
@@ -569,7 +578,7 @@ onMounted(() => {
                 <ShadcnLabel for="language">
                   Main Language
                 </ShadcnLabel>
-                <ShadcnSelect v-model="editedProject.main_language">
+                <ShadcnSelect v-if="editedProject.main_language" v-model="editedProject.main_language">
                   <ShadcnSelectTrigger>
                     <ShadcnSelectValue placeholder="Select programming language..." />
                   </ShadcnSelectTrigger>
@@ -681,7 +690,7 @@ onMounted(() => {
                           </div>
                         </div>
                         <InfoBlock
-                          :is-visible="!import_.files?.length"
+                          :is-visible="!import_.files.length"
                           :show-loader="false"
                           :show-dots="false"
                         >
@@ -989,7 +998,7 @@ onMounted(() => {
             <ShadcnLabel for="category">
               Category
             </ShadcnLabel>
-            <ShadcnSelect v-model="newFileForm.category">
+            <ShadcnSelect v-if="newFileForm.category" v-model="newFileForm.category">
               <ShadcnSelectTrigger>
                 <ShadcnSelectValue placeholder="Select file category..." />
               </ShadcnSelectTrigger>
@@ -1009,7 +1018,7 @@ onMounted(() => {
             <ShadcnLabel for="type">
               File Type
             </ShadcnLabel>
-            <ShadcnSelect v-model="newFileForm.file_type">
+            <ShadcnSelect v-if="newFileForm.file_type" v-model="newFileForm.file_type">
               <ShadcnSelectTrigger>
                 <ShadcnSelectValue placeholder="Select file type..." />
               </ShadcnSelectTrigger>
@@ -1043,6 +1052,7 @@ onMounted(() => {
                     Title
                   </ShadcnLabel>
                   <ShadcnInput
+                    v-if="fileData.customTitle"
                     :id="`file-${index}-title`"
                     v-model="fileData.customTitle"
                     :placeholder="fileData.file.name"
@@ -1054,7 +1064,7 @@ onMounted(() => {
                     <ShadcnLabel :for="`file-${index}-category`">
                       Category
                     </ShadcnLabel>
-                    <ShadcnSelect v-model="fileData.category">
+                    <ShadcnSelect v-if="fileData.category" v-model="fileData.category">
                       <ShadcnSelectTrigger>
                         <ShadcnSelectValue placeholder="Select category..." />
                       </ShadcnSelectTrigger>
@@ -1074,7 +1084,7 @@ onMounted(() => {
                     <ShadcnLabel :for="`file-${index}-type`">
                       File Type
                     </ShadcnLabel>
-                    <ShadcnSelect v-model="fileData.file_type">
+                    <ShadcnSelect v-if="fileData.file_type" v-model="fileData.file_type">
                       <ShadcnSelectTrigger>
                         <ShadcnSelectValue placeholder="Select type..." />
                       </ShadcnSelectTrigger>
@@ -1096,6 +1106,7 @@ onMounted(() => {
                     Content
                   </ShadcnLabel>
                   <ShadcnTextarea
+                    v-if="fileData.content"
                     :id="`file-${index}-content`"
                     v-model="fileData.content"
                     :placeholder="`Content of ${fileData.file.name}`"
@@ -1141,6 +1152,7 @@ onMounted(() => {
             Title
           </ShadcnLabel>
           <ShadcnInput
+            v-if="editFileForm.title"
             id="edit-title"
             v-model="editFileForm.title"
             placeholder="File title"
@@ -1152,7 +1164,7 @@ onMounted(() => {
             <ShadcnLabel for="edit-category">
               Category
             </ShadcnLabel>
-            <ShadcnSelect v-model="editFileForm.category">
+            <ShadcnSelect v-if="editFileForm.category" v-model="editFileForm.category">
               <ShadcnSelectTrigger>
                 <ShadcnSelectValue placeholder="Select category..." />
               </ShadcnSelectTrigger>
@@ -1172,7 +1184,7 @@ onMounted(() => {
             <ShadcnLabel for="edit-type">
               File Type
             </ShadcnLabel>
-            <ShadcnSelect v-model="editFileForm.file_type">
+            <ShadcnSelect v-if="editFileForm.file_type" v-model="editFileForm.file_type">
               <ShadcnSelectTrigger>
                 <ShadcnSelectValue placeholder="Select type..." />
               </ShadcnSelectTrigger>
@@ -1194,6 +1206,7 @@ onMounted(() => {
             Content
           </ShadcnLabel>
           <ShadcnTextarea
+            v-if="editFileForm.content"
             id="edit-content"
             v-model="editFileForm.content"
             placeholder="File content"

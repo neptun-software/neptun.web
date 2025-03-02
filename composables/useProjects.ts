@@ -42,7 +42,7 @@ export function useProjects() {
     try {
       isLoading.value = true
       const { user } = useUserSession()
-      const response = await $fetch<GetProject>(`/api/users/${user.value?.id}/projects`, {
+      const response = await $fetch<GetProject>(`/api/users/${user.value?.id ?? -1}/projects`, {
         method: 'POST',
         body: project,
       })

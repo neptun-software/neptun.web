@@ -30,11 +30,6 @@ const currentRouteName = computed(() => router.currentRoute.value.name)
     -->
 
     <ConfigProvider :use-id="useSsrSaveId">
-      <ShadcnToaster
-        close-button
-        position="top-center"
-        offset="1.5rem"
-      />
       <NuxtLoadingIndicator
         color="hsl(var(--primary) / 0.9)"
         error-color="hsl(var(--destructive))"
@@ -47,6 +42,7 @@ const currentRouteName = computed(() => router.currentRoute.value.name)
         <NuxtRouteAnnouncer />
         <NuxtLayout>
           <NuxtPage />
+          <ShadcnToaster close-button position="top-center" offset="1.5rem" />
         </NuxtLayout>
       </div>
     </ConfigProvider>

@@ -5,9 +5,13 @@ import { Check, Circle, Dot } from 'lucide-vue-next'
 import * as z from 'zod'
 
 const { $toast } = useNuxtApp()
-
-const isLoading = ref(false)
 const { user } = useUserSession()
+const isLoading = ref(false)
+
+interface FreshProject {
+  'project-type': string
+  'project-language': string
+}
 
 const formSchema = [
   z.object({
@@ -38,7 +42,7 @@ const formSchema = [
   }),
 ]
 
-const stepIndex = ref(1)
+const stepIndex = ref<number>(1)
 const steps = [
   {
     step: 1,
@@ -70,10 +74,7 @@ function goBack() {
   }
 }
 
-async function createProject(data: {
-  'project-type': string
-  'project-language': string
-}) {
+async function createProject(data: FreshProject) {
   try {
     isLoading.value = true
     const response = await $fetch(`/api/users/${user.value?.id ?? -1}/projects`, {
@@ -83,7 +84,6 @@ async function createProject(data: {
         description: `A ${data['project-type']} project created from Neptun AI`,
         type: data['project-type'],
         main_language: data['project-language'],
-        neptun_user_id: user.value?.id ?? -1,
       },
     })
 
@@ -103,11 +103,11 @@ async function createProject(data: {
   }
 }
 
-async function onSubmit(values: any) {
+async function onSubmit(values: FreshProject) {
   if (stepIndex.value === steps.length) {
     await createProject(values)
   } else {
-    toast('You submitted the following values:', {
+    $toast.info('You submitted the following values:', {
       description: h(
         'pre',
         {
@@ -125,9 +125,7 @@ const doCreateGitRepository = ref(false)
 
 <template>
   <ShadcnForm
-    v-slot="{ meta, values, validate }"
-    as=""
-    keep-values
+    v-slot="{ meta, values, validate }" as="" keep-values
     :validation-schema="toTypedSchema(formSchema[stepIndex - 1])"
   >
     <form
@@ -137,18 +135,18 @@ const doCreateGitRepository = ref(false)
           validate();
 
           if (stepIndex === steps.length) {
-            onSubmit(values);
+            onSubmit(values as any);
           }
         }
       "
     >
-      <ShadcnStepper v-model="stepIndex" class="flex gap-2 items-start w-full">
+      <ShadcnStepper
+        v-model="stepIndex"
+        class="flex gap-2 items-start w-full"
+      >
         <ShadcnStepperItem
-          v-for="step in steps"
-          :key="step.step"
-          v-slot="{ state }"
-          class="flex relative flex-col justify-center items-center w-full"
-          :step="step.step"
+          v-for="step in steps" :key="step.step" v-slot="{ state }"
+          class="flex relative flex-col justify-center items-center w-full" :step="step.step"
         >
           <ShadcnStepperSeparator
             v-if="step.step !== steps[steps.length - 1].step"
@@ -157,18 +155,13 @@ const doCreateGitRepository = ref(false)
 
           <ShadcnStepperTrigger as-child>
             <ShadcnButton
-              :variant="
-                state === 'completed' || state === 'active'
-                  ? 'default'
-                  : 'outline'
-              "
-              size="icon"
-              class="z-10 rounded-full shrink-0"
-              :class="[
+              :variant="state === 'completed' || state === 'active'
+                ? 'default'
+                : 'outline'
+              " size="icon" class="z-10 rounded-full shrink-0" :class="[
                 state === 'active'
                   && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
-              ]"
-              :disabled="state !== 'completed' && !meta.valid"
+              ]" :disabled="state !== 'completed' && !meta.valid"
             >
               <Check v-if="state === 'completed'" class="size-5" />
               <Circle v-if="state === 'active'" />
@@ -237,9 +230,7 @@ const doCreateGitRepository = ref(false)
               <ShadcnSelect v-bind="componentField">
                 <ShadcnFormControl>
                   <ShadcnSelectTrigger>
-                    <ShadcnSelectValue
-                      placeholder="Select a preferred programming language"
-                    />
+                    <ShadcnSelectValue placeholder="Select a preferred programming language" />
                   </ShadcnSelectTrigger>
                 </ShadcnFormControl>
                 <ShadcnSelectContent>
@@ -292,41 +283,24 @@ const doCreateGitRepository = ref(false)
           <ShadcnLabel for="create-git-repository">
             Would you like me to setup a github repository?
           </ShadcnLabel>
-          <ShadcnSwitch
-            id="create-git-repository"
-            v-model:checked="doCreateGitRepository"
-            disabled
-          />
+          <ShadcnSwitch id="create-git-repository" v-model:checked="doCreateGitRepository" disabled />
 
           <ShadcnSeparator />
         </template>
       </div>
 
       <div class="flex justify-between items-center mt-4">
-        <ShadcnButton
-          :disabled="!canGoBack"
-          variant="outline"
-          size="sm"
-          @click="goBack"
-        >
+        <ShadcnButton :disabled="!canGoBack" variant="outline" size="sm" @click="goBack">
           Back
         </ShadcnButton>
         <div class="flex gap-3 items-center">
           <ShadcnButton
-            v-if="stepIndex !== 3"
-            :type="meta.valid ? 'button' : 'submit'"
-            :disabled="!canGoNext || isLoading"
-            size="sm"
-            @click="meta.valid && goNext()"
+            v-if="stepIndex !== 3" :type="meta.valid ? 'button' : 'submit'"
+            :disabled="!canGoNext || isLoading" size="sm" @click="meta.valid && goNext()"
           >
             Next
           </ShadcnButton>
-          <ShadcnButton
-            v-if="stepIndex === 3"
-            size="sm"
-            type="submit"
-            :disabled="isLoading"
-          >
+          <ShadcnButton v-if="stepIndex === 3" size="sm" type="submit" :disabled="isLoading">
             <template v-if="isLoading">
               Creating Project...
             </template>

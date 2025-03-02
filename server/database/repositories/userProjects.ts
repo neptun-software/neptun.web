@@ -1,15 +1,11 @@
 import type { GetProject, ProjectToCreate, ReadProject, ReadUser } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
-import {
+import { neptun_user_project } from '../../../lib/types/database.tables/schema'
 
-  neptun_user_project,
-
-} from '../../../lib/types/database.tables/schema'
-
-export async function createProject(project: ProjectToCreate) {
+export async function createProject(user_id: ReadUser['id'], project: ProjectToCreate) {
   const createdProject = await db
     .insert(neptun_user_project)
-    .values(project)
+    .values({ ...project, neptun_user_id: user_id })
     .returning()
     .catch((err) => {
       if (LOG_BACKEND) {

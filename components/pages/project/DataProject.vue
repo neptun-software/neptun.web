@@ -110,7 +110,6 @@ async function generateConfigurationFiles() {
       description: projectContext.value,
       type: 'web-app',
       main_language: 'typescript',
-      neptun_user_id: userId,
     })
 
     await uploadFiles(project.id, {
@@ -152,7 +151,10 @@ watch(isStepValid, (valid) => {
 </script>
 
 <template>
-  <ShadcnStepper v-model="stepIndex" class="flex gap-2 items-start w-full">
+  <ShadcnStepper
+    v-model="stepIndex"
+    class="flex gap-2 items-start w-full"
+  >
     <ShadcnStepperItem
       v-for="step in steps"
       :key="step.step"
@@ -300,7 +302,7 @@ watch(isStepValid, (valid) => {
           <ShadcnTextarea
             v-model="projectContext"
             placeholder="Describe your project, its goals, and any specific requirements..."
-            :rows="6"
+            rows="6"
           />
         </div>
       </div>
