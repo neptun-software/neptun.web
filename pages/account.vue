@@ -68,7 +68,7 @@ async function signOut() {
     <h1 class="text-2xl font-bold md:text-3xl">
       Account
     </h1>
-    <ShadcnSeparator class="h-1 my-2 md:my-4" />
+    <ShadcnSeparator class="my-2 h-1 md:my-4" />
     <AuthState>
       <template #default="{ loggedIn }">
         <div class="flex flex-col gap-4 md:flex-row md:gap-8">
@@ -102,7 +102,7 @@ async function signOut() {
               Password
             </ShadcnLabel>
             <div class="flex flex-col gap-2 md:flex-row">
-              <div class="flex flex-col w-full gap-2 md:flex-row">
+              <div class="flex flex-col gap-2 w-full md:flex-row">
                 <ShadcnInput
                   id="password"
                   v-model="updatedUser.password"
@@ -130,14 +130,14 @@ async function signOut() {
                     || updatedUser.password !== updatedUser.confirmPassword
                 "
                 :on-click-async="updateAccount"
-                class="w-full md:w-auto whitespace-nowrap"
+                class="w-full whitespace-nowrap md:w-auto"
               >
                 Update
               </AsyncButton>
             </div>
           </div>
         </div>
-        <ShadcnSeparator class="h-1 my-2" />
+        <ShadcnSeparator class="my-2 h-1" />
 
         <AsyncButton v-if="loggedIn" class="mr-1" :on-click-async="signOut">
           Logout
@@ -175,13 +175,13 @@ async function signOut() {
       </template>
       <template #placeholder>
         <ShadcnButton disabled>
-          <Loader2 class="w-4 h-4 mr-2 animate-spin" />
+          <Loader2 class="mr-2 w-4 h-4 animate-spin" />
           Loading Account Data!
         </ShadcnButton>
       </template>
     </AuthState>
 
-    <ShadcnSeparator class="h-1 my-2" />
+    <ShadcnSeparator class="my-2 h-1" />
 
     <AccountSection>
       <template #header>
