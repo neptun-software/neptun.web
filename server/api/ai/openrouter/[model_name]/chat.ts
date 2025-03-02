@@ -167,7 +167,7 @@ export default defineEventHandler(async (event) => {
 
     // consume the stream to ensure it runs to completion & triggers onFinish
     // even when the client response is aborted:
-    await result.consumeStream()
+    void result.consumeStream()
     return result.toDataStreamResponse()
   } catch (error: unknown) {
     if (LOG_BACKEND) {
