@@ -71,6 +71,13 @@
       "when": 1740920212305,
       "tag": "0009_workable_doomsday",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1741304543353,
+      "tag": "0010_nostalgic_spot",
+      "breakpoints": true
     }
   ]
 }

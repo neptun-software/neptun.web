@@ -130,6 +130,7 @@ export default defineEventHandler(async (event) => {
 
         const { id: userId } = user
         const githubAppInstallationToCreate = {
+          github_installation_id: installationId,
           github_account_id: githubUserId,
           github_account_name: githubUserName,
           github_account_avatar_url: githubUserAvatarUrl,

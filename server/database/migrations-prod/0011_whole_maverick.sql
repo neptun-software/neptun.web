@@ -1,0 +1,1 @@
+ALTER TABLE "github_app_installation" ADD COLUMN "github_installation_id" integer NOT NULL;

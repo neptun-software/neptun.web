@@ -78,6 +78,13 @@
       "when": 1740920218315,
       "tag": "0010_broken_kulan_gath",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1741304548073,
+      "tag": "0011_whole_maverick",
+      "breakpoints": true
     }
   ]
 }

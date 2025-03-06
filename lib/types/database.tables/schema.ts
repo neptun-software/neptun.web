@@ -503,6 +503,7 @@ export const SelectChatFileSchema = createSelectSchema(chat_conversation_file)
 
 export const github_app_installation = pgTable('github_app_installation', {
   id: serial('id').primaryKey(),
+  github_installation_id: integer('github_installation_id').notNull(), // GitHub's actual installation ID
   github_account_type: text('github_account_type').notNull(), // Organization or User (do not make me an enum, because it might break, if github changes their naming, which they do regularly without calling it a breaking change)
   github_account_avatar_url: text('github_account_avatar_url').notNull(), // should be encrypted in the future (includes id)
   github_account_id: integer('github_account_id').notNull(), // should be encrypted in the future
@@ -525,6 +526,7 @@ const InsertGithubAppInstallationSchemaBase = createInsertSchema(
 )
 export const InsertGithubAppInstallationSchema
   = InsertGithubAppInstallationSchemaBase.pick({
+    github_installation_id: true,
     github_account_type: true,
     github_account_avatar_url: true,
     github_account_id: true,

@@ -54,6 +54,7 @@
     "@nuxtjs/device": "^3.2.4",
     "@nuxtjs/mdc": "0.13.3",
     "@nuxtjs/robots": "^5.2.2",
+    "@octokit/graphql-schema": "^15.26.0",
     "@openrouter/ai-sdk-provider": "^0.2.2",
     "@radix-icons/vue": "^1.0.0",
     "@tanstack/vue-table": "^8.20.5",

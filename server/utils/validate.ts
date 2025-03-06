@@ -144,6 +144,20 @@ export const ContextFileIdSchema = z.object({
 
 type ContextFileIdType = z.infer<typeof ContextFileIdSchema>
 
+export const GithubRepositoryIdSchema = z.object({
+  github_account_id: primaryIdSchema,
+  github_repository_id: primaryIdSchema,
+})
+
+type GithubRepositoryIdType = z.infer<typeof GithubRepositoryIdSchema>
+
+export const GithubRepositoryNameSchema = z.object({
+  github_account_name: z.string().min(1),
+  github_repository_name: z.string().min(1),
+})
+
+type GithubRepositoryNameType = z.infer<typeof GithubRepositoryNameSchema>
+
 /* QUERY SCHEMAs */
 
 /**
@@ -1249,5 +1263,85 @@ export async function validateParamContextFileId(
     `Invalid routeParams(user_id, project_id, context_file_id). The context file with id=${event.context.validated.params.context_file_id} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
     'routeParams(user_id, project_id, context_file_id):',
     (user, data) => user.id !== data.user_id,
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, github_account_id, github_repository_id) */
+export async function validateParamGithubRepositoryId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<GithubRepositoryIdType>> {
+  return validateParams<GithubRepositoryIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const github_account_id = Number(params?.github_account_id)
+        // @ts-expect-error
+        const github_repository_id = Number(params?.github_repository_id)
+
+        event.context.validated.params.github_account_id = github_account_id
+        event.context.validated.params.github_repository_id = github_repository_id
+
+        return GithubRepositoryIdSchema.safeParse({
+          github_account_id,
+          github_repository_id,
+        })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            github_account_id: result.data.github_account_id,
+            github_repository_id: result.data.github_repository_id,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(github_account_id, github_repository_id).',
+    `Invalid routeParams(github_account_id, github_repository_id). The GitHub repository with id=${event.context.validated.params.github_repository_id} for account=${event.context.validated.params.github_account_id} does not exist or you do not have access to it.`,
+    'routeParams(github_account_id, github_repository_id):',
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(github_account_name, github_repository_name) */
+export async function validateParamGithubRepositoryName(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<GithubRepositoryNameType>> {
+  return validateParams<GithubRepositoryNameType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const github_account_name = params?.github_account_name
+        // @ts-expect-error
+        const github_repository_name = params?.github_repository_name
+
+        event.context.validated.params.github_account_name = github_account_name
+        event.context.validated.params.github_repository_name = github_repository_name
+
+        return GithubRepositoryNameSchema.safeParse({
+          github_account_name,
+          github_repository_name,
+        })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            github_account_name: result.data.github_account_name,
+            github_repository_name: result.data.github_repository_name,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(github_account_name, github_repository_name).',
+    `Invalid routeParams(github_account_name, github_repository_name). The GitHub repository with name=${event.context.validated.params.github_repository_name} for account=${event.context.validated.params.github_account_name} does not exist or you do not have access to it.`,
+    'routeParams(github_account_name, github_repository_name):',
   )
 }
