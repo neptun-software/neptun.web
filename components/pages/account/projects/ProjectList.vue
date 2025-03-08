@@ -721,7 +721,7 @@ onMounted(() => {
                       :show-loader="isFetchingImports"
                       :show-dots="isFetchingImports"
                     >
-                      {{ isFetchingImports ? 'Loading imports...' : 'No imports in this project yet.' }}
+                      {{ isFetchingImports ? 'Loading imports' : 'No imports in this project yet.' }}
                       <template #action>
                         <AsyncButton
                           v-if="!isFetchingImports && selectedProjectId"
@@ -777,7 +777,7 @@ onMounted(() => {
                       :show-loader="isFetchingUserFiles"
                       :show-dots="isFetchingUserFiles"
                     >
-                      {{ isFetchingUserFiles ? 'Loading files...' : 'No files linked to this project.' }}
+                      {{ isFetchingUserFiles ? 'Loading files' : 'No files linked to this project.' }}
                       <template #action>
                         <AsyncButton
                           v-if="!isFetchingUserFiles && selectedProjectId"
@@ -833,7 +833,7 @@ onMounted(() => {
                       :show-loader="isFetchingTemplateCollections"
                       :show-dots="isFetchingTemplateCollections"
                     >
-                      {{ isFetchingTemplateCollections ? 'Loading collections...' : 'No template collections linked to this project.' }}
+                      {{ isFetchingTemplateCollections ? 'Loading collections' : 'No template collections linked to this project.' }}
                       <template #action>
                         <AsyncButton
                           v-if="!isFetchingTemplateCollections && selectedProjectId"
@@ -889,7 +889,7 @@ onMounted(() => {
                       :show-loader="isFetchingGithubInstallations"
                       :show-dots="isFetchingGithubInstallations"
                     >
-                      {{ isFetchingGithubInstallations ? 'Loading installations...' : 'No GitHub installations linked to this project.' }}
+                      {{ isFetchingGithubInstallations ? 'Loading installations' : 'No GitHub installations linked to this project.' }}
                       <template #action>
                         <AsyncButton
                           v-if="!isFetchingGithubInstallations && selectedProjectId"
@@ -945,7 +945,7 @@ onMounted(() => {
                       :show-loader="isFetchingChatConversations"
                       :show-dots="isFetchingChatConversations"
                     >
-                      {{ isFetchingChatConversations ? 'Loading conversations...' : 'No chat conversations linked to this project.' }}
+                      {{ isFetchingChatConversations ? 'Loading conversations' : 'No chat conversations linked to this project.' }}
                       <template #action>
                         <AsyncButton
                           v-if="!isFetchingChatConversations && selectedProjectId"
@@ -1348,7 +1348,7 @@ onMounted(() => {
           :show-loader="isFetchingAvailableResources"
           :show-dots="isFetchingAvailableResources"
         >
-          {{ isFetchingAvailableResources ? 'Loading resources...' : 'No resources available to link.' }}
+          {{ isFetchingAvailableResources ? 'Loading resources' : 'No resources available to link.' }}
         </InfoBlock>
       </ShadcnScrollArea>
 
