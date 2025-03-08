@@ -12,7 +12,7 @@ GET
 
 ### Route
 
-`GET https://neptun-webui.vercel.app/api/models`
+`/models`
 
 ### Route Parameters
 

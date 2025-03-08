@@ -4,7 +4,12 @@ import { convertStringsToDates } from '~/utils/formatters'
 export function useProjects() {
   const activeProject = useState<GetProject | undefined>('active-project', () => undefined)
   const projectsList = useState<GetProject[]>('projects-list', () => [])
-  const isLoading = useState<boolean>('projects-loading', () => false)
+  
+  const isFetchingProject = useState<boolean>('project-fetching', () => false)
+  const isFetchingProjects = useState<boolean>('projects-fetching', () => false)
+  const isCreatingProject = useState<boolean>('project-creating', () => false)
+  const isUpdatingProject = useState<boolean>('project-updating', () => false)
+  const isDeletingProject = useState<boolean>('project-deleting', () => false)
 
   async function fetchProject(projectId: number) {
     if (!projectId) {
@@ -12,7 +17,7 @@ export function useProjects() {
     }
 
     try {
-      isLoading.value = true
+      isFetchingProject.value = true
       const { user } = useUserSession()
       const response = await $fetch<GetProject>(`/api/users/${user.value?.id}/projects/${projectId}`)
       activeProject.value = convertStringsToDates(response)
@@ -20,13 +25,13 @@ export function useProjects() {
       console.error('Failed to load project:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isFetchingProject.value = false
     }
   }
 
   async function fetchProjects() {
     try {
-      isLoading.value = true
+      isFetchingProjects.value = true
       const { user } = useUserSession()
       const response = await $fetch<GetProject[]>(`/api/users/${user.value?.id}/projects`)
       projectsList.value = response.map(project => convertStringsToDates(project))
@@ -34,76 +39,79 @@ export function useProjects() {
       console.error('Failed to load projects:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isFetchingProjects.value = false
     }
   }
 
   async function createProject(project: ProjectToCreate) {
     try {
-      isLoading.value = true
+      isCreatingProject.value = true
       const { user } = useUserSession()
-      const response = await $fetch<GetProject>(`/api/users/${user.value?.id ?? -1}/projects`, {
+      const response = await $fetch<GetProject>(`/api/users/${user.value?.id}/projects`, {
         method: 'POST',
         body: project,
       })
-      const newProject = convertStringsToDates(response)
-      projectsList.value.push(newProject)
-      return newProject
+      
+      projectsList.value = [...projectsList.value, convertStringsToDates(response)]
+      
+      return response.id
     } catch (error) {
       console.error('Failed to create project:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isCreatingProject.value = false
     }
   }
 
   async function updateProject(projectId: number, updates: Partial<GetProject>) {
     try {
-      isLoading.value = true
+      isUpdatingProject.value = true
       const { user } = useUserSession()
+      
       const response = await $fetch<GetProject>(`/api/users/${user.value?.id}/projects/${projectId}`, {
         method: 'PATCH',
         body: updates,
       })
-      const updatedProject = convertStringsToDates(response)
-
-      // Update in lists if present
+      
       const index = projectsList.value.findIndex(p => p.id === projectId)
       if (index !== -1) {
-        projectsList.value[index] = updatedProject
+        projectsList.value[index] = convertStringsToDates(response)
       }
-
-      // Update active project if it's the current one
-      if (activeProject.value?.id === projectId) {
-        activeProject.value = updatedProject
+      
+      if (activeProject.value && activeProject.value.id === projectId) {
+        activeProject.value = convertStringsToDates(response)
       }
-
-      return updatedProject
+      
+      return response
     } catch (error) {
       console.error('Failed to update project:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isUpdatingProject.value = false
     }
   }
 
   async function deleteProject(projectId: number) {
     try {
-      isLoading.value = true
+      isDeletingProject.value = true
       const { user } = useUserSession()
+      
       await $fetch(`/api/users/${user.value?.id}/projects/${projectId}`, {
         method: 'DELETE',
       })
-
+      
       projectsList.value = projectsList.value.filter(p => p.id !== projectId)
-      if (activeProject.value?.id === projectId) {
+      
+      if (activeProject.value && activeProject.value.id === projectId) {
         activeProject.value = undefined
       }
+      
+      return true
     } catch (error) {
       console.error('Failed to delete project:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isDeletingProject.value = false
     }
   }
 
@@ -114,7 +122,11 @@ export function useProjects() {
   return {
     activeProject,
     projectsList,
-    isLoading,
+    isFetchingProject,
+    isFetchingProjects,
+    isCreatingProject,
+    isUpdatingProject,
+    isDeletingProject,
     fetchProject,
     fetchProjects,
     createProject,

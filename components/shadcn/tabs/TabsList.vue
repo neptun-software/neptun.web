@@ -13,7 +13,7 @@ const delegatedProps = computed(() => {
   return delegated
 })
 
-const tabsListRef = ref<HTMLElement | null>(null)
+const $tabsListElement = ref<HTMLElement | null>(null)
 const isInitialRender = ref(true)
 const indicatorStyle = ref({
   left: '0px',
@@ -26,7 +26,7 @@ const indicatorStyle = ref({
 const { start: updateIndicatorDebounced } = useTimeoutFn(updateIndicator, 50)
 
 async function updateIndicator() {
-  if (!tabsListRef.value) {
+  if (!$tabsListElement.value) {
     return
   }
 
@@ -36,7 +36,7 @@ async function updateIndicator() {
       requestAnimationFrame(async () => {
         await nextTick()
 
-        const activeTab = tabsListRef.value?.querySelector<HTMLElement>('[data-state="active"]')
+        const activeTab = $tabsListElement.value?.querySelector<HTMLElement>('[data-state="active"]')
         if (!activeTab) {
           indicatorStyle.value.opacity = '0'
           return
@@ -51,7 +51,7 @@ async function updateIndicator() {
         indicatorStyle.value.opacity = '1'
 
         const activeRect = activeTab.getBoundingClientRect()
-        const tabsRect = tabsListRef.value!.getBoundingClientRect()
+        const tabsRect = $tabsListElement.value!.getBoundingClientRect()
 
         indicatorStyle.value = {
           left: `${activeRect.left - tabsRect.left}px`,
@@ -74,7 +74,7 @@ async function updateIndicator() {
 
 // Watch for content changes that might affect sizing
 useMutationObserver(
-  tabsListRef,
+  $tabsListElement,
   () => {
     updateIndicatorDebounced()
   },
@@ -87,22 +87,22 @@ useMutationObserver(
 )
 
 onMounted(() => {
-  if (tabsListRef.value) {
+  if ($tabsListElement.value) {
     updateIndicator()
   }
 })
 
 // Watch for any changes to the active tab
-watch(() => tabsListRef.value?.querySelector('[data-state="active"]'), () => {
+watch(() => $tabsListElement.value?.querySelector('[data-state="active"]'), () => {
   updateIndicatorDebounced()
 }, { deep: true })
 
-useResizeObserver(tabsListRef, () => {
+useResizeObserver($tabsListElement, () => {
   updateIndicatorDebounced()
 })
 
 // Watch for parent size changes (up to 2 levels up)
-const parentRef = computed(() => tabsListRef.value?.parentElement || null)
+const parentRef = computed(() => $tabsListElement.value?.parentElement || null)
 const grandParentRef = computed(() => parentRef.value?.parentElement || null)
 
 useResizeObserver(parentRef, () => {
@@ -115,7 +115,7 @@ useResizeObserver(grandParentRef, () => {
 </script>
 
 <template>
-  <div ref="tabsListRef" class="relative">
+  <div ref="$tabsListElement" class="relative">
     <!-- Background -->
     <div class="absolute inset-0 rounded-md bg-muted" />
 

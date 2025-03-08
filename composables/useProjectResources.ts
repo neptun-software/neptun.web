@@ -53,7 +53,23 @@ interface ApiError {
 
 export function useProjectResources() {
   const { user } = useUserSession()
-  const isLoading = ref(false)
+  
+  const isFetchingUserFiles = ref(false)
+  const isFetchingTemplateCollections = ref(false)
+  const isFetchingGithubInstallations = ref(false)
+  const isFetchingChatConversations = ref(false)
+  const isFetchingAvailableResources = ref(false)
+  const isLinkingResource = ref(false)
+  const isUnlinkingResource = ref(false)
+  const isFetchingImports = ref(false)
+  const isCreatingImport = ref(false)
+  const isUpdatingImport = ref(false)
+  const isUploadingFiles = ref(false)
+  const isLinkingFile = ref(false)
+  const isUnlinkingFile = ref(false)
+  const isUpdatingFile = ref(false)
+  const isDeletingImport = ref(false)
+
   const imports = ref<ProjectImport[]>([])
   const resources = ref<ResourceMap>({
     'user-files': [] as ReadUserFile[],
@@ -83,7 +99,21 @@ export function useProjectResources() {
 
   async function fetchResources(projectId: number, resourceType: ResourceType): Promise<void> {
     try {
-      isLoading.value = true
+      switch (resourceType) {
+        case 'user-files':
+          isFetchingUserFiles.value = true
+          break
+        case 'template-collections':
+          isFetchingTemplateCollections.value = true
+          break
+        case 'github-installations':
+          isFetchingGithubInstallations.value = true
+          break
+        case 'chat-conversations':
+          isFetchingChatConversations.value = true
+          break
+      }
+
       const response = await $fetch<ResourceMap[typeof resourceType]>(
         `/api/users/${user.value?.id}/projects/${projectId}/resources/${resourceType}`,
       )
@@ -107,7 +137,20 @@ export function useProjectResources() {
       handleError(error as ApiError)
       throw error
     } finally {
-      isLoading.value = false
+      switch (resourceType) {
+        case 'user-files':
+          isFetchingUserFiles.value = false
+          break
+        case 'template-collections':
+          isFetchingTemplateCollections.value = false
+          break
+        case 'github-installations':
+          isFetchingGithubInstallations.value = false
+          break
+        case 'chat-conversations':
+          isFetchingChatConversations.value = false
+          break
+      }
     }
   }
 
@@ -129,6 +172,7 @@ export function useProjectResources() {
     data: ResourceToCreate,
   ): Promise<void> {
     try {
+      isLinkingResource.value = true
       await $fetch(`/api/users/${user.value?.id}/projects/${projectId}/resources/${resourceType}`, {
         method: 'POST',
         body: data,
@@ -137,6 +181,8 @@ export function useProjectResources() {
     } catch (error) {
       handleError(error as ApiError)
       throw error
+    } finally {
+      isLinkingResource.value = false
     }
   }
 
@@ -146,6 +192,7 @@ export function useProjectResources() {
     resourceId: number,
   ): Promise<void> {
     try {
+      isUnlinkingResource.value = true
       await $fetch(`/api/users/${user.value?.id}/projects/${projectId}/resources/${resourceType}/${resourceId}`, {
         method: 'DELETE',
       })
@@ -166,12 +213,14 @@ export function useProjectResources() {
     } catch (error) {
       handleError(error as ApiError)
       throw error
+    } finally {
+      isUnlinkingResource.value = false
     }
   }
 
   async function fetchImportsWithFiles(projectId: number) {
     try {
-      isLoading.value = true
+      isFetchingImports.value = true
 
       const importsResponse = await $fetch<ReadContextImport[]>(
         `/api/users/${user.value?.id}/projects/${projectId}/resources/imports`,
@@ -191,38 +240,45 @@ export function useProjectResources() {
       console.error('Failed to fetch imports with files:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isFetchingImports.value = false
     }
   }
 
   async function createImport(projectId: number) {
-    const userId = user.value?.id
-    if (!userId) {
-      throw new Error('User not found')
-    }
+    try {
+      isCreatingImport.value = true
+      const userId = user.value?.id
+      if (!userId) {
+        throw new Error('User not found')
+      }
 
-    const response = await $fetch<ReadContextImport>(
-      `/api/users/${userId}/projects/${projectId}/resources/imports`,
-      {
-        method: 'POST',
-        body: {
-          neptun_user_id: userId,
-          project_id: projectId,
-          source_type: 'local_folder',
-          source_path: '/',
-          source_ref: '',
-          import_status: 'pending',
-          error_message: null,
-          file_tree: {},
+      const response = await $fetch<ReadContextImport>(
+        `/api/users/${userId}/projects/${projectId}/resources/imports`,
+        {
+          method: 'POST',
+          body: {
+            neptun_user_id: userId,
+            project_id: projectId,
+            source_type: 'local_folder',
+            source_path: '/',
+            source_ref: '',
+            import_status: 'pending',
+            error_message: null,
+            file_tree: {},
+          },
         },
-      },
-    )
-    return response.id
+      )
+      return response.id
+    } catch (error) {
+      throw error
+    } finally {
+      isCreatingImport.value = false
+    }
   }
 
   async function updateImport(projectId: number, importId: number, updates: Partial<ReadContextImport>) {
     try {
-      isLoading.value = true
+      isUpdatingImport.value = true
       await $fetch(
         `/api/users/${user.value?.id}/projects/${projectId}/resources/imports/${importId}`,
         {
@@ -235,13 +291,13 @@ export function useProjectResources() {
       console.error('Failed to update import:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isUpdatingImport.value = false
     }
   }
 
   async function uploadFiles(projectId: number, { files, category, file_type }: FileUploadData, existingImportId?: number) {
     try {
-      isLoading.value = true
+      isUploadingFiles.value = true
 
       const userId = user.value?.id
       if (!userId) {
@@ -291,16 +347,13 @@ export function useProjectResources() {
       console.error('Failed to upload files:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isUploadingFiles.value = false
     }
   }
 
   async function linkFile(projectId: number, fileData: ContextFileToCreate) {
     try {
-      isLoading.value = true
-
-      console.log('Sending request body:', JSON.stringify(fileData, null, 2))
-
+      isLinkingFile.value = true
       const userId = user.value?.id
       if (!userId) {
         throw new Error('User not found')
@@ -323,13 +376,13 @@ export function useProjectResources() {
       console.error('Failed to link file:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isLinkingFile.value = false
     }
   }
 
   async function unlinkFile(projectId: number, fileId: number) {
     try {
-      isLoading.value = true
+      isUnlinkingFile.value = true
       await $fetch(
         `/api/users/${user.value?.id}/projects/${projectId}/resources/files/${fileId}`,
         { method: 'DELETE' },
@@ -339,13 +392,13 @@ export function useProjectResources() {
       console.error('Failed to unlink file:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isUnlinkingFile.value = false
     }
   }
 
   async function updateFile(projectId: number, fileId: number, updates: Partial<ReadContextFile>) {
     try {
-      isLoading.value = true
+      isUpdatingFile.value = true
       await $fetch(
         `/api/users/${user.value?.id}/projects/${projectId}/resources/files/${fileId}`,
         {
@@ -358,13 +411,13 @@ export function useProjectResources() {
       console.error('Failed to update file:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isUpdatingFile.value = false
     }
   }
 
   async function deleteImport(projectId: number, importId: number) {
     try {
-      isLoading.value = true
+      isDeletingImport.value = true
       await $fetch(
         `/api/users/${user.value?.id}/projects/${projectId}/resources/imports/${importId}`,
         { method: 'DELETE' },
@@ -374,13 +427,13 @@ export function useProjectResources() {
       console.error('Failed to delete import:', error)
       throw error
     } finally {
-      isLoading.value = false
+      isDeletingImport.value = false
     }
   }
 
   async function fetchAvailableResources(resourceType: ResourceType): Promise<void> {
     try {
-      isLoading.value = true
+      isFetchingAvailableResources.value = true
       const response = await $fetch<
         | ResourceMap[typeof resourceType]
         | { chats: ReadChatConversation[] }
@@ -415,12 +468,26 @@ export function useProjectResources() {
       handleError(error as ApiError)
       throw error
     } finally {
-      isLoading.value = false
+      isFetchingAvailableResources.value = false
     }
   }
 
   return {
-    isLoading,
+    isFetchingUserFiles,
+    isFetchingTemplateCollections,
+    isFetchingGithubInstallations,
+    isFetchingChatConversations,
+    isFetchingAvailableResources,
+    isLinkingResource,
+    isUnlinkingResource,
+    isFetchingImports,
+    isCreatingImport,
+    isUpdatingImport,
+    isUploadingFiles,
+    isLinkingFile,
+    isUnlinkingFile,
+    isUpdatingFile,
+    isDeletingImport,
     imports,
     resources,
     availableResources,

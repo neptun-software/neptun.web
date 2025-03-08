@@ -3,6 +3,7 @@
 - `POST` [`/auth/otp`](../auth-otp.post.md)
 - `POST` [`/{email}/reset-password`](../email-{email}-reset-password.post.md)
 - `GET` [`/health`](../health.get.md)
+- `GET` [`/models`](../models.get.md)
 
 ## API Routes
 
@@ -88,10 +89,6 @@
 - `GET` [`/api/users/{user_id}/projects/{project_id}/resources/files?context_file_category=xxx&context_file_type=xxx`](../api-users-{user_id}-projects-{project_id}-resources-files.get.md)
 - `PUT` [`/api/users/{user_id}/projects/{project_id}/resources/files/{context_file_id}`](../api-users-{user_id}-projects-{project_id}-resources-files-{context_file_id}.put.md)
 - `DELETE` [`/api/users/{user_id}/projects/{project_id}/resources/files/{context_file_id}`](../api-users-{user_id}-projects-{project_id}-resources-files-{context_file_id}.delete.md)
-
-### Model Routes
-
-- `GET` [`/models`](../models.get.md)
 
 ### Other Routes
 

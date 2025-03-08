@@ -31,9 +31,23 @@ interface FileFormData {
   file_type: ReadContextFile['file_type']
 }
 
-const { projectsList, isLoading, fetchProjects, deleteProject, updateProject } = useProjects()
+const { projectsList, isFetchingProjects, isUpdatingProject, isDeletingProject, fetchProjects, deleteProject, updateProject } = useProjects()
 const {
-  isLoading: isLoadingResources,
+  isFetchingUserFiles,
+  isFetchingTemplateCollections,
+  isFetchingGithubInstallations,
+  isFetchingChatConversations,
+  isFetchingAvailableResources,
+  isLinkingResource,
+  isUnlinkingResource,
+  isFetchingImports,
+  isCreatingImport,
+  isUpdatingImport,
+  isUploadingFiles,
+  isLinkingFile,
+  isUnlinkingFile,
+  isUpdatingFile,
+  isDeletingImport,
   imports,
   resources,
   availableResources,
@@ -421,7 +435,7 @@ onMounted(() => {
     <template #content>
       <div class="space-y-4">
         <InfoBlock
-          :is-visible="isLoading"
+          :is-visible="isFetchingProjects"
           :show-loader="true"
           :show-dots="true"
         >
@@ -429,14 +443,14 @@ onMounted(() => {
         </InfoBlock>
 
         <InfoBlock
-          :is-visible="!isLoading && projectsList.length === 0"
+          :is-visible="!isFetchingProjects && projectsList.length === 0"
           :show-loader="false"
           :show-dots="false"
         >
           No projects yet. Create your first project to get started.
         </InfoBlock>
 
-        <div v-if="!isLoading" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div v-if="!isFetchingProjects" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div
             v-for="project in projectsList"
             :key="project.id"
@@ -650,6 +664,7 @@ onMounted(() => {
                           <AsyncButton
                             size="sm"
                             variant="destructive"
+                            :loading="isDeletingImport"
                             :on-click-async="(event: MouseEvent) => handleDeleteImport(import_.id)"
                           >
                             Delete Import
@@ -675,6 +690,7 @@ onMounted(() => {
                               <AsyncButton
                                 size="sm"
                                 variant="outline"
+                                :loading="isUpdatingFile"
                                 :on-click-async="(event: MouseEvent) => handleEditFile(file)"
                               >
                                 Edit
@@ -682,6 +698,7 @@ onMounted(() => {
                               <AsyncButton
                                 size="sm"
                                 variant="destructive"
+                                :loading="isUnlinkingFile"
                                 :on-click-async="(event: MouseEvent) => handleUnlinkFile(file.id)"
                               >
                                 Delete
@@ -701,13 +718,13 @@ onMounted(() => {
 
                     <InfoBlock
                       :is-visible="!imports || imports.length === 0"
-                      :show-loader="isLoadingResources"
-                      :show-dots="isLoadingResources"
+                      :show-loader="isFetchingImports"
+                      :show-dots="isFetchingImports"
                     >
-                      {{ isLoadingResources ? 'Loading imports...' : 'No imports in this project yet.' }}
+                      {{ isFetchingImports ? 'Loading imports...' : 'No imports in this project yet.' }}
                       <template #action>
                         <AsyncButton
-                          v-if="!isLoadingResources && selectedProjectId"
+                          v-if="!isFetchingImports && selectedProjectId"
                           size="sm"
                           variant="outline"
                           :on-click-async="handleRefreshImports"
@@ -748,6 +765,7 @@ onMounted(() => {
                         <AsyncButton
                           size="sm"
                           variant="destructive"
+                          :loading="isUnlinkingResource"
                           :on-click-async="() => handleUnlinkResource('user-files', file.id)"
                         >
                           Unlink
@@ -756,13 +774,13 @@ onMounted(() => {
                     </div>
                     <InfoBlock
                       :is-visible="resources['user-files'].length === 0"
-                      :show-loader="isLoadingResources"
-                      :show-dots="isLoadingResources"
+                      :show-loader="isFetchingUserFiles"
+                      :show-dots="isFetchingUserFiles"
                     >
-                      {{ isLoadingResources ? 'Loading files...' : 'No files linked to this project.' }}
+                      {{ isFetchingUserFiles ? 'Loading files...' : 'No files linked to this project.' }}
                       <template #action>
                         <AsyncButton
-                          v-if="!isLoadingResources && selectedProjectId"
+                          v-if="!isFetchingUserFiles && selectedProjectId"
                           size="sm"
                           variant="outline"
                           :on-click-async="handleRefreshUserFiles"
@@ -803,6 +821,7 @@ onMounted(() => {
                         <AsyncButton
                           size="sm"
                           variant="destructive"
+                          :loading="isUnlinkingResource"
                           :on-click-async="() => handleUnlinkResource('template-collections', collection.id)"
                         >
                           Unlink
@@ -811,13 +830,13 @@ onMounted(() => {
                     </div>
                     <InfoBlock
                       :is-visible="resources['template-collections'].length === 0"
-                      :show-loader="isLoadingResources"
-                      :show-dots="isLoadingResources"
+                      :show-loader="isFetchingTemplateCollections"
+                      :show-dots="isFetchingTemplateCollections"
                     >
-                      {{ isLoadingResources ? 'Loading collections...' : 'No template collections linked to this project.' }}
+                      {{ isFetchingTemplateCollections ? 'Loading collections...' : 'No template collections linked to this project.' }}
                       <template #action>
                         <AsyncButton
-                          v-if="!isLoadingResources && selectedProjectId"
+                          v-if="!isFetchingTemplateCollections && selectedProjectId"
                           size="sm"
                           variant="outline"
                           :on-click-async="handleRefreshTemplateCollections"
@@ -858,6 +877,7 @@ onMounted(() => {
                         <AsyncButton
                           size="sm"
                           variant="destructive"
+                          :loading="isUnlinkingResource"
                           :on-click-async="() => handleUnlinkResource('github-installations', installation.id)"
                         >
                           Unlink
@@ -866,13 +886,13 @@ onMounted(() => {
                     </div>
                     <InfoBlock
                       :is-visible="resources['github-installations'].length === 0"
-                      :show-loader="isLoadingResources"
-                      :show-dots="isLoadingResources"
+                      :show-loader="isFetchingGithubInstallations"
+                      :show-dots="isFetchingGithubInstallations"
                     >
-                      {{ isLoadingResources ? 'Loading installations...' : 'No GitHub installations linked to this project.' }}
+                      {{ isFetchingGithubInstallations ? 'Loading installations...' : 'No GitHub installations linked to this project.' }}
                       <template #action>
                         <AsyncButton
-                          v-if="!isLoadingResources && selectedProjectId"
+                          v-if="!isFetchingGithubInstallations && selectedProjectId"
                           size="sm"
                           variant="outline"
                           :on-click-async="handleRefreshGithubInstallations"
@@ -913,6 +933,7 @@ onMounted(() => {
                         <AsyncButton
                           size="sm"
                           variant="destructive"
+                          :loading="isUnlinkingResource"
                           :on-click-async="() => handleUnlinkResource('chat-conversations', conversation.id)"
                         >
                           Unlink
@@ -921,13 +942,13 @@ onMounted(() => {
                     </div>
                     <InfoBlock
                       :is-visible="resources['chat-conversations'].length === 0"
-                      :show-loader="isLoadingResources"
-                      :show-dots="isLoadingResources"
+                      :show-loader="isFetchingChatConversations"
+                      :show-dots="isFetchingChatConversations"
                     >
-                      {{ isLoadingResources ? 'Loading conversations...' : 'No chat conversations linked to this project.' }}
+                      {{ isFetchingChatConversations ? 'Loading conversations...' : 'No chat conversations linked to this project.' }}
                       <template #action>
                         <AsyncButton
-                          v-if="!isLoadingResources && selectedProjectId"
+                          v-if="!isFetchingChatConversations && selectedProjectId"
                           size="sm"
                           variant="outline"
                           :on-click-async="handleRefreshChatConversations"
@@ -948,6 +969,7 @@ onMounted(() => {
         <AsyncButton
           variant="destructive"
           :on-click-async="handleProjectDelete"
+          :loading="isDeletingProject"
         >
           Delete Project
         </AsyncButton>
@@ -957,6 +979,7 @@ onMounted(() => {
           </ShadcnButton>
           <AsyncButton
             :on-click-async="handleUpdateProject"
+            :loading="isUpdatingProject"
           >
             Save Changes
           </AsyncButton>
@@ -1128,6 +1151,7 @@ onMounted(() => {
         </ShadcnButton>
         <AsyncButton
           :disabled="newFileForm.files.length === 0"
+          :loading="isUploadingFiles"
           :on-click-async="handleCreateFile"
         >
           Upload Files
@@ -1223,6 +1247,7 @@ onMounted(() => {
           Cancel
         </ShadcnButton>
         <AsyncButton
+          :loading="isUpdatingFile"
           :on-click-async="handleSaveFileEdit"
         >
           Save Changes
@@ -1293,6 +1318,7 @@ onMounted(() => {
             <AsyncButton
               size="sm"
               :disabled="resources[selectedResourceType].some(r => r.id === resource.id)"
+              :loading="isLinkingResource"
               :on-click-async="async () => {
                 if (selectedProjectId && selectedResourceType) {
                   const resourceId = (() => {
@@ -1319,10 +1345,10 @@ onMounted(() => {
 
         <InfoBlock
           :is-visible="!selectedResourceType || availableResources[selectedResourceType].length === 0"
-          :show-loader="isLoadingResources"
-          :show-dots="isLoadingResources"
+          :show-loader="isFetchingAvailableResources"
+          :show-dots="isFetchingAvailableResources"
         >
-          {{ isLoadingResources ? 'Loading resources...' : 'No resources available to link.' }}
+          {{ isFetchingAvailableResources ? 'Loading resources...' : 'No resources available to link.' }}
         </InfoBlock>
       </ShadcnScrollArea>
 

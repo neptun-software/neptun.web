@@ -1,7 +1,6 @@
 import type { GetGithubAppInstallationRepository, NewGithubAppInstallationRepository } from '~/lib/types/database.tables/schema'
-import { and, eq, or, sql } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import {
-  github_app_installation,
   github_app_installation_repository,
 } from '~/lib/types/database.tables/schema'
 
@@ -63,13 +62,13 @@ export async function findRepositoryInUserInstallations(
     where: (installation, { eq }) => eq(installation.neptun_user_id, user_id),
     with: {
       github_app_installation_repositories: {
-        where: (repository, { eq }) => eq(repository.github_repository_id, github_repository_id)
-      }
-    }
+        where: (repository, { eq }) => eq(repository.github_repository_id, github_repository_id),
+      },
+    },
   })
 
   const validInstallations = installations.filter(
-    inst => inst.github_app_installation_repositories.length > 0
+    inst => inst.github_app_installation_repositories.length > 0,
   )
 
   if (validInstallations.length === 0) {
@@ -77,13 +76,13 @@ export async function findRepositoryInUserInstallations(
   }
 
   const exactMatch = validInstallations.find(
-    inst => inst.github_account_id === github_account_id
+    inst => inst.github_account_id === github_account_id,
   )
 
   const selectedInstallation = exactMatch || validInstallations[0]
 
   return {
     installation: selectedInstallation,
-    repository: selectedInstallation.github_app_installation_repositories[0]
+    repository: selectedInstallation.github_app_installation_repositories[0],
   }
 }

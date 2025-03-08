@@ -6,7 +6,7 @@ const amount = 20
 const sineDots = Math.floor(amount * 0.3)
 const idleTimeout = 150
 
-const scrollElement = ref(null)
+const $scrollElement = ref(null)
 const isScrolling = ref(false)
 const { x: scrollX, y: scrollY } = useWindowScroll() // needed, so that the bubbles are set to the right position, when the user scrolls
 const { x: mouseX, y: mouseY } = useMouse()
@@ -153,9 +153,9 @@ onMounted(() => {
 
   document.getElementById('home').style.cursor = 'none'
 
-  scrollElement.value = window
-  if (scrollElement.value) {
-    const { isScrolling: scrollStatus } = useScroll(scrollElement.value, {
+  $scrollElement.value = window
+  if ($scrollElement.value) {
+    const { isScrolling: scrollStatus } = useScroll($scrollElement.value, {
       throttle: 16,
     })
 

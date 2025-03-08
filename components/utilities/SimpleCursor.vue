@@ -26,13 +26,13 @@ const isVisible = ref(false)
 const { x, y } = useMouse({ type: 'client' })
 const { x: scrollX, y: scrollY } = useWindowScroll()
 
-const targetElements = ref([])
+const $targetElements = ref([])
 const isHovering = computed(() => {
-  if (targetElements.value.length === 0) {
+  if ($targetElements.value.length === 0) {
     return false
   }
 
-  return targetElements.value.some((el) => {
+  return $targetElements.value.some((el) => {
     if (!el) {
       return false
     }
@@ -83,7 +83,7 @@ function updateCursorPosition() {
 const updateCursorPositionDebounced = useDebounceFn(updateCursorPosition, 5)
 
 function updateTargetElements() {
-  targetElements.value = props.targets
+  $targetElements.value = props.targets
     .map(selector => document.querySelector(selector))
     .filter(el => el)
 }

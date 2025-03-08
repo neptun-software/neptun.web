@@ -10,38 +10,98 @@ const { data, error } = await useFetch(
 )
 
 const cookieVisible = ref(false)
-const markdownEl = ref<HTMLElement | null>(null)
+const $markdownElement = ref<HTMLElement | null>(null)
 const cookieMask = '•'.repeat(40)
+const cookieCopied = ref(false)
+const { copy } = useClipboard({ legacy: true })
+
+function copyCookie() {
+  if (data.value?.auth?.neptun_session_cookie) {
+    copy(data.value.auth.neptun_session_cookie)
+    cookieCopied.value = true
+    setTimeout(() => {
+      cookieCopied.value = false
+    }, 2000)
+  }
+}
+
+function handleMarkdownClick(event) {
+  const line = event.target.closest('.line')
+  if (!line) {
+    return
+  }
+
+  if (line.textContent?.includes('neptun_session_cookie')) {
+    copyCookie()
+  }
+}
+
+function styleCookieLine() {
+  if (!$markdownElement.value) {
+    return
+  }
+
+  const lines = $markdownElement.value.querySelectorAll('.line')
+  if (!lines || !lines.length) {
+    return
+  }
+
+  for (const line of lines) {
+    if (line.textContent?.includes('neptun_session_cookie')) {
+      line.classList.add('cookie-line')
+      line.style.cursor = 'pointer'
+      line.style.borderRadius = '0.25rem'
+      line.style.padding = '0.25rem 0.5rem'
+      line.style.position = 'relative'
+
+      const spans = line.querySelectorAll('span')
+      for (const span of spans) {
+        if (span.textContent?.includes('"neptun_session_cookie"')) {
+          let currentSpan = span.nextElementSibling
+          while (currentSpan) {
+            if (currentSpan.textContent?.includes('"')
+              && (currentSpan.textContent?.includes('•')
+                || currentSpan.textContent?.includes(data.value?.auth?.neptun_session_cookie ?? ''))) {
+              currentSpan.classList.add('cookie-value')
+              currentSpan.dataset.cookieValue = 'true'
+              break
+            }
+            currentSpan = currentSpan.nextElementSibling
+          }
+          break
+        }
+      }
+    }
+  }
+}
 
 function toggleCookieVisibility() {
   cookieVisible.value = !cookieVisible.value
 
   nextTick(() => {
-    const lines = markdownEl.value?.querySelectorAll('.line')
+    const lines = $markdownElement.value?.querySelectorAll('.line')
     if (!lines) {
       return
     }
 
-    if (lines) {
-      for (const line of lines) {
-        if (line.textContent?.includes('neptun_session_cookie')) {
-          const spans = line.querySelectorAll('span')
-          for (const span of spans) {
-            if (span.textContent?.includes('"neptun_session_cookie"')) {
-              let currentSpan = span.nextElementSibling
-              while (currentSpan) {
-                if (currentSpan.textContent?.includes('"')
-                  && (currentSpan.textContent?.includes('•')
-                    || currentSpan.textContent?.includes(data.value?.auth?.neptun_session_cookie ?? ''))) {
-                  if (cookieVisible.value) {
-                    currentSpan.textContent = `"${data.value?.auth?.neptun_session_cookie}"`
-                  } else {
-                    currentSpan.textContent = `"${cookieMask}"`
-                  }
-                  return
+    for (const line of lines) {
+      if (line.textContent?.includes('neptun_session_cookie')) {
+        const spans = line.querySelectorAll('span')
+        for (const span of spans) {
+          if (span.textContent?.includes('"neptun_session_cookie"')) {
+            let currentSpan = span.nextElementSibling
+            while (currentSpan) {
+              if (currentSpan.textContent?.includes('"')
+                && (currentSpan.textContent?.includes('•')
+                  || currentSpan.textContent?.includes(data.value?.auth?.neptun_session_cookie ?? ''))) {
+                if (cookieVisible.value) {
+                  currentSpan.textContent = `"${data.value?.auth?.neptun_session_cookie}"`
+                } else {
+                  currentSpan.textContent = `"${cookieMask}"`
                 }
-                currentSpan = currentSpan.nextElementSibling
+                return
               }
+              currentSpan = currentSpan.nextElementSibling
             }
           }
         }
@@ -87,6 +147,31 @@ const pipInstallCommand = 'pip install neptun'
 async function downloadConfiguration() {
   await downloadAsFile(cliConfigurationToCopy.value, 'neptun-config', 'application/json', 'json')
 }
+
+onMounted(() => {
+  if ($markdownElement.value) {
+    useMutationObserver($markdownElement.value, () => {
+      nextTick(styleCookieLine)
+    }, {
+      childList: true,
+      subtree: true,
+      attributes: false,
+      characterData: true,
+    })
+  }
+
+  nextTick(styleCookieLine)
+})
+
+watch(() => $markdownElement.value, (newVal) => {
+  if (newVal) {
+    nextTick(styleCookieLine)
+  }
+})
+
+watch(cookieVisible, () => {
+  nextTick(styleCookieLine)
+})
 </script>
 
 <template>
@@ -94,9 +179,15 @@ async function downloadConfiguration() {
     <div class="overflow-hidden relative my-2 rounded-lg border bg-background border-slate-200 dark:border-border">
       <ShadcnScrollArea class="max-w-[calc(100vw-(1rem))] px-2 py-2">
         <ShadcnScrollBar orientation="horizontal" />
-        <div ref="markdownEl">
+        <div
+          ref="$markdownElement"
+          @click="handleMarkdownClick"
+        >
           <ClientOnly fallback-tag="div">
-            <MarkdownRenderer :content="cliConfigurationMarkdown" />
+            <MarkdownRenderer
+              :content="cliConfigurationMarkdown"
+              @rendered="styleCookieLine"
+            />
             <template #fallback>
               <ShadcnSkeleton class="my-2 w-full h-10 bg-slate-400" />
             </template>
@@ -113,10 +204,10 @@ async function downloadConfiguration() {
                 @click="toggleCookieVisibility"
               >
                 <span v-if="cookieVisible">
-                  <EyeOff class="size-5" />
+                  <EyeOff class="size-6" />
                 </span>
                 <span v-else>
-                  <Eye class="size-5" />
+                  <Eye class="size-6" />
                 </span>
               </ShadcnButton>
 
@@ -134,6 +225,14 @@ async function downloadConfiguration() {
           </ClientOnly>
         </div>
       </ShadcnScrollArea>
+
+      <!-- Copied notification -->
+      <div
+        v-if="cookieCopied"
+        class="absolute top-1/2 left-1/2 z-10 px-2 py-1 text-sm text-white bg-green-500 rounded transform -translate-x-1/2 -translate-y-1/2"
+      >
+        Cookie copied!
+      </div>
     </div>
 
     <div>
@@ -165,4 +264,25 @@ async function downloadConfiguration() {
   </div>
 </template>
 
-<style scoped></style>
+<style lang="postcss" scoped>
+:deep(.cookie-line:hover) {
+  @apply bg-secondary;
+}
+
+/* Show the tooltip only when cookieVisible is false */
+:deep(.cookie-line:hover)::after {
+  content: 'Click to copy';
+  display: v-bind('!cookieVisible ? "block" : "none"');
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;
+  @apply bg-secondary text-secondary-foreground;
+}
+</style>

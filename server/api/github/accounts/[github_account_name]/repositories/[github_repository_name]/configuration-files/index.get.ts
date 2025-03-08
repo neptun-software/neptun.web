@@ -1,5 +1,6 @@
+import type { GitHubResponse } from '~/server/api/github/(shared)/file'
 import { graphql } from '@octokit/graphql'
-import { CONFIG_FILES_QUERY, GitHubResponse, processEntries, handleGitHubError } from '~/server/api/github/(shared)/file'
+import { CONFIG_FILES_QUERY, handleGitHubError, processEntries } from '~/server/api/github/(shared)/file'
 import { validateParamGithubRepositoryName } from '~/server/utils/validate'
 
 export default defineEventHandler(async (event) => {
@@ -60,7 +61,6 @@ export default defineEventHandler(async (event) => {
         repository: github_repository_name,
         config_files: configFiles,
       }
-
     } catch (noTokenError) {
       if (process.env.GITHUB_TOKEN) {
         graphqlWithAuth = graphql.defaults({
@@ -101,7 +101,7 @@ export default defineEventHandler(async (event) => {
         }
       } else {
         if (noTokenError instanceof Error) {
-            const errorMessage = noTokenError.message.toLowerCase()
+          const errorMessage = noTokenError.message.toLowerCase()
 
           if (errorMessage.includes('bad credentials') || errorMessage.includes('not found')) {
             return sendError(event, createError({

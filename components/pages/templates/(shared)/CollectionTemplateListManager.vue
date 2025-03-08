@@ -45,10 +45,10 @@ interface ExtendedFile extends File {
 }
 
 const files = ref<ExtendedFile[]>([])
-const inputFileRef = ref<HTMLInputElement | null>(null)
-const dropZoneRef = ref<HTMLDivElement>()
+const $inputFileElement = ref<HTMLInputElement | null>(null)
+const $dropZoneElement = ref<HTMLDivElement>()
 
-const { isOverDropZone } = useDropZone(dropZoneRef, {
+const { isOverDropZone } = useDropZone($dropZoneElement, {
   onDrop,
 })
 
@@ -68,10 +68,10 @@ function onFileInput(event: Event) {
 }
 
 function updateInputFileValue() {
-  if (inputFileRef.value) {
+  if ($inputFileElement.value) {
     const dataTransfer = new DataTransfer()
     files.value.forEach(file => dataTransfer.items.add(file))
-    inputFileRef.value.files = dataTransfer.files
+    $inputFileElement.value.files = dataTransfer.files
   }
 }
 
@@ -505,14 +505,14 @@ async function handleUploadCollection(data: ImportedTemplateData) {
           <!-- File Upload -->
           <div class="flex flex-col gap-2 p-4 rounded-md border">
             <ShadcnInput
-              ref="inputFileRef"
+              ref="$inputFileElement"
               type="file"
               multiple
               class="flex justify-center items-center p-4 w-full h-32 rounded-md border-2 border-dashed bg-secondary text-secondary-foreground border-primary"
               @change="onFileInput"
             >
               <div
-                ref="dropZoneRef"
+                ref="$dropZoneElement"
                 class="flex justify-center items-center p-4 w-full h-full bg-secondary text-secondary-foreground"
               >
                 Drop files here... ({{ isOverDropZone }})

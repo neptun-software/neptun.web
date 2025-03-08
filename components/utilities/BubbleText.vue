@@ -17,7 +17,7 @@ const { pressed } = useMousePressed() // touch and click
 const { width, height } = useWindowSize()
 const mouse = ref<Mouse>({ x: 0, y: 0 })
 const radius = ref<number>(1)
-const canvas = ref<HTMLCanvasElement | null>(null)
+const $canvasElement = ref<HTMLCanvasElement | null>(null)
 const particles: Particle[] = []
 const isLoaded = ref(false)
 
@@ -111,26 +111,26 @@ class Particle {
 }
 
 function initScene() {
-  if (!canvas.value) {
+  if (!$canvasElement.value) {
     return
   }
 
-  const ctx = canvas.value.getContext('2d', { willReadFrequently: true })
+  const ctx = $canvasElement.value.getContext('2d', { willReadFrequently: true })
   if (!ctx) {
     return
   }
 
-  const ww = (canvas.value.width = window.innerWidth)
-  const wh = (canvas.value.height = window.innerHeight)
+  const ww = ($canvasElement.value.width = window.innerWidth)
+  const wh = ($canvasElement.value.height = window.innerHeight)
 
-  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
+  ctx.clearRect(0, 0, $canvasElement.value.width, $canvasElement.value.height)
   ctx.font = `bold ${ww / 4}px sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle' // align text vertically in the middle
   ctx.fillText(props.text || 'Neptun', ww / 2, wh / 2)
 
   const data = ctx.getImageData(0, 0, ww, wh).data
-  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
+  ctx.clearRect(0, 0, $canvasElement.value.width, $canvasElement.value.height)
   ctx.globalCompositeOperation = 'screen'
 
   particles.length = 0
@@ -144,17 +144,17 @@ function initScene() {
 }
 
 function render() {
-  if (!canvas.value) {
+  if (!$canvasElement.value) {
     return
   }
 
-  const ctx = canvas.value.getContext('2d')
+  const ctx = $canvasElement.value.getContext('2d')
   if (!ctx) {
     return
   }
 
   requestAnimationFrame(render)
-  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
+  ctx.clearRect(0, 0, $canvasElement.value.width, $canvasElement.value.height)
   particles.forEach(particle =>
     particle.render(ctx, mouse.value, radius.value),
   )
@@ -174,7 +174,7 @@ onMounted(() => {
 
 <template>
   <div class="overflow-hidden h-full bg-slate-950">
-    <canvas id="scene" ref="canvas" class="z-10" />
+    <canvas id="scene" ref="$canvasElement" class="z-10" />
     <div class="absolute left-0 w-full bg-cyan-600">
       <div>
         <svg

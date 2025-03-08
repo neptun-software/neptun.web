@@ -41,7 +41,7 @@ onMounted(async () => {
 
 <template>
   <div v-if="isLoading && data.length === 0">
-    <InfoBlock :is-visible="true" show-loader show-dots>
+    <InfoBlock :is-visible="true" show-loader show-dots class="mb-0">
       Loading templates
     </InfoBlock>
   </div>
@@ -64,19 +64,24 @@ onMounted(async () => {
       </ShadcnButton>
     </div>
 
-    <CollectionTemplateList :collections="data" :is-loading="isLoading" />
+    <CollectionTemplateList
+      :key="`page-${currentPage}`"
+      :collections="data"
+      :is-loading="isLoading"
+    />
 
     <InfoBlock
       :is-visible="isLoading"
       show-loader
       show-dots
+      class="mb-0"
     >
       Loading templates
     </InfoBlock>
   </div>
 
   <div v-else>
-    <InfoBlock :is-visible="true">
+    <InfoBlock :is-visible="true" class="mb-0">
       No templates found
     </InfoBlock>
   </div>
