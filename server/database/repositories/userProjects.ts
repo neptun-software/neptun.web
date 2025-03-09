@@ -1,6 +1,7 @@
 import type { GetProject, ProjectToCreate, ReadProject, ReadUser } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
 import { neptun_user_project } from '../../../lib/types/database.tables/schema'
+import { generateProjectContext, updateProjectContext } from './projectContext'
 
 export async function createProject(user_id: ReadUser['id'], project: ProjectToCreate) {
   const createdProject = await db
@@ -17,6 +18,16 @@ export async function createProject(user_id: ReadUser['id'], project: ProjectToC
   if (!createdProject) {
     return null
   }
+
+  try {
+    const context = await generateProjectContext(user_id, createdProject[0].id)
+    await updateProjectContext(user_id, createdProject[0].id, context)
+  } catch (err) {
+    if (LOG_BACKEND) {
+      console.error('Failed to generate initial project context:', err)
+    }
+  }
+
   return createdProject[0]
 }
 
@@ -118,6 +129,15 @@ export async function updateProject(
   if (!updatedProject) {
     return null
   }
+
+  try {
+    await updateProjectContext(user_id, project_id)
+  } catch (err) {
+    if (LOG_BACKEND) {
+      console.error('Failed to update project context after project update:', err)
+    }
+  }
+
   return updatedProject[0]
 }
 

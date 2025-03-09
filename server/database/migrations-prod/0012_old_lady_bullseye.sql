@@ -1,0 +1,1 @@
+ALTER TABLE "neptun_user_project" ADD COLUMN "prompt_context" jsonb;

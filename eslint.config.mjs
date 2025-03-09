@@ -60,6 +60,8 @@ export default withNuxt(
     files: ['**/*.md'],
     rules: {
       'no-irregular-whitespace': 'off',
+      'format/prettier': 'off',
+      'style/no-multiple-empty-lines': 'off',
     },
   },
   {

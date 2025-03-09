@@ -4,12 +4,15 @@ import type {
   ReadTemplateCollection,
   ReadUserFile,
 } from '../../../lib/types/database.tables/schema'
+import { eq } from 'drizzle-orm'
+import { neptun_user_project } from '../../../lib/types/database.tables/schema'
 import {
   createProjectChatConversation,
   deleteProjectChatConversation,
   readAllProjectChatConversations,
   readProjectChatConversation,
 } from './projectChatConversations'
+import { updateProjectContext } from './projectContext'
 import {
   createProjectGithubInstallation,
   deleteProjectGithubInstallation,
@@ -30,43 +33,92 @@ import {
 } from './projectUserFiles'
 
 export type ResourceType = 'user-files' | 'template-collections' | 'github-installations' | 'chat-conversations'
+export type ProjectResource = ReadUserFile | ReadTemplateCollection | GetGithubAppInstallation | ReadChatConversation
 
 /* CREATE RESOURCE */
 export async function createResource(
   project_id: number,
   resource_type: ResourceType,
   resource_id: number,
-): Promise<ReadUserFile | ReadTemplateCollection | GetGithubAppInstallation | ReadChatConversation | null> {
+): Promise<ProjectResource | null> {
+  let result: ProjectResource | null = null
+  let installation: GetGithubAppInstallation | null = null
+
   switch (resource_type) {
     case 'user-files':
-      return createProjectUserFile(project_id, resource_id)
+      result = await createProjectUserFile(project_id, resource_id)
+      break
     case 'template-collections':
-      return createProjectTemplateCollection(project_id, resource_id)
+      result = await createProjectTemplateCollection(project_id, resource_id)
+      break
     case 'github-installations':
-      return createProjectGithubInstallation(project_id, resource_id)
+      installation = await createProjectGithubInstallation(project_id, resource_id)
+      if (installation) {
+        result = {
+          ...installation,
+          github_installation_id: installation.id,
+        } as GetGithubAppInstallation
+      }
+      break
     case 'chat-conversations':
-      return createProjectChatConversation(project_id, resource_id)
+      result = await createProjectChatConversation(project_id, resource_id)
+      break
     default:
-      throw new Error(`Invalid resource type: ${resource_type as ResourceType}`)
+      throw new Error(`Invalid resource type: ${String(resource_type)}`)
   }
+
+  if (result) {
+    const project = await db
+      .select()
+      .from(neptun_user_project)
+      .where(eq(neptun_user_project.id, project_id))
+      .limit(1)
+      .catch(() => null)
+
+    if (project && project.length > 0) {
+      try {
+        await updateProjectContext(project[0].neptun_user_id, project_id)
+      } catch (err) {
+        if (LOG_BACKEND) {
+          console.error('Failed to update project context after resource creation:', err)
+        }
+      }
+    }
+  }
+
+  return result
 }
 
 /* READ ALL RESOURCES */
 export async function readAllResources(
   project_id: number,
   resource_type: ResourceType,
-): Promise<(ReadUserFile | ReadTemplateCollection | GetGithubAppInstallation | ReadChatConversation)[] | null> {
+): Promise<ProjectResource[]> {
   switch (resource_type) {
-    case 'user-files':
-      return readAllProjectUserFiles(project_id)
-    case 'template-collections':
-      return readAllProjectTemplateCollections(project_id)
-    case 'github-installations':
-      return readAllProjectGithubInstallations(project_id)
-    case 'chat-conversations':
-      return readAllProjectChatConversations(project_id)
+    case 'user-files': {
+      const files = await readAllProjectUserFiles(project_id)
+      return (files || []) as ReadUserFile[]
+    }
+    case 'template-collections': {
+      const templates = await readAllProjectTemplateCollections(project_id)
+      return (templates || []) as ReadTemplateCollection[]
+    }
+    case 'github-installations': {
+      const installations = await readAllProjectGithubInstallations(project_id)
+      if (!installations) {
+        return []
+      }
+      return installations.map(installation => ({
+        ...installation,
+        github_installation_id: installation.id,
+      })) as GetGithubAppInstallation[]
+    }
+    case 'chat-conversations': {
+      const conversations = await readAllProjectChatConversations(project_id)
+      return (conversations || []) as ReadChatConversation[]
+    }
     default:
-      throw new Error(`Invalid resource type: ${resource_type as ResourceType}`)
+      throw new Error(`Invalid resource type: ${String(resource_type)}`)
   }
 }
 
@@ -75,18 +127,26 @@ export async function readResource(
   project_id: number,
   resource_type: ResourceType,
   resource_id: number,
-): Promise<ReadUserFile | ReadTemplateCollection | GetGithubAppInstallation | ReadChatConversation | null> {
+): Promise<ProjectResource | null> {
   switch (resource_type) {
     case 'user-files':
       return readProjectUserFile(project_id, resource_id)
     case 'template-collections':
       return readProjectTemplateCollection(project_id, resource_id)
-    case 'github-installations':
-      return readProjectGithubInstallation(project_id, resource_id)
+    case 'github-installations': {
+      const installation = await readProjectGithubInstallation(project_id, resource_id)
+      if (installation) {
+        return {
+          ...installation,
+          github_installation_id: installation.id,
+        } as GetGithubAppInstallation
+      }
+      return null
+    }
     case 'chat-conversations':
       return readProjectChatConversation(project_id, resource_id)
     default:
-      throw new Error(`Invalid resource type: ${resource_type as ResourceType}`)
+      throw new Error(`Invalid resource type: ${String(resource_type)}`)
   }
 }
 
@@ -107,9 +167,28 @@ export async function deleteResource(
       case 'chat-conversations':
         return deleteProjectChatConversation(project_id, resource_id)
       default:
-        throw new Error(`Invalid resource type: ${resource_type as ResourceType}`)
+        throw new Error(`Invalid resource type: ${String(resource_type)}`)
     }
   })()
+
+  if (result) {
+    const project = await db
+      .select()
+      .from(neptun_user_project)
+      .where(eq(neptun_user_project.id, project_id))
+      .limit(1)
+      .catch(() => null)
+
+    if (project && project.length > 0) {
+      try {
+        await updateProjectContext(project[0].neptun_user_id, project_id)
+      } catch (err) {
+        if (LOG_BACKEND) {
+          console.error('Failed to update project context after resource deletion:', err)
+        }
+      }
+    }
+  }
 
   return Boolean(result)
 }

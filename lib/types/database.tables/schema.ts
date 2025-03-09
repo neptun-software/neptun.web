@@ -631,6 +631,7 @@ export const neptun_user_project = pgTable('neptun_user_project', {
   description: text('description'),
   type: project_type('type').notNull(),
   main_language: programming_language('main_language').notNull(),
+  prompt_context: jsonb('prompt_context'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at')
     .defaultNow()
@@ -685,6 +686,53 @@ export type GetProject = typeof neptun_user_project.$inferSelect
 
 export type ProjectToCreate = Omit<NewProject, 'id' | 'created_at' | 'updated_at' | 'neptun_user_id'>
 export type ReadProject = GetProject
+
+export interface ProjectPromptContext {
+  identity: {
+    name: string
+    creator: string
+  }
+  goal: string
+  returnFormat: string
+  rules: string[]
+  project: {
+    name: string
+    description?: string
+    type: string
+    main_language: string
+    created_at: string
+    updated_at: string
+  }
+  resources: {
+    files?: {
+      id: number
+      title: string
+      language: string
+      extension: string
+      content: string
+      summary?: string
+      original_path?: string
+      parent_path?: string
+      depth?: number
+      import_id?: number
+    }[]
+    templates?: {
+      id: number
+      name: string
+      description?: string
+      content?: string
+    }[]
+    imports?: {
+      id: number
+      source_type: string
+      source_path: string
+      source_ref: string | null
+      import_status: string
+      file_tree: unknown
+    }[]
+  }
+  currentDate: string
+}
 
 const InsertProjectSchemaBase = createInsertSchema(neptun_user_project)
 export const InsertProjectSchema = InsertProjectSchemaBase.pick({

@@ -4,7 +4,7 @@ import { convertStringsToDates } from '~/utils/formatters'
 export function useProjects() {
   const activeProject = useState<GetProject | undefined>('active-project', () => undefined)
   const projectsList = useState<GetProject[]>('projects-list', () => [])
-  
+
   const isFetchingProject = useState<boolean>('project-fetching', () => false)
   const isFetchingProjects = useState<boolean>('projects-fetching', () => false)
   const isCreatingProject = useState<boolean>('project-creating', () => false)
@@ -51,9 +51,9 @@ export function useProjects() {
         method: 'POST',
         body: project,
       })
-      
+
       projectsList.value = [...projectsList.value, convertStringsToDates(response)]
-      
+
       return response.id
     } catch (error) {
       console.error('Failed to create project:', error)
@@ -67,21 +67,21 @@ export function useProjects() {
     try {
       isUpdatingProject.value = true
       const { user } = useUserSession()
-      
+
       const response = await $fetch<GetProject>(`/api/users/${user.value?.id}/projects/${projectId}`, {
         method: 'PATCH',
         body: updates,
       })
-      
+
       const index = projectsList.value.findIndex(p => p.id === projectId)
       if (index !== -1) {
         projectsList.value[index] = convertStringsToDates(response)
       }
-      
+
       if (activeProject.value && activeProject.value.id === projectId) {
         activeProject.value = convertStringsToDates(response)
       }
-      
+
       return response
     } catch (error) {
       console.error('Failed to update project:', error)
@@ -95,17 +95,17 @@ export function useProjects() {
     try {
       isDeletingProject.value = true
       const { user } = useUserSession()
-      
+
       await $fetch(`/api/users/${user.value?.id}/projects/${projectId}`, {
         method: 'DELETE',
       })
-      
+
       projectsList.value = projectsList.value.filter(p => p.id !== projectId)
-      
+
       if (activeProject.value && activeProject.value.id === projectId) {
         activeProject.value = undefined
       }
-      
+
       return true
     } catch (error) {
       console.error('Failed to delete project:', error)

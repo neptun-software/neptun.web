@@ -68,6 +68,8 @@
 - `PATCH` [`/api/users/{user_id}/projects/{project_id}`](../api-users-{user_id}-projects-{project_id}.patch.md)
 - `DELETE` [`/api/users/{user_id}/projects/{project_id}`](../api-users-{user_id}-projects-{project_id}.delete.md)
 - `GET` `/api/users/{user_id}/projects/{project_id}/chats` [read](../api-users-{user_id}-projects-{project_id}-chats.get.md)
+- `GET` && `POST` `/api/users/{user_id}/projects/{project_id}/context` [read](../api-users-{user_id}-projects-{project_id}-context.get.md) | [create](../api-users-{user_id}-projects-{project_id}-context.post.md)
+- `GET` [`/api/users/{user_id}/projects/{project_id}/context/markdown`](../api-users-{user_id}-projects-{project_id}-context-markdown.get.md)
 
 ### Project Resources Routes
 

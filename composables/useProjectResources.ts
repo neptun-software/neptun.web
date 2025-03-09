@@ -53,7 +53,7 @@ interface ApiError {
 
 export function useProjectResources() {
   const { user } = useUserSession()
-  
+
   const isFetchingUserFiles = ref(false)
   const isFetchingTemplateCollections = ref(false)
   const isFetchingGithubInstallations = ref(false)
@@ -245,8 +245,8 @@ export function useProjectResources() {
   }
 
   async function createImport(projectId: number) {
+    isCreatingImport.value = true
     try {
-      isCreatingImport.value = true
       const userId = user.value?.id
       if (!userId) {
         throw new Error('User not found')
@@ -269,8 +269,6 @@ export function useProjectResources() {
         },
       )
       return response.id
-    } catch (error) {
-      throw error
     } finally {
       isCreatingImport.value = false
     }

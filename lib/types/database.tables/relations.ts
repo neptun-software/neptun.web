@@ -206,6 +206,7 @@ export const projectRelations = relations(
     user_files: many(project_user_file),
     github_installations: many(project_github_installation),
     chat_conversations: many(project_chat_conversation),
+    context_imports: many(neptun_context_import),
   }),
 )
 
