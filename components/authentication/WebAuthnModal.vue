@@ -23,6 +23,9 @@ async function signUp() {
     .then(() => {
       fetch()
       show.value = false
+      navigateTo('/dashboard', {
+        redirectCode: 303,
+      })
     })
     .catch((err) => {
       console.log(err)
@@ -40,6 +43,9 @@ async function signIn() {
     .then(() => {
       fetch()
       show.value = false
+      navigateTo('/dashboard', {
+        redirectCode: 303,
+      })
     })
     .catch((err) => {
       console.log(err)
