@@ -58,6 +58,7 @@
     "RWKV",
     "shadcn",
     "shiki",
+    "simplewebauthn",
     "sonner",
     "sveltekit",
     "Swrv",
@@ -73,6 +74,7 @@
     "vfile",
     "vite",
     "vueuse",
+    "webauthn",
     "yoyo",
     "yxxx"
   ],

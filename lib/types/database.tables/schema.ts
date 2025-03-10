@@ -1,7 +1,9 @@
+import type { WebAuthnCredential } from '#auth-utils'
 import type { Message } from 'ai'
 import {
   boolean,
   integer,
+  json,
   jsonb,
   pgEnum,
   pgTable,
@@ -219,6 +221,64 @@ export const SelectOauthAccountSchema = SelectOauthAccountSchemaBase.pick({
   oauth_email: true,
   provider: true,
 })
+
+/* WebAuthn Credentials */
+
+export const neptun_user_webauthn_credential = pgTable('neptun_user_webauthn_credential', {
+  id: text('id').unique().notNull(), // Credential ID
+  public_key: text('public_key').notNull(),
+  counter: integer('counter').notNull().default(0),
+  backed_up: boolean('backed_up').notNull().default(false),
+  transports: json('transports').notNull().$type<WebAuthnCredential['transports']>(),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+
+  user_id: integer('neptun_user_id')
+    .notNull()
+    .references(() => neptun_user.id, { onDelete: 'cascade' }),
+})
+
+type NewWebAuthnCredential = typeof neptun_user_webauthn_credential.$inferInsert
+type GetWebAuthnCredential = typeof neptun_user_webauthn_credential.$inferSelect
+
+export type WebAuthnCredentialToCreate = Omit<NewWebAuthnCredential, 'created_at' | 'updated_at'>
+export type ReadWebAuthnCredential = GetWebAuthnCredential
+
+export const InsertWebAuthnCredentialSchema = createInsertSchema(neptun_user_webauthn_credential).pick({
+  id: true,
+  user_id: true,
+  public_key: true,
+  counter: true,
+  backed_up: true,
+  transports: true,
+})
+
+export const SelectWebAuthnCredentialSchema = createSelectSchema(neptun_user_webauthn_credential)
+
+// WebAuthn Challenges for security
+export const neptun_webauthn_challenge = pgTable('neptun_webauthn_challenge', {
+  id: serial('id').primaryKey(),
+  attempt_id: text('attempt_id').unique().notNull(),
+  challenge: text('challenge').notNull(),
+  created_at: timestamp('created_at').defaultNow(),
+  expires_at: timestamp('expires_at').notNull(),
+})
+
+type NewWebAuthnChallenge = typeof neptun_webauthn_challenge.$inferInsert
+type GetWebAuthnChallenge = typeof neptun_webauthn_challenge.$inferSelect
+
+export type WebAuthnChallengeToCreate = Omit<NewWebAuthnChallenge, 'id' | 'created_at'>
+export type ReadWebAuthnChallenge = GetWebAuthnChallenge
+
+export const InsertWebAuthnChallengeSchema = createInsertSchema(neptun_webauthn_challenge).pick({
+  attempt_id: true,
+  challenge: true,
+  expires_at: true,
+})
+
+export const SelectWebAuthnChallengeSchema = createSelectSchema(neptun_webauthn_challenge)
 
 /* CHATS */
 

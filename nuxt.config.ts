@@ -392,4 +392,8 @@ export default defineNuxtConfig({
      */
     componentDir: './components/shadcn',
   },
+
+  auth: {
+    webAuthn: true,
+  },
 })

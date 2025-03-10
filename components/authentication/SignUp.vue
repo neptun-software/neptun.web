@@ -52,7 +52,7 @@ async function signUp() {
 
 <template>
   <div>
-    <ShadcnCard class="max-w-full mx-2">
+    <ShadcnCard class="mx-2 max-w-full">
       <ShadcnCardHeader>
         <ShadcnCardTitle class="text-xl">
           Sign Up
@@ -109,9 +109,12 @@ async function signUp() {
               </ul>
             </div>
 
-            <AsyncButton class="w-full" :on-click-async="signUp">
-              Create an account
-            </AsyncButton>
+            <div class="flex gap-2">
+              <AsyncButton class="flex-1" :on-click-async="signUp">
+                Create with Password
+              </AsyncButton>
+              <WebAuthnModal />
+            </div>
 
             <ShadcnSeparator label="or Oauth" class="my-2" />
 

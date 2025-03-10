@@ -58,6 +58,8 @@
     "@octokit/graphql-schema": "^15.26.0",
     "@openrouter/ai-sdk-provider": "^0.2.2",
     "@radix-icons/vue": "^1.0.0",
+    "@simplewebauthn/browser": "11",
+    "@simplewebauthn/server": "11",
     "@tanstack/vue-table": "^8.20.5",
     "@uploadthing/nuxt": "^7.1.5",
     "@vee-validate/zod": "^4.15.0",

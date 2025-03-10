@@ -15,6 +15,7 @@ import {
   neptun_user_project,
   neptun_user_template,
   neptun_user_template_collection,
+  neptun_user_webauthn_credential,
   project_chat_conversation,
   project_github_installation,
   project_template_collection,
@@ -25,6 +26,7 @@ export const neptun_userRelations = relations(
   neptun_user,
   ({ many }) => ({
     neptun_user_oauth_accounts: many(neptun_user_oauth_account),
+    webauthn_credentials: many(neptun_user_webauthn_credential),
     github_app_installations: many(github_app_installation),
     chat_conversations: many(chat_conversation),
     chat_conversation_share_whitelists: many(
@@ -38,6 +40,16 @@ export const neptun_userRelations = relations(
     context_imports: many(neptun_context_import),
     context_files: many(neptun_context_file),
   }))
+
+export const neptun_user_webauthn_credentialRelations = relations(
+  neptun_user_webauthn_credential,
+  ({ one }) => ({
+    neptun_user: one(neptun_user, {
+      fields: [neptun_user_webauthn_credential.user_id],
+      references: [neptun_user.id],
+    }),
+  }),
+)
 
 export const neptun_user_oauth_accountRelations = relations(
   neptun_user_oauth_account,

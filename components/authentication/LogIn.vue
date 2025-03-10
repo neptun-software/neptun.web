@@ -118,9 +118,12 @@ async function signIn() {
               </ul>
             </div>
 
-            <AsyncButton class="w-full" :on-click-async="signIn">
-              Login to your account
-            </AsyncButton>
+            <div class="flex gap-2">
+              <AsyncButton class="flex-1" :on-click-async="signIn">
+                Login with Password
+              </AsyncButton>
+              <WebAuthnModal />
+            </div>
 
             <ShadcnSeparator label="or Oauth" class="my-2" />
             <div class="flex flex-col gap-1">
