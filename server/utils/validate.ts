@@ -1,6 +1,6 @@
-import type { User } from '#auth-utils'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import type { ZodError } from 'zod'
+import type { User } from '../types/user'
 import type { ChatConversationKeys, OrderByDirection } from '~/lib/types/models/chat'
 import { z } from 'zod'
 import { context_file_category, context_file_type, import_source_type, primaryIdSchema, programming_language, project_type } from '~/lib/types/database.tables/schema'
@@ -9,7 +9,6 @@ import {
   AllowedAiModelPublishersEnum,
 } from '~/lib/types/models/ai'
 import {
-
   possibleOrderByColumns,
   possibleOrderByDirections,
 } from '~/lib/types/models/chat'
@@ -321,15 +320,23 @@ async function validateParams<S, E = S>(
     console.info(logData, maybeValidatedParams.data)
   }
 
-  if (
-    unauthorizedCheck
-    && unauthorizedCheck(event.context.user, maybeValidatedParams.data!)
-  ) {
-    return {
-      statusCode: 401,
-      statusMessage: 'Unauthorized.',
-      message: 'You do not have access to view the information.',
-      data: null,
+  if (unauthorizedCheck) {
+    const user = event.context.user
+    if (!isValidUser(user)) {
+      return {
+        statusCode: 401,
+        statusMessage: 'Unauthorized.',
+        message: 'Invalid user session.',
+        data: null,
+      }
+    }
+    if (unauthorizedCheck(user, maybeValidatedParams.data!)) {
+      return {
+        statusCode: 401,
+        statusMessage: 'Unauthorized.',
+        message: 'You do not have access to view the information.',
+        data: null,
+      }
     }
   }
 
@@ -1343,5 +1350,14 @@ export async function validateParamGithubRepositoryName(
     'Successfully validated routeParams(github_account_name, github_repository_name).',
     `Invalid routeParams(github_account_name, github_repository_name). The GitHub repository with name=${event.context.validated.params.github_repository_name} for account=${event.context.validated.params.github_account_name} does not exist or you do not have access to it.`,
     'routeParams(github_account_name, github_repository_name):',
+  )
+}
+
+export function isValidUser(user: unknown): user is User {
+  return (
+    typeof user === 'object'
+    && user !== null
+    && 'id' in user
+    && typeof (user as User).id === 'number'
   )
 }

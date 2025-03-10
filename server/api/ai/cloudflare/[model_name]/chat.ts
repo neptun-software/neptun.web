@@ -3,7 +3,7 @@ import { createError } from 'h3'
 import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema'
 import { persistAiChatMessage, persistUserChatMessage } from '~/server/utils/chat'
-import { validateParamAiModelName, validateQueryChatId } from '~/server/utils/validate'
+import { isValidUser, validateParamAiModelName, validateQueryChatId } from '~/server/utils/validate'
 
 interface CloudflareError {
   code: number
@@ -22,7 +22,15 @@ interface CloudflareStreamResponse {
 export default defineEventHandler(async (event) => {
   /* 0. VALIDATE METHOD */
   assertMethod(event, ['POST'])
+
+  /* 1. VALIDATE USER */
   const user = event.context.user
+  if (!isValidUser(user)) {
+    throw createError({
+      statusCode: 401,
+      message: 'Invalid user session',
+    })
+  }
 
   /* VALIDATE QUERY */
   const maybeChatId = await validateQueryChatId(event)

@@ -10,6 +10,7 @@ import {
   defaultAiModelProvider,
 } from '~/lib/types/models/ai'
 import {
+  isValidUser,
   validateParamAiModelName,
   validateQueryChatId,
 } from '~/server/utils/validate'
@@ -22,7 +23,15 @@ export default defineLazyEventHandler(async () => {
   return defineEventHandler(async (event) => {
     /* 0. VALIDATE METHOD */
     assertMethod(event, ['POST'])
+
+    /* 1. VALIDATE USER */
     const user = event.context.user
+    if (!isValidUser(user)) {
+      throw createError({
+        statusCode: 401,
+        message: 'Invalid user session',
+      })
+    }
 
     /* VALIDATE QUERY */
     const maybeChatId = await validateQueryChatId(event)

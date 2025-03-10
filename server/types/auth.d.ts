@@ -1,22 +1,11 @@
+import type { User as BaseUser } from './user'
+
 declare module '#auth-utils' {
-  interface User {
-    id: number
-    primary_email: string
-    oauth?: {
-      github?: {
-        github_id?: string
-        github_email?: string
-      }
-      google?: {
-        google_id?: string
-        google_email?: string
-      }
-    }
-  }
+  interface User extends BaseUser { }
 
   interface UserSession {
     loggedInAt: Date
   }
 }
 
-export {}
+export { }
