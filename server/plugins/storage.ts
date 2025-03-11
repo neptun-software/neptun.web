@@ -1,10 +1,10 @@
-import vercelKVDriver from 'unstorage/drivers/vercel-kv'
+import kvDriver from 'unstorage/drivers/upstash'
 
 export default defineNitroPlugin(() => {
   const storage = useStorage()
 
   try {
-    const driver = vercelKVDriver({
+    const driver = kvDriver({
       url: useRuntimeConfig().temporaryStorageConnectionUrl, // db host
       token: useRuntimeConfig().temporaryStorageConnectionToken, // db password
     })
