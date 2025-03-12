@@ -1,7 +1,14 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { HTMLAttributes } from 'vue'
+import { cn } from '@/lib/utils'
+
+const props = defineProps<{
+  class?: HTMLAttributes['class']
+}>()
+</script>
 
 <template>
-  <footer class="z-10 flex flex-col border-t bg-background">
+  <footer :class="cn('flex z-10 flex-col border-t bg-background p-8 justify-center', props.class)">
     <AppLinks />
     <p class="mt-2 text-center text-muted-foreground">
       Animated Icons by
@@ -15,11 +22,3 @@
     </p>
   </footer>
 </template>
-
-<style scoped>
-footer {
-  padding: 2rem;
-  display: flex;
-  justify-content: center;
-}
-</style>

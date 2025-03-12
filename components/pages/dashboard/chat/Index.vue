@@ -15,6 +15,7 @@ import {
   Settings2,
   Trash2,
 } from 'lucide-vue-next'
+import maximizeMinimizeJson from '~/assets/icons/Maximize-minimize/maximizeMinimize.json'
 import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { AllowedAiModelsEnum } from '~/lib/types/models/ai'
 
@@ -27,6 +28,7 @@ const {
   resetAiPlaygroundChat,
 } = useAiChatPlayground()
 const { generateMarkdownFromUrl } = useDashboard()
+const { isZenMode, toggleZenMode } = useUiStore()
 
 /* CHAT AI */
 const { selectedAiChat, selectedAiChatIsPlayground, selectedAiChatKey }
@@ -427,7 +429,7 @@ function stopGeneration() {
 </script>
 
 <template>
-  <div class="relative flex flex-col h-full min-h-[60vh] max-h-[75vh] rounded-xl bg-muted/50 p-4 order-1 2xl:order-2">
+  <div class="flex relative flex-col order-1 p-4 bg-muted/50 2xl:order-2" :class="{ 'rounded-xl h-full min-h-[60vh] max-h-[75vh]': !isZenMode, 'h-screen': isZenMode }">
     <div class="absolute top-3 left-3 z-10 pb-2">
       <div class="flex gap-1">
         <ShadcnDrawer>
@@ -484,6 +486,20 @@ function stopGeneration() {
             {{ autoScrollEnabled ? 'Disable' : 'Enable' }} auto-scroll
           </span>
         </ShadcnToggle>
+
+        <!-- Zen Mode Toggle -->
+        <ShadcnButton
+          variant="ghost"
+          size="icon"
+          @click="toggleZenMode"
+        >
+          <span v-once>
+            <AnimatedIcon :animation-data="maximizeMinimizeJson" :is-active="isZenMode" />
+          </span>
+          <span class="sr-only">
+            {{ isZenMode ? 'Exit' : 'Enter' }} zen mode
+          </span>
+        </ShadcnButton>
       </div>
     </div>
 

@@ -1,14 +1,16 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const { isZenMode } = useUiStore()
+</script>
 
 <template>
   <div id="ui-content">
-    <DynamicHeader />
+    <DynamicHeader :root-class="{ hidden: isZenMode }" />
     <main>
       <!-- INFO: overflow-x-hidden breaks position sticky and switching to another layout for the dashboard alone breaks the animation... -->
       <!-- class="overflow-x-hidden" -->
       <slot />
     </main>
-    <DynamicFooter />
+    <DynamicFooter :class="{ hidden: isZenMode }" />
   </div>
 </template>
 

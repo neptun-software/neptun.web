@@ -3,6 +3,7 @@ import type { HTMLAttributes } from 'vue'
 import { navigateTo } from '#imports'
 
 const props = defineProps<{
+  rootClass?: HTMLAttributes['class']
   class?: HTMLAttributes['class']
 }>()
 
@@ -21,13 +22,14 @@ function handleSignOut(): (event: MouseEvent) => Promise<void> {
   <header
     ref="$headerNavigationElement"
     class="sticky top-0 left-0 z-40 border-b bg-background"
+    :class="props.rootClass"
   >
     <nav
-      class="flex items-center justify-between gap-2 px-4 py-4"
+      class="flex gap-2 justify-between items-center px-4 py-4"
       :class="props.class"
     >
       <AppLinks layout="navigation" />
-      <div class="flex items-center gap-2">
+      <div class="flex gap-2 items-center">
         <AsyncButton
           v-if="loggedIn"
           variant="outline"

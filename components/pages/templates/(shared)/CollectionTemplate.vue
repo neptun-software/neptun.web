@@ -65,13 +65,15 @@ const shareUrl = computed(() =>
           :value="templateIndex"
         >
           <div class="relative">
-            <ShadcnScrollArea class="px-2 py-1 w-full rounded-md border bg-accent" style="max-height: 50vh;">
-              <div class="w-full">
-                <MarkdownRenderer
-                  :content="`\`\`\`${supportedShikiLanguages.includes(template.language as BundledLanguage) ? template.language : 'text'}\n${template.text?.trim()} \n\`\`\``"
-                  :unique-key="`collection-${collection.id}-template-${template.id}`"
-                  :use-simple-renderer="useSimpleRenderer"
-                />
+            <ShadcnScrollArea class="w-full rounded-md border bg-accent">
+              <div class="w-full" style="max-height: 50vh;">
+                <div class="px-2 py-1">
+                  <MarkdownRenderer
+                    :content="`\`\`\`${supportedShikiLanguages.includes(template.language as BundledLanguage) ? template.language : 'text'}\n${template.text?.trim()} \n\`\`\``"
+                    :unique-key="`collection-${collection.id}-template-${template.id}`"
+                    :use-simple-renderer="useSimpleRenderer"
+                  />
+                </div>
               </div>
               <ShadcnScrollBar orientation="vertical" />
             </ShadcnScrollArea>

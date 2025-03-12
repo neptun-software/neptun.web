@@ -64,7 +64,7 @@ async function handleSave() {
       <div
         v-for="template in templates"
         :key="template.id"
-        class="p-3 border rounded-md"
+        class="p-3 rounded-md border"
       >
         <div v-if="editingTemplate === template.id && editForm">
           <div class="space-y-2">
@@ -91,7 +91,7 @@ async function handleSave() {
               :disabled="isUpdating"
               :rows="8"
             />
-            <div class="flex items-center gap-2">
+            <div class="flex gap-2 items-center">
               <!-- TODO: make me a select with search -->
               <ShadcnInput
                 v-model="editForm.language"
@@ -104,7 +104,7 @@ async function handleSave() {
                 :disabled="isUpdating"
               />
             </div>
-            <div class="flex justify-end gap-2">
+            <div class="flex gap-2 justify-end">
               <ShadcnButton
                 variant="outline"
                 size="sm"
@@ -123,7 +123,7 @@ async function handleSave() {
             </div>
           </div>
         </div>
-        <div v-else class="flex items-start justify-between">
+        <div v-else class="flex justify-between items-start">
           <div>
             <h4 class="font-medium">
               {{ template.title || template.file_name }}

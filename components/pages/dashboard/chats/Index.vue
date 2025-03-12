@@ -11,6 +11,7 @@ import {
   Search,
   Trash2,
 } from 'lucide-vue-next'
+import refreshJson from '~/assets/icons/Refresh/refresh.json'
 import {
   defaultAiModelDomain,
 } from '~/lib/types/models/ai'
@@ -262,8 +263,8 @@ const calculatedChatsListHeight = computed(() => {
           "
         >
           <!-- class="[&>*]:hover:animate-spin" -->
-          Reload
-          <RefreshIcon :animation-is-active="refreshAnimationIsActive" />
+          <span class="mr-1">Reload</span>
+          <AnimatedIcon :animation-data="refreshJson" :is-active="refreshAnimationIsActive" />
         </AsyncButton>
       </div>
 

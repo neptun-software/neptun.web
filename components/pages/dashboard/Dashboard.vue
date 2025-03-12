@@ -2,6 +2,7 @@
 const isInfoHidden = ref(false)
 const { selectedAiChatKey } = useSelectedAiChat()
 const isSmScreen = useMediaQuery('(max-width: 1023px)')
+const { isZenMode } = useUiStore()
 </script>
 
 <template>
@@ -20,35 +21,40 @@ const isSmScreen = useMediaQuery('(max-width: 1023px)')
         </div>
       </template>
       <template v-else>
-        <!-- Panel group for larger screens -->
-        <ShadcnResizablePanelGroup
-          id="handle-group-1"
-          direction="horizontal"
-          class="mt-2 max-w-full panel-group"
-        >
-          <ShadcnResizablePanel
-            id="handle-panel-1"
-            :class="{ hidden: isInfoHidden }"
-            :min-size="25"
-            :default-size="25"
+        <template v-if="!isZenMode">
+          <!-- Panel group for larger screens -->
+          <ShadcnResizablePanelGroup
+            id="handle-group-1"
+            direction="horizontal"
+            class="mt-2 max-w-full panel-group"
           >
-            <DashboardChatTabs />
-          </ShadcnResizablePanel>
-          <ShadcnResizableHandle
-            id="handle-handle-1"
-            with-handle
-            @dblclick="isInfoHidden = !isInfoHidden"
-          />
-          <ShadcnResizablePanel
-            id="handle-panel-2"
-            :min-size="50"
-            :default-size="75"
-            class="px-2"
-          >
-            <!-- MESSAGES OF CHAT (needs key, to rerender chat, so that useChat gets a new ID, useChat can not be put anywhere else than the setup script, because some functionality depends on that environment) -->
-            <DashboardChat :key="selectedAiChatKey" />
-          </ShadcnResizablePanel>
-        </ShadcnResizablePanelGroup>
+            <ShadcnResizablePanel
+              id="handle-panel-1"
+              :class="{ hidden: isInfoHidden }"
+              :min-size="25"
+              :default-size="25"
+            >
+              <DashboardChatTabs />
+            </ShadcnResizablePanel>
+            <ShadcnResizableHandle
+              id="handle-handle-1"
+              with-handle
+              @dblclick="isInfoHidden = !isInfoHidden"
+            />
+            <ShadcnResizablePanel
+              id="handle-panel-2"
+              :min-size="50"
+              :default-size="75"
+              class="px-2"
+            >
+              <!-- MESSAGES OF CHAT (needs key, to rerender chat, so that useChat gets a new ID, useChat can not be put anywhere else than the setup script, because some functionality depends on that environment) -->
+              <DashboardChat :key="selectedAiChatKey" />
+            </ShadcnResizablePanel>
+          </ShadcnResizablePanelGroup>
+        </template>
+        <template v-else>
+          <DashboardChat :key="selectedAiChatKey" />
+        </template>
       </template>
     </ClientOnly>
   </div>

@@ -3,6 +3,7 @@ import { buttonVariants } from '@/components/shadcn/button'
 import { cn } from '@/lib/utils'
 import { ChevronsUpDown, Code2, Plus } from 'lucide-vue-next'
 
+const { isZenMode } = useUiStore()
 const { $toast } = useNuxtApp()
 
 definePageMeta({
@@ -53,9 +54,10 @@ watchEffect(async () => {
 </script>
 
 <template>
-  <div class="grid pl-2 w-full">
+  <div class="grid w-full" :class="{ 'pl-2': !isZenMode }">
     <div class="flex flex-col">
       <header
+        v-if="!isZenMode"
         class="flex sticky left-0 z-20 gap-1 justify-between items-center py-2 pt-4 border-b bg-background"
         :style="{ top: `${headerNavigationHeight}px` }"
       >
