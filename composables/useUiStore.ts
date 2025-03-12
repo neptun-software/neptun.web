@@ -4,7 +4,7 @@ export function useUiStore() {
   const route = useRoute()
   const router = useRouter()
 
-  const isZenMode = computed(() => route.query.layout === 'zen' && route.name === 'Dashboard')
+  const isZenMode = computed(() => route.query.layout === 'zen' && (route.name === 'Dashboard' || route.path === '/'))
   const toggleZenMode = () => {
     const query = { ...route.query }
     if (isZenMode.value) {
