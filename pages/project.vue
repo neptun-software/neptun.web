@@ -7,6 +7,14 @@ definePageMeta({
 
 const importTrigger = ref(null)
 const isImportActive = ref(false)
+const { getTabState, setTabState } = useUiStore()
+
+const projectTab = computed({
+  get: () => getTabState('project').value || 'create',
+  set: (value) => {
+    setTabState('project', value)
+  },
+})
 
 useMutationObserver(importTrigger, (mutations) => {
   for (const mutation of mutations) {
@@ -37,7 +45,7 @@ useMutationObserver(importTrigger, (mutations) => {
       </ShadcnCardHeader>
       <ShadcnSeparator class="my-2" />
       <ShadcnCardContent>
-        <ShadcnTabs default-value="create" class="w-full">
+        <ShadcnTabs v-model="projectTab" default-value="create" class="w-full">
           <ShadcnTabsList class="flex flex-grow justify-start">
             <ShadcnTabsTrigger value="create" class="tab-trigger">
               Start from Scratch

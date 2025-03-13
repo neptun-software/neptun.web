@@ -1,23 +1,16 @@
 <script lang="ts" setup>
-const { user } = useUserSession()
+const { getTabState, setTabState } = useUiStore()
 
-type possibleDashboardTabs = 'chat' | 'chats'
-const selectedDashboardTab = ref<any>('chat')
-const selectedDashboardTabFromLocalStorage
-  = useLocalStorage<possibleDashboardTabs>(
-    localStorageTopicKey(`${user.value?.id ?? -1}:selected-dashboard-tab`),
-    'chat',
-  )
-
-watch(selectedDashboardTab, () => {
-  if (selectedDashboardTab.value === 'chat' || selectedDashboardTab.value === 'chats') {
-    selectedDashboardTabFromLocalStorage.value = selectedDashboardTab.value
-  }
+const selectedDashboardTab = computed({
+  get: () => getTabState('dashboard_chat').value || 'chat',
+  set: (value) => {
+    setTabState('dashboard_chat', value)
+  },
 })
 
 onMounted(() => {
-  if (selectedDashboardTabFromLocalStorage.value === 'chat' || selectedDashboardTabFromLocalStorage.value === 'chats') {
-    selectedDashboardTab.value = selectedDashboardTabFromLocalStorage.value
+  if (!selectedDashboardTab.value) {
+    selectedDashboardTab.value = 'chat'
   }
 })
 </script>
