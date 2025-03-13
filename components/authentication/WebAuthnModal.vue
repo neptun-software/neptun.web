@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 
+interface Props {
+  mode: 'login' | 'signup'
+}
+
+const props = defineProps<Props>()
 const show = ref(false)
-const logging = ref(false)
 const userName = ref('')
 const { $toast } = useNuxtApp()
 
@@ -12,47 +16,49 @@ const { register, authenticate, isSupported } = useWebAuthn({
   authenticateEndpoint: '/api/auth/webauthn/authenticate',
 })
 
+const isAuthenticating = ref(false)
+
 async function signUp() {
-  if (logging.value || !userName.value) {
+  if (!userName.value) {
     return
   }
-  logging.value = true
-  await register({
-    userName: userName.value,
-  })
-    .then(() => {
-      fetch()
-      show.value = false
-      navigateTo('/dashboard', {
-        redirectCode: 303,
-      })
+
+  try {
+    isAuthenticating.value = true
+    await register({
+      userName: userName.value,
     })
-    .catch((err) => {
-      console.log(err)
-      $toast.error(err.data?.message || err.message)
+    await fetch()
+    show.value = false
+    await navigateTo('/dashboard', {
+      redirectCode: 303,
     })
-  logging.value = false
+  } catch (err: any) {
+    console.log(err)
+    $toast.error(err.data?.message || err.message)
+  } finally {
+    isAuthenticating.value = false
+  }
 }
 
 async function signIn() {
-  if (logging.value) {
-    return
+  try {
+    isAuthenticating.value = true
+    await authenticate(userName.value)
+    await fetch()
+    show.value = false
+    await navigateTo('/dashboard', {
+      redirectCode: 303,
+    })
+  } catch (err: any) {
+    console.log(err)
+    $toast.error(err.data?.message || err.message)
+  } finally {
+    isAuthenticating.value = false
   }
-  logging.value = true
-  await authenticate(userName.value)
-    .then(() => {
-      fetch()
-      show.value = false
-      navigateTo('/dashboard', {
-        redirectCode: 303,
-      })
-    })
-    .catch((err) => {
-      console.log(err)
-      $toast.error(err.data?.message || err.message)
-    })
-  logging.value = false
 }
+
+const buttonText = computed(() => props.mode === 'login' ? 'Login with Passkey' : 'Register Passkey')
 </script>
 
 <template>
@@ -65,7 +71,7 @@ async function signIn() {
           type="button"
         >
           <Icon icon="lucide:key" class="mr-2 w-4 h-4" />
-          Passkeys
+          {{ buttonText }}
         </ShadcnButton>
       </ShadcnDialogTrigger>
 
@@ -73,14 +79,15 @@ async function signIn() {
         <ShadcnDialogHeader>
           <ShadcnDialogTitle>Passkey Authentication</ShadcnDialogTitle>
           <ShadcnDialogDescription>
-            Use biometrics or security keys to login without passwords
+            {{ props.mode === 'login' ? 'Login using your passkey' : 'Register a new passkey for password-less login' }}
           </ShadcnDialogDescription>
         </ShadcnDialogHeader>
 
-        <div class="py-4 space-y-6">
+        <div class="py-4">
           <form
+            v-if="props.mode === 'signup'"
             class="space-y-4"
-            @submit.prevent="signUp"
+            @submit.prevent
           >
             <div class="space-y-2">
               <ShadcnLabel for="email-register">
@@ -92,26 +99,23 @@ async function signIn() {
                 type="email"
                 placeholder="your.name@domain.tld"
                 required
+                :disabled="isAuthenticating"
               />
             </div>
 
             <AsyncButton
-              type="submit"
-              :loading="logging"
-              :disabled="!userName"
+              :on-click-async="signUp"
+              :is-disabled="!userName"
               class="w-full"
             >
               Register New Passkey
             </AsyncButton>
           </form>
 
-          <ShadcnSeparator>
-            <span class="px-2 text-xs text-muted-foreground">OR</span>
-          </ShadcnSeparator>
-
           <form
+            v-else
             class="space-y-4"
-            @submit.prevent="signIn"
+            @submit.prevent
           >
             <div class="space-y-2">
               <ShadcnLabel for="email-login">
@@ -124,12 +128,13 @@ async function signIn() {
                 placeholder="your.name@domain.tld"
                 autocomplete="username webauthn"
                 required
+                :disabled="isAuthenticating"
               />
             </div>
 
             <AsyncButton
-              type="submit"
-              :loading="logging"
+              :on-click-async="signIn"
+              :is-disabled="!userName"
               class="w-full"
             >
               Authenticate with Passkey
@@ -137,9 +142,9 @@ async function signIn() {
           </form>
         </div>
 
-        <ShadcnDialogFooter>
-          <p class="text-xs text-muted-foreground">
-            Passkeys are more secure than passwords and easier to use
+        <ShadcnDialogFooter class="block mx-auto">
+          <p class="flex text-xs text-muted-foreground">
+            <Icon icon="lucide:info" class="mr-1 w-4 h-4" /> Passkeys are more secure than passwords and easier to use
           </p>
         </ShadcnDialogFooter>
       </ShadcnDialogContent>
@@ -147,4 +152,5 @@ async function signIn() {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+</style>
