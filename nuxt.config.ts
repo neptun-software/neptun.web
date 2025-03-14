@@ -372,6 +372,8 @@ export default defineNuxtConfig({
           'https://neptunai.changeip.co',
           'https://neptungen.ddns.info',
           'https://neptun.jonasfroeller.online',
+          'https://www.neptunai.tech',
+          'https://neptunai.tech',
         ],
         'frame-src': ['https://neptun-software.github.io'],
       },
