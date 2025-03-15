@@ -22,7 +22,7 @@ async function loadMore() {
   if (!isInitialized.value && data.value.length > 0) {
     return
   }
-  
+
   const hasMoreData = await fetchInfiniteData(page.value, pageSize.value, data)
   if (hasMoreData) {
     page.value += 1

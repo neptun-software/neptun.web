@@ -18,11 +18,13 @@ const { console } = useLogger()
 const auth = useAuth()
 const { fetch } = useUserSession()
 
-const email = ref('')
-const password = ref('')
-const emailErrors = ref<string[]>([])
-const passwordErrors = ref<string[]>([])
-const isAuthenticating = ref(false)
+const email = useState<string>('email', () => '')
+const password = useState<string>('password', () => '')
+const confirmPassword = ref('')
+const emailErrors = useState<string[]>('emailErrors', () => [])
+const passwordErrors = useState<string[]>('passwordErrors', () => [])
+const confirmPasswordErrors = ref<string[]>([])
+const isAuthenticating = useState<boolean>('isAuthenticating', () => false)
 
 watch(email, (newEmail) => {
   emailErrors.value = validateEmailInput(newEmail)
@@ -32,24 +34,25 @@ watch(password, (newPassword) => {
   passwordErrors.value = validatePasswordInput(newPassword)
 })
 
+watch(confirmPassword, (newConfirmPassword) => {
+  confirmPasswordErrors.value = validatePasswordInput(newConfirmPassword)
+})
+
 async function handleSubmit() {
   try {
     isAuthenticating.value = true
-    const authAction = props.mode === 'login' ? auth.signIn : auth.signUp
-    const { error } = await authAction(email.value, password.value)
-
-    if (error) {
-      console.info('error:', error.message, error.data)
-      const authError = error as ApiValidationError
-      emailErrors.value = authError?.data?.data?.issues
-        ?.filter((issue: ZodIssue) => issue.path[0] === 'email')
-        .map((issue: ZodIssue) => issue.message) || []
-      passwordErrors.value = authError?.data?.data?.issues
-        ?.filter((issue: ZodIssue) => issue.path[0] === 'password')
-        .map((issue: ZodIssue) => issue.message) || []
-
-      $toast.error(authError.message)
-      return
+    if (props.mode === 'login') {
+      const { error } = await auth.signIn(email.value, password.value)
+      if (error) {
+        handleAuthError(error)
+        return
+      }
+    } else {
+      const { error } = await auth.signUp(email.value, password.value, confirmPassword.value)
+      if (error) {
+        handleAuthError(error)
+        return
+      }
     }
 
     await fetch() // reloadNuxtApp({ ttl: 0, force: true, persistState: false, path: "/dashboard" });
@@ -59,6 +62,21 @@ async function handleSubmit() {
   } finally {
     isAuthenticating.value = false
   }
+}
+
+function handleAuthError(error: ApiValidationError) {
+  console.info('error:', error.message, error.data)
+  emailErrors.value = error?.data?.data?.issues
+    ?.filter((issue: ZodIssue) => issue.path[0] === 'email')
+    .map((issue: ZodIssue) => issue.message) || []
+  passwordErrors.value = error?.data?.data?.issues
+    ?.filter((issue: ZodIssue) => issue.path[0] === 'password')
+    .map((issue: ZodIssue) => issue.message) || []
+  confirmPasswordErrors.value = error?.data?.data?.issues
+    ?.filter((issue: ZodIssue) => issue.path[0] === 'confirmPassword')
+    .map((issue: ZodIssue) => issue.message) || []
+
+  $toast.error(error.message)
 }
 
 const formTitle = computed(() => props.mode === 'login' ? 'Log In' : 'Sign Up')
@@ -81,6 +99,19 @@ const alternateActionLink = computed(() =>
 const alternateActionLabel = computed(() =>
   props.mode === 'login' ? 'Sign Up' : 'Log In',
 )
+
+const isSubmitDisabled = computed(() => {
+  const hasErrors = emailErrors.value.length > 0 || passwordErrors.value.length > 0
+  const hasEmptyFields = !email.value || !password.value
+
+  if (props.mode === 'login') {
+    return hasEmptyFields || hasErrors || isAuthenticating.value
+  }
+
+  const hasSignupErrors = hasErrors || confirmPasswordErrors.value.length > 0
+  const hasEmptySignupFields = hasEmptyFields || !confirmPassword.value
+  return hasEmptySignupFields || hasSignupErrors || isAuthenticating.value
+})
 </script>
 
 <template>
@@ -156,12 +187,34 @@ const alternateActionLabel = computed(() =>
                 </li>
               </ul>
             </div>
+            <div v-if="mode === 'signup'">
+              <div class="grid gap-2 mb-1">
+                <ShadcnLabel for="confirmPassword">
+                  Confirm Password
+                </ShadcnLabel>
+                <PasswordInput
+                  v-model="confirmPassword"
+                  :on-enter="handleSubmit"
+                  :disabled="isAuthenticating"
+                />
+              </div>
+
+              <ul v-if="confirmPasswordErrors?.length > 0" class="pl-5 list-disc">
+                <li
+                  v-for="(error, index) in confirmPasswordErrors"
+                  :key="index"
+                  class="text-sm font-bold text-destructive"
+                >
+                  {{ error }}<br>
+                </li>
+              </ul>
+            </div>
 
             <div class="flex gap-2">
               <AsyncButton
                 class="flex-1"
                 :on-click-async="handleSubmit"
-                :is-disabled="!email || !password || isAuthenticating"
+                :is-disabled="isSubmitDisabled"
               >
                 {{ submitButtonText }}
               </AsyncButton>

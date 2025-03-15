@@ -17,11 +17,11 @@ export function useAuth() {
     }
   }
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, confirmPassword: string) => {
     try {
       const data = await $fetch<ApiAuthResponse>('/api/auth/sign-up', {
         method: 'POST',
-        body: { email, password },
+        body: { email, password, confirmPassword },
       })
 
       return { data, error: null }

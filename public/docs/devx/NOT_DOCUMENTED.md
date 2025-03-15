@@ -9,6 +9,8 @@
 - `GET` `/auth/github.app.get.ts`
 - `GET` `/auth/github.get.ts`
 - `GET` `/auth/google.get.ts`
+- `POST` `/api/auth/webauthn/authenticate`
+- `POST` `/api/auth/webauthn/register`
 
 **Information:**
 

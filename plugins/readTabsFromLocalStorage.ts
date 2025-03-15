@@ -11,8 +11,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hooks.hook('app:mounted', () => {
     const route = router.currentRoute.value
     const relevantTabKeys = routeTabKeys[route.name as string] || []
-    
-    if (relevantTabKeys.length === 0) return
+
+    if (relevantTabKeys.length === 0) {
+      return
+    }
 
     const query = { ...route.query }
     let hasChanges = false
@@ -28,7 +30,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
 
     if (hasChanges) {
-      router.replace({ query })
+      void router.replace({ query })
     }
   })
 })

@@ -17,16 +17,16 @@ export function useUiStore() {
   }
 
   const defaultTabValues: Record<string, string> = {
-    'templates_main': 'templates',
-    'templates_view': 'paginated-pages',
-    'dashboard_chat': 'chat',
-    'project': 'create',
+    templates_main: 'templates',
+    templates_view: 'paginated-pages',
+    dashboard_chat: 'chat',
+    project: 'create',
   }
 
   const getTabState = (key: string) => {
     const storageValue = useLocalStorage(
       localStorageTopicKey(`${user.value?.id ?? -1}:tab_${key}`),
-      defaultTabValues[key] || ''
+      defaultTabValues[key] || '',
     )
 
     return computed(() => {
