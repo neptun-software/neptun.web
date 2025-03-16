@@ -1,118 +1,11 @@
-import type { InferSelectModel } from 'drizzle-orm'
 import type {
-  neptun_context_import,
   ProjectPromptContext,
-  ReadContextFile,
   ReadProject,
   ReadUser,
-  ReadUserFile,
 } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
 import { neptun_user_project } from '../../../lib/types/database.tables/schema'
-import { readAllProjectTemplateCollections } from './projectTemplateCollections'
-import { readAllProjectUserFiles } from './projectUserFiles'
-import { readProject } from './userProjects'
-
-type ProjectWithResources = InferSelectModel<typeof neptun_user_project> & {
-  user_files: { user_file: ReadUserFile }[]
-  template_collections: {
-    template_collection: {
-      templates: {
-        id: number
-        file_name: string
-        description: string | null
-        neptun_user_file: { text: string } | null
-      }[]
-    }
-  }[]
-  context_imports: (InferSelectModel<typeof neptun_context_import> & {
-    context_files: ReadContextFile[]
-  })[]
-}
-
-function createProjectContext(
-  project: ReadProject,
-  files: ReadUserFile[] = [],
-  templates: { id: number, name: string, description: string | null, content?: string }[] = [],
-  contextImports: ProjectWithResources['context_imports'] = [],
-): ProjectPromptContext {
-  const resources = {
-    files: [
-      ...files.map(file => ({
-        id: file.id,
-        title: file.title ?? 'Untitled',
-        language: file.language,
-        extension: file.extension,
-        content: file.text,
-        summary: '',
-      })),
-      ...contextImports.flatMap(imp => imp.context_files.map(file => ({
-        id: file.id,
-        title: file.title,
-        language: file.language,
-        extension: file.file_type.split('.').pop() || '',
-        content: file.content,
-        summary: '', // TODO
-        original_path: file.original_path,
-        parent_path: file.parent_path,
-        depth: file.depth,
-        import_id: file.import_id,
-      }))),
-    ],
-    templates: templates.map(template => ({
-      id: template.id,
-      name: template.name,
-      description: template.description ?? undefined,
-      content: template.content,
-    })),
-    imports: contextImports.map(imp => ({
-      id: imp.id,
-      source_type: imp.source_type,
-      source_path: imp.source_path,
-      source_ref: imp.source_ref,
-      import_status: imp.import_status,
-      file_tree: imp.file_tree,
-    })),
-  }
-
-  return {
-    identity: {
-      name: `${project.name} Assistant`,
-      creator: 'Neptun AI', // TODO
-    },
-    goal: `You are an AI assistant for the ${project.type} project "${project.name}". Your goal is to help the user with their ${project.main_language} project.`,
-    returnFormat: 'Provide clear, concise, and helpful responses related to the project context using markdown syntax.',
-    rules: [
-      'Do not make assumptions about project requirements that are not specified in the context.',
-      'If you are unsure about something, ask for clarification rather than guessing.',
-    ],
-    project: {
-      name: project.name,
-      description: project.description ?? undefined,
-      type: project.type,
-      main_language: project.main_language,
-      created_at: project.created_at?.toISOString() ?? new Date().toISOString(),
-      updated_at: project.updated_at?.toISOString() ?? new Date().toISOString(),
-    },
-    resources,
-    currentDate: new Date().toISOString(),
-  }
-}
-
-export async function generateProjectContext(
-  user_id: ReadUser['id'],
-  project_id: ReadProject['id'],
-) {
-  const project = await readProject(user_id, project_id)
-  if (!project) {
-    throw new Error('Project not found')
-  }
-
-  const files = await readAllProjectUserFiles(project_id)
-  const templates = await readAllProjectTemplateCollections(project_id)
-
-  return createProjectContext(project, files || [], templates || [])
-}
+import { neptun_user_template } from '../../../lib/types/database.tables/schema'
 
 export async function readProjectContext(
   user_id: ReadUser['id'],
@@ -120,70 +13,111 @@ export async function readProjectContext(
 ): Promise<ProjectPromptContext | null> {
   const result = await db.query.neptun_user_project.findFirst({
     where: and(
-      eq(neptun_user_project.id, project_id),
       eq(neptun_user_project.neptun_user_id, user_id),
+      eq(neptun_user_project.id, project_id)
     ),
     with: {
-      user_files: {
+      context_imports: {
         with: {
-          user_file: true,
+          context_files: {
+            columns: {
+              title: true,
+              original_path: true,
+              content: true,
+              file_type: true,
+              category: true,
+              file_size: true,
+              pdf_url: true,
+              language: true,
+              metadata: true,
+              parent_path: true,
+              depth: true,
+            }
+          }
         },
+        columns: {
+          source_type: true,
+          source_path: true,
+          source_ref: true,
+          import_status: true,
+          error_message: true,
+          file_tree: true,
+        }
       },
       template_collections: {
         with: {
           template_collection: {
-            with: {
-              templates: {
-                with: {
-                  neptun_user_file: true,
-                },
-              },
-            },
-          },
-        },
-      },
-      context_imports: {
-        with: {
-          context_files: true,
-        },
-      },
+            columns: {
+              name: true,
+              description: true,
+              is_shared: true,
+              share_uuid: true,
+            }
+          }
+        }
+      }
     },
+    columns: {
+      name: true,
+      description: true,
+      type: true,
+      main_language: true,
+    }
   })
 
   if (!result) {
     return null
   }
 
-  const files = result.user_files.map(puf => puf.user_file)
-  const templates = result.template_collections
-    .flatMap(ptc => ptc.template_collection.templates
-      .map(template => ({
-        id: template.id,
-        name: template.file_name,
-        description: template.description,
-        content: template.neptun_user_file?.text,
-      })))
-  const contextImports = result.context_imports.map(imp => ({
-    id: imp.id,
-    created_at: imp.created_at,
-    updated_at: imp.updated_at,
-    neptun_user_id: imp.neptun_user_id,
-    project_id: imp.project_id,
-    source_type: imp.source_type,
-    source_path: imp.source_path,
-    source_ref: imp.source_ref,
-    import_status: imp.import_status,
-    error_message: imp.error_message,
-    file_tree: imp.file_tree,
-    context_files: imp.context_files,
-  }))
+  async function readProjectTemplateCollectionTemplates(collection_id: number) {
+    return await db.query.neptun_user_template.findMany({
+      where: eq(neptun_user_template.template_collection_id, collection_id),
+      with: {
+        neptun_user_file: {
+          columns: {
+            title: true,
+            text: true,
+            language: true,
+            extension: true,
+          }
+        }
+      },
+      columns: {
+        description: true,
+        file_name: true,
+      }
+    })
+  }
 
-  return createProjectContext(
-    result,
-    files,
-    templates,
-    contextImports,
+  const collectionsWithTemplates = await Promise.all(
+    result.template_collections.map(async (collection) => {
+      const templates = await readProjectTemplateCollectionTemplates(collection.template_collection_id)
+      return {
+        ...collection.template_collection,
+        templates
+      }
+    })
   )
+
+  return {
+    goal: `You are an AI assistant for the ${result.type} project "${result.name}". Your goal is to help the user with their ${result.main_language} project.`,
+    returnFormat: 'Provide clear, concise, and helpful responses related to the project context using markdown syntax.',
+    rules: [
+      'Do not make assumptions about project requirements that are not specified in the context.',
+      'If you are unsure about something, ask for clarification rather than guessing.',
+    ],
+    project: {
+      name: result.name,
+      description: result.description,
+      type: result.type,
+      main_language: result.main_language,
+    },
+    resources: {
+      collections: collectionsWithTemplates,
+      imports: result.context_imports,
+    },
+    currentDate: new Date().toISOString()
+  }
 }
 
 export async function updateProjectContext(
@@ -221,110 +155,117 @@ export async function updateProjectContext(
 }
 
 export function contextToMarkdown(context: ProjectPromptContext | null): string {
-  if (!context) {
+  if (!context?.resources?.collections || !context.resources.imports) {
     return ''
   }
 
   const sections: string[] = []
 
-  // Identity Section
-  sections.push(`# ${context.identity.name}`)
-  sections.push(`Created by ${context.identity.creator}`)
-  sections.push('')
-
-  // Goal Section
+  // Project Information
+  sections.push('# Project Context\n')
   sections.push('## Goal')
   sections.push(context.goal)
   sections.push('')
 
-  // Project Details Section
-  sections.push('## Project Details')
-  sections.push(`- **Name:** ${context.project.name}`)
-  if (context.project.description) {
-    sections.push(`- **Description:** ${context.project.description}`)
-  }
-  sections.push(`- **Type:** ${context.project.type}`)
-  sections.push(`- **Main Language:** ${context.project.main_language}`)
-  sections.push(`- **Created:** ${new Date(context.project.created_at).toLocaleString()}`)
-  sections.push(`- **Last Updated:** ${new Date(context.project.updated_at).toLocaleString()}`)
+  // Return Format
+  sections.push('## Return Format')
+  sections.push(context.returnFormat)
   sections.push('')
 
-  // Rules Section
+  // Rules
   sections.push('## Rules')
-  context.rules.forEach((rule) => {
+  context.rules.forEach(rule => {
     sections.push(`- ${rule}`)
   })
   sections.push('')
 
-  // Resources Section
-  sections.push('## Resources')
-
-  // Imports
-  const imports = context.resources.imports || []
-  if (imports.length > 0) {
-    sections.push('### Imports')
-    imports.forEach((imp) => {
-      sections.push(`#### ${imp.source_type} Import`)
-      sections.push(`- **Path:** ${imp.source_path}`)
-      if (imp.source_ref) {
-        sections.push(`- **Reference:** ${imp.source_ref}`)
-      }
-      sections.push(`- **Status:** ${imp.import_status}`)
-      if (imp.file_tree) {
-        sections.push('- **File Tree:**')
-        sections.push('```json')
-        sections.push(JSON.stringify(imp.file_tree, null, 2))
-        sections.push('```')
-      }
-      sections.push('')
-    })
-  }
-
-  // Files
-  const files = context.resources.files || []
-  if (files.length > 0) {
-    sections.push('### Files')
-    files.forEach((file) => {
-      sections.push(`#### ${file.title} (${file.language}, .${file.extension})`)
-      if (file.original_path) {
-        sections.push(`Original Path: ${file.original_path}`)
-      }
-      if (file.parent_path) {
-        sections.push(`Parent Path: ${file.parent_path}`)
-      }
-      if (file.depth !== undefined) {
-        sections.push(`Depth: ${file.depth}`)
-      }
-      if (file.import_id !== undefined) {
-        sections.push(`Import ID: ${file.import_id}`)
-      }
-      if (file.summary) {
-        sections.push(file.summary)
-      }
-      sections.push('')
-    })
-  }
-
-  // Templates
-  const templates = context.resources.templates || []
-  if (templates.length > 0) {
-    sections.push('### Templates')
-    templates.forEach((template) => {
-      sections.push(`#### ${template.name}`)
-      if (template.description) {
-        sections.push(template.description)
-      }
-      sections.push('')
-    })
-  }
-
-  // Return Format
-  sections.push('## Response Format')
-  sections.push(context.returnFormat)
+  // Project Details
+  sections.push('## Project Details')
+  sections.push(`- **Name:** ${context.project.name}`)
+  sections.push(`- **Description:** ${context.project.description || ''}`)
+  sections.push(`- **Type:** ${context.project.type}`)
+  sections.push(`- **Main Language:** ${context.project.main_language}`)
   sections.push('')
 
+  // Template Collections
+  if (context.resources.collections.length > 0) {
+    sections.push('## Template Collections')
+    context.resources.collections.forEach(collection => {
+      sections.push(`### Collection: ${collection.name}`)
+      sections.push(`- **Description:** ${collection.description || ''}`)
+      sections.push(`- **Shared:** ${collection.is_shared ? 'Yes' : 'No'}`)
+      sections.push(`- **Share UUID:** ${collection.share_uuid}`)
+
+      if (collection.templates?.length > 0) {
+        sections.push('\n#### Templates')
+        collection.templates.forEach(template => {
+          sections.push(`##### ${template.file_name}`)
+          sections.push(`- **Description:** ${template.description || ''}`)
+          if (template.neptun_user_file) {
+            sections.push(`- **Title:** ${template.neptun_user_file.title || ''}`)
+            sections.push(`- **Language:** ${template.neptun_user_file.language}`)
+            sections.push(`- **Extension:** ${template.neptun_user_file.extension}`)
+            sections.push('\n**Content:**')
+            sections.push('```' + template.neptun_user_file.language)
+            sections.push(template.neptun_user_file.text)
+            sections.push('```')
+          }
+        })
+      }
+      sections.push('')
+    })
+  }
+
+  // Context Imports
+  if (context.resources.imports.length > 0) {
+    sections.push('## Context Imports')
+    context.resources.imports.forEach(importItem => {
+      sections.push(`### Import Source: ${importItem.source_type}`)
+      sections.push(`- **Source Path:** ${importItem.source_path}`)
+      sections.push(`- **Source Reference:** ${importItem.source_ref || ''}`)
+      sections.push(`- **Status:** ${importItem.import_status}`)
+      sections.push(`- **Error Message:** ${importItem.error_message || ''}`)
+      
+      if (Object.keys(importItem.file_tree || {}).length > 0) {
+        sections.push('\n#### File Tree')
+        sections.push('```json')
+        sections.push(JSON.stringify(importItem.file_tree, null, 2))
+        sections.push('```\n')
+      }
+
+      if (importItem.context_files?.length > 0) {
+        sections.push('#### Context Files')
+        importItem.context_files.forEach(file => {
+          sections.push(`##### ${file.title}`)
+          sections.push(`- **Original Path:** ${file.original_path}`)
+          sections.push(`- **Type:** ${file.file_type}`)
+          sections.push(`- **Category:** ${file.category || ''}`)
+          sections.push(`- **Size:** ${file.file_size !== null ? `${file.file_size} bytes` : ''}`)
+          sections.push(`- **PDF URL:** ${file.pdf_url || ''}`)
+          sections.push(`- **Language:** ${file.language}`)
+          sections.push(`- **Parent Path:** ${file.parent_path || ''}`)
+          sections.push(`- **Depth:** ${file.depth !== null ? file.depth : ''}`)
+          
+          if (file.metadata) {
+            sections.push('\n**Metadata:**')
+            sections.push('```json')
+            sections.push(JSON.stringify(file.metadata, null, 2))
+            sections.push('```')
+          }
+
+          sections.push('\n**Content:**')
+          sections.push('```' + file.language)
+          sections.push(file.content)
+          sections.push('```')
+        })
+      }
+      sections.push('')
+    })
+  }
+
   // Current Date
-  sections.push(`*Generated on ${new Date(context.currentDate).toLocaleString()}*`)
+  sections.push('---\n')
+  sections.push(`*Last Updated: ${context.currentDate}*`)
 
   return sections.join('\n')
 }

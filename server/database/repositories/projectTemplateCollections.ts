@@ -132,3 +132,47 @@ export async function deleteProjectTemplateCollection(
       return false
     })
 }
+
+export async function readAllProjectTemplateCollectionsWithTemplates(project_id: ReadProject['id']) {
+  const collections = await db.query.project_template_collection.findMany({
+    where: eq(project_template_collection.project_id, project_id),
+    with: {
+      template_collection: {
+        with: {
+          templates: {
+            with: {
+              neptun_user_file: true,
+            },
+            columns: {
+              id: true,
+              description: true,
+              file_name: true,
+              created_at: true,
+              updated_at: true,
+            },
+          },
+        },
+        columns: {
+          id: true,
+          name: true,
+          description: true,
+          is_shared: true,
+          share_uuid: true,
+          created_at: true,
+          updated_at: true,
+        },
+      },
+    },
+  }).catch((err) => {
+    if (LOG_BACKEND) {
+      console.error('Failed to read project template collections with templates:', err)
+    }
+    return null
+  })
+
+  if (!collections) {
+    return null
+  }
+
+  return collections
+}

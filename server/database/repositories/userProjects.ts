@@ -1,7 +1,7 @@
 import type { GetProject, ProjectToCreate, ReadProject, ReadUser } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
 import { neptun_user_project } from '../../../lib/types/database.tables/schema'
-import { generateProjectContext, updateProjectContext } from './projectContext'
+import { readProjectContext, updateProjectContext } from './projectContext'
 
 export async function createProject(user_id: ReadUser['id'], project: ProjectToCreate) {
   const createdProject = await db
@@ -20,7 +20,7 @@ export async function createProject(user_id: ReadUser['id'], project: ProjectToC
   }
 
   try {
-    const context = await generateProjectContext(user_id, createdProject[0].id)
+    const context = await readProjectContext(user_id, createdProject[0].id) ?? undefined
     await updateProjectContext(user_id, createdProject[0].id, context)
   } catch (err) {
     if (LOG_BACKEND) {

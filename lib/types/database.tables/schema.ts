@@ -748,48 +748,53 @@ export type ProjectToCreate = Omit<NewProject, 'id' | 'created_at' | 'updated_at
 export type ReadProject = GetProject
 
 export interface ProjectPromptContext {
-  identity: {
-    name: string
-    creator: string
-  }
   goal: string
   returnFormat: string
   rules: string[]
   project: {
-    name: string
-    description?: string
-    type: string
-    main_language: string
-    created_at: string
-    updated_at: string
+    name: ReadProject["name"]
+    description: ReadProject["description"]
+    type: ReadProject["type"]
+    main_language: ReadProject["main_language"]
   }
   resources: {
-    files?: {
-      id: number
-      title: string
-      language: string
-      extension: string
-      content: string
-      summary?: string
-      original_path?: string
-      parent_path?: string
-      depth?: number
-      import_id?: number
-    }[]
-    templates?: {
-      id: number
+    collections: Array<{
       name: string
-      description?: string
-      content?: string
-    }[]
-    imports?: {
-      id: number
-      source_type: string
+      description: string | null
+      is_shared: boolean
+      share_uuid: string
+      templates: Array<{
+        file_name: string
+        description: string | null
+        neptun_user_file: {
+          title: string | null
+          text: string
+          language: string
+          extension: string
+        } | null
+      }>
+    }>
+    imports: Array<{
+      source_type: typeof import_source_type.enumValues[number]
       source_path: string
       source_ref: string | null
       import_status: string
+      error_message: string | null
       file_tree: unknown
-    }[]
+      context_files: Array<{
+        title: string
+        original_path: string
+        content: string
+        file_type: typeof context_file_type.enumValues[number]
+        category: typeof context_file_category.enumValues[number] | null
+        file_size: number | null
+        pdf_url: string | null
+        language: string
+        metadata: unknown
+        parent_path: string | null
+        depth: number | null
+      }>
+    }>
   }
   currentDate: string
 }
