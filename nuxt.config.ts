@@ -18,6 +18,16 @@ const corsHandler = {
   },
 }
 
+const noRestrictionsSecurityConfig = {
+  security: {
+    headers: {
+      xXSSProtection: false,
+    },
+    xssValidator: false,
+    requestSizeLimiter: false
+  }
+} as const
+
 const NODE_ENV = process.env.NODE_ENV
 console.info(`NODE_ENV: ${NODE_ENV}`)
 
@@ -242,6 +252,12 @@ export default defineNuxtConfig({
         corsHandler,
       },
     },
+    '/api/ai/**/chat': noRestrictionsSecurityConfig,
+    '/api/users/*/chats/*/messages/**': noRestrictionsSecurityConfig,
+    '/api/users/*/chats/*/files/**': noRestrictionsSecurityConfig,
+    '/api/users/*/projects/*/resources/files/**': noRestrictionsSecurityConfig,
+    '/api/users/*/projects/*/context/**': noRestrictionsSecurityConfig,
+    '/api/users/*/collections/*/templates/**': noRestrictionsSecurityConfig,
     '/auth/**': {
       security: {
         corsHandler,
