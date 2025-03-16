@@ -47,13 +47,20 @@ No query parameters required.
 ### Success Response (200 OK)
 
 ````markdown
-# My Project Assistant
-
-Created by Neptun AI
+# Project Context
 
 ## Goal
 
 You are an AI assistant for the web-app project "My Project". Your goal is to help the user with their typescript project.
+
+## Return Format
+
+Provide clear, concise, and helpful responses related to the project context using markdown syntax.
+
+## Rules
+
+- Do not make assumptions about project requirements that are not specified in the context.
+- If you are unsure about something, ask for clarification rather than guessing.
 
 ## Project Details
 
@@ -61,52 +68,91 @@ You are an AI assistant for the web-app project "My Project". Your goal is to he
 - **Description:** A sample project
 - **Type:** web-app
 - **Main Language:** typescript
-- **Created:** 3/20/2024, 10:00:00 AM
-- **Last Updated:** 3/20/2024, 10:00:00 AM
 
-## Rules
+## Template Collections
 
-- Do not make assumptions about project requirements that are not specified in the context.
-- If you are unsure about something, ask for clarification rather than guessing.
+### Collection: React Components
+- **Description:** Common React component templates
+- **Shared:** Yes
+- **Share UUID:** 550e8400-e29b-41d4-a716-446655440000
 
-## Resources
+#### Templates
 
-### Files
+##### Button.tsx
+- **Description:** Reusable button component
+- **Title:** Button Component
+- **Language:** typescript
+- **Extension:** tsx
 
-#### index.ts (typescript, .ts)
-
-```typescript
-import React from 'react';
-
-export default function App() {
-  return <div>Hello World</div>;
-}
-```
-
-### Templates
-
-#### React Component
-
-A template for creating React components
-
+**Content:**
 ```typescript
 import React from 'react';
 
 interface Props {
-  // Add props here
+  label: string;
+  onClick: () => void;
 }
 
-export default function Component(props: Props) {
-  return <div>New Component</div>;
+export default function Button(props: Props) {
+  return <button onClick={props.onClick}>{props.label}</button>;
 }
 ```
 
-## Response Format
+## Context Imports
 
-Provide clear, concise, and helpful responses related to the project context using markdown syntax.
+### Import Source: local_folder
+- **Source Path:** /src
+- **Source Reference:** main
+- **Status:** completed
+- **Error Message:** 
 
-_Generated on 3/20/2024, 10:00:00 AM_
+#### File Tree
+```json
+{
+  "src": {
+    "components": {
+      "Button.tsx": null
+    }
+  }
+}
+```
 
+#### Context Files
+
+##### Button.tsx
+- **Original Path:** src/components/Button.tsx
+- **Type:** text
+- **Category:** unknown
+- **Size:** 156 bytes
+- **PDF URL:** 
+- **Language:** typescript
+- **Parent Path:** /src/components
+- **Depth:** 2
+
+**Metadata:**
+```json
+{
+  "lastModified": "2024-03-20T10:00:00Z"
+}
+```
+
+**Content:**
+```typescript
+import React from 'react';
+
+interface Props {
+  label: string;
+  onClick: () => void;
+}
+
+export default function Button(props: Props) {
+  return <button onClick={props.onClick}>{props.label}</button>;
+}
+```
+
+---
+
+*Last Updated: 2024-03-20T10:00:00.000Z*
 ````
 
 ### Error Response (404 Not Found)

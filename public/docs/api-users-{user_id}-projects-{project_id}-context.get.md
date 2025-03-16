@@ -49,10 +49,6 @@ No query parameters required.
 ```json
 {
   "context": {
-    "identity": {
-      "name": "My Project Assistant",
-      "creator": "Neptun AI"
-    },
     "goal": "You are an AI assistant for the web-app project \"My Project\". Your goal is to help the user with their typescript project.",
     "returnFormat": "Provide clear, concise, and helpful responses related to the project context using markdown syntax.",
     "rules": [
@@ -63,31 +59,64 @@ No query parameters required.
       "name": "My Project",
       "description": "A sample project",
       "type": "web-app",
-      "main_language": "typescript",
-      "created_at": "2024-03-20T10:00:00Z",
-      "updated_at": "2024-03-20T10:00:00Z"
+      "main_language": "typescript"
     },
     "resources": {
-      "files": [
+      "collections": [
         {
-          "id": 1,
-          "title": "index.ts",
-          "language": "typescript",
-          "extension": "ts",
-          "content": "import React from 'react';\n\nexport default function App() {\n  return <div>Hello World</div>;\n}",
-          "summary": ""
+          "name": "React Components",
+          "description": "Common React component templates",
+          "is_shared": true,
+          "share_uuid": "550e8400-e29b-41d4-a716-446655440000",
+          "templates": [
+            {
+              "file_name": "Button.tsx",
+              "description": "Reusable button component",
+              "neptun_user_file": {
+                "title": "Button Component",
+                "text": "import React from 'react';\n\ninterface Props {\n  label: string;\n  onClick: () => void;\n}\n\nexport default function Button(props: Props) {\n  return <button onClick={props.onClick}>{props.label}</button>;\n}",
+                "language": "typescript",
+                "extension": "tsx"
+              }
+            }
+          ]
         }
       ],
-      "templates": [
+      "imports": [
         {
-          "id": 1,
-          "name": "React Component",
-          "description": "A template for creating React components",
-          "content": "import React from 'react';\n\ninterface Props {\n  // Add props here\n}\n\nexport default function Component(props: Props) {\n  return <div>New Component</div>;\n}"
+          "source_type": "local_folder",
+          "source_path": "/src",
+          "source_ref": "main",
+          "import_status": "completed",
+          "error_message": null,
+          "file_tree": {
+            "src": {
+              "components": {
+                "Button.tsx": null
+              }
+            }
+          },
+          "context_files": [
+            {
+              "title": "Button.tsx",
+              "original_path": "src/components/Button.tsx",
+              "content": "import React from 'react';\n\ninterface Props {\n  label: string;\n  onClick: () => void;\n}\n\nexport default function Button(props: Props) {\n  return <button onClick={props.onClick}>{props.label}</button>;\n}",
+              "file_type": "text",
+              "category": "unknown",
+              "file_size": 156,
+              "pdf_url": null,
+              "language": "typescript",
+              "metadata": {
+                "lastModified": "2024-03-20T10:00:00Z"
+              },
+              "parent_path": "/src/components",
+              "depth": 2
+            }
+          ]
         }
       ]
     },
-    "currentDate": "2024-03-20T10:00:00Z"
+    "currentDate": "2024-03-20T10:00:00.000Z"
   }
 }
 ```
@@ -105,36 +134,53 @@ No query parameters required.
 
 ```typescript
 interface ProjectPromptContext {
-  identity: {
-    name: string
-    creator: string
-  }
   goal: string
   returnFormat: string
   rules: string[]
   project: {
     name: string
-    description?: string
+    description: string | null
     type: string
     main_language: string
-    created_at: string
-    updated_at: string
   }
   resources: {
-    files?: {
-      id: number
-      title: string
-      language: string
-      extension: string
-      content: string
-      summary?: string
-    }[]
-    templates?: {
-      id: number
+    collections: Array<{
       name: string
-      description?: string
-      content?: string
-    }[]
+      description: string | null
+      is_shared: boolean
+      share_uuid: string
+      templates: Array<{
+        file_name: string
+        description: string | null
+        neptun_user_file: {
+          title: string | null
+          text: string
+          language: string
+          extension: string
+        } | null
+      }>
+    }>
+    imports: Array<{
+      source_type: 'local_folder' | 'github_repository_installation' | 'public_github_repository_url'
+      source_path: string
+      source_ref: string | null
+      import_status: string
+      error_message: string | null
+      file_tree: unknown
+      context_files: Array<{
+        title: string
+        original_path: string
+        content: string
+        file_type: 'markdown' | 'pdf' | 'text'
+        category: ('bundler' | 'build_tool' | 'server' | 'package_manager' | 'runtime' | 'documentation' | 'test_tool' | 'unknown') | null
+        file_size: number | null
+        pdf_url: string | null
+        language: string
+        metadata: unknown
+        parent_path: string | null
+        depth: number | null
+      }>
+    }>
   }
   currentDate: string
 }
@@ -148,47 +194,87 @@ interface ApiResponse {
 
 ```python
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Union, Any
+from enum import Enum
 from pydantic import BaseModel
 
-class ProjectFile(BaseModel):
-    id: int
-    title: str
+class ImportSourceType(str, Enum):
+    LOCAL_FOLDER = 'local_folder'
+    GITHUB_REPOSITORY_INSTALLATION = 'github_repository_installation'
+    PUBLIC_GITHUB_REPOSITORY_URL = 'public_github_repository_url'
+
+class FileType(str, Enum):
+    MARKDOWN = 'markdown'
+    PDF = 'pdf'
+    TEXT = 'text'
+
+class FileCategory(str, Enum):
+    BUNDLER = 'bundler'
+    BUILD_TOOL = 'build_tool'
+    SERVER = 'server'
+    PACKAGE_MANAGER = 'package_manager'
+    RUNTIME = 'runtime'
+    DOCUMENTATION = 'documentation'
+    TEST_TOOL = 'test_tool'
+    UNKNOWN = 'unknown'
+
+class UserFile(BaseModel):
+    title: Optional[str]
+    text: str
     language: str
     extension: str
-    content: str
-    summary: Optional[str]
 
-class ProjectTemplate(BaseModel):
-    id: int
+class Template(BaseModel):
+    file_name: str
+    description: Optional[str]
+    neptun_user_file: Optional[UserFile]
+
+class Collection(BaseModel):
     name: str
     description: Optional[str]
-    content: Optional[str]
+    is_shared: bool
+    share_uuid: str
+    templates: List[Template]
 
-class ProjectDetails(BaseModel):
+class ContextFile(BaseModel):
+    title: str
+    original_path: str
+    content: str
+    file_type: FileType
+    category: Optional[FileCategory]
+    file_size: Optional[int]
+    pdf_url: Optional[str]
+    language: str
+    metadata: Any
+    parent_path: Optional[str]
+    depth: Optional[int]
+
+class Import(BaseModel):
+    source_type: ImportSourceType
+    source_path: str
+    source_ref: Optional[str]
+    import_status: str
+    error_message: Optional[str]
+    file_tree: Any
+    context_files: List[ContextFile]
+
+class Project(BaseModel):
     name: str
     description: Optional[str]
     type: str
     main_language: str
-    created_at: datetime
-    updated_at: datetime
 
-class ProjectIdentity(BaseModel):
-    name: str
-    creator: str
-
-class ProjectResources(BaseModel):
-    files: Optional[List[ProjectFile]]
-    templates: Optional[List[ProjectTemplate]]
+class Resources(BaseModel):
+    collections: List[Collection]
+    imports: List[Import]
 
 class ProjectPromptContext(BaseModel):
-    identity: ProjectIdentity
     goal: str
     returnFormat: str
     rules: List[str]
-    project: ProjectDetails
-    resources: ProjectResources
-    currentDate: datetime
+    project: Project
+    resources: Resources
+    currentDate: str
 
 class ApiResponse(BaseModel):
     context: ProjectPromptContext
