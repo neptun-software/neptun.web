@@ -752,10 +752,10 @@ export interface ProjectPromptContext {
   returnFormat: string
   rules: string[]
   project: {
-    name: ReadProject["name"]
-    description: ReadProject["description"]
-    type: ReadProject["type"]
-    main_language: ReadProject["main_language"]
+    name: ReadProject['name']
+    description: ReadProject['description']
+    type: ReadProject['type']
+    main_language: ReadProject['main_language']
   }
   resources: {
     collections: Array<{

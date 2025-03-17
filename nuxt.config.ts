@@ -24,8 +24,8 @@ const noRestrictionsSecurityConfig = {
       xXSSProtection: false,
     },
     xssValidator: false,
-    requestSizeLimiter: false
-  }
+    requestSizeLimiter: false,
+  },
 } as const
 
 const NODE_ENV = process.env.NODE_ENV

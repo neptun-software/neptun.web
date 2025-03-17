@@ -4,9 +4,9 @@ import { createError } from 'h3'
 import { createOllama } from 'ollama-ai-provider'
 import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema'
+import { readProjectContext } from '~/server/database/repositories/projectContext'
 import { persistAiChatMessage, persistUserChatMessage } from '~/server/utils/chat'
 import { isValidUser, validateParamAiModelName, validateQueryChatId } from '~/server/utils/validate'
-import { readProjectContext } from '~/server/database/repositories/projectContext'
 
 // TODO: Make index endpoint using the appropriate provider - also "default" provider endpoint that is just vercel ai, to reduce code duplication in ollama and openrouter.
 export default defineEventHandler(async (event) => {

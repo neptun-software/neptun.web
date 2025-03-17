@@ -4,9 +4,9 @@ import { streamText } from 'ai'
 import { createError } from 'h3'
 import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema'
+import { readProjectContext } from '~/server/database/repositories/projectContext'
 import { persistAiChatMessage, persistUserChatMessage } from '~/server/utils/chat'
 import { isValidUser, validateParamAiModelName, validateQueryChatId } from '~/server/utils/validate'
-import { readProjectContext } from '~/server/database/repositories/projectContext'
 
 export default defineEventHandler(async (event) => {
   if (LOG_BACKEND) {

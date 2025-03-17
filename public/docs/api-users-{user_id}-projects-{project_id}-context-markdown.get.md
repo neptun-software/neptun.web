@@ -104,7 +104,7 @@ export default function Button(props: Props) {
 - **Source Path:** /src
 - **Source Reference:** main
 - **Status:** completed
-- **Error Message:** 
+- **Error Message:**
 
 #### File Tree
 ```json
@@ -124,7 +124,7 @@ export default function Button(props: Props) {
 - **Type:** text
 - **Category:** unknown
 - **Size:** 156 bytes
-- **PDF URL:** 
+- **PDF URL:**
 - **Language:** typescript
 - **Parent Path:** /src/components
 - **Depth:** 2

@@ -4,8 +4,7 @@ import type {
   ReadUser,
 } from '../../../lib/types/database.tables/schema'
 import { and, eq } from 'drizzle-orm'
-import { neptun_user_project } from '../../../lib/types/database.tables/schema'
-import { neptun_user_template } from '../../../lib/types/database.tables/schema'
+import { neptun_user_project, neptun_user_template } from '../../../lib/types/database.tables/schema'
 
 export async function readProjectContext(
   user_id: ReadUser['id'],
@@ -14,7 +13,7 @@ export async function readProjectContext(
   const result = await db.query.neptun_user_project.findFirst({
     where: and(
       eq(neptun_user_project.neptun_user_id, user_id),
-      eq(neptun_user_project.id, project_id)
+      eq(neptun_user_project.id, project_id),
     ),
     with: {
       context_imports: {
@@ -32,8 +31,8 @@ export async function readProjectContext(
               metadata: true,
               parent_path: true,
               depth: true,
-            }
-          }
+            },
+          },
         },
         columns: {
           source_type: true,
@@ -42,7 +41,7 @@ export async function readProjectContext(
           import_status: true,
           error_message: true,
           file_tree: true,
-        }
+        },
       },
       template_collections: {
         with: {
@@ -52,17 +51,17 @@ export async function readProjectContext(
               description: true,
               is_shared: true,
               share_uuid: true,
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
     },
     columns: {
       name: true,
       description: true,
       type: true,
       main_language: true,
-    }
+    },
   })
 
   if (!result) {
@@ -70,7 +69,7 @@ export async function readProjectContext(
   }
 
   async function readProjectTemplateCollectionTemplates(collection_id: number) {
-    return await db.query.neptun_user_template.findMany({
+    return db.query.neptun_user_template.findMany({
       where: eq(neptun_user_template.template_collection_id, collection_id),
       with: {
         neptun_user_file: {
@@ -79,13 +78,13 @@ export async function readProjectContext(
             text: true,
             language: true,
             extension: true,
-          }
-        }
+          },
+        },
       },
       columns: {
         description: true,
         file_name: true,
-      }
+      },
     })
   }
 
@@ -94,9 +93,9 @@ export async function readProjectContext(
       const templates = await readProjectTemplateCollectionTemplates(collection.template_collection_id)
       return {
         ...collection.template_collection,
-        templates
+        templates,
       }
-    })
+    }),
   )
 
   return {
@@ -116,7 +115,7 @@ export async function readProjectContext(
       collections: collectionsWithTemplates,
       imports: result.context_imports,
     },
-    currentDate: new Date().toISOString()
+    currentDate: new Date().toISOString(),
   }
 }
 
@@ -174,7 +173,7 @@ export function contextToMarkdown(context: ProjectPromptContext | null): string 
 
   // Rules
   sections.push('## Rules')
-  context.rules.forEach(rule => {
+  context.rules.forEach((rule) => {
     sections.push(`- ${rule}`)
   })
   sections.push('')
@@ -190,7 +189,7 @@ export function contextToMarkdown(context: ProjectPromptContext | null): string 
   // Template Collections
   if (context.resources.collections.length > 0) {
     sections.push('## Template Collections')
-    context.resources.collections.forEach(collection => {
+    context.resources.collections.forEach((collection) => {
       sections.push(`### Collection: ${collection.name}`)
       sections.push(`- **Description:** ${collection.description || ''}`)
       sections.push(`- **Shared:** ${collection.is_shared ? 'Yes' : 'No'}`)
@@ -198,7 +197,7 @@ export function contextToMarkdown(context: ProjectPromptContext | null): string 
 
       if (collection.templates?.length > 0) {
         sections.push('\n#### Templates')
-        collection.templates.forEach(template => {
+        collection.templates.forEach((template) => {
           sections.push(`##### ${template.file_name}`)
           sections.push(`- **Description:** ${template.description || ''}`)
           if (template.neptun_user_file) {
@@ -206,7 +205,7 @@ export function contextToMarkdown(context: ProjectPromptContext | null): string 
             sections.push(`- **Language:** ${template.neptun_user_file.language}`)
             sections.push(`- **Extension:** ${template.neptun_user_file.extension}`)
             sections.push('\n**Content:**')
-            sections.push('```' + template.neptun_user_file.language)
+            sections.push(`\`\`\`${template.neptun_user_file.language}`)
             sections.push(template.neptun_user_file.text)
             sections.push('```')
           }
@@ -219,13 +218,13 @@ export function contextToMarkdown(context: ProjectPromptContext | null): string 
   // Context Imports
   if (context.resources.imports.length > 0) {
     sections.push('## Context Imports')
-    context.resources.imports.forEach(importItem => {
+    context.resources.imports.forEach((importItem) => {
       sections.push(`### Import Source: ${importItem.source_type}`)
       sections.push(`- **Source Path:** ${importItem.source_path}`)
       sections.push(`- **Source Reference:** ${importItem.source_ref || ''}`)
       sections.push(`- **Status:** ${importItem.import_status}`)
       sections.push(`- **Error Message:** ${importItem.error_message || ''}`)
-      
+
       if (Object.keys(importItem.file_tree || {}).length > 0) {
         sections.push('\n#### File Tree')
         sections.push('```json')
@@ -235,7 +234,7 @@ export function contextToMarkdown(context: ProjectPromptContext | null): string 
 
       if (importItem.context_files?.length > 0) {
         sections.push('#### Context Files')
-        importItem.context_files.forEach(file => {
+        importItem.context_files.forEach((file) => {
           sections.push(`##### ${file.title}`)
           sections.push(`- **Original Path:** ${file.original_path}`)
           sections.push(`- **Type:** ${file.file_type}`)
@@ -245,7 +244,7 @@ export function contextToMarkdown(context: ProjectPromptContext | null): string 
           sections.push(`- **Language:** ${file.language}`)
           sections.push(`- **Parent Path:** ${file.parent_path || ''}`)
           sections.push(`- **Depth:** ${file.depth !== null ? file.depth : ''}`)
-          
+
           if (file.metadata) {
             sections.push('\n**Metadata:**')
             sections.push('```json')
@@ -254,7 +253,7 @@ export function contextToMarkdown(context: ProjectPromptContext | null): string 
           }
 
           sections.push('\n**Content:**')
-          sections.push('```' + file.language)
+          sections.push(`\`\`\`${file.language}`)
           sections.push(file.content)
           sections.push('```')
         })

@@ -9,13 +9,13 @@ import {
   defaultAiModel,
   defaultAiModelProvider,
 } from '~/lib/types/models/ai'
+import { readProjectContext } from '~/server/database/repositories/projectContext'
 import {
   isValidUser,
   validateParamAiModelName,
   validateQueryChatId,
 } from '~/server/utils/validate'
 import { getSanitizedMessageContent } from '~/utils/chat'
-import { readProjectContext } from '~/server/database/repositories/projectContext'
 
 export default defineLazyEventHandler(async () => {
   const apiKey = useRuntimeConfig().huggingfaceApiKey as string

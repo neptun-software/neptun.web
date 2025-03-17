@@ -126,7 +126,9 @@ const isFetchingPrompt = ref(false)
 const systemPrompt = ref<string | null>(null)
 
 async function fetchSystemPrompt() {
-  if (!selectedProject.value || !user.value) return
+  if (!selectedProject.value || !user.value) {
+    return
+  }
 
   try {
     isFetchingPrompt.value = true
@@ -143,7 +145,9 @@ async function fetchSystemPrompt() {
 }
 
 async function createSystemPrompt() {
-  if (!selectedProject.value || !user.value) return
+  if (!selectedProject.value || !user.value) {
+    return
+  }
 
   try {
     isCreatingPrompt.value = true
