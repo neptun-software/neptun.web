@@ -1,4 +1,3 @@
-import type { ProjectPromptContext } from '~/lib/types/database.tables/schema'
 import { updateProjectContext } from '~/server/database/repositories/projectContext'
 
 export default defineEventHandler(async (event) => {
@@ -15,21 +14,29 @@ export default defineEventHandler(async (event) => {
   }
   const { user_id, project_id } = validationResult.data
 
-  const body = await readBody<{ context?: ProjectPromptContext }>(event)
-  const context = body?.context
+  try {
+    const updatedContext = await updateProjectContext(user_id, project_id)
+    if (!updatedContext) {
+      return sendError(
+        event,
+        createError({
+          statusCode: 500,
+          statusMessage: 'Failed to generate project context',
+        }),
+      )
+    }
 
-  const updatedContext = await updateProjectContext(user_id, project_id, context)
-  if (!updatedContext) {
+    return {
+      context: updatedContext,
+    }
+  } catch (error) {
+    console.error('Error generating project context:', error)
     return sendError(
       event,
       createError({
         statusCode: 500,
-        statusMessage: 'Failed to update project context',
+        statusMessage: error instanceof Error ? error.message : 'Failed to generate project context',
       }),
     )
-  }
-
-  return {
-    context: updatedContext,
   }
 })

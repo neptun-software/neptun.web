@@ -16,6 +16,7 @@ import {
 } from '~/lib/types/database.tables/schema'
 
 const { $toast } = useNuxtApp()
+const { user } = useUserSession()
 
 interface FileUploadData {
   files: File[]
@@ -120,10 +121,52 @@ const editFileForm = ref<{
 const showLinkResourceDialog = ref(false)
 const selectedResourceType = ref<Parameters<typeof linkResource>[1] | null>(null)
 
+const isCreatingPrompt = ref(false)
+const isFetchingPrompt = ref(false)
+const systemPrompt = ref<string | null>(null)
+
+async function fetchSystemPrompt() {
+  if (!selectedProject.value || !user.value) return
+
+  try {
+    isFetchingPrompt.value = true
+    const response = await $fetch(`/api/users/${user.value.id}/projects/${selectedProject.value.id}/context`)
+    if (response.context) {
+      systemPrompt.value = JSON.stringify(response.context)
+    }
+  } catch (error) {
+    console.error('Failed to fetch system prompt:', error)
+    $toast.error('Failed to fetch system prompt')
+  } finally {
+    isFetchingPrompt.value = false
+  }
+}
+
+async function createSystemPrompt() {
+  if (!selectedProject.value || !user.value) return
+
+  try {
+    isCreatingPrompt.value = true
+    const response = await $fetch(`/api/users/${user.value.id}/projects/${selectedProject.value.id}/context`, {
+      method: 'POST',
+    })
+    console.log('Create system prompt response:', response)
+    systemPrompt.value = JSON.stringify(response.context) || null
+    console.log('Set system prompt to:', systemPrompt.value)
+    $toast.success('System prompt created')
+  } catch (error) {
+    console.error('Failed to create system prompt:', error)
+    $toast.error('Failed to create system prompt')
+  } finally {
+    isCreatingPrompt.value = false
+  }
+}
+
 async function openProjectDetails(project: GetProject) {
   router.push({ query: { project_id: project.id } })
   if (project.id) {
     await Promise.all([
+      fetchSystemPrompt(),
       fetchImportsWithFiles(project.id),
       fetchResources(project.id, 'user-files'),
       fetchResources(project.id, 'template-collections'),
@@ -195,12 +238,13 @@ async function handleCreateFile(): Promise<void> {
   try {
     const importId = await createImport(projectId)
     const uploadPromises = newFileForm.value.files.map(async (fileData) => {
-      const uploadData: FileUploadData = {
+      const category = fileData.category || 'unknown' as const
+      const uploadData = {
         files: [fileData.file],
-        category: fileData.category || 'unknown',
-        file_type: fileData.file_type,
-      }
-      await uploadFiles(projectId, uploadData as FileUploadData, importId)
+        category,
+        file_type: fileData.file_type || 'text',
+      } satisfies FileUploadData
+      await uploadFiles(projectId, uploadData, importId)
     })
 
     await Promise.all(uploadPromises)
@@ -608,6 +652,37 @@ onMounted(() => {
                 </ShadcnSelect>
               </div>
 
+              <div class="grid gap-2 items-center">
+                <ShadcnLabel>
+                  System Prompt
+                </ShadcnLabel>
+                <template v-if="isFetchingPrompt">
+                  <InfoBlock :is-visible="true" :show-loader="true" :show-dots="true">
+                    Loading system prompt
+                  </InfoBlock>
+                </template>
+                <template v-else-if="systemPrompt">
+                  <div class="whitespace-pre-wrap rounded-lg border max-h-[200px] overflow-y-auto">
+                    <MarkdownRenderer :content="`\`\`\`json\n${systemPrompt}\n\`\`\``" />
+                  </div>
+                </template>
+                <template v-else>
+                  <InfoBlock :is-visible="true" :show-loader="false" :show-dots="false">
+                    No system prompt set.
+                    <template #action>
+                      <AsyncButton
+                        size="sm"
+                        variant="outline"
+                        :loading="isCreatingPrompt"
+                        :on-click-async="createSystemPrompt"
+                      >
+                        Create
+                      </AsyncButton>
+                    </template>
+                  </InfoBlock>
+                </template>
+              </div>
+
               <div class="grid grid-cols-2 gap-4 pt-2">
                 <div class="space-y-1">
                   <p class="text-sm font-medium text-muted-foreground">
@@ -671,7 +746,7 @@ onMounted(() => {
                           </AsyncButton>
                         </div>
 
-                        <div v-if="import_.files && import_.files.length > 0" class="pl-4 space-y-2">
+                        <div v-if="import_?.files && import_.files.length > 0" class="pl-4 space-y-2">
                           <div
                             v-for="file in import_.files"
                             :key="file.id"
@@ -707,7 +782,7 @@ onMounted(() => {
                           </div>
                         </div>
                         <InfoBlock
-                          :is-visible="!import_.files.length"
+                          :is-visible="!import_?.files?.length"
                           :show-loader="false"
                           :show-dots="false"
                         >

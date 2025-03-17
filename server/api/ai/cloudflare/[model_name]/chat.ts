@@ -4,6 +4,7 @@ import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema'
 import { persistAiChatMessage, persistUserChatMessage } from '~/server/utils/chat'
 import { isValidUser, validateParamAiModelName, validateQueryChatId } from '~/server/utils/validate'
+import { readProjectContext } from '~/server/database/repositories/projectContext'
 
 interface CloudflareError {
   code: number
@@ -86,7 +87,13 @@ export default defineEventHandler(async (event) => {
   const validatedBody = body.data
   const { messages } = validatedBody
 
-  const SYSTEM_MESSAGE = 'You have to answer all my questions and provide all information using Markdown syntax. This includes formatting text, adding lists, inserting links, using code blocks, and any other Markdown features that are appropriate for your responses.'
+  let systemPrompt = null
+  // Add project context if available
+  if (chat_id !== -1 && !is_playground) {
+    systemPrompt = JSON.stringify(await readProjectContext(user.id, chat_id))
+  }
+
+  const SYSTEM_MESSAGE = systemPrompt || 'You have to answer all my questions and provide all information using Markdown syntax. This includes formatting text, adding lists, inserting links, using code blocks, and any other Markdown features that are appropriate for your responses.'
   if (!messages.some(message => message.content === SYSTEM_MESSAGE)) {
     if (LOG_BACKEND) {
       console.info('No system message found. Adding initial system message...')

@@ -6,6 +6,7 @@ import { POSSIBLE_AI_MODELS } from '~/lib/data/ai.models'
 import { ChatConversationMessagesToCreateSchema } from '~/lib/types/database.tables/schema'
 import { persistAiChatMessage, persistUserChatMessage } from '~/server/utils/chat'
 import { isValidUser, validateParamAiModelName, validateQueryChatId } from '~/server/utils/validate'
+import { readProjectContext } from '~/server/database/repositories/projectContext'
 
 export default defineEventHandler(async (event) => {
   if (LOG_BACKEND) {
@@ -143,8 +144,15 @@ export default defineEventHandler(async (event) => {
     const host = getHeader(event, 'host')
     const isExternalRequest = !requestOrigin || (host && !requestOrigin.includes(host)) */
 
+    let systemPrompt = ''
+    // Add project context if available
+    if (chat_id !== -1 && !is_playground) {
+      systemPrompt = JSON.stringify(await readProjectContext(user.id, chat_id))
+    }
+
     const result = streamText({
       model: openrouter(config.model),
+      system: systemPrompt,
       messages: messages.map(msg => ({
         role: msg.role,
         content: msg.content,
