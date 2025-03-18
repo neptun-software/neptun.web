@@ -5,3 +5,5 @@ export const protectedRoutes = ['/', ...dashboardAliases, ...accountAliases, ...
 
 export const templatesAliasBase = ['/snippets', '/collections', '/starters']
 export const templatesAliases = [...templatesAliasBase, ...templatesAliasBase.map(path => `/shared/${path}`)]
+
+export const toolsAliases = ['/converters']

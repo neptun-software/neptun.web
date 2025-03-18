@@ -23,7 +23,7 @@ const { data: ast, status } = await useAsyncData(
   <div class="relative">
     <ShadcnScrollArea v-if="!useSimpleRenderer" class="w-full">
       <div id="complex-markdown-renderer" class="w-full">
-        <div class="text-sm break-words whitespace-pre-wrap md:text-base">
+        <div class="text-sm whitespace-pre-wrap break-words md:text-base">
           <template v-if="status === 'success' && ast">
             <!-- MDC is too slow and offers no feedback to the user as well as no great fallback -->
             <MDCRenderer :body="ast.body" :data="ast.data" />
@@ -36,7 +36,7 @@ const { data: ast, status } = await useAsyncData(
       <ShadcnScrollBar orientation="horizontal" />
     </ShadcnScrollArea>
     <div v-else>
-      <div class="text-sm break-all whitespace-pre-wrap md:text-base">
+      <div class="text-sm whitespace-pre-wrap break-all md:text-base">
         <template v-if="status === 'success' && ast">
           <!-- MDC is too slow and offers no feedback to the user as well as no great fallback -->
           <MDCRenderer :body="ast.body" :data="ast.data" />
@@ -49,7 +49,7 @@ const { data: ast, status } = await useAsyncData(
 
     <div
       v-show="status === 'pending'"
-      class="absolute w-4 h-4 -translate-x-1/2 md:w-6 md:h-6 top-2 left-1/2"
+      class="absolute top-2 left-1/2 w-4 h-4 -translate-x-1/2 md:w-6 md:h-6"
     >
       <Loader2 class="w-full h-full text-blue-500 animate-spin" />
     </div>
