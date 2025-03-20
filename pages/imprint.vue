@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 definePageMeta({
   name: 'Imprint',
-  alias: ['/imprint'],
+  alias: ['/site-notice', '/legal-notice', '/legal-disclosure', '/legal-disclosure-information', '/company-information'],
 })
 </script>
 

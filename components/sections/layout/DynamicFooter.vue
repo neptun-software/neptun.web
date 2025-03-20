@@ -15,6 +15,17 @@ const props = defineProps<{
     <ShadcnSeparator class="mt-2 mb-1 bg-transparent" />
 
     <div class="flex flex-wrap gap-4 justify-center mt-4">
+      <NuxtLink to="/imprint" active-class="text-primary" class="flex gap-2 items-center text-muted-foreground hover:text-foreground">
+        <Icon icon="carbon:information" class="w-5 h-5" />
+        <span>Imprint</span>
+      </NuxtLink>
+      <NuxtLink to="/privacy-policy" active-class="text-primary" class="flex gap-2 items-center text-muted-foreground hover:text-foreground">
+        <Icon icon="carbon:security" class="w-5 h-5" />
+        <span>Privacy Policy</span>
+      </NuxtLink>
+    </div>
+
+    <div class="flex flex-wrap gap-4 justify-center mt-4">
       <NuxtLink to="https://github.com/neptun-software" target="_blank" class="flex gap-2 items-center text-muted-foreground hover:text-foreground">
         <Icon icon="ant-design:github-filled" class="w-5 h-5" />
         <span>GitHub</span>
@@ -34,10 +45,6 @@ const props = defineProps<{
       <NuxtLink to="https://neptun-tools-docs.pages.dev" target="_blank" class="flex gap-2 items-center text-muted-foreground hover:text-foreground">
         <Icon icon="oui:documentation" class="w-5 h-5" />
         <span>Documentation</span>
-      </NuxtLink>
-      <NuxtLink to="/imprint" active-class="text-primary" class="flex gap-2 items-center text-muted-foreground hover:text-foreground">
-        <Icon icon="carbon:information" class="w-5 h-5" />
-        <span>Imprint</span>
       </NuxtLink>
     </div>
 
