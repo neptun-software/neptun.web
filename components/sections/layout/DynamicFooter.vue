@@ -49,7 +49,7 @@ const props = defineProps<{
     </div>
 
     <ShadcnSeparator class="mt-2 mb-1 bg-transparent" />
-    
+
     <p class="mt-2 text-center text-muted-foreground">
       Animated Icons by
       <NuxtLink
