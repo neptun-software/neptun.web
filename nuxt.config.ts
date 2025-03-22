@@ -258,6 +258,16 @@ export default defineNuxtConfig({
     '/api/users/*/projects/*/resources/files/**': noRestrictionsSecurityConfig,
     '/api/users/*/projects/*/context/**': noRestrictionsSecurityConfig,
     '/api/users/*/collections/*/templates/**': noRestrictionsSecurityConfig,
+    '/tools': {
+      security: {
+        headers: {
+          crossOriginEmbedderPolicy: 'unsafe-none',
+          contentSecurityPolicy: {
+            'img-src': ['*'],
+          },
+        },
+      },
+    },
     '/auth/**': {
       security: {
         corsHandler,
