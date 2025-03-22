@@ -67,7 +67,8 @@
 - `GET` [`/api/users/{user_id}/projects/{project_id}`](../api-users-{user_id}-projects-{project_id}.get.md)
 - `PATCH` [`/api/users/{user_id}/projects/{project_id}`](../api-users-{user_id}-projects-{project_id}.patch.md)
 - `DELETE` [`/api/users/{user_id}/projects/{project_id}`](../api-users-{user_id}-projects-{project_id}.delete.md)
-- `GET` `/api/users/{user_id}/projects/{project_id}/chats` [read](../api-users-{user_id}-projects-{project_id}-chats.get.md)
+- `GET` && `POST` && `DELETE` `/api/users/{user_id}/projects/{project_id}/chats` [read](../api-users-{user_id}-projects-{project_id}-chats.get.md) | [create](../api-users-{user_id}-projects-{project_id}-chats.post.md) | [delete](../api-users-{user_id}-projects-{project_id}-chats.delete.md)
+- `DELETE` [`/api/users/{user_id}/projects/{project_id}/chats/{chat_id}`](../api-users-{user_id}-projects-{project_id}-chats-{chat_id}.delete.md)
 - `GET` && `POST` `/api/users/{user_id}/projects/{project_id}/context` [read](../api-users-{user_id}-projects-{project_id}-context.get.md) | [create](../api-users-{user_id}-projects-{project_id}-context.post.md)
 - `GET` [`/api/users/{user_id}/projects/{project_id}/context/markdown`](../api-users-{user_id}-projects-{project_id}-context-markdown.get.md)
 
@@ -94,5 +95,6 @@
 
 ### Other Routes
 
-- `GET` [`/api/html-to-markdown/{url}`](../api-html-to-markdown-{url}.get.md)
 - `GET` [`/api/users/{user_id}/files`](../api-users-{user_id}-files.get.md)
+- `GET` [`/api/html-to-markdown/{url}`](../api-html-to-markdown-{url}.get.md)
+- `GET` [`/api/og/{url}`](../api-og-{url}.get.md)

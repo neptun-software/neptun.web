@@ -205,32 +205,54 @@ watch(cookieVisible, () => {
                 Failed to fetch CLI configuration.
               </p>
             </template>
-            <span class="flex absolute top-2 right-2 gap-2 items-center">
-              <ShadcnButton
-                size="icon"
-                variant="ghost"
-                title="Toggle session cookie visibility"
-                @click="toggleCookieVisibility"
-              >
-                <span v-if="cookieVisible">
-                  <EyeOff class="size-6" />
-                </span>
-                <span v-else>
-                  <Eye class="size-6" />
-                </span>
-              </ShadcnButton>
+            <ShadcnTooltipProvider>
+              <span class="flex absolute top-2 right-2 gap-2 items-center">
+                <ShadcnTooltip>
+                  <ShadcnTooltipTrigger as-child>
+                    <ShadcnButton
+                      size="icon"
+                      variant="ghost"
+                      @click="toggleCookieVisibility"
+                    >
+                      <span v-if="cookieVisible">
+                        <EyeOff class="size-6" />
+                      </span>
+                      <span v-else>
+                        <Eye class="size-6" />
+                      </span>
+                    </ShadcnButton>
+                  </ShadcnTooltipTrigger>
+                  <ShadcnTooltipContent side="top">
+                    Toggle session cookie visibility.
+                  </ShadcnTooltipContent>
+                </ShadcnTooltip>
 
-              <AsyncButton
-                size="icon" variant="ghost" :hide-loader="true" :is-disabled="textForClipboard === ''"
-                :on-click-async="downloadConfiguration"
-              >
-                <Download class="size-6" />
-              </AsyncButton>
+                <ShadcnTooltip>
+                  <ShadcnTooltipTrigger as-child>
+                    <AsyncButton
+                      size="icon" variant="ghost" :hide-loader="true" :is-disabled="textForClipboard === ''"
+                      :on-click-async="downloadConfiguration"
+                    >
+                      <Download class="size-6" />
+                    </AsyncButton>
+                  </ShadcnTooltipTrigger>
+                  <ShadcnTooltipContent side="top">
+                    Download CLI configuration.
+                  </ShadcnTooltipContent>
+                </ShadcnTooltip>
 
-              <ShadcnButton size="icon" variant="ghost" :disabled="textForClipboard === ''">
-                <CopyToClipboard :text="textForClipboard" />
-              </ShadcnButton>
-            </span>
+                <ShadcnTooltip>
+                  <ShadcnTooltipTrigger as-child>
+                    <ShadcnButton size="icon" variant="ghost" :disabled="textForClipboard === ''">
+                      <CopyToClipboard :text="textForClipboard" />
+                    </ShadcnButton>
+                  </ShadcnTooltipTrigger>
+                  <ShadcnTooltipContent side="top">
+                    Copy CLI configuration to clipboard.
+                  </ShadcnTooltipContent>
+                </ShadcnTooltip>
+              </span>
+            </ShadcnTooltipProvider>
           </ClientOnly>
         </div>
       </ShadcnScrollArea>

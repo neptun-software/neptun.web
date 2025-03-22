@@ -157,6 +157,14 @@ export const GithubRepositoryNameSchema = z.object({
 
 type GithubRepositoryNameType = z.infer<typeof GithubRepositoryNameSchema>
 
+export const ProjectChatIdSchema = z.object({
+  user_id: primaryIdSchema,
+  project_id: primaryIdSchema,
+  chat_id: primaryIdSchema,
+})
+
+type ProjectChatIdType = z.infer<typeof ProjectChatIdSchema>
+
 /* QUERY SCHEMAs */
 
 /**
@@ -1359,5 +1367,51 @@ export function isValidUser(user: unknown): user is User {
     && user !== null
     && 'id' in user
     && typeof (user as User).id === 'number'
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, project_id, chat_id) */
+export async function validateParamProjectChatId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ProjectChatIdType>> {
+  return validateParams<ProjectChatIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const project_id = Number(params?.project_id)
+        // @ts-expect-error
+        const chat_id = Number(params?.chat_id)
+
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.project_id = project_id
+        event.context.validated.params.chat_id = chat_id
+
+        return ProjectChatIdSchema.safeParse({
+          user_id,
+          project_id,
+          chat_id,
+        })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            user_id: result.data.user_id,
+            project_id: result.data.project_id,
+            chat_id: result.data.chat_id,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, project_id, chat_id).',
+    `Invalid routeParams(user_id, project_id, chat_id). The chat with id=${event.context.validated.params.chat_id} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
+    'routeParams(user_id, project_id, chat_id):',
+    (user, data) => user.id !== data.user_id,
   )
 }

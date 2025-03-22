@@ -483,42 +483,82 @@ function stopGeneration() {
           </ShadcnDialogContent>
         </ShadcnDialog>
 
-        <AsyncButton
-          size="icon" variant="ghost" :hide-loader="false" :is-disabled="chatMessages.length === 0"
-          :on-click-async="() => downloadChatMessages()"
-        >
-          <Download class="size-6" />
-          <span class="sr-only">Download Chat</span>
-        </AsyncButton>
+        <ShadcnTooltipProvider>
+          <ShadcnTooltip>
+            <ShadcnTooltipTrigger as-child>
+              <AsyncButton
+                size="icon" variant="ghost" :hide-loader="false" :is-disabled="chatMessages.length === 0"
+                :on-click-async="() => downloadChatMessages()"
+              >
+                <Download class="size-6" />
+                <span class="sr-only">Download Chat</span>
+              </AsyncButton>
+            </ShadcnTooltipTrigger>
+            <ShadcnTooltipContent side="top">
+              Download chat messages as JSON.
+            </ShadcnTooltipContent>
+          </ShadcnTooltip>
 
-        <DashboardChatShareDialog />
-        <ShadcnButton
-          size="icon" variant="ghost" :disabled="chatMessages.length === 0 || chatResponseIsLoading"
-          @click="scrollToBottom()"
-        >
-          <Mouse class="size-6" />
-          <span class="sr-only">Scroll to bottom</span>
-        </ShadcnButton>
-        <ShadcnToggle :pressed="autoScrollEnabled" class="px-2" @update:pressed="autoScrollEnabled = $event">
-          <Icon icon="mdi:automatic" class="size-6" />
-          <span class="sr-only">
-            {{ autoScrollEnabled ? 'Disable' : 'Enable' }} auto-scroll
-          </span>
-        </ShadcnToggle>
+          <ShadcnTooltip>
+            <ShadcnTooltipTrigger as-child>
+              <DashboardChatShareDialog />
+            </ShadcnTooltipTrigger>
+            <ShadcnTooltipContent side="top">
+              Share the chat with others.
+            </ShadcnTooltipContent>
+          </ShadcnTooltip>
 
-        <!-- Zen Mode Toggle -->
-        <ShadcnButton
-          variant="ghost"
-          size="icon"
-          @click="toggleZenMode"
-        >
-          <span v-once>
-            <AnimatedIcon :animation-data="maximizeMinimizeJson" :is-active="isZenMode" />
-          </span>
-          <span class="sr-only">
-            {{ isZenMode ? 'Exit' : 'Enter' }} zen mode
-          </span>
-        </ShadcnButton>
+          <ShadcnTooltip>
+            <ShadcnTooltipTrigger as-child>
+              <ShadcnButton
+                size="icon" variant="ghost" :disabled="chatMessages.length === 0 || chatResponseIsLoading"
+                @click="scrollToBottom()"
+              >
+                <Mouse class="size-6" />
+                <span class="sr-only">Scroll to bottom</span>
+              </ShadcnButton>
+            </ShadcnTooltipTrigger>
+            <ShadcnTooltipContent side="top">
+              Scroll to the bottom of the chat.
+            </ShadcnTooltipContent>
+          </ShadcnTooltip>
+
+          <ShadcnToggle :pressed="autoScrollEnabled" class="px-2" @update:pressed="autoScrollEnabled = $event">
+            <ShadcnTooltip>
+              <ShadcnTooltipTrigger as-child>
+                <div>
+                  <Icon icon="mdi:automatic" class="size-6" />
+                  <span class="sr-only">
+                    {{ autoScrollEnabled ? 'Disable' : 'Enable' }} auto-scroll
+                  </span>
+                </div>
+              </ShadcnTooltipTrigger>
+              <ShadcnTooltipContent side="top">
+                Toggle auto-scrolling.
+              </ShadcnTooltipContent>
+            </ShadcnTooltip>
+          </ShadcnToggle>
+
+          <ShadcnTooltip>
+            <ShadcnTooltipTrigger as-child>
+              <ShadcnButton
+                variant="ghost"
+                size="icon"
+                @click="toggleZenMode"
+              >
+                <span v-once>
+                  <AnimatedIcon :animation-data="maximizeMinimizeJson" :is-active="isZenMode" />
+                </span>
+                <span class="sr-only">
+                  {{ isZenMode ? 'Exit' : 'Enter' }} zen mode
+                </span>
+              </ShadcnButton>
+            </ShadcnTooltipTrigger>
+            <ShadcnTooltipContent side="top">
+              Toggle zen-mode.
+            </ShadcnTooltipContent>
+          </ShadcnTooltip>
+        </ShadcnTooltipProvider>
       </div>
     </div>
 
@@ -600,11 +640,11 @@ function stopGeneration() {
                 <ShadcnTooltipTrigger as-child>
                   <ShadcnButton variant="ghost" size="icon" :disabled="isOverMaxTokens">
                     <Link class="size-4" />
-                    <span class="sr-only">URL context</span>
+                    <span class="sr-only">URL Context</span>
                   </ShadcnButton>
                 </ShadcnTooltipTrigger>
                 <ShadcnTooltipContent side="top">
-                  URL context
+                  URL Context
                 </ShadcnTooltipContent>
               </ShadcnPopoverTrigger>
               <ShadcnPopoverContent>
@@ -668,7 +708,7 @@ function stopGeneration() {
                   </ShadcnButton>
                 </ShadcnTooltipTrigger>
                 <ShadcnTooltipContent side="top">
-                  Clear
+                  Clear Chat
                 </ShadcnTooltipContent>
               </ShadcnAlertDialogTrigger>
               <ShadcnAlertDialogContent>
@@ -696,11 +736,11 @@ function stopGeneration() {
                 " :on-click-async="() => reloadLast()"
               >
                 <RefreshCcw class="size-4" />
-                <span class="sr-only">Reload Last</span>
+                <span class="sr-only">Regenerate Last Message</span>
               </AsyncButton>
             </ShadcnTooltipTrigger>
             <ShadcnTooltipContent>
-              <p>Reload Last Message</p>
+              <p>Regenerate Last Message</p>
             </ShadcnTooltipContent>
           </ShadcnTooltip>
         </ShadcnTooltipProvider>

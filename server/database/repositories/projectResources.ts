@@ -192,3 +192,27 @@ export async function deleteResource(
 
   return Boolean(result)
 }
+
+/* DELETE MULTIPLE RESOURCES */
+export async function deleteResources(
+  project_id: number,
+  resource_type: ResourceType,
+  resource_ids: number[],
+): Promise<boolean> {
+  switch (resource_type) {
+    case 'user-files':
+      return Promise.all(resource_ids.map(async id => deleteProjectUserFile(project_id, id)))
+        .then(results => results.every(Boolean))
+    case 'template-collections':
+      return Promise.all(resource_ids.map(async id => deleteProjectTemplateCollection(project_id, id)))
+        .then(results => results.every(Boolean))
+    case 'github-installations':
+      return Promise.all(resource_ids.map(async id => deleteProjectGithubInstallation(project_id, id)))
+        .then(results => results.every(Boolean))
+    case 'chat-conversations':
+      return Promise.all(resource_ids.map(async id => deleteProjectChatConversation(project_id, id)))
+        .then(results => results.every(Boolean))
+    default:
+      throw new Error(`Invalid resource type: ${String(resource_type)}`)
+  }
+}

@@ -22,6 +22,7 @@ const { console } = useLogger()
 
 export function useDashboard() {
   const { $toast } = useNuxtApp()
+  const { activeProject } = useProjects()
 
   const handleFetch = async <T>(
     url: string,
@@ -213,7 +214,9 @@ export function useDashboard() {
     name: string,
     model: string,
   ) => {
-    const url = `/api/users/${user_id}/chats`
+    const url = activeProject.value?.id
+      ? `/api/users/${user_id}/projects/${activeProject.value.id}/chats`
+      : `/api/users/${user_id}/chats`
     const options = {
       method: 'POST' as HTTPMethod,
       body: { model, name },
@@ -222,9 +225,9 @@ export function useDashboard() {
     }
 
     const toastMessages = {
-      loading: 'Persisting chat history...',
-      success: (_data: unknown) => 'Chat history persisted!',
-      error: (_data: unknown) => 'Failed to persist chat history!',
+      loading: 'Creating new chat...',
+      success: (_data: unknown) => 'Chat created successfully!',
+      error: (_data: unknown) => 'Failed to create chat!',
     }
 
     try {
@@ -241,7 +244,7 @@ export function useDashboard() {
 
       return response.chat.id
     } catch {
-      console.error('Failed to persist chat history!')
+      console.error('Failed to create chat!')
     }
   }
 
@@ -322,7 +325,10 @@ export function useDashboard() {
     chat_id: number | number[],
   ): Promise<void> => {
     if (!Array.isArray(chat_id)) {
-      const url = `/api/users/${user_id}/chats/${chat_id}`
+      const url = activeProject.value?.id
+        ? `/api/users/${user_id}/projects/${activeProject.value.id}/chats/${chat_id}`
+        : `/api/users/${user_id}/chats/${chat_id}`
+
       const options = {
         method: 'DELETE' as HTTPMethod,
         lazy: true,
@@ -343,7 +349,10 @@ export function useDashboard() {
       return
     }
 
-    const url = `/api/users/${user_id}/chats`
+    const url = activeProject.value?.id
+      ? `/api/users/${user_id}/projects/${activeProject.value.id}/chats`
+      : `/api/users/${user_id}/chats`
+
     const options = {
       method: 'DELETE' as HTTPMethod,
       lazy: true,
