@@ -188,7 +188,9 @@ async function signOut() {
         CLI Configuration
       </template>
       <template #content>
-        <CLI />
+        <KeepAlive>
+          <CLI />
+        </KeepAlive>
       </template>
     </AccountSection>
 

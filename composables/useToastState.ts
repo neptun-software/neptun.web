@@ -147,34 +147,32 @@ export function useToastState() {
 
     const toastHandler = showToast(requestId, loadingMessage)
 
-    let resolveToastPromise: (value: unknown) => void
-    let rejectToastPromise: (error: unknown) => void
     const toastPromise = new Promise<unknown>((resolve, reject) => {
-      resolveToastPromise = resolve
-      rejectToastPromise = reject
+      promise
+        .then((data) => {
+          if (toastPromises.value.get(requestId) === promise) {
+            const message = typeof successMessage === 'function' ? successMessage(data) : successMessage
+            toastHandler.success(message)
+            setTimeout(() => {
+              resolve(data)
+              removeToast(requestId)
+            }, 2000)
+          }
+        })
+        .catch((error) => {
+          if (toastPromises.value.get(requestId) === promise) {
+            const message = typeof errorMessage === 'function' ? errorMessage(error) : errorMessage
+            toastHandler.error(message)
+            setTimeout(() => {
+              reject(error)
+              removeToast(requestId)
+            }, 3000)
+          }
+        })
+        .finally(() => {
+          isWaitingForResponse.value.delete(requestId)
+        })
     })
-
-    // Handle the original promise
-    promise
-      .then((data) => {
-        if (toastPromises.value.get(requestId) === promise) { // Only update if this is still the current toast
-          const message = typeof successMessage === 'function' ? successMessage(data) : successMessage
-          toastHandler.success(message)
-          // Wait for toast duration then resolve
-          setTimeout(() => resolveToastPromise(data), 2000)
-        }
-      })
-      .catch((error) => {
-        if (toastPromises.value.get(requestId) === promise) { // Only update if this is still the current toast
-          const message = typeof errorMessage === 'function' ? errorMessage(error) : errorMessage
-          toastHandler.error(message)
-          // Wait for toast duration then reject
-          setTimeout(() => rejectToastPromise(error), 3000)
-        }
-      })
-      .finally(() => {
-        isWaitingForResponse.value.delete(requestId)
-      })
 
     return {
       requestId,
@@ -182,6 +180,8 @@ export function useToastState() {
       toastPromise,
     }
   }
+
+  onUnmounted(cleanup)
 
   return {
     showToast,

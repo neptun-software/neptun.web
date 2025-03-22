@@ -93,7 +93,10 @@ watchEffect(async () => {
                 :key="project.id"
                 class="gap-2 px-1.5 py-1.5 rounded-md cursor-pointer"
                 :class="project.id === activeProject?.id ? 'bg-accent/50' : ''"
-                @click="() => navigateTo(`/?project_id=${project.id}`)"
+                @click="() => {
+                  const query = { ...route.query, project_id: project.id.toString() }
+                  navigateTo({ query }, { replace: true })
+                }"
               >
                 <div class="flex justify-center items-center rounded-md border size-6 bg-primary/10">
                   <Code2 class="size-4 shrink-0 text-primary" />
@@ -111,7 +114,11 @@ watchEffect(async () => {
                   buttonVariants({ variant: 'secondary', size: 'sm' }),
                   'w-full justify-center cursor-pointer',
                 )"
-                @click="() => navigateTo('/')"
+                @click="() => {
+                  const query = { ...route.query }
+                  delete query.project_id
+                  navigateTo({ query }, { replace: true })
+                }"
               >
                 Clear active project
               </ShadcnDropdownMenuItem>

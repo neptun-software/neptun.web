@@ -27,7 +27,7 @@ enum Category {
   LanguagesAndDevelopmentTools = 'Languages & Development Tools',
   FrontendFrameworksAndLibraries = 'Frontend Frameworks & Libraries',
   BackendFrameworks = 'Backend Frameworks',
-  StylingAndDesign = 'Styling & Design'
+  StylingAndDesign = 'Styling & Design',
 }
 
 interface Recommendation {
@@ -63,7 +63,7 @@ const recommendations = ref<Recommendation[]>([
     category: Category.ContainerizationAndOrchestration,
     description: 'Handles the workflow for building, pushing, and deploying Kubernetes applications',
   },
-  
+
   // Package & Version Management
   {
     url: 'https://helm.sh',
@@ -77,7 +77,7 @@ const recommendations = ref<Recommendation[]>([
     category: Category.PackageAndVersionManagement,
     description: 'Universal version manager for runtime environments and CLI tools',
   },
-  
+
   // Infrastructure Management
   {
     url: 'https://www.portainer.io',
@@ -97,7 +97,7 @@ const recommendations = ref<Recommendation[]>([
     category: Category.InfrastructureManagement,
     description: 'Declarative continuous delivery tool for Kubernetes following GitOps principles',
   },
-  
+
   // CI/CD & Version Control
   {
     url: 'https://www.jenkins.io',
@@ -111,7 +111,7 @@ const recommendations = ref<Recommendation[]>([
     category: Category.CICDAndVersionControl,
     description: 'Development platform for hosting and collaborating on code',
   },
-  
+
   // Web Servers & Authentication
   {
     url: 'https://www.nginx.com',
@@ -143,7 +143,7 @@ const recommendations = ref<Recommendation[]>([
     category: Category.WebServersAndAuthentication,
     description: 'Open source mail server for SMTP, IMAP, and web interface',
   },
-  
+
   // Package Registries & Runtimes
   {
     url: 'https://jsr.io',
@@ -157,7 +157,7 @@ const recommendations = ref<Recommendation[]>([
     category: Category.PackageRegistriesAndRuntimes,
     description: 'Fast all-in-one JavaScript runtime and toolkit with bundler, test runner, and package manager',
   },
-  
+
   // Infrastructure & Deployment
   {
     url: 'https://coolify.io',
@@ -165,7 +165,7 @@ const recommendations = ref<Recommendation[]>([
     category: Category.InfrastructureAndDeployment,
     description: 'Open-source & self-hostable Heroku/Netlify/Vercel alternative',
   },
-  
+
   // Languages & Development Tools
   {
     url: 'https://www.typescriptlang.org',
@@ -197,7 +197,7 @@ const recommendations = ref<Recommendation[]>([
     category: Category.LanguagesAndDevelopmentTools,
     description: 'Modern and intuitive Action testing tool for developers',
   },
-  
+
   // Frontend Frameworks & Libraries
   {
     url: 'https://vuejs.org',
@@ -241,7 +241,7 @@ const recommendations = ref<Recommendation[]>([
     category: Category.BackendFrameworks,
     description: 'Type-safe HTML templating language for Go that helps build robust web applications',
   },
-  
+
   // Backend Frameworks
   {
     url: 'https://nitro.build',
@@ -267,7 +267,7 @@ const recommendations = ref<Recommendation[]>([
     category: Category.BackendFrameworks,
     description: 'Kotlin framework for building asynchronous servers and clients',
   },
-  
+
   // Styling & Design
   {
     url: 'https://tailwindcss.com',
@@ -299,12 +299,14 @@ const searchQuery = ref('')
 
 const filteredRecommendations = computed(() => {
   const query = searchQuery.value.toLowerCase().trim()
-  if (!query) return recommendations.value
+  if (!query) {
+    return recommendations.value
+  }
 
-  return recommendations.value.filter(rec => 
-    rec.category.toLowerCase().includes(query) ||
-    rec.description.toLowerCase().includes(query) ||
-    rec.url.toLowerCase().includes(query)
+  return recommendations.value.filter(rec =>
+    rec.category.toLowerCase().includes(query)
+    || rec.description.toLowerCase().includes(query)
+    || rec.url.toLowerCase().includes(query),
   )
 })
 
@@ -359,14 +361,14 @@ onMounted(() => {
 
 const groupedRecommendations = computed(() => {
   const groups = {} as Record<string, Recommendation[]>
-  
-  filteredRecommendations.value.forEach(rec => {
+
+  filteredRecommendations.value.forEach((rec) => {
     if (!groups[rec.category]) {
       groups[rec.category] = []
     }
     groups[rec.category].push(rec)
   })
-  
+
   return groups
 })
 </script>
@@ -387,7 +389,9 @@ const groupedRecommendations = computed(() => {
 
     <div class="space-y-8">
       <div v-for="(tools, category) in groupedRecommendations" :key="category" class="space-y-4">
-        <h2 class="text-2xl font-semibold">{{ category }}</h2>
+        <h2 class="text-2xl font-semibold">
+          {{ category }}
+        </h2>
         <div class="space-y-4">
           <div v-for="rec in tools" :key="rec.url" class="group">
             <ShadcnCard class="shadow-none transition-all duration-200 hover:border-primary">

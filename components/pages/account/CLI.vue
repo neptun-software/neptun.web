@@ -9,10 +9,16 @@ const { data, error } = await useFetch(
   `/api/users/${user.value?.id ?? -1}/cli`,
 )
 
-const cookieVisible = ref(false)
-const $markdownElement = ref<HTMLElement | null>(null)
+const cliKey = computed(() => {
+  const configData = data.value?.auth?.neptun_session_cookie
+  const chatData = `${selectedAiChat.value.id}-${selectedAiChat.value.name}-${selectedAiChat.value.model}`
+  return `${configData}-${chatData}`
+})
+
+const cookieVisible = shallowRef(false)
+const cookieCopied = shallowRef(false)
+const $markdownElement = shallowRef<HTMLElement | null>(null)
 const cookieMask = '•'.repeat(40)
-const cookieCopied = ref(false)
 const { copy } = useClipboard({ legacy: true })
 
 function copyCookie() {
@@ -25,13 +31,14 @@ function copyCookie() {
   }
 }
 
-function handleMarkdownClick(event) {
-  const line = event.target.closest('.line')
+function handleMarkdownClick(event: MouseEvent) {
+  const line = (event.target as HTMLElement).closest('.line')
   if (!line) {
     return
   }
 
-  if (line.textContent?.includes('neptun_session_cookie')) {
+  const htmlLine = line as HTMLElement
+  if (htmlLine.textContent?.includes('neptun_session_cookie')) {
     copyCookie()
   }
 }
@@ -47,17 +54,19 @@ function styleCookieLine() {
   }
 
   for (const line of lines) {
-    if (line.textContent?.includes('neptun_session_cookie')) {
-      line.classList.add('cookie-line')
-      line.style.cursor = 'pointer'
-      line.style.borderRadius = '0.25rem'
-      line.style.padding = '0.25rem 0.5rem'
-      line.style.position = 'relative'
+    const htmlLine = line as HTMLElement
+    if (htmlLine.textContent?.includes('neptun_session_cookie')) {
+      htmlLine.classList.add('cookie-line')
+      htmlLine.style.cursor = 'pointer'
+      htmlLine.style.borderRadius = '0.25rem'
+      htmlLine.style.padding = '0.25rem 0.5rem'
+      htmlLine.style.position = 'relative'
 
-      const spans = line.querySelectorAll('span')
+      const spans = htmlLine.querySelectorAll('span')
       for (const span of spans) {
-        if (span.textContent?.includes('"neptun_session_cookie"')) {
-          let currentSpan = span.nextElementSibling
+        const htmlSpan = span as HTMLElement
+        if (htmlSpan.textContent?.includes('"neptun_session_cookie"')) {
+          let currentSpan = htmlSpan.nextElementSibling as HTMLElement
           while (currentSpan) {
             if (currentSpan.textContent?.includes('"')
               && (currentSpan.textContent?.includes('•')
@@ -66,7 +75,7 @@ function styleCookieLine() {
               currentSpan.dataset.cookieValue = 'true'
               break
             }
-            currentSpan = currentSpan.nextElementSibling
+            currentSpan = currentSpan.nextElementSibling as HTMLElement
           }
           break
         }
@@ -175,7 +184,7 @@ watch(cookieVisible, () => {
 </script>
 
 <template>
-  <div>
+  <div :key="cliKey">
     <div class="overflow-hidden relative my-2 rounded-lg border bg-background border-slate-200 dark:border-border">
       <ShadcnScrollArea class="max-w-[calc(100vw-(1rem))] px-2 py-2">
         <ShadcnScrollBar orientation="horizontal" />

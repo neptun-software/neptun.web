@@ -96,7 +96,9 @@ function waitForValidRef(condition: Ref<boolean | undefined>) {
   return promise
 }
 
-const chatMessagesKey = ref<string>(crypto.randomUUID())
+const chatMessagesKey = computed(() => {
+  return `${selectedAiChat.value.id}-${chatMessages.value.length}`
+})
 const { setPromiseToast, cleanup: cleanupToasts } = useToastState()
 const currentPromiseToast = ref<{ requestId: string, isWaiting: ComputedRef<boolean> } | null>(null)
 
@@ -117,7 +119,6 @@ watch(
     }
 
     await aiIsDoneResponding
-    chatMessagesKey.value = crypto.randomUUID()
     if (selectedAiChat.value.id !== -1) {
       await loadFiles(user.value?.id ?? -1, selectedAiChat.value.id)
     }
@@ -200,6 +201,11 @@ function appendFileUploadToInput(type: string, name: string, text: string) {
 
 // Load data
 async function loadChatMessages(user_id: number, chat_id: number) {
+  // Skip if we already have messages for this chat
+  if (loadedChats.value.has(chat_id) && chatMessages.value.length > 0) {
+    return
+  }
+
   if (user_id !== -1) {
     if (chat_id === -1) {
       // load playground, if no chat is selected
@@ -250,10 +256,23 @@ const maxTokens = computed(() => {
 
 const isOverMaxTokens = computed(() => currentChatMessage.value.length > maxTokens.value)
 
+const loadedChats = useState('loaded-chats', () => new Set())
+
+const shouldLoadMessages = computed(() => {
+  return !loadedChats.value.has(selectedAiChat.value.id) || chatMessages.value.length === 0
+})
+
 onMounted(async () => {
+  if (!shouldLoadMessages.value) {
+    isLoading.value = false
+    return
+  }
+
+  isLoading.value = true
   await loadChatMessages(user.value?.id ?? -1, selectedAiChat.value.id).then(
     () => {
       isLoading.value = false
+      loadedChats.value.add(selectedAiChat.value.id)
       // currentChatMessageHistoryClear();
     },
   )
@@ -514,7 +533,9 @@ function stopGeneration() {
 
     <div class="flex flex-col flex-grow pt-10 pb-6 max-w-full min-h-0">
       <ShadcnScrollArea ref="$scrollArea">
-        <DashboardChatMessages :key="chatMessagesKey" :messages="messagesWithStreaming" />
+        <KeepAlive>
+          <DashboardChatMessages :key="chatMessagesKey" :messages="messagesWithStreaming" />
+        </KeepAlive>
 
         <template v-if="isLoading">
           <MessagesSkeleton />
