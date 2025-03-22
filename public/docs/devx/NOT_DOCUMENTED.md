@@ -3,7 +3,6 @@
 > Those are only needed for the website.
 
 - `GET` `/`
-- `GET` `/api/og/{url}/index.ts`
 
 **Authentication:**
 
