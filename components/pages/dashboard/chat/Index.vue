@@ -200,6 +200,7 @@ function appendFileUploadToInput(type: string, name: string, text: string) {
 }
 
 // Load data
+const loadedChats = useState('loaded-chats', () => new Set())
 async function loadChatMessages(user_id: number, chat_id: number) {
   // Skip if we already have messages for this chat
   if (loadedChats.value.has(chat_id) && chatMessages.value.length > 0) {
@@ -255,8 +256,6 @@ const maxTokens = computed(() => {
 })
 
 const isOverMaxTokens = computed(() => currentChatMessage.value.length > maxTokens.value)
-
-const loadedChats = useState('loaded-chats', () => new Set())
 
 const shouldLoadMessages = computed(() => {
   return !loadedChats.value.has(selectedAiChat.value.id) || chatMessages.value.length === 0

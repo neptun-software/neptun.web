@@ -7,31 +7,31 @@ import { composerize, MessageType } from 'composerize-ts'
 import { Download } from 'lucide-vue-next'
 
 const dockerRun = ref(
-  'docker run -it \
-  --network=bridge \
-  --publish=8080:80 \
-  --cap-add=NET_ADMIN \
-  --volume=/tmp/host:/container/path \
-  --env MY_VAR=value \
-  --name=mycontainer \
-  --hostname=myhostname \
-  --dns=8.8.8.8 \
-  --entrypoint=/bin/bash \
-  --workdir=/app \
-  --user=1000:1000 \
-  --group-add=group1 \
-  --restart=always \
-  --health-cmd="echo healthy" \
-  --log-driver=json-file \
-  --tmpfs=/tmp \
-  --device=/dev/sda:/dev/sda \
-  --sysctl net.ipv4.ip_forward=1 \
-  --label com.example.foo=bar \
-  --read-only \
-  --stop-signal=SIGTERM \
-  --ulimit nofile=1024:1024 \
-  --security-opt label=level:s0 \
-  ubuntu',
+  `docker run -it 
+  --network=bridge 
+  --publish=8080:80 
+  --cap-add=NET_ADMIN 
+  --volume=/tmp/host:/container/path 
+  --env MY_VAR=value 
+  --name=mycontainer 
+  --hostname=myhostname 
+  --dns=8.8.8.8 
+  --entrypoint=/bin/bash 
+  --workdir=/app 
+  --user=1000:1000 
+  --group-add=group1 
+  --restart=always 
+  --health-cmd="echo healthy" 
+  --log-driver=json-file 
+  --tmpfs=/tmp 
+  --device=/dev/sda:/dev/sda 
+  --sysctl net.ipv4.ip_forward=1 
+  --label com.example.foo=bar 
+  --read-only 
+  --stop-signal=SIGTERM 
+  --ulimit nofile=1024:1024 
+  --security-opt label=level:s0 
+  ubuntu`,
 )
 
 const conversionResult = computed(() =>

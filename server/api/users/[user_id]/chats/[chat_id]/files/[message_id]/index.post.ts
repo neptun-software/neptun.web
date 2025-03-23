@@ -8,7 +8,7 @@ import { createChatConversationFiles } from '~/server/database/repositories/chat
 // Create files for chat conversation
 export default defineEventHandler(async (event) => {
   /* VALIDATE PARAMS */
-  const maybeMessageId = await validateParamMessageId(event)
+  const maybeMessageId = await validateParamChatMessageId(event)
   if (maybeMessageId.statusCode !== 200) {
     return sendError(
       event,

@@ -130,8 +130,8 @@ async function deleteProjectChat(
     {
       method: 'DELETE',
       headers: {
-        'Accept': 'application/json',
-        'Cookie': `neptun-session=${sessionCookie}`,
+        Accept: 'application/json',
+        Cookie: `neptun-session=${sessionCookie}`,
       },
     }
   )

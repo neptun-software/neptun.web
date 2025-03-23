@@ -5,7 +5,7 @@ import { readUserIdsOfPrimaryEmails } from '~/server/database/repositories/users
 // Create chat conversation share whitelist entry
 export default defineEventHandler(async (event) => {
   /* VALIDATE PARAMS */
-  const maybeShareId = await validateParamShareId(event)
+  const maybeShareId = await validateParamChatShareId(event)
   if (maybeShareId.statusCode !== 200) {
     return sendError(
       event,

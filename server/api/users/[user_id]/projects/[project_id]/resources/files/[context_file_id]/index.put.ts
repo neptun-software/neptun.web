@@ -1,10 +1,9 @@
 import { UpdateContextFileSchema } from '~/lib/types/database.tables/schema'
 import { updateContextFile } from '~/server/database/repositories/projectContextFiles'
-import { validateParamContextFileId } from '~/server/utils/validate'
 
 export default defineEventHandler(async (event) => {
   /* VALIDATE PARAMS */
-  const maybeContextFileId = await validateParamContextFileId(event)
+  const maybeContextFileId = await validateParamProjectContextFileId(event)
   if (maybeContextFileId.statusCode !== 200) {
     return sendError(
       event,

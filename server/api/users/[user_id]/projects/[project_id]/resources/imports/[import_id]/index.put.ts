@@ -1,10 +1,9 @@
 import { UpdateContextImportSchema } from '~/lib/types/database.tables/schema'
 import { updateContextImport } from '~/server/database/repositories/projectContextImports'
-import { validateParamImportId } from '~/server/utils/validate'
 
 export default defineEventHandler(async (event) => {
   /* VALIDATE PARAMS */
-  const maybeImportId = await validateParamImportId(event)
+  const maybeImportId = await validateParamProjectImportId(event)
   if (maybeImportId.statusCode !== 200) {
     return sendError(
       event,

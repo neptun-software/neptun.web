@@ -2,6 +2,7 @@ import type { EventHandlerRequest, H3Event } from 'h3'
 import type { ZodError } from 'zod'
 import type { User } from '../types/user'
 import type { ChatConversationKeys, OrderByDirection } from '~/lib/types/models/chat'
+import type { ResourceType } from '~/lib/types/models/project'
 import { z } from 'zod'
 import { context_file_category, context_file_type, import_source_type, primaryIdSchema, programming_language, project_type } from '~/lib/types/database.tables/schema'
 import {
@@ -13,6 +14,7 @@ import {
   possibleOrderByDirections,
 } from '~/lib/types/models/chat'
 import { emailSchema } from '~/lib/validation/user/email'
+import { hasAccessToChatFile, hasAccessToChatMessage, hasAccessToChatShare, hasAccessToGithubRepository, hasAccessToProject, hasAccessToProjectChatFile, hasAccessToResource, hasAccessToTemplate } from '../database/repositories/userResourceAccess'
 
 /* ROUTE PARAMETER SCHEMAs */
 export const UserIdSchema = z.object({
@@ -165,6 +167,14 @@ export const ProjectChatIdSchema = z.object({
 
 type ProjectChatIdType = z.infer<typeof ProjectChatIdSchema>
 
+export const ChatFileIdSchema = z.object({
+  user_id: primaryIdSchema,
+  chat_id: primaryIdSchema,
+  file_id: primaryIdSchema,
+})
+
+type ChatFileIdType = z.infer<typeof ChatFileIdSchema>
+
 /* QUERY SCHEMAs */
 
 /**
@@ -266,7 +276,7 @@ async function validateParams<S, E = S>(
   validationSuccessMessage: string,
   validationErrorMessage: string,
   logData?: any,
-  unauthorizedCheck?: (user: User, data: S) => boolean,
+  accessCheck?: (user: User, data: S) => Promise<boolean> | boolean,
   secondValidationStep?: (data: S) => {
     validationErrorMessage: string
     data: S | null
@@ -328,7 +338,7 @@ async function validateParams<S, E = S>(
     console.info(logData, maybeValidatedParams.data)
   }
 
-  if (unauthorizedCheck) {
+  if (accessCheck) {
     const user = event.context.user
     if (!isValidUser(user)) {
       return {
@@ -338,11 +348,13 @@ async function validateParams<S, E = S>(
         data: null,
       }
     }
-    if (unauthorizedCheck(user, maybeValidatedParams.data!)) {
+
+    const hasAccess = await accessCheck(user, maybeValidatedParams.data!)
+    if (!hasAccess) {
       return {
         statusCode: 401,
         statusMessage: 'Unauthorized.',
-        message: 'You do not have access to view the information.',
+        message: 'You do not have access to this resource.',
         data: null,
       }
     }
@@ -613,244 +625,49 @@ export async function validateParamUrl(
       data: null,
     }
   }
-
-  // TODO: improve typing, so that the short-form can be used:
-  /* return validateParams<{ url: URL }, UrlType>(
-    event,
-    async () => await getValidatedRouterParams(event, UrlSchema.safeParse),
-    'Successfully validated routeParams(url).',
-    'Invalid routeParams(url).',
-    "url:",
-    undefined,
-    (data) => {
-      try {
-        const url = new URL(decodeURIComponent(String(data.url)));
-        return {
-          success: true,
-          validationErrorMessage: '',
-          data: url,
-        };
-      } catch {
-        return {
-          success: false,
-          validationErrorMessage: 'URL is not conform to official URL format.',
-          data: null,
-        };
-      }
-    }
-  ); */
 }
 
-/* VALIDATE ROUTE PARAMS(user_id) */
-export async function validateParamUserId(
+/* VALIDATE ROUTE PARAMS(github_account_name, github_repository_name) */
+export async function validateParamGithubRepositoryName(
   event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<UserIdType>> {
-  return validateParams<UserIdType>(
+): Promise<ValidationResult<GithubRepositoryNameType>> {
+  return validateParams<GithubRepositoryNameType>(
     event,
     async () => {
       const result = await getValidatedRouterParams(event, (params) => {
         // @ts-expect-error
-        const user_id = Number(params?.user_id) // => NaN if not a number, not present
-        event.context.validated.params.user_id = user_id
+        const github_account_name = params?.github_account_name
+        // @ts-expect-error
+        const github_repository_name = params?.github_repository_name
 
-        // check if user_id is a valid user_id
-        return UserIdSchema.safeParse({ user_id })
+        event.context.validated.params.github_account_name = github_account_name
+        event.context.validated.params.github_repository_name = github_repository_name
+
+        return GithubRepositoryNameSchema.safeParse({
+          github_account_name,
+          github_repository_name,
+        })
       })
-      if (result.success) {
-        return { success: true, data: { user_id: result.data.user_id } }
-      } else {
-        return result
-      }
-    },
-    'Successfully validated routeParams(user_id).',
-    'Invalid routeParams(user_id).',
-    'queryParams(user_id):',
-    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
-  )
-}
 
-/* VALIDATE ROUTE PARAMS(email) */
-export async function validateParamEmail(
-  event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<UserEmailType>> {
-  return validateParams<UserEmailType>(
-    event,
-    async () => {
-      const result = await getValidatedRouterParams(
-        event,
-        params => UserEmailSchema.safeParse(params),
-      )
-
-      event.context.validated.params.email = result?.data?.email || null
-
-      if (result.success) {
-        return {
-          success: true,
-          data: { email: result.data.email },
-        }
-      } else {
-        return result
-      }
-    },
-    'Successfully validated routeParams(email).',
-    'Invalid routeParams(email).',
-    'queryParams(email):',
-  )
-}
-
-/* VALIDATE ROUTE PARAMS(user_id, chat_id) */
-export async function validateParamChatId(
-  event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<ChatIdType>> {
-  return validateParams<ChatIdType>(
-    event,
-    async () => {
-      const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-expect-error
-        const user_id = Number(params?.user_id) // => NaN if not a number, not present
-        // @ts-expect-error
-        const chat_id = Number(params?.chat_id)
-        event.context.validated.params.user_id = user_id
-        event.context.validated.params.chat_id = chat_id
-
-        return ChatIdSchema.safeParse({ user_id, chat_id })
-      })
-      if (result.success) {
-        return {
-          success: true,
-          data: { user_id: result.data.user_id, chat_id: result.data.chat_id },
-        }
-      } else {
-        return result
-      }
-    },
-    'Successfully validated routeParams(user_id, chat_id).',
-    `Invalid routeParams(user_id, chat_id). You (user_id=${event.context.validated.params.user_id}) do not have access to view the user information of routeParams(user_id=${event.context.validated.params.user_id}, chat_id=${event.context.validated.params.chat_id}).`,
-    'queryParams(user_id, chat_id):',
-    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
-  )
-}
-
-/* VALIDATE ROUTE PARAMS(user_id, installation_id) */
-export async function validateParamInstallationId(
-  event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<InstallationIdType>> {
-  return validateParams<InstallationIdType>(
-    event,
-    async () => {
-      const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-expect-error
-        const user_id = Number(params?.user_id) // => NaN if not a number, not present
-        // @ts-expect-error
-        const installation_id = Number(params?.installation_id)
-        event.context.validated.params.user_id = user_id
-        event.context.validated.params.installation_id = installation_id
-
-        return InstallationIdSchema.safeParse({ user_id, installation_id })
-      })
       if (result.success) {
         return {
           success: true,
           data: {
-            user_id: result.data.user_id,
-            installation_id: result.data.installation_id,
+            github_account_name: result.data.github_account_name,
+            github_repository_name: result.data.github_repository_name,
           },
         }
       } else {
         return result
       }
     },
-    'Successfully validated routeParams(user_id, installation_id).',
-    'Invalid routeParams(user_id, installation_id).',
-    'queryParams(user_id, installation_id):',
-    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
-  )
-}
-
-/* VALIDATE ROUTE PARAMS(user_id, chat_id, share_id) */
-export async function validateParamShareId(
-  event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<ShareIdType>> {
-  return validateParams<ShareIdType>(
-    event,
-    async () => {
-      const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-expect-error
-        const user_id = Number(params?.user_id) // => NaN if not a number, not present
-        // @ts-expect-error
-        const chat_id = Number(params?.chat_id)
-        // @ts-expect-error
-        const share_id = Number(params?.share_id)
-        event.context.validated.params.user_id = user_id
-        event.context.validated.params.chat_id = chat_id
-        event.context.validated.params.share_id = share_id
-
-        return ShareIdSchema.safeParse({ user_id, chat_id, share_id })
-      })
-      if (result.success) {
-        return {
-          success: true,
-          data: {
-            user_id: result.data.user_id,
-            chat_id: result.data.chat_id,
-            share_id: result.data.share_id,
-          },
-        }
-      } else {
-        return result
-      }
-    },
-    'Successfully validated routeParams(user_id, chat_id, share_id).',
-    `Invalid routeParams(user_id, chat_id, share_id). You (user_id=${event.context.validated.params.user_id}) do not have access to view the user information of routeParams(user_id=${event.context.validated.params.user_id}, chat_id=${event.context.validated.params.chat_id}, share_id=${event.context.validated.params.share_id}).`,
-    'queryParams(user_id, chat_id, share_id):',
-    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
-  )
-}
-
-/* VALIDATE ROUTE PARAMS(user_id, chat_id, message_id) */
-export async function validateParamMessageId(
-  event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<ChatMessageIdType>> {
-  return validateParams<ChatMessageIdType>(
-    event,
-    async () => {
-      const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-expect-error
-        const user_id = Number(params?.user_id) // => NaN if not a number, not present
-        // @ts-expect-error
-        const chat_id = Number(params?.chat_id)
-        // @ts-expect-error
-        const message_id = Number(params?.message_id)
-        event.context.validated.params.user_id = user_id
-        event.context.validated.params.chat_id = chat_id
-        event.context.validated.params.message_id = message_id
-
-        return ChatMessageIdSchema.safeParse({ user_id, chat_id, message_id })
-      })
-      if (result.success) {
-        return {
-          success: true,
-          data: {
-            user_id: result.data.user_id,
-            chat_id: result.data.chat_id,
-            message_id: result.data.message_id,
-          },
-        }
-      } else {
-        return result
-      }
-    },
-    'Successfully validated routeParams(user_id, chat_id, message_id).',
-    `Invalid routeParams(user_id, chat_id, message_id). You (user_id=${event.context.validated.params.user_id}) do not have access to view the user information of routeParams(user_id=${event.context.validated.params.user_id}, chat_id=${event.context.validated.params.chat_id}).`,
-    'queryParams(user_id, chat_id, message_id):',
-    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
+    'Successfully validated routeParams(github_account_name, github_repository_name).',
+    `Invalid routeParams(github_account_name, github_repository_name). The GitHub repository with name=${event.context.validated.params.github_repository_name} for account=${event.context.validated.params.github_account_name} does not exist or you do not have access to it.`,
+    'routeParams(github_account_name, github_repository_name):',
   )
 }
 
 /* VALIDATE ROUTE PARAMS(model_publisher, model_name) */
-/**
- * User access validation has to be checked before this!!! (user_id is fetched from query params)
- */
 export async function validateParamAiModelName(
   event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<ModelType>> {
@@ -909,40 +726,61 @@ export async function validateParamAiModelName(
   )
 }
 
-/* VALIDATE ROUTE PARAMS(user_id, collection_id) */
-export async function validateParamCollectionId(
+/* VALIDATE ROUTE PARAMS(email) */
+export async function validateParamEmail(
   event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<CollectionIdType>> {
-  return validateParams<CollectionIdType>(
+): Promise<ValidationResult<UserEmailType>> {
+  return validateParams<UserEmailType>(
     event,
     async () => {
-      const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-expect-error
-        const user_id = Number(params?.user_id)
-        // @ts-expect-error
-        const collection_id = Number(params?.collection_id)
+      const result = await getValidatedRouterParams(
+        event,
+        params => UserEmailSchema.safeParse(params),
+      )
 
-        event.context.validated.params.user_id = user_id
-        event.context.validated.params.collection_id = collection_id
+      event.context.validated.params.email = result?.data?.email || null
 
-        return CollectionIdSchema.safeParse({ user_id, collection_id })
-      })
       if (result.success) {
         return {
           success: true,
-          data: {
-            user_id: result.data.user_id,
-            collection_id: result.data.collection_id,
-          },
+          data: { email: result.data.email },
         }
       } else {
         return result
       }
     },
-    'Successfully validated routeParams(user_id, collection_id).',
-    `Invalid routeParams(user_id, collection_id).`,
-    'queryParams(user_id, collection_id):',
-    (user, data) => user.id !== data.user_id, // check if user has access to collection (TODO: extend in the future, to allow multiple accounts connected to one account)
+    'Successfully validated routeParams(email).',
+    'Invalid routeParams(email).',
+    'queryParams(email):',
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(uuid) */
+export async function validateParamUuid(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<UuidType>> {
+  return validateParams<UuidType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(
+        event,
+        params => UuidSchema.safeParse(params),
+      )
+
+      event.context.validated.params.uuid = result?.data?.uuid || null
+
+      if (result.success) {
+        return {
+          success: true,
+          data: { uuid: result.data.uuid },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(uuid).',
+    `Invalid routeParams(uuid). The resource with uuid=${event.context.validated.params.uuid} does not exist or you do not have access to it.`,
+    'queryParams(uuid):',
   )
 }
 
@@ -983,6 +821,349 @@ export async function validateParamCollectionUuid(
   )
 }
 
+/* --- */
+
+/* VALIDATE ROUTE PARAMS(user_id) */
+export async function validateParamUserId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<UserIdType>> {
+  return validateParams<UserIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id) // => NaN if not a number, not present
+        event.context.validated.params.user_id = user_id
+
+        // check if user_id is a valid user_id
+        return UserIdSchema.safeParse({ user_id })
+      })
+      if (result.success) {
+        return { success: true, data: { user_id: result.data.user_id } }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id).',
+    'Invalid routeParams(user_id).',
+    'queryParams(user_id):',
+    (user, data) => user.id === data.user_id,
+  )
+}
+
+/* INSTALLATIONS */
+
+/* VALIDATE ROUTE PARAMS(user_id, installation_id) */
+export async function validateParamInstallationId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<InstallationIdType>> {
+  return validateParams<InstallationIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id) // => NaN if not a number, not present
+        // @ts-expect-error
+        const installation_id = Number(params?.installation_id)
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.installation_id = installation_id
+
+        return InstallationIdSchema.safeParse({ user_id, installation_id })
+      })
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            user_id: result.data.user_id,
+            installation_id: result.data.installation_id,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, installation_id).',
+    `Invalid routeParams(user_id, installation_id). The installation with id=${event.context.validated.params.installation_id} does not exist or you do not have access to it.`,
+    'queryParams(user_id, installation_id):',
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToResource(user, 'github-installations', data.installation_id)
+    },
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, github_account_id, github_repository_id) */
+export async function validateParamGithubRepositoryId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<GithubRepositoryIdType>> {
+  return validateParams<GithubRepositoryIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const github_account_id = Number(params?.github_account_id)
+        // @ts-expect-error
+        const github_repository_id = Number(params?.github_repository_id)
+
+        event.context.validated.params.github_account_id = github_account_id
+        event.context.validated.params.github_repository_id = github_repository_id
+
+        return GithubRepositoryIdSchema.safeParse({
+          github_account_id,
+          github_repository_id,
+        })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            github_account_id: result.data.github_account_id,
+            github_repository_id: result.data.github_repository_id,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(github_account_id, github_repository_id).',
+    `Invalid routeParams(github_account_id, github_repository_id). The GitHub repository with id=${event.context.validated.params.github_repository_id} for account=${event.context.validated.params.github_account_id} does not exist or you do not have access to it.`,
+    'routeParams(github_account_id, github_repository_id):',
+    async (user, data) => {
+      return hasAccessToGithubRepository(user, data.github_repository_id)
+    },
+  )
+}
+
+/* CHATS */
+
+/* VALIDATE ROUTE PARAMS(user_id, chat_id) */
+export async function validateParamChatId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ChatIdType>> {
+  return validateParams<ChatIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id) // => NaN if not a number, not present
+        // @ts-expect-error
+        const chat_id = Number(params?.chat_id)
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.chat_id = chat_id
+
+        return ChatIdSchema.safeParse({ user_id, chat_id })
+      })
+      if (result.success) {
+        return {
+          success: true,
+          data: { user_id: result.data.user_id, chat_id: result.data.chat_id },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, chat_id).',
+    `Invalid routeParams(user_id, chat_id). The chat with id=${event.context.validated.params.chat_id} does not exist or you do not have access to it.`,
+    'queryParams(user_id, chat_id):',
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToResource(user, 'chat-conversations', data.chat_id)
+    },
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, chat_id, message_id) */
+export async function validateParamChatMessageId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ChatMessageIdType>> {
+  return validateParams<ChatMessageIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id) // => NaN if not a number, not present
+        // @ts-expect-error
+        const chat_id = Number(params?.chat_id)
+        // @ts-expect-error
+        const message_id = Number(params?.message_id)
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.chat_id = chat_id
+        event.context.validated.params.message_id = message_id
+
+        return ChatMessageIdSchema.safeParse({ user_id, chat_id, message_id })
+      })
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            user_id: result.data.user_id,
+            chat_id: result.data.chat_id,
+            message_id: result.data.message_id,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, chat_id, message_id).',
+    `Invalid routeParams(user_id, chat_id, message_id). The message with id=${event.context.validated.params.message_id} does not exist or you do not have access to it.`,
+    'queryParams(user_id, chat_id, message_id):',
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToChatMessage(user, data.message_id)
+    },
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, chat_id, file_id) */
+export async function validateParamChatFileId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ChatFileIdType>> {
+  return validateParams<ChatFileIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const chat_id = Number(params?.chat_id)
+        // @ts-expect-error
+        const file_id = Number(params?.file_id)
+
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.chat_id = chat_id
+        event.context.validated.params.file_id = file_id
+
+        return ChatFileIdSchema.safeParse({ user_id, chat_id, file_id })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            user_id: result.data.user_id,
+            chat_id: result.data.chat_id,
+            file_id: result.data.file_id,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, chat_id, file_id).',
+    `Invalid routeParams(user_id, chat_id, file_id). The file with id=${event.context.validated.params.file_id} does not exist or you do not have access to it.`,
+    'routeParams(user_id, chat_id, file_id):',
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToChatFile(user, data.file_id)
+    },
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, chat_id, share_id) */
+export async function validateParamChatShareId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<ShareIdType>> {
+  return validateParams<ShareIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id) // => NaN if not a number, not present
+        // @ts-expect-error
+        const chat_id = Number(params?.chat_id)
+        // @ts-expect-error
+        const share_id = Number(params?.share_id)
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.chat_id = chat_id
+        event.context.validated.params.share_id = share_id
+
+        return ShareIdSchema.safeParse({ user_id, chat_id, share_id })
+      })
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            user_id: result.data.user_id,
+            chat_id: result.data.chat_id,
+            share_id: result.data.share_id,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, chat_id, share_id).',
+    `Invalid routeParams(user_id, chat_id, share_id). The share with id=${event.context.validated.params.share_id} does not exist or you do not have access to it.`,
+    'queryParams(user_id, chat_id, share_id):',
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToChatShare(user, data.share_id)
+    },
+  )
+}
+
+/* COLLECTIONS */
+
+/* VALIDATE ROUTE PARAMS(user_id, collection_id) */
+export async function validateParamCollectionId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<CollectionIdType>> {
+  return validateParams<CollectionIdType>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const collection_id = Number(params?.collection_id)
+
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.collection_id = collection_id
+
+        return CollectionIdSchema.safeParse({ user_id, collection_id })
+      })
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            user_id: result.data.user_id,
+            collection_id: result.data.collection_id,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, collection_id).',
+    `Invalid routeParams(user_id, collection_id). The collection with id=${event.context.validated.params.collection_id} does not exist or you do not have access to it.`,
+    'queryParams(user_id, collection_id):',
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToResource(user, 'template-collections', data.collection_id)
+    },
+  )
+}
+
 /* VALIDATE ROUTE PARAMS(user_id, collection_id, template_id) */
 export async function validateParamTemplateId(
   event: H3Event<EventHandlerRequest>,
@@ -1019,40 +1200,19 @@ export async function validateParamTemplateId(
       }
     },
     'Successfully validated routeParams(user_id, collection_id, template_id).',
-    `Invalid routeParams(user_id, collection_id, template_id). The resource with template_id=${event.context.validated.params.template_id} does not exist or you do not have access to it.`,
+    `Invalid routeParams(user_id, collection_id, template_id). The template with id=${event.context.validated.params.template_id} does not exist or you do not have access to it.`,
     'queryParams(user_id, collection_id, template_id):',
-    (user, data) => user.id !== data.user_id, // check if user has access to user information (TODO: extend in the future, to allow multiple accounts connected to one account)
-  )
-}
-
-/* VALIDATE ROUTE PARAMS(uuid) */
-export async function validateParamUuid(
-  event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<UuidType>> {
-  return validateParams<UuidType>(
-    event,
-    async () => {
-      const result = await getValidatedRouterParams(
-        event,
-        params => UuidSchema.safeParse(params),
-      )
-
-      event.context.validated.params.uuid = result?.data?.uuid || null
-
-      if (result.success) {
-        return {
-          success: true,
-          data: { uuid: result.data.uuid },
-        }
-      } else {
-        return result
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
       }
+
+      return hasAccessToTemplate(user, data.template_id)
     },
-    'Successfully validated routeParams(uuid).',
-    `Invalid routeParams(uuid). The resource with uuid=${event.context.validated.params.uuid} does not exist or you do not have access to it.`,
-    'queryParams(uuid):',
   )
 }
+
+/* PROJECTS */
 
 /* VALIDATE ROUTE PARAMS(user_id, project_id) */
 export async function validateParamProjectId(
@@ -1088,7 +1248,13 @@ export async function validateParamProjectId(
     'Successfully validated routeParams(user_id, project_id).',
     `Invalid routeParams(user_id, project_id). The project with id=${event.context.validated.params.project_id} for user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
     'routeParams(user_id, project_id):',
-    (user, data) => user.id !== data.user_id, // check if user has access to project information
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToProject(user, data.project_id)
+    },
   )
 }
 
@@ -1134,7 +1300,13 @@ export async function validateParamResourceType(
     'Successfully validated routeParams(user_id, project_id, resource_type).',
     `Invalid routeParams(user_id, project_id, resource_type). The resource type=${event.context.validated.params.resource_type} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
     'routeParams(user_id, project_id, resource_type):',
-    (user, data) => user.id !== data.user_id,
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToProject(user, data.project_id)
+    },
   )
 }
 
@@ -1185,12 +1357,23 @@ export async function validateParamResourceId(
     'Successfully validated routeParams(user_id, project_id, resource_type, resource_id).',
     `Invalid routeParams(user_id, project_id, resource_type, resource_id). The resource with id=${event.context.validated.params.resource_id} of type=${event.context.validated.params.resource_type} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
     'routeParams(user_id, project_id, resource_type, resource_id):',
-    (user, data) => user.id !== data.user_id,
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToResource(
+        user,
+        data.resource_type as ResourceType,
+        data.resource_id,
+        data.project_id,
+      )
+    },
   )
 }
 
 /* VALIDATE ROUTE PARAMS(user_id, project_id, import_id) */
-export async function validateParamImportId(
+export async function validateParamProjectImportId(
   event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<ImportIdType>> {
   return validateParams<ImportIdType>(
@@ -1231,12 +1414,23 @@ export async function validateParamImportId(
     'Successfully validated routeParams(user_id, project_id, import_id).',
     `Invalid routeParams(user_id, project_id, import_id). The import with id=${event.context.validated.params.import_id} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
     'routeParams(user_id, project_id, import_id):',
-    (user, data) => user.id !== data.user_id,
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToResource(
+        user,
+        'project-context-imports',
+        data.import_id,
+        data.project_id,
+      )
+    },
   )
 }
 
 /* VALIDATE ROUTE PARAMS(user_id, project_id, context_file_id) */
-export async function validateParamContextFileId(
+export async function validateParamProjectContextFileId(
   event: H3Event<EventHandlerRequest>,
 ): Promise<ValidationResult<ContextFileIdType>> {
   return validateParams<ContextFileIdType>(
@@ -1277,96 +1471,18 @@ export async function validateParamContextFileId(
     'Successfully validated routeParams(user_id, project_id, context_file_id).',
     `Invalid routeParams(user_id, project_id, context_file_id). The context file with id=${event.context.validated.params.context_file_id} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
     'routeParams(user_id, project_id, context_file_id):',
-    (user, data) => user.id !== data.user_id,
-  )
-}
-
-/* VALIDATE ROUTE PARAMS(user_id, github_account_id, github_repository_id) */
-export async function validateParamGithubRepositoryId(
-  event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<GithubRepositoryIdType>> {
-  return validateParams<GithubRepositoryIdType>(
-    event,
-    async () => {
-      const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-expect-error
-        const github_account_id = Number(params?.github_account_id)
-        // @ts-expect-error
-        const github_repository_id = Number(params?.github_repository_id)
-
-        event.context.validated.params.github_account_id = github_account_id
-        event.context.validated.params.github_repository_id = github_repository_id
-
-        return GithubRepositoryIdSchema.safeParse({
-          github_account_id,
-          github_repository_id,
-        })
-      })
-
-      if (result.success) {
-        return {
-          success: true,
-          data: {
-            github_account_id: result.data.github_account_id,
-            github_repository_id: result.data.github_repository_id,
-          },
-        }
-      } else {
-        return result
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
       }
+
+      return hasAccessToResource(
+        user,
+        'project-context-files',
+        data.context_file_id,
+        data.project_id,
+      )
     },
-    'Successfully validated routeParams(github_account_id, github_repository_id).',
-    `Invalid routeParams(github_account_id, github_repository_id). The GitHub repository with id=${event.context.validated.params.github_repository_id} for account=${event.context.validated.params.github_account_id} does not exist or you do not have access to it.`,
-    'routeParams(github_account_id, github_repository_id):',
-  )
-}
-
-/* VALIDATE ROUTE PARAMS(github_account_name, github_repository_name) */
-export async function validateParamGithubRepositoryName(
-  event: H3Event<EventHandlerRequest>,
-): Promise<ValidationResult<GithubRepositoryNameType>> {
-  return validateParams<GithubRepositoryNameType>(
-    event,
-    async () => {
-      const result = await getValidatedRouterParams(event, (params) => {
-        // @ts-expect-error
-        const github_account_name = params?.github_account_name
-        // @ts-expect-error
-        const github_repository_name = params?.github_repository_name
-
-        event.context.validated.params.github_account_name = github_account_name
-        event.context.validated.params.github_repository_name = github_repository_name
-
-        return GithubRepositoryNameSchema.safeParse({
-          github_account_name,
-          github_repository_name,
-        })
-      })
-
-      if (result.success) {
-        return {
-          success: true,
-          data: {
-            github_account_name: result.data.github_account_name,
-            github_repository_name: result.data.github_repository_name,
-          },
-        }
-      } else {
-        return result
-      }
-    },
-    'Successfully validated routeParams(github_account_name, github_repository_name).',
-    `Invalid routeParams(github_account_name, github_repository_name). The GitHub repository with name=${event.context.validated.params.github_repository_name} for account=${event.context.validated.params.github_account_name} does not exist or you do not have access to it.`,
-    'routeParams(github_account_name, github_repository_name):',
-  )
-}
-
-export function isValidUser(user: unknown): user is User {
-  return (
-    typeof user === 'object'
-    && user !== null
-    && 'id' in user
-    && typeof (user as User).id === 'number'
   )
 }
 
@@ -1410,8 +1526,85 @@ export async function validateParamProjectChatId(
       }
     },
     'Successfully validated routeParams(user_id, project_id, chat_id).',
-    `Invalid routeParams(user_id, project_id, chat_id). The chat with id=${event.context.validated.params.chat_id} for project=${event.context.validated.params.project_id} and user=${event.context.validated.params.user_id} does not exist or you do not have access to it.`,
+    `Invalid routeParams(user_id, project_id, chat_id). The chat with id=${event.context.validated.params.chat_id} for project=${event.context.validated.params.project_id} does not exist or you do not have access to it.`,
     'routeParams(user_id, project_id, chat_id):',
-    (user, data) => user.id !== data.user_id,
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToResource(
+        user,
+        'project-chat-conversations',
+        data.chat_id,
+        data.project_id,
+      )
+    },
+  )
+}
+
+/* VALIDATE ROUTE PARAMS(user_id, project_id, chat_id, file_id) */
+export async function validateParamProjectChatFileId(
+  event: H3Event<EventHandlerRequest>,
+): Promise<ValidationResult<{ user_id: number, project_id: number, chat_id: number, file_id: number }>> {
+  return validateParams<{ user_id: number, project_id: number, chat_id: number, file_id: number }>(
+    event,
+    async () => {
+      const result = await getValidatedRouterParams(event, (params) => {
+        // @ts-expect-error
+        const user_id = Number(params?.user_id)
+        // @ts-expect-error
+        const project_id = Number(params?.project_id)
+        // @ts-expect-error
+        const chat_id = Number(params?.chat_id)
+        // @ts-expect-error
+        const file_id = Number(params?.file_id)
+
+        event.context.validated.params.user_id = user_id
+        event.context.validated.params.project_id = project_id
+        event.context.validated.params.chat_id = chat_id
+        event.context.validated.params.file_id = file_id
+
+        return z.object({
+          user_id: primaryIdSchema,
+          project_id: primaryIdSchema,
+          chat_id: primaryIdSchema,
+          file_id: primaryIdSchema,
+        }).safeParse({ user_id, project_id, chat_id, file_id })
+      })
+
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            user_id: result.data.user_id,
+            project_id: result.data.project_id,
+            chat_id: result.data.chat_id,
+            file_id: result.data.file_id,
+          },
+        }
+      } else {
+        return result
+      }
+    },
+    'Successfully validated routeParams(user_id, project_id, chat_id, file_id).',
+    `Invalid routeParams(user_id, project_id, chat_id, file_id). The file with id=${event.context.validated.params.file_id} does not exist or you do not have access to it.`,
+    'routeParams(user_id, project_id, chat_id, file_id):',
+    async (user, data) => {
+      if (user.id !== data.user_id) {
+        return false
+      }
+
+      return hasAccessToProjectChatFile(user, data.project_id, data.file_id)
+    },
+  )
+}
+
+export function isValidUser(user: unknown): user is User {
+  return (
+    typeof user === 'object'
+    && user !== null
+    && 'id' in user
+    && typeof (user as User).id === 'number'
   )
 }
