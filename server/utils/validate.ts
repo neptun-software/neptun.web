@@ -344,7 +344,7 @@ async function validateParams<S, E = S>(
       return {
         statusCode: 401,
         statusMessage: 'Unauthorized.',
-        message: 'Invalid user session.',
+        message: 'You must be logged in to access this endpoint.',
         data: null,
       }
     }

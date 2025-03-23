@@ -78,6 +78,7 @@
 - `GET` [`/api/users/{user_id}/projects/{project_id}/resources/{resource_type}`](../api-users-{user_id}-projects-{project_id}-resources-{resource_type}.get.md)
 - `GET` [`/api/users/{user_id}/projects/{project_id}/resources/{resource_type}/{resource_id}`](../api-users-{user_id}-projects-{project_id}-resources-{resource_type}-{resource_id}.get.md)
 - `DELETE` [`/api/users/{user_id}/projects/{project_id}/resources/{resource_type}/{resource_id}`](../api-users-{user_id}-projects-{project_id}-resources-{resource_type}-{resource_id}.delete.md)
+- `GET` [`/api/users/{user_id}/projects/{project_id}/resources/github-repositories`](../api-users-{user_id}-projects-{project_id}-resources-github-repositories.get.md)
 
 ### Project Imports Routes
 

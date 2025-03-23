@@ -1742,6 +1742,36 @@
         }
       }
     },
+    "/api/users/{user_id}/projects/{project_id}/resources/github-repositories": {
+      "get": {
+        "tags": [
+          "API Routes"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/users/{user_id}/projects/{project_id}/resources/imports/{import_id}": {
       "delete": {
         "tags": [

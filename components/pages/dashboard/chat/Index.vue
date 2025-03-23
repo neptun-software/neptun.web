@@ -444,6 +444,10 @@ function stopGeneration() {
     $toast.success('Chat generation stopped')
   }
 }
+
+function appendContextToInput(context: string) {
+  currentChatMessage.value += context
+}
 </script>
 
 <template>
@@ -621,6 +625,7 @@ function stopGeneration() {
         :class="{ 'text-destructive': isOverMaxTokens }" @keydown="handleInputFieldKeyboardEvents"
       />
       <div class="flex flex-wrap items-center p-3 pt-0">
+        <DashboardChatContextPopover @context-added="appendContextToInput" />
         <ShadcnTooltipProvider>
           <ShadcnTooltip>
             <ShadcnTooltipTrigger as-child>
@@ -782,4 +787,5 @@ function stopGeneration() {
   </div>
 </template>
 
-<style scoped lang="postcss"></style>
+<style scoped lang="postcss">
+</style>

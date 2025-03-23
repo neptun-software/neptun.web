@@ -31,6 +31,7 @@ export default defineEventHandler(async (event) => {
     }))
   }
 
+  event.context.user = session.user
   const validationResult = await validateParamGithubRepositoryId(event)
   if (validationResult.statusCode !== 200) {
     return sendError(event, createError({
@@ -41,7 +42,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const { github_account_id, github_repository_id } = validationResult.data
-  console.log('Fetching repo info for:', { github_account_id, github_repository_id, user_id: session.user.id })
 
   try {
     // Step 1: Find the installation and repository

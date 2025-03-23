@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
     }))
   }
 
+  event.context.user = session.user
   const validationResult = await validateParamGithubRepositoryName(event)
   if (validationResult.statusCode !== 200) {
     return sendError(event, createError({

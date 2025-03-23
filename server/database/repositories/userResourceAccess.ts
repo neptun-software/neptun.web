@@ -553,7 +553,7 @@ export async function hasAccessToGithubRepository(
       eq(github_app_installation_repository.github_app_installation_id, github_app_installation.id),
     )
     .where(and(
-      eq(github_app_installation_repository.id, repositoryId),
+      eq(github_app_installation_repository.github_repository_id, repositoryId),
       eq(github_app_installation.neptun_user_id, user.id),
     ))
     .limit(1)
@@ -581,7 +581,7 @@ export async function hasAccessToProjectGithubRepository(
       eq(neptun_user_project.id, project_github_installation.project_id),
     )
     .where(and(
-      eq(github_app_installation_repository.id, repositoryId),
+      eq(github_app_installation_repository.github_repository_id, repositoryId),
       eq(neptun_user_project.neptun_user_id, user.id),
       eq(project_github_installation.project_id, projectId),
     ))
