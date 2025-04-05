@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import type { ToasterProps } from 'vue-sonner'
-import { Toaster as Sonner } from 'vue-sonner'
+import { Toaster as Sonner, type ToasterProps } from 'vue-sonner'
 
 const props = defineProps<ToasterProps>()
 </script>
@@ -17,6 +16,10 @@ const props = defineProps<ToasterProps>()
           'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
         cancelButton:
           'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
+      },
+      style: {
+        '--z-index': 2147483647,
+        'z-index': 'calc(var(--z-index) - var(--index))',
       },
     }"
   />
