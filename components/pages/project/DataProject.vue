@@ -105,14 +105,14 @@ async function generateConfigurationFiles() {
       return
     }
 
-    const project = await createProject({
+    const projectId = await createProject({
       name: 'New Project',
       description: projectContext.value,
       type: 'web-app',
       main_language: 'typescript',
     })
 
-    await uploadFiles(project.id, {
+    await uploadFiles(projectId, {
       files: files.value,
       category: 'documentation',
       file_type: 'text',
@@ -121,7 +121,7 @@ async function generateConfigurationFiles() {
     $toast.success('Project created successfully')
 
     await new Promise(resolve => setTimeout(resolve, 250))
-    navigateTo(`/?project_id=${project.id}`)
+    navigateTo(`/?project_id=${projectId}`)
   } catch (error) {
     console.error('Failed to generate project:', error)
     if (error instanceof Error) {
