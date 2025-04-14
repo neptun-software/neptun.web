@@ -21,21 +21,22 @@ const { data: ast, status } = await useAsyncData(
 
 <template>
   <div class="relative">
-    <ShadcnScrollArea v-if="!useSimpleRenderer" class="w-full">
-      <div id="complex-markdown-renderer" class="w-full">
-        <div class="text-sm whitespace-pre-wrap break-words md:text-base">
-          <template v-if="status === 'success' && ast">
-            <!-- MDC is too slow and offers no feedback to the user as well as no great fallback -->
-            <MDCRenderer :body="ast.body" :data="ast.data" />
-          </template>
-          <template v-else>
-            {{ content }}
-          </template>
-        </div>
-      </div>
-      <ShadcnScrollBar orientation="horizontal" />
-    </ShadcnScrollArea>
-    <div v-else>
+    <template v-if="!useSimpleRenderer">
+        <ShadcnScrollArea id="complex-markdown-renderer" class="w-full">
+          <div class="text-sm whitespace-pre-wrap break-words md:text-base" style="max-width: 50vw; max-height: 50vh;">
+            <template v-if="status === 'success' && ast">
+              <!-- MDC is too slow and offers no feedback to the user as well as no great fallback -->
+              <MDCRenderer :body="ast.body" :data="ast.data" />
+            </template>
+            <template v-else>
+              {{ content }}
+            </template>
+          </div>
+          <ShadcnScrollBar orientation="horizontal" />
+          <ShadcnScrollBar orientation="vertical" />
+        </ShadcnScrollArea>
+    </template>
+    <template v-else>
       <div class="text-sm whitespace-pre-wrap break-all md:text-base">
         <template v-if="status === 'success' && ast">
           <!-- MDC is too slow and offers no feedback to the user as well as no great fallback -->
@@ -45,7 +46,7 @@ const { data: ast, status } = await useAsyncData(
           {{ content }}
         </template>
       </div>
-    </div>
+    </template>
 
     <div
       v-show="status === 'pending'"
@@ -59,7 +60,6 @@ const { data: ast, status } = await useAsyncData(
 <style lang="postcss" scoped>
 #complex-markdown-renderer {
   :deep(pre) {
-    overflow-x: auto;
     white-space: pre;
     max-width: 100%;
     font-size: 0.875rem;

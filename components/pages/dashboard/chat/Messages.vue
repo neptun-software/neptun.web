@@ -23,9 +23,14 @@ onMounted(() => {
               codeBlock.classList.add(
                 'relative',
                 'min-h-[calc(1.25rem+1rem+(2*0.5rem))]',
+                'overflow-x-auto',
               )
 
-              // creates a Vue component instance
+              const codeElement = codeBlock.querySelector('code')
+              if (codeElement) {
+                codeElement.classList.add('max-w-[50vw]', 'block')
+              }
+
               const copyComponent = h(CopyToClipboard, {
                 class:
                   'absolute top-2 right-2 transition opacity-20 hover:opacity-100',

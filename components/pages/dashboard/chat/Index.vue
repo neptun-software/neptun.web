@@ -587,7 +587,7 @@ function appendContextToInput(context: string) {
         <!-- User Input Draft -->
         <div v-if="currentChatMessage.trim() !== ''" class="flex justify-end mt-8 mb-2">
           <div
-            class="break-words whitespace-pre-wrap max-w-[80%] border border-orange-300 rounded-lg bg-background px-4 py-2"
+            class="px-4 py-2 whitespace-pre-wrap break-words rounded-lg border border-orange-300 bg-background" style="max-width: 50vw;"
           >
             {{ currentChatMessage }}
           </div>
