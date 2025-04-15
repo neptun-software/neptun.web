@@ -7,7 +7,8 @@ defineProps<{
 
 <template>
   <div>
-    <MarkdownRenderer :content="content" :unique-key="uniqueKey" />
+    <!-- <MarkdownRenderer :content="content" :unique-key="uniqueKey" /> -->
+     <DashboardChatMessageMarkdownPreview :markdown="content" />
   </div>
 </template>
 

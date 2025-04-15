@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import type { Message } from '@ai-sdk/vue'
-import { render } from 'vue'
-import CopyToClipboard from '~/components/utilities/CopyToClipboard.vue'
+/* import { render } from 'vue'
+import CopyToClipboard from '~/components/utilities/CopyToClipboard.vue' */
 
 defineProps<{
   messages: Message[]
 }>()
 
-const $messagesList = ref<HTMLElement | null>(null)
+/* const $messagesList = ref<HTMLElement | null>(null)
 
 // adds "copy code" button to each code block
 onMounted(() => {
@@ -48,14 +48,17 @@ onMounted(() => {
       },
     )
   }
-})
+}) */
 </script>
 
 <template>
-  <div ref="$messagesList">
+  <!-- <div ref="$messagesList">
     <template v-for="message in messages" :key="message.id">
       <DashboardChatMessage :message="message" />
     </template>
+  </div> -->
+  <div v-for="message in messages" :key="message.id">
+    <DashboardChatMessage :message="message" />
   </div>
 </template>
 
