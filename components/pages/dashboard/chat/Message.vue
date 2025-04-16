@@ -5,7 +5,15 @@ const props = defineProps<{
   message: Message
 }>()
 
-const messageContent = computed(() => props.message.content)
+const isMarkdownReady = ref(false)
+
+watch(() => props.message.content, () => {
+  isMarkdownReady.value = false
+})
+
+const handleMarkdownReady = () => {
+  isMarkdownReady.value = true
+}
 </script>
 
 <template>
@@ -19,29 +27,42 @@ const messageContent = computed(() => props.message.content)
     <div
       v-if="message.role === 'assistant'"
       :id="`message-${message.id}-assistant`"
-      class="px-4 pb-2 pt-4 border rounded-lg bg-background border-slate-200 max-w-[80%] relative dark:border-border"
+      class="px-4 py-3 border rounded-lg bg-background border-slate-200 max-w-[80%] relative dark:border-border"
       :data-message-created-at="message.createdAt"
     >
+      <!-- Show raw text while markdown is rendering -->
+      <div v-if="!isMarkdownReady && !message.isStreaming" class="mb-2 whitespace-pre-wrap">
+        {{ message.content }}
+      </div>
+      
+      <!-- Hide the preview until it's ready or streaming -->
+      <div :class="{ 'hidden': !isMarkdownReady && !message.isStreaming }">
+        <!-- Always use the same component instance -->
+        <DashboardChatMessageMarkdownPreview
+          :key="`preview-${message.id}`"
+          :markdown="message.content"
+          :is-streaming="message.isStreaming"
+          @ready="handleMarkdownReady"
+        />
+      </div>
+
+      <!-- Only show controls when not streaming -->
       <template v-if="!message.isStreaming">
-        <DashboardChatMessageContent :content="messageContent" :unique-key="`message-${message.id}-${message.role}-${message.content.length}`" />
         <ShadcnSeparator class="my-4" label="Controls" />
         <DashboardChatMessageControls
-          :key="messageContent"
-          :message="messageContent"
+          :key="`controls-${message.id}`"
+          :message="message.content"
         />
       </template>
-      <div v-else class="whitespace-pre-wrap break-words">
-        {{ messageContent }}
-      </div>
     </div>
 
     <div
       v-if="message.role === 'user'"
       :id="`message-${message.id}-user`"
-      class="px-4 py-2 border rounded-lg bg-background border-slate-200 max-w-[80%] dark:border-border"
+      class="px-4 py-3 border rounded-lg bg-background border-slate-200 max-w-[80%] dark:border-border"
       :data-message-created-at="message.createdAt"
     >
-      <DashboardChatMessageContent :content="messageContent" :unique-key="`message-${message.id}-${message.role}-${message.content.length}`" />
+      {{ message.content }}
     </div>
   </div>
 </template>

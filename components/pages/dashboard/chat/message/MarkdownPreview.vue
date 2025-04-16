@@ -9,6 +9,8 @@ const props = defineProps<{
   isStreaming?: boolean // Controls whether to animate the static markdown rendering
 }>()
 
+const emit = defineEmits(['ready'])
+
 const renderedContent = ref('')
 const codeBlockCounter = ref(0)
 const isStreamingActive = ref(false)
@@ -24,7 +26,7 @@ const codeBlocksInPreview = ref<Map<string, {
 const completedCodeBlocks = ref<Set<string>>(new Set())
 const previewElement = ref<HTMLElement | null>(null)
 
-const { selectedTheme } = useTheme()
+const { selectedTheme, isDarkMode } = useTheme()
 
 // Pre-parse markdown to identify code blocks
 const parseMarkdownForCodeBlocks = (text: string | undefined) => {
@@ -218,6 +220,12 @@ onMounted(async () => {
         readFromStream(newStream)
       }
     }, { immediate: true })
+
+    watch(() => isDarkMode.value, () => {
+      // Theme changed, but we don't need to re-render content
+      // The code blocks will keep their current theme until they're interacted with or new ones are created
+      // This watcher is needed!!!
+    }, { immediate: true })
   } catch (error) {
     console.error('Error initializing markdown:', error)
   }
@@ -254,6 +262,10 @@ const renderMarkdown = (mdContent: string | undefined) => {
       if (blockId && index < codeBlocks.length) {
         createCodeBlock(placeholder as HTMLElement, blockId, language, codeBlocks[index].content)
       }
+    })
+    
+    nextTick(() => {
+      emit('ready')
     })
   })
 }
@@ -471,6 +483,8 @@ const readFromStream = async (stream: ReadableStream<string>) => {
     const firstChunk = await reader.read()
     if (!firstChunk.done && firstChunk.value) {
       await processChunk(firstChunk.value)
+      
+      emit('ready')
     }
     
     // Continue processing remaining chunks
@@ -513,6 +527,8 @@ const readFromStream = async (stream: ReadableStream<string>) => {
     console.error('Error reading from stream:', error)
   } finally {
     isStreamingActive.value = false
+    
+    emit('ready')
   }
 }
 
@@ -765,6 +781,8 @@ const streamMarkdownAnimation = async (mdContent: string) => {
       }
       // Skip code animation since we're showing full content immediately
     }
+    
+    emit('ready')
   } catch (error) {
     console.error('Error animating markdown:', error)
   } finally {
@@ -774,16 +792,16 @@ const streamMarkdownAnimation = async (mdContent: string) => {
 </script>
 
 <template>
-    <ShadcnScrollArea class="h-full">
+    <ShadcnScrollArea>
         <div 
             ref="previewElement"
-            class="overflow-auto p-4 max-w-none h-full prose dark:prose-invert"
+            class="overflow-auto max-w-none h-full prose dark:prose-invert"
             v-html="renderedContent">
         </div>
     </ShadcnScrollArea>
 </template>
 
-<style>
+<style lang="postcss">
 .prose pre, 
 .prose pre.shiki,
 .prose pre.shiki-stream,
@@ -822,5 +840,20 @@ const streamMarkdownAnimation = async (mdContent: string) => {
 
 .prose [class*="p-"].shiki-stream {
   padding: 1rem !important;
+}
+
+:deep(details) {
+  @apply bg-secondary rounded-md p-2;
+}
+
+:deep(summary) {
+  @apply cursor-pointer;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none;
+}
+
+:deep(details + *) {
+  @apply mt-4;
 }
 </style>

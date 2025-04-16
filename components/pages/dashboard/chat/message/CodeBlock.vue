@@ -4,6 +4,7 @@ import { CodeToTokenTransformStream } from 'shiki-stream'
 import CopyToClipboard from '~/components/utilities/CopyToClipboard.vue'
 import type { ThemeOption } from '~/utils/themes'
 import { useShikiHighlighter } from '~/composables/useShikiHighlighter'
+import { Icon } from '@iconify/vue'
 
 const props = defineProps<{
   language: string
@@ -23,14 +24,17 @@ const emit = defineEmits<{
 
 const isWrapped = ref(false)
 const isExpanded = ref(false)
-const { isDarkMode, selectedTheme, themeOptions, currentTheme } = useTheme()
-const { getHighlighter } = useShikiHighlighter()
+const { selectedTheme, themeOptions, currentTheme, isDarkMode } = useTheme()
+const { getHighlighter, isLoading: isThemeChanging } = useShikiHighlighter()
 const isStreamingComplete = ref(false)
 const isStreamLocked = ref(false)
 const completeContent = ref('')
 
 const renderedContent = ref('')
 const finalRenderStarted = ref(false)
+
+// Prevent immediate re-renders on theme changes
+const shouldUpdateTheme = ref(false)
 
 defineExpose({
   appendContent,
@@ -67,10 +71,11 @@ const highlighter = ref()
 const fullContent = ref('')
 const contentBuffer = ref('')
 
-const applyThemeInstantly = () => {
+const applyThemeInstantly = async () => {
+  if (isThemeChanging.value) return
+  
   try {
-    const currentContent = fullContent.value
-    tokensStream.value = createTokenStream(currentContent)
+    tokensStream.value = createTokenStream(fullContent.value)
   } catch (error) {
     console.error('Error applying theme instantly:', error)
   }
@@ -143,11 +148,19 @@ watch(() => props.content, (newContent) => {
   startStreaming()
 })
 
-watch([() => isDarkMode.value, () => selectedTheme.value], () => {
-  if (highlighter.value && fullContent.value) {
-    applyThemeInstantly()
+watch([isDarkMode, () => theme.value], () => {
+  // Don't update theme on initial mount
+  if (!shouldUpdateTheme.value) {
+    // Only set the flag to true after component is fully mounted
+    nextTick(() => {
+      shouldUpdateTheme.value = true
+    })
+    return
   }
-}, { deep: true })
+  
+  // Apply theme change - for both dark mode switch and manual theme cycling
+  applyThemeInstantly()
+}, { immediate: true })
 
 watch(() => props.textStream, (newStream) => {
   if (newStream && !isStreamingComplete.value) {
@@ -340,9 +353,14 @@ const resetStream = () => {
 }
 
 const cycleTheme = () => {
+  if (isThemeChanging.value) return
+  
   const currentIndex = themeOptions.findIndex(option => option.value === theme.value?.value)
   const nextIndex = (currentIndex + 1) % themeOptions.length
   theme.value = themeOptions[nextIndex]
+  
+  shouldUpdateTheme.value = true
+  applyThemeInstantly() 
 }
 
 const langColor = computed(() => {
@@ -353,45 +371,9 @@ const langColor = computed(() => {
 
 <template>
   <div class="rounded-lg">
-    <DevOnly>
-      <div class="flex justify-between items-center mb-4">
-        <ShadcnCombobox v-model="theme" by="value">
-          <ShadcnComboboxAnchor as-child>
-            <ShadcnComboboxTrigger as-child>
-              <ShadcnButton variant="outline" class="w-[200px] justify-between" :disabled="isStreaming">
-                {{ theme?.label ?? 'Select theme' }}
-                <Icon name="lucide:chevron-down" class="ml-2 w-4 h-4 opacity-50 shrink-0" />
-              </ShadcnButton>
-            </ShadcnComboboxTrigger>
-          </ShadcnComboboxAnchor>
-
-          <ShadcnComboboxList class="w-[200px]">
-            <ShadcnComboboxInput class="px-3 w-full h-9" placeholder="Search theme..." />
-            <ShadcnComboboxEmpty class="p-2 text-sm text-center text-muted-foreground">
-              No theme found.
-            </ShadcnComboboxEmpty>
-
-            <ShadcnComboboxGroup>
-              <ShadcnComboboxItem v-for="option in themeOptions" :key="option.value" :value="option" class="py-2">
-                {{ option.label }}
-                <ShadcnComboboxItemIndicator>
-                  <Icon name="lucide:check" class="ml-auto w-4 h-4" />
-                </ShadcnComboboxItemIndicator>
-              </ShadcnComboboxItem>
-            </ShadcnComboboxGroup>
-          </ShadcnComboboxList>
-        </ShadcnCombobox>
-
-        <div class="flex gap-2 items-center">
-          <span class="text-sm">Light</span>
-          <ShadcnSwitch v-model="isDarkMode" :disabled="isStreaming" />
-          <span class="text-sm">Dark</span>
-        </div>
-      </div>
-    </DevOnly>
-
+    <br>
     <div v-if="tokensStream" class="relative overflow-clip rounded-lg border">
-      <div class="px-4 py-2 flex items-center justify-between sticky top-0 z-10 bg-muted w-[calc(100%+0.5rem)] mr-[-0.5rem]">
+      <div class="flex sticky top-0 z-10 justify-between items-center px-4 w-full h-12 bg-muted">
         <div class="flex gap-2 items-center">
           <span
             class="inline-block w-2.5 h-2.5 rounded-full"
@@ -405,8 +387,15 @@ const langColor = computed(() => {
           <ShadcnTooltipProvider>
             <ShadcnTooltip>
               <ShadcnTooltipTrigger asChild>
-                <ShadcnButton variant="ghost" size="icon" class="w-8 h-8" @click="cycleTheme">
-                  <Icon name="lucide:palette" class="w-5 h-5" />
+                <ShadcnButton 
+                  variant="ghost" 
+                  size="icon" 
+                  class="w-8 h-8" 
+                  @click="cycleTheme"
+                  :disabled="isThemeChanging"
+                >
+                  <Icon v-if="isThemeChanging" icon="lucide:loader-2" class="w-5 h-5 animate-spin" />
+                  <Icon v-else icon="lucide:palette" class="w-5 h-5" />
                 </ShadcnButton>
               </ShadcnTooltipTrigger>
               <ShadcnTooltipContent>
@@ -417,7 +406,7 @@ const langColor = computed(() => {
             <ShadcnTooltip>
               <ShadcnTooltipTrigger asChild>
                 <ShadcnButton variant="ghost" size="icon" class="w-8 h-8" @click="isWrapped = !isWrapped">
-                  <Icon :name="isWrapped ? 'lucide:wrap-text' : 'lucide:scroll'" class="w-5 h-5" />
+                  <Icon :icon="isWrapped ? 'lucide:wrap-text' : 'lucide:scroll'" class="w-5 h-5" />
                 </ShadcnButton>
               </ShadcnTooltipTrigger>
               <ShadcnTooltipContent>
@@ -428,7 +417,7 @@ const langColor = computed(() => {
             <ShadcnTooltip>
               <ShadcnTooltipTrigger asChild>
                 <ShadcnButton variant="ghost" size="icon" class="w-8 h-8" @click="isExpanded = !isExpanded">
-                  <Icon :name="isExpanded ? 'lucide:minimize-2' : 'lucide:maximize-2'" class="w-5 h-5" />
+                  <Icon :icon="isExpanded ? 'lucide:minimize-2' : 'lucide:maximize-2'" class="w-5 h-5" />
                 </ShadcnButton>
               </ShadcnTooltipTrigger>
               <ShadcnTooltipContent>
@@ -457,12 +446,6 @@ const langColor = computed(() => {
         <ShadcnScrollBar orientation="horizontal" :class="{ 'hidden': isWrapped }" />
       </ShadcnScrollArea>
     </div>
-
-    <DevOnly>
-      <div class="flex gap-2 mt-4">
-        <ShadcnButton @click="startStreaming" :disabled="isStreaming">Create</ShadcnButton>
-        <ShadcnButton @click="resetStream" variant="outline">Remove</ShadcnButton>
-      </div>
-    </DevOnly>
+    <br>
   </div>
 </template>
