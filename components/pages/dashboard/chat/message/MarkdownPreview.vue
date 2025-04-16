@@ -174,11 +174,17 @@ let md: any = null
 
 onMounted(async () => {
   try {
-    md = await import('markdown-it').then(m => new m.default({
-      html: true,
-      linkify: true,
-      typographer: true
-    }))
+    md = await import('markdown-it').then(m => {
+      const markdownIt = new m.default({
+        html: true,
+        linkify: true,
+        typographer: true
+      });
+  
+      markdownIt.disable(['image']);
+      
+      return markdownIt;
+    });
     
     md.use(customCodeBlockPlugin)
     md.use(await Shiki({
