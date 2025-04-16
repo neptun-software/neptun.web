@@ -1,11 +1,12 @@
-import { createHighlighter, createJavaScriptRegexEngine, type Highlighter } from 'shiki'
+import type { Highlighter } from 'shiki'
+import { createHighlighter, createJavaScriptRegexEngine } from 'shiki'
 
 let highlighterInstance: Highlighter | null = null
 let highlighterPromise: Promise<Highlighter> | null = null
 
 export function useShikiHighlighter() {
-  const isLoading = useState("shiki-is-loading", () => false)
-  const error = useState<Error | null>("shiki-error", () => null)
+  const isLoading = useState('shiki-is-loading', () => false)
+  const error = useState<Error | null>('shiki-error', () => null)
 
   const getHighlighter = async (): Promise<Highlighter> => {
     if (highlighterInstance) {
@@ -25,14 +26,14 @@ export function useShikiHighlighter() {
         'github-light', 'light-plus', 'min-light', 'one-light', 'slack-ochin', 'snazzy-light', 'vitesse-light',
         'github-dark', 'dark-plus', 'min-dark', 'one-dark-pro', 'slack-dark', 'andromeeda', 'vitesse-dark',
       ],
-      engine: createJavaScriptRegexEngine()
+      engine: createJavaScriptRegexEngine(),
     })
-      .then(highlighter => {
+      .then((highlighter) => {
         highlighterInstance = highlighter
         isLoading.value = false
         return highlighter
       })
-      .catch(err => {
+      .catch((err) => {
         error.value = err instanceof Error ? err : new Error(String(err))
         isLoading.value = false
         highlighterPromise = null
@@ -54,6 +55,6 @@ export function useShikiHighlighter() {
     getHighlighter,
     disposeHighlighter,
     isLoading,
-    error
+    error,
   }
 }

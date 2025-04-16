@@ -1,12 +1,14 @@
-export const useTheme = () => {
+export function useTheme() {
   const prefersDark = usePreferredDark()
   const colorMode = useColorMode()
-  const selectedTheme = useState<ThemeOption>("selected-theme", () => themeOptions[0])
+  const selectedTheme = useState<ThemeOption>('selected-theme', () => themeOptions[0])
 
   const isDarkMode = computed(() => colorMode.value === 'dark')
 
   const currentTheme = computed(() => {
-    if (!selectedTheme.value) return 'github-light'
+    if (!selectedTheme.value) {
+      return 'github-light'
+    }
     const themeKey = selectedTheme.value.value
     return isDarkMode.value ? themePairs[themeKey].dark : themePairs[themeKey].light
   })
@@ -21,6 +23,6 @@ export const useTheme = () => {
     isDarkMode,
     selectedTheme,
     currentTheme,
-    themeOptions
+    themeOptions,
   }
 }

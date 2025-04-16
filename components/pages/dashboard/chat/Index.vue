@@ -42,7 +42,7 @@ const {
   isLoading: chatResponseIsLoading,
   setMessages: setChatMessages,
   stop: stopChatGeneration,
-  status: chatStatus
+  status: chatStatus,
   /* append: appendChatMessage, */
 } = useChat({
   id: String(selectedAiChat.value.id),
@@ -583,9 +583,9 @@ function appendContextToInput(context: string) {
               <p>Start a conversation with the AI</p>
             </div>
           </template>
-          
+
           <template v-else>
-            <DashboardChatMessage 
+            <DashboardChatMessage
               v-for="message in messagesWithStreaming"
               :key="message.id"
               :message="message"

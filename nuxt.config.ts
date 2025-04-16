@@ -3,10 +3,10 @@
 import type { HTTPMethod } from 'nuxt-security'
 import vue from '@vitejs/plugin-vue'
 import removeConsole from 'vite-plugin-remove-console'
+import topLevelAwait from 'vite-plugin-top-level-await'
+import wasm from 'vite-plugin-wasm'
 import { supportedShikiLanguages } from './utils/languages'
 import { protectedRoutes } from './utils/pages'
-import wasm from "vite-plugin-wasm";
-import topLevelAwait from "vite-plugin-top-level-await";
 
 // import wasm from "vite-plugin-wasm";
 // import topLevelAwait from "vite-plugin-top-level-await";
@@ -399,7 +399,7 @@ export default defineNuxtConfig({
     headers: {
       crossOriginEmbedderPolicy: NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp',
       contentSecurityPolicy: {
-        'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:"], // temporary fix for wasm
+        'script-src': ['\'self\'', '\'unsafe-inline\'', '\'unsafe-eval\'', 'https:'], // temporary fix for wasm
         'img-src': [
           'http://localhost:42124',
           'https://avatars.githubusercontent.com',

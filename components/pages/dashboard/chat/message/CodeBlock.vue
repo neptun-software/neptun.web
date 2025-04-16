@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { ShikiStreamRenderer } from 'shiki-stream/vue'
-import { CodeToTokenTransformStream } from 'shiki-stream'
-import CopyToClipboard from '~/components/utilities/CopyToClipboard.vue'
 import type { ThemeOption } from '~/utils/themes'
-import { useShikiHighlighter } from '~/composables/useShikiHighlighter'
 import { Icon } from '@iconify/vue'
+import { CodeToTokenTransformStream } from 'shiki-stream'
+import { ShikiStreamRenderer } from 'shiki-stream/vue'
+import CopyToClipboard from '~/components/utilities/CopyToClipboard.vue'
+import { useShikiHighlighter } from '~/composables/useShikiHighlighter'
 
 const props = defineProps<{
   language: string
@@ -39,29 +39,29 @@ const shouldUpdateTheme = ref(false)
 defineExpose({
   appendContent,
   refreshStream,
-  isStreamingComplete
+  isStreamingComplete,
 })
 
 const theme = computed({
   get: () => selectedTheme.value,
   set: (value) => {
     selectedTheme.value = value
-  }
+  },
 })
 
-const createTokenStream = (content: string): ReadableStream => {
+function createTokenStream(content: string): ReadableStream {
   return new ReadableStream({
     start(controller) {
       controller.enqueue(content)
       controller.close()
-    }
+    },
   }).pipeThrough(
     new CodeToTokenTransformStream({
       highlighter: highlighter.value,
       lang: props.language,
       theme: currentTheme.value,
-      allowRecalls: true
-    })
+      allowRecalls: true,
+    }),
   )
 }
 
@@ -71,9 +71,11 @@ const highlighter = ref()
 const fullContent = ref('')
 const contentBuffer = ref('')
 
-const applyThemeInstantly = async () => {
-  if (isThemeChanging.value) return
-  
+async function applyThemeInstantly() {
+  if (isThemeChanging.value) {
+    return
+  }
+
   try {
     tokensStream.value = createTokenStream(fullContent.value)
   } catch (error) {
@@ -82,7 +84,9 @@ const applyThemeInstantly = async () => {
 }
 
 function appendContent(newContent: string) {
-  if (!props.streamingMode) return
+  if (!props.streamingMode) {
+    return
+  }
 
   contentBuffer.value = newContent
   if (highlighter.value && !isStreaming.value) {
@@ -91,10 +95,14 @@ function appendContent(newContent: string) {
 }
 
 function refreshStream() {
-  if (!highlighter.value || isStreamingComplete.value) return
+  if (!highlighter.value || isStreamingComplete.value) {
+    return
+  }
 
   const contentToUse = props.streamingMode ? contentBuffer.value : props.content
-  if (!contentToUse.trim()) return
+  if (!contentToUse.trim()) {
+    return
+  }
 
   resetStream()
   isStreaming.value = true
@@ -107,8 +115,8 @@ function refreshStream() {
         highlighter: highlighter.value,
         lang: props.language,
         theme: currentTheme.value,
-        allowRecalls: true
-      })
+        allowRecalls: true,
+      }),
     )
   } catch (error) {
     console.error('Error in token transformation:', error)
@@ -139,7 +147,9 @@ onMounted(async () => {
 })
 
 watch(() => props.content, (newContent) => {
-  if (props.streamingMode) return
+  if (props.streamingMode) {
+    return
+  }
 
   if (tokensStream.value) {
     resetStream()
@@ -157,7 +167,7 @@ watch([isDarkMode, () => theme.value], () => {
     })
     return
   }
-  
+
   // Apply theme change - for both dark mode switch and manual theme cycling
   applyThemeInstantly()
 }, { immediate: true })
@@ -174,37 +184,41 @@ watch(isStreaming, (newValue) => {
   }
 })
 
-const startStreamingFromInput = async (stream: ReadableStream<string>) => {
-  if (!highlighter.value || isStreamingComplete.value) return
-  
+async function startStreamingFromInput(stream: ReadableStream<string>) {
+  if (!highlighter.value || isStreamingComplete.value) {
+    return
+  }
+
   isStreaming.value = true
   isStreamingComplete.value = false
   finalRenderStarted.value = false
-  
+
   let fullContentBuffer = ''
-  
+
   try {
     // Create the token stream ONCE at the beginning
     const transformStream = new TransformStream<string, string>()
     const writer = transformStream.writable.getWriter()
-    
+
     tokensStream.value = transformStream.readable.pipeThrough(
       new CodeToTokenTransformStream({
         highlighter: highlighter.value,
         lang: props.language,
         theme: currentTheme.value,
-        allowRecalls: true
-      })
+        allowRecalls: true,
+      }),
     )
-    
+
     const reader = stream.getReader()
     let lastContentLength = 0
     let shortUpdateCount = 0
     let shortUpdateTimer: ReturnType<typeof setTimeout> | null = null
 
     const writeToStream = (content: string) => {
-      if (finalRenderStarted.value) return
-      
+      if (finalRenderStarted.value) {
+        return
+      }
+
       try {
         writer.write(content)
         renderedContent.value = content
@@ -216,12 +230,14 @@ const startStreamingFromInput = async (stream: ReadableStream<string>) => {
         finalizeStream()
       }
     }
-    
+
     const finalizeStream = async () => {
-      if (finalRenderStarted.value) return
-      
+      if (finalRenderStarted.value) {
+        return
+      }
+
       finalRenderStarted.value = true
-      
+
       try {
         const finalContent = fullContentBuffer.trim()
         if (finalContent) {
@@ -229,7 +245,7 @@ const startStreamingFromInput = async (stream: ReadableStream<string>) => {
           renderedContent.value = finalContent
           fullContent.value = finalContent
         }
-        
+
         await writer.close()
       } catch (err) {
         console.error('Error finalizing stream:', err)
@@ -242,48 +258,48 @@ const startStreamingFromInput = async (stream: ReadableStream<string>) => {
         isStreamingComplete.value = true
         isStreamLocked.value = true
         isStreaming.value = false
-        
+
         if (props.blockId) {
           emit('streaming-complete', props.blockId)
           emit('update:isComplete', true)
         }
       }
     }
-    
+
     while (true) {
       const { value, done } = await reader.read()
-      
+
       if (done) {
         // Stream is complete
         if (shortUpdateTimer) {
           clearTimeout(shortUpdateTimer)
           shortUpdateTimer = null
         }
-        
+
         await finalizeStream()
         break
       }
-      
+
       if (!value || isStreamLocked.value || finalRenderStarted.value) {
         continue
       }
-      
+
       fullContentBuffer = value
-      
+
       // Update immediately for significant content changes or first content
       const contentSizeDiff = fullContentBuffer.length - lastContentLength
       const hasSignificantNewContent = contentSizeDiff > 10 || lastContentLength === 0
       const isSmallContent = fullContentBuffer.length < 100
-      
+
       // For small content or significant updates, update immediately without batching
       if (hasSignificantNewContent || isSmallContent) {
         writeToStream(fullContentBuffer)
         lastContentLength = fullContentBuffer.length
-      } 
+      }
       // For small incremental updates, we'll count them and update after a few
       else if (contentSizeDiff > 0) {
         shortUpdateCount++
-        
+
         // If we've collected a few small updates or it's been a while, update
         if (shortUpdateCount >= 3) {
           writeToStream(fullContentBuffer)
@@ -301,7 +317,7 @@ const startStreamingFromInput = async (stream: ReadableStream<string>) => {
         }
       }
     }
-    
+
     reader.releaseLock()
   } catch (error) {
     console.error('Error in streaming:', error)
@@ -311,12 +327,12 @@ const startStreamingFromInput = async (stream: ReadableStream<string>) => {
   }
 }
 
-const createContentStream = (content: string): ReadableStream<string> => {
+function createContentStream(content: string): ReadableStream<string> {
   if (!content || isStreamLocked.value) {
     return new ReadableStream({
       start(controller) {
         controller.close()
-      }
+      },
     })
   }
 
@@ -324,27 +340,29 @@ const createContentStream = (content: string): ReadableStream<string> => {
     start(controller) {
       controller.enqueue(content)
       controller.close()
-      
+
       isStreamLocked.value = true
       isStreamingComplete.value = true
       isStreaming.value = false
-      
+
       if (props.streamingMode && props.blockId) {
         emit('streaming-complete', props.blockId)
         emit('update:isComplete', true)
       }
-    }
+    },
   })
 }
 
-const startStreaming = () => {
-  if (!highlighter.value) return
+function startStreaming() {
+  if (!highlighter.value) {
+    return
+  }
   isStreamingComplete.value = false
-  
+
   refreshStream()
 }
 
-const resetStream = () => {
+function resetStream() {
   tokensStream.value = undefined
   isStreaming.value = false
   isStreamingComplete.value = false
@@ -352,15 +370,17 @@ const resetStream = () => {
   completeContent.value = ''
 }
 
-const cycleTheme = () => {
-  if (isThemeChanging.value) return
-  
+function cycleTheme() {
+  if (isThemeChanging.value) {
+    return
+  }
+
   const currentIndex = themeOptions.findIndex(option => option.value === theme.value?.value)
   const nextIndex = (currentIndex + 1) % themeOptions.length
   theme.value = themeOptions[nextIndex]
-  
+
   shouldUpdateTheme.value = true
-  applyThemeInstantly() 
+  applyThemeInstantly()
 }
 
 const langColor = computed(() => {
@@ -378,7 +398,7 @@ const langColor = computed(() => {
           <span
             class="inline-block w-2.5 h-2.5 rounded-full"
             :style="{ backgroundColor: langColor }"
-          ></span>
+          />
           <span class="text-xs font-medium text-muted-foreground">
             {{ title && language ? `${title} |` : title }} {{ language }} {{ extension ? `(${extension})` : "" }}
           </span>
@@ -386,13 +406,13 @@ const langColor = computed(() => {
         <div class="flex gap-1 items-center">
           <ShadcnTooltipProvider>
             <ShadcnTooltip>
-              <ShadcnTooltipTrigger asChild>
-                <ShadcnButton 
-                  variant="ghost" 
-                  size="icon" 
-                  class="w-8 h-8" 
-                  @click="cycleTheme"
+              <ShadcnTooltipTrigger as-child>
+                <ShadcnButton
+                  variant="ghost"
+                  size="icon"
+                  class="w-8 h-8"
                   :disabled="isThemeChanging"
+                  @click="cycleTheme"
                 >
                   <Icon v-if="isThemeChanging" icon="lucide:loader-2" class="w-5 h-5 animate-spin" />
                   <Icon v-else icon="lucide:palette" class="w-5 h-5" />
@@ -404,7 +424,7 @@ const langColor = computed(() => {
             </ShadcnTooltip>
 
             <ShadcnTooltip>
-              <ShadcnTooltipTrigger asChild>
+              <ShadcnTooltipTrigger as-child>
                 <ShadcnButton variant="ghost" size="icon" class="w-8 h-8" @click="isWrapped = !isWrapped">
                   <Icon :icon="isWrapped ? 'lucide:wrap-text' : 'lucide:scroll'" class="w-5 h-5" />
                 </ShadcnButton>
@@ -415,7 +435,7 @@ const langColor = computed(() => {
             </ShadcnTooltip>
 
             <ShadcnTooltip>
-              <ShadcnTooltipTrigger asChild>
+              <ShadcnTooltipTrigger as-child>
                 <ShadcnButton variant="ghost" size="icon" class="w-8 h-8" @click="isExpanded = !isExpanded">
                   <Icon :icon="isExpanded ? 'lucide:minimize-2' : 'lucide:maximize-2'" class="w-5 h-5" />
                 </ShadcnButton>
@@ -426,7 +446,7 @@ const langColor = computed(() => {
             </ShadcnTooltip>
 
             <ShadcnTooltip>
-              <ShadcnTooltipTrigger asChild>
+              <ShadcnTooltipTrigger as-child>
                 <CopyToClipboard :text="content" variant="ghost" class="w-8 h-8" />
               </ShadcnTooltipTrigger>
               <ShadcnTooltipContent>
@@ -438,12 +458,14 @@ const langColor = computed(() => {
       </div>
 
       <ShadcnScrollArea class="p-4">
-        <ShikiStreamRenderer :stream="tokensStream" class="font-mono text-sm" :class="[
-          isWrapped ? 'whitespace-pre-wrap' : 'whitespace-pre',
-          isExpanded ? 'max-h-fit' : 'max-h-[25vh]'
-        ]" />
+        <ShikiStreamRenderer
+          :stream="tokensStream" class="font-mono text-sm" :class="[
+            isWrapped ? 'whitespace-pre-wrap' : 'whitespace-pre',
+            isExpanded ? 'max-h-fit' : 'max-h-[25vh]',
+          ]"
+        />
         <ShadcnScrollBar orientation="vertical" />
-        <ShadcnScrollBar orientation="horizontal" :class="{ 'hidden': isWrapped }" />
+        <ShadcnScrollBar orientation="horizontal" :class="{ hidden: isWrapped }" />
       </ShadcnScrollArea>
     </div>
     <br>

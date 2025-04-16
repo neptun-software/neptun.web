@@ -11,7 +11,7 @@ watch(() => props.message.content, () => {
   isMarkdownReady.value = false
 })
 
-const handleMarkdownReady = () => {
+function handleMarkdownReady() {
   isMarkdownReady.value = true
 }
 </script>
@@ -34,9 +34,9 @@ const handleMarkdownReady = () => {
       <div v-if="!isMarkdownReady && !message.isStreaming" class="mb-2 whitespace-pre-wrap">
         {{ message.content }}
       </div>
-      
+
       <!-- Hide the preview until it's ready or streaming -->
-      <div :class="{ 'hidden': !isMarkdownReady && !message.isStreaming }">
+      <div :class="{ hidden: !isMarkdownReady && !message.isStreaming }">
         <!-- Always use the same component instance -->
         <DashboardChatMessageMarkdownPreview
           :key="`preview-${message.id}`"
@@ -74,7 +74,7 @@ const handleMarkdownReady = () => {
 }
 </style>
 
-<!-- 
+<!--
 :deep(div :is(*:last-child)) {
   margin-bottom: 0;
   padding-bottom: 0;
