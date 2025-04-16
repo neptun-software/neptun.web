@@ -22,19 +22,19 @@ const { data: ast, status } = await useAsyncData(
 <template>
   <div class="relative">
     <template v-if="!useSimpleRenderer">
-        <ShadcnScrollArea id="complex-markdown-renderer" class="w-full">
-          <div class="text-sm whitespace-pre-wrap break-words md:text-base" style="max-width: 50vw; max-height: 50vh;">
-            <template v-if="status === 'success' && ast">
-              <!-- MDC is too slow and offers no feedback to the user as well as no great fallback -->
-              <MDCRenderer :body="ast.body" :data="ast.data" />
-            </template>
-            <template v-else>
-              {{ content }}
-            </template>
-          </div>
-          <ShadcnScrollBar orientation="horizontal" />
-          <ShadcnScrollBar orientation="vertical" />
-        </ShadcnScrollArea>
+      <ShadcnScrollArea id="complex-markdown-renderer" class="w-full">
+        <div class="text-sm whitespace-pre-wrap break-words md:text-base" style="max-width: 50vw; max-height: 50vh;">
+          <template v-if="status === 'success' && ast">
+            <!-- MDC is too slow and offers no feedback to the user as well as no great fallback -->
+            <MDCRenderer :body="ast.body" :data="ast.data" />
+          </template>
+          <template v-else>
+            {{ content }}
+          </template>
+        </div>
+        <ShadcnScrollBar orientation="horizontal" />
+        <ShadcnScrollBar orientation="vertical" />
+      </ShadcnScrollArea>
     </template>
     <template v-else>
       <div class="text-sm whitespace-pre-wrap break-all md:text-base">

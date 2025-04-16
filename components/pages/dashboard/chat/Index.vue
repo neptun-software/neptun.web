@@ -42,6 +42,7 @@ const {
   isLoading: chatResponseIsLoading,
   setMessages: setChatMessages,
   stop: stopChatGeneration,
+  status: chatStatus,
   /* append: appendChatMessage, */
 } = useChat({
   id: String(selectedAiChat.value.id),
@@ -575,9 +576,21 @@ function appendContextToInput(context: string) {
     </div>
 
     <div class="flex flex-col flex-grow pt-10 pb-6 max-w-full min-h-0">
-      <ShadcnScrollArea ref="$scrollArea">
+      <ShadcnScrollArea ref="$scrollArea" class="h-full">
         <KeepAlive>
-          <DashboardChatMessages :key="chatMessagesKey" :messages="messagesWithStreaming" />
+          <template v-if="messagesWithStreaming.length === 0">
+            <div class="pt-8 text-center text-muted-foreground">
+              <p>Start a conversation with the AI</p>
+            </div>
+          </template>
+
+          <template v-else>
+            <DashboardChatMessage
+              v-for="message in messagesWithStreaming"
+              :key="message.id"
+              :message="message"
+            />
+          </template>
         </KeepAlive>
 
         <template v-if="isLoading">

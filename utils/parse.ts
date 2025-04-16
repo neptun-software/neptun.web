@@ -4,10 +4,6 @@ import remarkParse from 'remark-parse'
 import remarkStringify from 'remark-stringify'
 import strip from 'strip-markdown'
 import { unified } from 'unified'
-import {
-  supportedFileExtensionsMap,
-  supportedShikiLanguages,
-} from '~/utils/formatters'
 
 // `remark-code-blocks` doesn't work anymore and writing remark plugins is a pain (spent about 2 hours on it...), that's why I am trying to do this using regex magic
 export async function getCodeBlocksFromMarkdown(
