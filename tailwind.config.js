@@ -35,11 +35,11 @@ export default {
     },
     extend: {
       typography: {
-        DEFAULT: typographyShared,
-        sm: typographyShared,
-        md: typographyShared,
-        lg: typographyShared,
-        xl: typographyShared,
+        'DEFAULT': typographyShared,
+        'sm': typographyShared,
+        'md': typographyShared,
+        'lg': typographyShared,
+        'xl': typographyShared,
         '2xl': typographyShared,
       },
       colors: {

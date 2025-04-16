@@ -49,6 +49,7 @@ const theme = computed({
   },
 })
 
+const highlighter = ref()
 function createTokenStream(content: string): ReadableStream {
   return new ReadableStream({
     start(controller) {
@@ -67,7 +68,6 @@ function createTokenStream(content: string): ReadableStream {
 
 const tokensStream = ref<ReadableStream>()
 const isStreaming = ref(false)
-const highlighter = ref()
 const fullContent = ref('')
 const contentBuffer = ref('')
 
@@ -214,23 +214,6 @@ async function startStreamingFromInput(stream: ReadableStream<string>) {
     let shortUpdateCount = 0
     let shortUpdateTimer: ReturnType<typeof setTimeout> | null = null
 
-    const writeToStream = (content: string) => {
-      if (finalRenderStarted.value) {
-        return
-      }
-
-      try {
-        writer.write(content)
-        renderedContent.value = content
-        fullContent.value = content
-
-        shortUpdateCount = 0
-      } catch (err) {
-        console.error('Error writing to token stream:', err)
-        finalizeStream()
-      }
-    }
-
     const finalizeStream = async () => {
       if (finalRenderStarted.value) {
         return
@@ -263,6 +246,23 @@ async function startStreamingFromInput(stream: ReadableStream<string>) {
           emit('streaming-complete', props.blockId)
           emit('update:isComplete', true)
         }
+      }
+    }
+
+    const writeToStream = (content: string) => {
+      if (finalRenderStarted.value) {
+        return
+      }
+
+      try {
+        writer.write(content)
+        renderedContent.value = content
+        fullContent.value = content
+
+        shortUpdateCount = 0
+      } catch (err) {
+        console.error('Error writing to token stream:', err)
+        finalizeStream()
       }
     }
 
