@@ -2,12 +2,8 @@
 import { ShikiStreamRenderer } from 'shiki-stream/vue'
 import { CodeToTokenTransformStream } from 'shiki-stream'
 import CopyToClipboard from '~/components/utilities/CopyToClipboard.vue'
-import { Icon } from '@iconify/vue'
-
-const isWrapped = ref(false)
-const isExpanded = ref(false)
-const { isDarkMode, selectedTheme, themeOptions, currentTheme } = useTheme()
-const { getHighlighter } = useShikiHighlighter()
+import type { ThemeOption } from '~/utils/themes'
+import { useShikiHighlighter } from '~/composables/useShikiHighlighter'
 
 const props = defineProps<{
   language: string
@@ -22,18 +18,63 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'streaming-complete': [blockId: string]
+  'update:isComplete': [isComplete: boolean]
 }>()
+
+const isWrapped = ref(false)
+const isExpanded = ref(false)
+const { isDarkMode, selectedTheme, themeOptions, currentTheme } = useTheme()
+const { getHighlighter } = useShikiHighlighter()
+const isStreamingComplete = ref(false)
+const isStreamLocked = ref(false)
+const completeContent = ref('')
+
+const renderedContent = ref('')
+const finalRenderStarted = ref(false)
 
 defineExpose({
   appendContent,
-  refreshStream
+  refreshStream,
+  isStreamingComplete
 })
+
+const theme = computed({
+  get: () => selectedTheme.value,
+  set: (value) => {
+    selectedTheme.value = value
+  }
+})
+
+const createTokenStream = (content: string): ReadableStream => {
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(content)
+      controller.close()
+    }
+  }).pipeThrough(
+    new CodeToTokenTransformStream({
+      highlighter: highlighter.value,
+      lang: props.language,
+      theme: currentTheme.value,
+      allowRecalls: true
+    })
+  )
+}
 
 const tokensStream = ref<ReadableStream>()
 const isStreaming = ref(false)
 const highlighter = ref()
 const fullContent = ref('')
 const contentBuffer = ref('')
+
+const applyThemeInstantly = () => {
+  try {
+    const currentContent = fullContent.value
+    tokensStream.value = createTokenStream(currentContent)
+  } catch (error) {
+    console.error('Error applying theme instantly:', error)
+  }
+}
 
 function appendContent(newContent: string) {
   if (!props.streamingMode) return
@@ -45,7 +86,7 @@ function appendContent(newContent: string) {
 }
 
 function refreshStream() {
-  if (!highlighter.value) return
+  if (!highlighter.value || isStreamingComplete.value) return
 
   const contentToUse = props.streamingMode ? contentBuffer.value : props.content
   if (!contentToUse.trim()) return
@@ -69,13 +110,6 @@ function refreshStream() {
     isStreaming.value = false
   }
 }
-
-const theme = computed({
-  get: () => selectedTheme.value,
-  set: (value) => {
-    selectedTheme.value = value
-  }
-})
 
 onMounted(async () => {
   try {
@@ -116,21 +150,32 @@ watch([() => isDarkMode.value, () => selectedTheme.value], () => {
 }, { deep: true })
 
 watch(() => props.textStream, (newStream) => {
-  if (newStream) {
+  if (newStream && !isStreamingComplete.value) {
     startStreamingFromInput(newStream)
   }
 })
 
-const applyThemeInstantly = () => {
-  try {
-    const textStream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(fullContent.value)
-        controller.close()
-      }
-    })
+watch(isStreaming, (newValue) => {
+  if (newValue === false && fullContent.value) {
+    isStreamingComplete.value = true
+  }
+})
 
-    tokensStream.value = textStream.pipeThrough(
+const startStreamingFromInput = async (stream: ReadableStream<string>) => {
+  if (!highlighter.value || isStreamingComplete.value) return
+  
+  isStreaming.value = true
+  isStreamingComplete.value = false
+  finalRenderStarted.value = false
+  
+  let fullContentBuffer = ''
+  
+  try {
+    // Create the token stream ONCE at the beginning
+    const transformStream = new TransformStream<string, string>()
+    const writer = transformStream.writable.getWriter()
+    
+    tokensStream.value = transformStream.readable.pipeThrough(
       new CodeToTokenTransformStream({
         highlighter: highlighter.value,
         lang: props.language,
@@ -138,13 +183,123 @@ const applyThemeInstantly = () => {
         allowRecalls: true
       })
     )
+    
+    const reader = stream.getReader()
+    let lastContentLength = 0
+    let shortUpdateCount = 0
+    let shortUpdateTimer: ReturnType<typeof setTimeout> | null = null
+
+    const writeToStream = (content: string) => {
+      if (finalRenderStarted.value) return
+      
+      try {
+        writer.write(content)
+        renderedContent.value = content
+        fullContent.value = content
+
+        shortUpdateCount = 0
+      } catch (err) {
+        console.error('Error writing to token stream:', err)
+        finalizeStream()
+      }
+    }
+    
+    const finalizeStream = async () => {
+      if (finalRenderStarted.value) return
+      
+      finalRenderStarted.value = true
+      
+      try {
+        const finalContent = fullContentBuffer.trim()
+        if (finalContent) {
+          writer.write(finalContent)
+          renderedContent.value = finalContent
+          fullContent.value = finalContent
+        }
+        
+        await writer.close()
+      } catch (err) {
+        console.error('Error finalizing stream:', err)
+        try {
+          writer.abort(err)
+        } catch (abortErr) {
+          console.error('Error aborting stream:', abortErr)
+        }
+      } finally {
+        isStreamingComplete.value = true
+        isStreamLocked.value = true
+        isStreaming.value = false
+        
+        if (props.blockId) {
+          emit('streaming-complete', props.blockId)
+          emit('update:isComplete', true)
+        }
+      }
+    }
+    
+    while (true) {
+      const { value, done } = await reader.read()
+      
+      if (done) {
+        // Stream is complete
+        if (shortUpdateTimer) {
+          clearTimeout(shortUpdateTimer)
+          shortUpdateTimer = null
+        }
+        
+        await finalizeStream()
+        break
+      }
+      
+      if (!value || isStreamLocked.value || finalRenderStarted.value) {
+        continue
+      }
+      
+      fullContentBuffer = value
+      
+      // Update immediately for significant content changes or first content
+      const contentSizeDiff = fullContentBuffer.length - lastContentLength
+      const hasSignificantNewContent = contentSizeDiff > 10 || lastContentLength === 0
+      const isSmallContent = fullContentBuffer.length < 100
+      
+      // For small content or significant updates, update immediately without batching
+      if (hasSignificantNewContent || isSmallContent) {
+        writeToStream(fullContentBuffer)
+        lastContentLength = fullContentBuffer.length
+      } 
+      // For small incremental updates, we'll count them and update after a few
+      else if (contentSizeDiff > 0) {
+        shortUpdateCount++
+        
+        // If we've collected a few small updates or it's been a while, update
+        if (shortUpdateCount >= 3) {
+          writeToStream(fullContentBuffer)
+          lastContentLength = fullContentBuffer.length
+        }
+        // Otherwise set a timer to ensure updates happen occasionally even for slow content
+        else if (!shortUpdateTimer) {
+          shortUpdateTimer = setTimeout(() => {
+            if (contentSizeDiff > 0) {
+              writeToStream(fullContentBuffer)
+              lastContentLength = fullContentBuffer.length
+            }
+            shortUpdateTimer = null
+          }, 25)
+        }
+      }
+    }
+    
+    reader.releaseLock()
   } catch (error) {
-    console.error('Error applying theme instantly:', error)
+    console.error('Error in streaming:', error)
+    isStreaming.value = false
+    isStreamingComplete.value = true
+    isStreamLocked.value = true
   }
 }
 
 const createContentStream = (content: string): ReadableStream<string> => {
-  if (!content) {
+  if (!content || isStreamLocked.value) {
     return new ReadableStream({
       start(controller) {
         controller.close()
@@ -152,82 +307,36 @@ const createContentStream = (content: string): ReadableStream<string> => {
     })
   }
 
-  fullContent.value = content
-
-  const fileSize = content.length
-  const chunkSize = fileSize > 100000 ? 10000 : 5000
-  const streamDelay = fileSize > 50000 ? 5 : 15
-
-  if (fileSize < 10000) {
-    const lines = content.split('\n')
-
-    return new ReadableStream({
-      start(controller) {
-        let lineIndex = 0
-        let currentLine = ''
-
-        const interval = setInterval(() => {
-          if (lineIndex < lines.length) {
-            currentLine = lines[lineIndex] + '\n'
-            controller.enqueue(currentLine)
-            lineIndex++
-          } else {
-            clearInterval(interval)
-            controller.close()
-            isStreaming.value = false
-            if (props.streamingMode && props.blockId) {
-              emit('streaming-complete', props.blockId)
-            }
-          }
-        }, 30)
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(content)
+      controller.close()
+      
+      isStreamLocked.value = true
+      isStreamingComplete.value = true
+      isStreaming.value = false
+      
+      if (props.streamingMode && props.blockId) {
+        emit('streaming-complete', props.blockId)
+        emit('update:isComplete', true)
       }
-    })
-  } else {
-    return new ReadableStream({
-      start(controller) {
-        if (fileSize > 500000) {
-          controller.enqueue(content)
-          controller.close()
-          isStreaming.value = false
-          if (props.streamingMode && props.blockId) {
-            emit('streaming-complete', props.blockId)
-          }
-          return
-        }
-
-        let position = 0
-
-        const processNextChunk = () => {
-          if (position < fileSize) {
-            const end = Math.min(position + chunkSize, fileSize)
-            controller.enqueue(content.substring(position, end))
-            position = end
-
-            setTimeout(processNextChunk, streamDelay)
-          } else {
-            controller.close()
-            isStreaming.value = false
-            if (props.streamingMode && props.blockId) {
-              emit('streaming-complete', props.blockId)
-            }
-          }
-        }
-
-        processNextChunk()
-      }
-    })
-  }
+    }
+  })
 }
 
 const startStreaming = () => {
-  if (!highlighter.value || isStreaming.value) return
-
+  if (!highlighter.value) return
+  isStreamingComplete.value = false
+  
   refreshStream()
 }
 
 const resetStream = () => {
   tokensStream.value = undefined
   isStreaming.value = false
+  isStreamingComplete.value = false
+  isStreamLocked.value = false
+  completeContent.value = ''
 }
 
 const cycleTheme = () => {
@@ -240,77 +349,49 @@ const langColor = computed(() => {
   const langKey = props.language.toLowerCase() as keyof typeof languageColors
   return languageColors[langKey] || '#ccc'
 })
-
-const startStreamingFromInput = async (stream: ReadableStream<string>) => {
-  if (!highlighter.value) return
-  
-  isStreaming.value = true
-  
-  try {
-    const reader = stream.getReader()
-    
-    // Create a single token stream that will be updated
-    tokensStream.value = new ReadableStream({
-      start(controller) {
-        // Initial empty enqueue
-        controller.enqueue('')
-      }
-    }).pipeThrough(
-      new CodeToTokenTransformStream({
-        highlighter: highlighter.value,
-        lang: props.language,
-        theme: currentTheme.value,
-        allowRecalls: true
-      })
-    )
-    
-    // Process the incoming stream
-    while (true) {
-      const { done, value } = await reader.read()
-      
-      if (done) {
-        isStreaming.value = false
-        if (props.blockId) {
-          emit('streaming-complete', props.blockId)
-        }
-        break
-      }
-      
-      // Use the full value directly - this is the complete code block content
-      fullContent.value = value
-      
-      // We'll update the existing stream rather than creating a new one
-      // This helps prevent flickering
-      resetStream()
-      
-      tokensStream.value = new ReadableStream({
-        start(controller) {
-          controller.enqueue(fullContent.value)
-          controller.close()
-        }
-      }).pipeThrough(
-        new CodeToTokenTransformStream({
-          highlighter: highlighter.value,
-          lang: props.language,
-          theme: currentTheme.value,
-          allowRecalls: true
-        })
-      )
-      
-      // Small delay to allow UI to update
-      await new Promise(resolve => setTimeout(resolve, 50))
-    }
-  } catch (error) {
-    console.error('Error in streaming:', error)
-    isStreaming.value = false
-  }
-}
 </script>
 
 <template>
-  <div class="rounded-lg"><br>
+  <div class="rounded-lg">
+    <DevOnly>
+      <div class="flex justify-between items-center mb-4">
+        <ShadcnCombobox v-model="theme" by="value">
+          <ShadcnComboboxAnchor as-child>
+            <ShadcnComboboxTrigger as-child>
+              <ShadcnButton variant="outline" class="w-[200px] justify-between" :disabled="isStreaming">
+                {{ theme?.label ?? 'Select theme' }}
+                <Icon name="lucide:chevron-down" class="ml-2 w-4 h-4 opacity-50 shrink-0" />
+              </ShadcnButton>
+            </ShadcnComboboxTrigger>
+          </ShadcnComboboxAnchor>
+
+          <ShadcnComboboxList class="w-[200px]">
+            <ShadcnComboboxInput class="px-3 w-full h-9" placeholder="Search theme..." />
+            <ShadcnComboboxEmpty class="p-2 text-sm text-center text-muted-foreground">
+              No theme found.
+            </ShadcnComboboxEmpty>
+
+            <ShadcnComboboxGroup>
+              <ShadcnComboboxItem v-for="option in themeOptions" :key="option.value" :value="option" class="py-2">
+                {{ option.label }}
+                <ShadcnComboboxItemIndicator>
+                  <Icon name="lucide:check" class="ml-auto w-4 h-4" />
+                </ShadcnComboboxItemIndicator>
+              </ShadcnComboboxItem>
+            </ShadcnComboboxGroup>
+          </ShadcnComboboxList>
+        </ShadcnCombobox>
+
+        <div class="flex gap-2 items-center">
+          <span class="text-sm">Light</span>
+          <ShadcnSwitch v-model="isDarkMode" :disabled="isStreaming" />
+          <span class="text-sm">Dark</span>
+        </div>
+      </div>
+    </DevOnly>
+
     <div v-if="tokensStream" class="relative overflow-clip rounded-lg border">
-      <div class="flex sticky top-0 z-10 justify-between items-center px-4 w-full h-12 bg-muted">
+      <div class="px-4 py-2 flex items-center justify-between sticky top-0 z-10 bg-muted w-[calc(100%+0.5rem)] mr-[-0.5rem]">
         <div class="flex gap-2 items-center">
           <span
             class="inline-block w-2.5 h-2.5 rounded-full"
@@ -325,7 +406,7 @@ const startStreamingFromInput = async (stream: ReadableStream<string>) => {
             <ShadcnTooltip>
               <ShadcnTooltipTrigger asChild>
                 <ShadcnButton variant="ghost" size="icon" class="w-8 h-8" @click="cycleTheme">
-                  <Icon icon="lucide:palette" class="w-5 h-5" />
+                  <Icon name="lucide:palette" class="w-5 h-5" />
                 </ShadcnButton>
               </ShadcnTooltipTrigger>
               <ShadcnTooltipContent>
@@ -336,7 +417,7 @@ const startStreamingFromInput = async (stream: ReadableStream<string>) => {
             <ShadcnTooltip>
               <ShadcnTooltipTrigger asChild>
                 <ShadcnButton variant="ghost" size="icon" class="w-8 h-8" @click="isWrapped = !isWrapped">
-                  <Icon :icon="isWrapped ? 'lucide:wrap-text' : 'lucide:scroll'" class="w-5 h-5" />
+                  <Icon :name="isWrapped ? 'lucide:wrap-text' : 'lucide:scroll'" class="w-5 h-5" />
                 </ShadcnButton>
               </ShadcnTooltipTrigger>
               <ShadcnTooltipContent>
@@ -347,7 +428,7 @@ const startStreamingFromInput = async (stream: ReadableStream<string>) => {
             <ShadcnTooltip>
               <ShadcnTooltipTrigger asChild>
                 <ShadcnButton variant="ghost" size="icon" class="w-8 h-8" @click="isExpanded = !isExpanded">
-                  <Icon :icon="isExpanded ? 'lucide:minimize-2' : 'lucide:maximize-2'" class="w-5 h-5" />
+                  <Icon :name="isExpanded ? 'lucide:minimize-2' : 'lucide:maximize-2'" class="w-5 h-5" />
                 </ShadcnButton>
               </ShadcnTooltipTrigger>
               <ShadcnTooltipContent>
@@ -375,6 +456,13 @@ const startStreamingFromInput = async (stream: ReadableStream<string>) => {
         <ShadcnScrollBar orientation="vertical" />
         <ShadcnScrollBar orientation="horizontal" :class="{ 'hidden': isWrapped }" />
       </ShadcnScrollArea>
-    </div><br>
+    </div>
+
+    <DevOnly>
+      <div class="flex gap-2 mt-4">
+        <ShadcnButton @click="startStreaming" :disabled="isStreaming">Create</ShadcnButton>
+        <ShadcnButton @click="resetStream" variant="outline">Remove</ShadcnButton>
+      </div>
+    </DevOnly>
   </div>
 </template>

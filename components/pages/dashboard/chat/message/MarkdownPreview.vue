@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Shiki from '@shikijs/markdown-it'
-import CodeBlock from './CodeBlock.vue'
+import CodeBlock from './CodeBlock.vue';
 import { h, createApp } from 'vue'
 
 const props = defineProps<{
@@ -12,7 +12,16 @@ const props = defineProps<{
 const renderedContent = ref('')
 const codeBlockCounter = ref(0)
 const isStreamingActive = ref(false)
-const codeBlocksInPreview = ref<Map<string, { blockId: string, placeholder: HTMLElement, content: string, language: string }>>(new Map())
+const codeBlocksInPreview = ref<Map<string, { 
+  blockId: string, 
+  placeholder: HTMLElement, 
+  content: string, 
+  language: string,
+  isComplete?: boolean 
+}>>(new Map())
+
+// Track completed code blocks to avoid unnecessary re-renders
+const completedCodeBlocks = ref<Set<string>>(new Set())
 const previewElement = ref<HTMLElement | null>(null)
 
 const { selectedTheme } = useTheme()
@@ -249,13 +258,19 @@ const renderMarkdown = (mdContent: string | undefined) => {
   })
 }
 
-// Create and mount a code block component
+const markCodeBlockAsComplete = (blockId: string) => {
+  completedCodeBlocks.value.add(blockId)
+  const block = codeBlocksInPreview.value.get(blockId)
+  if (block) {
+    block.isComplete = true
+    codeBlocksInPreview.value.set(blockId, block)
+  }
+}
+
 const createCodeBlock = (placeholder: HTMLElement, blockId: string, language: string | undefined, content: string | undefined, stream?: ReadableStream<string>) => {
-  // Default values for undefined parameters
   const safeLanguage = language || 'text'
   const safeContent = content || ''
   
-  // Create component instance
   const vNode = h(CodeBlock, {
     language: safeLanguage,
     extension: safeLanguage,
@@ -263,14 +278,23 @@ const createCodeBlock = (placeholder: HTMLElement, blockId: string, language: st
     content: safeContent,
     theme: selectedTheme.value,
     class: 'prose-code-block',
-    textStream: stream
+    textStream: stream,
+    blockId,
+    onStreamingComplete: (id: string) => {
+      markCodeBlockAsComplete(id)
+      console.log(`Code block ${id} completed streaming`)
+    },
+    'onUpdate:isComplete': (isComplete: boolean) => {
+      if (isComplete && blockId) {
+        markCodeBlockAsComplete(blockId)
+        console.log(`Code block ${blockId} marked complete via update event`)
+      }
+    }
   })
   
-  // Replace placeholder with component
   const container = document.createElement('div')
   placeholder.replaceWith(container)
   
-  // Mount component
   const app = createApp({
     render: () => vNode
   })
@@ -282,8 +306,39 @@ const createCodeBlock = (placeholder: HTMLElement, blockId: string, language: st
     blockId,
     placeholder: container,
     content: safeContent,
-    language: safeLanguage
+    language: safeLanguage,
+    isComplete: false
   })
+
+  // Capture the mounted element
+  const mountedElement = codeBlocksInPreview.value.get(blockId)?.placeholder
+  if (mountedElement) {
+    // Add a MutationObserver to detect when the code block is actually rendered
+    const observer = new MutationObserver((mutations) => {
+      // Check if the CodeBlock's inner components are loaded
+      const codeComponent = mountedElement.querySelector('.shiki-stream')
+      if (codeComponent) {
+        // Element is fully rendered, no need to observe anymore
+        observer.disconnect()
+        
+        // Get the Vue component instance to check state - if possible
+        const vueElement = mountedElement.querySelector('[data-v-component]')
+        if (vueElement) {
+          // Using any type to access Vue internal properties safely
+          const vueComponent = vueElement as any
+          if (vueComponent.__vueParentComponent?.exposed?.isStreamingComplete?.value === true) {
+            markCodeBlockAsComplete(blockId)
+          }
+        }
+      }
+    })
+    
+    // Start observing
+    observer.observe(mountedElement, { 
+      childList: true, 
+      subtree: true 
+    })
+  }
 }
 
 // Read from a ReadableStream and render progressively
@@ -293,6 +348,7 @@ const readFromStream = async (stream: ReadableStream<string>) => {
   isStreamingActive.value = true
   renderedContent.value = ''
   codeBlocksInPreview.value.clear()
+  completedCodeBlocks.value.clear()
   
   try {
     const reader = stream.getReader()
@@ -322,29 +378,64 @@ const readFromStream = async (stream: ReadableStream<string>) => {
       language: string, 
       index: number,
       contentStream: ReadableStream<string>,
-      lastContent: string
+      lastContent: string,
+      isComplete: boolean
     }>()
     
     // For stable code block indexing
     let codeBlockCount = 0
     
-    while (!done) {
-      const { value, done: isDone } = await reader.read()
-      done = isDone
+    // Use smarter chunk handling - process immediately for first chunks or when needed
+    let processingChunk = false
+    let queuedChunk: string | null = null
+    let lastProcessedLength = 0
+    let consecutiveSmallUpdates = 0
+    
+    const processChunk = async (value: string) => {
+      if (processingChunk) {
+        // If already processing, queue the newest one
+        queuedChunk = value
+        return
+      }
       
-      if (value) {
+      processingChunk = true
+      
+      try {
         // Add new content to the accumulator
-        accumulator += value
+        accumulator = value
         
         // Pre-process the entire content to separate text and code blocks
         const segments = segmentMarkdown(accumulator)
+        
+        // Create a snapshot of the current completed blocks to check later
+        const completedBlocksSnapshot = new Set(completedCodeBlocks.value)
         
         // Process code blocks first to extract and track their content
         for (let i = 0; i < segments.length; i++) {
           const segment = segments[i]
           if (segment.type === 'code') {
             const codeBlockId = `stream-block-${i}`
-            codeBlockContents.set(codeBlockId, segment.content || '')
+            
+            // Skip updating content for completed blocks
+            if (completedCodeBlocks.value.has(codeBlockId)) {
+              continue
+            }
+            
+            // Check if this is a new code block
+            const isNewCodeBlock = !codeBlockContents.has(codeBlockId)
+            
+            // Check if content changed (for existing blocks)
+            const existingContent = codeBlockContents.get(codeBlockId) || ''
+            const contentChanged = existingContent !== segment.content && segment.content !== ''
+            
+            // For small code blocks or significant changes, always update
+            const isSmallCodeBlock = segment.content.length < 100
+            const hasSignificantChange = segment.content.length > existingContent.length + 5
+            
+            // Always update new blocks or changed content that meets our criteria
+            if (isNewCodeBlock || (contentChanged && (isSmallCodeBlock || hasSignificantChange))) {
+              codeBlockContents.set(codeBlockId, segment.content || '')
+            }
           }
         }
         
@@ -356,14 +447,65 @@ const readFromStream = async (stream: ReadableStream<string>) => {
           renderedCodeBlocks,
           codeBlockStreams,
           codeBlockContents,
-          codeBlockCount
+          codeBlockCount,
+          completedBlocksSnapshot
         )
+        
+        lastProcessedLength = value.length
+        
+        // Allow immediate processing of queued chunks after this
+        await nextTick()
+      } finally {
+        processingChunk = false
+        
+        // If we have a queued chunk, process it next
+        if (queuedChunk) {
+          const nextChunk = queuedChunk
+          queuedChunk = null
+          await processChunk(nextChunk)
+        }
       }
+    }
+    
+    // Process the first chunk immediately to make code blocks appear immediately
+    const firstChunk = await reader.read()
+    if (!firstChunk.done && firstChunk.value) {
+      await processChunk(firstChunk.value)
+    }
+    
+    // Continue processing remaining chunks
+    while (!done) {
+      const { value, done: isDone } = await reader.read()
+      done = isDone
       
-      // Small delay to allow UI to update
-      if (!done) {
-        await new Promise(resolve => setTimeout(resolve, 10))
+      if (value) {
+        // Determine if we should process this update immediately
+        const sizeDiff = value.length - lastProcessedLength
+        
+        // Always process if it's a significant update
+        if (sizeDiff > 20) {
+          consecutiveSmallUpdates = 0
+          await processChunk(value)
+        } 
+        // For small updates, we'll count them and only process if we get a few
+        else if (sizeDiff > 0) {
+          consecutiveSmallUpdates++
+          
+          // Process every few small updates
+          if (consecutiveSmallUpdates >= 3) {
+            consecutiveSmallUpdates = 0
+            await processChunk(value)
+          } else {
+            // Just queue it for now
+            queuedChunk = value
+          }
+        }
       }
+    }
+    
+    // Process any final queued chunk
+    if (queuedChunk) {
+      await processChunk(queuedChunk)
     }
     
     reader.releaseLock()
@@ -384,16 +526,35 @@ const renderStableStreamContent = (
     language: string, 
     index: number,
     contentStream: ReadableStream<string>,
-    lastContent: string
+    lastContent: string,
+    isComplete: boolean
   }>,
   codeBlockStreams: Map<string, TransformStream<string, string>>,
   codeBlockContents: Map<string, string>,
-  codeBlockCount: number
+  initialCodeBlockCount: number,
+  completedBlocksSnapshot?: Set<string>
 ) => {
   if (!md) return
   
   // Track the highest index we've seen
-  let highestCodeBlockIndex = codeBlockCount
+  let codeBlockCount = initialCodeBlockCount
+  
+  // Check existing code blocks for completion first
+  renderedCodeBlocks.forEach((blockInfo, blockId) => {
+    if (blockInfo.isComplete) {
+      completedCodeBlocks.value.add(blockId)
+    } else {
+      // Try to check the component state directly
+      const element = blockInfo.element
+      if (element) {
+        const shikiElement = element.querySelector('.shiki-stream')
+        if (shikiElement && !shikiElement.textContent?.includes('...')) {
+          // If content is complete without loading indicators, mark as complete
+          markCodeBlockAsComplete(blockId)
+        }
+      }
+    }
+  })
   
   // Process each segment in order
   for (let i = 0; i < segments.length; i++) {
@@ -418,11 +579,18 @@ const renderStableStreamContent = (
       textContainer.innerHTML = renderedHtml
     } 
     else if (segment.type === 'code') {
-      // Handle code blocks - these need special treatment to avoid flickering
+      // Handle code blocks
       const codeBlockId = `stream-block-${i}`
+      
+      // Skip if this code block is already complete
+      if (completedCodeBlocks.value.has(codeBlockId)) {
+        continue
+      }
+      
+      // Get the current content for this block
       const currentContent = codeBlockContents.get(codeBlockId) || ''
       
-      // Check if we already have this code block
+      // Create code block immediately if it doesn't exist yet
       if (!renderedCodeBlocks.has(codeBlockId)) {
         // Create a new placeholder for the code block
         const placeholder = document.createElement('div')
@@ -430,48 +598,84 @@ const renderStableStreamContent = (
         placeholder.setAttribute('data-language', segment.language || 'text')
         container.appendChild(placeholder)
         
-        // Create a stable transform stream for this code block
-        if (!codeBlockStreams.has(codeBlockId)) {
-          const { readable, writable } = new TransformStream<string, string>()
-          codeBlockStreams.set(codeBlockId, { readable, writable })
-        }
+        // Create fresh stream for this code block to ensure immediate rendering
+        const { readable, writable } = new TransformStream<string, string>()
+        codeBlockStreams.set(codeBlockId, { readable, writable })
         
-        const streamPair = codeBlockStreams.get(codeBlockId)!
-        const contentStream = streamPair.readable
+        const contentStream = readable
         
-        // Create initial code block with content and stream
+        // Create the code block component even with empty content to make it visible
         createCodeBlock(
           placeholder,
           codeBlockId,
           segment.language,
-          currentContent,
-          contentStream
+          '', // Start with empty content
+          contentStream 
         )
         
         // Store for future reference with index and last content
         renderedCodeBlocks.set(codeBlockId, {
           element: codeBlocksInPreview.value.get(codeBlockId)?.placeholder as HTMLElement,
           language: segment.language || 'text',
-          index: highestCodeBlockIndex + 1,
+          index: codeBlockCount + 1,
           contentStream,
-          lastContent: currentContent
+          lastContent: '',
+          isComplete: false
         })
         
-        highestCodeBlockIndex++
-      } 
-      
-      // Only send updates if content has changed
-      const blockInfo = renderedCodeBlocks.get(codeBlockId)!
-      if (currentContent !== blockInfo.lastContent) {
-        // Send the latest content to the stream
-        const streamPair = codeBlockStreams.get(codeBlockId)
-        if (streamPair) {
-          const writer = streamPair.writable.getWriter()
+        codeBlockCount++
+        
+        // Immediately send initial content to make it visible
+        if (currentContent) {
+          const writer = writable.getWriter()
           writer.write(currentContent)
           writer.releaseLock()
+        }
+      } 
+      else {
+        // Block exists, check if it was completed during this update cycle
+        if (completedBlocksSnapshot && completedBlocksSnapshot.has(codeBlockId)) {
+          continue
+        }
+        
+        // Only update existing blocks if they're not complete and content changed
+        const blockInfo = renderedCodeBlocks.get(codeBlockId)!
+        
+        // Apply a more thorough check before updating content
+        if (!blockInfo.isComplete && 
+            !completedCodeBlocks.value.has(codeBlockId) && 
+            currentContent !== blockInfo.lastContent && 
+            currentContent.trim().length > 0) {
           
-          // Update the tracked last content
-          blockInfo.lastContent = currentContent
+          // Avoid sending content that's a subset of what we've already sent
+          if (blockInfo.lastContent && currentContent.startsWith(blockInfo.lastContent)) {
+            // Check if there's actual new content beyond what we've sent
+            const newContentPart = currentContent.substring(blockInfo.lastContent.length)
+            if (!newContentPart.trim()) {
+              continue // Skip if there's no actual new content
+            }
+          }
+          
+          try {
+            // Add a guard in case the writer is in a bad state
+            const streamPair = codeBlockStreams.get(codeBlockId)
+            if (streamPair) {
+              const writer = streamPair.writable.getWriter()
+              writer.write(currentContent).catch(err => {
+                console.warn(`Error writing to stream for block ${codeBlockId}:`, err)
+                // If we encounter an error, mark the block as complete to avoid further attempts
+                markCodeBlockAsComplete(codeBlockId)
+              })
+              writer.releaseLock()
+              
+              // Update the tracked last content
+              blockInfo.lastContent = currentContent
+            }
+          } catch (error) {
+            console.warn(`Failed to update code block ${codeBlockId}:`, error)
+            // If we encounter an error, mark the block as complete
+            markCodeBlockAsComplete(codeBlockId)
+          }
         }
       }
     }
@@ -573,7 +777,7 @@ const streamMarkdownAnimation = async (mdContent: string) => {
     <ShadcnScrollArea class="h-full">
         <div 
             ref="previewElement"
-            class="overflow-auto max-w-none h-full prose dark:prose-invert"
+            class="overflow-auto p-4 max-w-none h-full prose dark:prose-invert"
             v-html="renderedContent">
         </div>
     </ShadcnScrollArea>

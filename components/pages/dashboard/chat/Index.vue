@@ -42,6 +42,7 @@ const {
   isLoading: chatResponseIsLoading,
   setMessages: setChatMessages,
   stop: stopChatGeneration,
+  status: chatStatus
   /* append: appendChatMessage, */
 } = useChat({
   id: String(selectedAiChat.value.id),
@@ -576,9 +577,34 @@ function appendContextToInput(context: string) {
 
     <div class="flex flex-col flex-grow pt-10 pb-6 max-w-full min-h-0">
       <ShadcnScrollArea ref="$scrollArea">
-        <KeepAlive>
+        <div class="flex flex-col p-4 space-y-4">
+          <template v-if="messagesWithStreaming.length === 0">
+            <div class="flex items-center justify-center h-[30vh] text-muted-foreground">
+              <p>Start a conversation with the AI</p>
+            </div>
+          </template>
+          
+          <template v-else>
+            <div 
+              v-for="message in messagesWithStreaming" 
+              :key="message.id"
+              class="flex pb-4"
+              :class="message.role === 'user' ? 'justify-end' : 'justify-start'"
+            >
+              <div class="max-w-[80%] rounded-lg p-3" :class="message.role === 'assistant' ? 'bg-secondary/20' : 'bg-primary/10'">
+                <DashboardChatMessageMarkdownPreview 
+                  v-if="message.role === 'assistant'"
+                  :markdown="message.content"
+                  :is-streaming="chatStatus === 'streaming'"
+                />
+                <p v-else>{{ message.content }}</p>
+              </div>
+            </div>
+          </template>
+        </div>
+        <!-- <KeepAlive>
           <DashboardChatMessages :key="chatMessagesKey" :messages="messagesWithStreaming" />
-        </KeepAlive>
+        </KeepAlive> -->
 
         <template v-if="isLoading">
           <MessagesSkeleton />
