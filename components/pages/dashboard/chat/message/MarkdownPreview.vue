@@ -6,7 +6,7 @@ import { h, createApp } from 'vue'
 const props = defineProps<{
   markdown?: string
   textStream?: ReadableStream<string>
-  isStreaming?: boolean // Controls whether to animate the static markdown rendering
+  isStreaming?: boolean
 }>()
 
 const emit = defineEmits(['ready'])
@@ -98,7 +98,6 @@ const segmentMarkdown = (mdContent: string | undefined) => {
     const line = lines[i]
     
     if (line.startsWith('```') && !inCodeBlock) {
-      // End text segment if needed
       if (currentTextSegment) {
         segments.push({
           type: 'text',
@@ -107,7 +106,6 @@ const segmentMarkdown = (mdContent: string | undefined) => {
         currentTextSegment = ''
       }
       
-      // Start code block
       inCodeBlock = true
       currentCodeBlock = {
         language: line.substring(3).trim() || 'text',
@@ -115,28 +113,23 @@ const segmentMarkdown = (mdContent: string | undefined) => {
       }
     } 
     else if (line.startsWith('```') && inCodeBlock) {
-      // End code block
       segments.push({
         type: 'code',
         language: currentCodeBlock.language,
         content: currentCodeBlock.content
       })
       
-      // Reset for next text segment
       inCodeBlock = false
       currentCodeBlock = { language: '', content: '' }
     }
     else if (inCodeBlock) {
-      // Add to code block
       currentCodeBlock.content += line + '\n'
     }
     else {
-      // Add to text segment
       currentTextSegment += line + '\n'
     }
   }
   
-  // Add final text segment if needed
   if (currentTextSegment) {
     segments.push({
       type: 'text',
@@ -144,7 +137,6 @@ const segmentMarkdown = (mdContent: string | undefined) => {
     })
   }
   
-  // If we ended with an open code block, add it
   if (inCodeBlock) {
     segments.push({
       type: 'code',
@@ -161,7 +153,6 @@ const customCodeBlockPlugin = (md: any) => {
     const token = tokens[idx]
     const language = token.info.trim() || 'text'
     
-    // Generate unique ID for the code block
     const blockId = env.codeBlocks && env.currentBlockIndex < env.codeBlocks.length 
       ? env.codeBlocks[env.currentBlockIndex++].id
       : `code-block-${codeBlockCounter.value++}`
@@ -194,35 +185,31 @@ onMounted(async () => {
       }
     }))
     
-    // Initial render
     if (props.markdown) {
       renderMarkdown(props.markdown)
     }
     
-    // Watch for content changes
     watch(() => props.markdown, (newContent) => {
-      if (isStreamingActive.value || !newContent) return
-      renderMarkdown(newContent)
+      if (!newContent) return
+      
+      if (props.isStreaming) {
+        streamMarkdownAnimation(newContent)
+      } else if (!isStreamingActive.value) {
+        renderMarkdown(newContent)
+      }
     })
 
-    // Watch for streaming trigger
     watch(() => props.isStreaming, (streaming) => {
       if (streaming && props.markdown) {
-        // Use timeout to ensure value change is detected even if toggled quickly
-        setTimeout(() => {
-          streamMarkdownAnimation(props.markdown as string)
-        }, 0)
+        streamMarkdownAnimation(props.markdown)
       }
     }, { immediate: true })
     
-    // Watch for text stream
     watch(() => props.textStream, (newStream) => {
       if (newStream) {
-        // Clear any existing content
         renderedContent.value = ''
         codeBlocksInPreview.value.clear()
         
-        // Start reading from the stream
         readFromStream(newStream)
       }
     }, { immediate: true })
@@ -237,23 +224,16 @@ onMounted(async () => {
   }
 })
 
-// Render markdown directly without streaming
 const renderMarkdown = (mdContent: string | undefined) => {
   if (!md || !mdContent) return
   
-  // Parse code blocks for custom rendering
   const codeBlocks = parseMarkdownForCodeBlocks(mdContent)
-  
-  // Setup rendering environment
   const env = { 
     codeBlocks,
     currentBlockIndex: 0
   }
   
-  // Reset counter for new rendering
   codeBlockCounter.value = 0
-  
-  // Render the markdown
   renderedContent.value = md.render(mdContent, env)
   
   // Handle code blocks after DOM is updated
@@ -289,15 +269,25 @@ const createCodeBlock = (placeholder: HTMLElement, blockId: string, language: st
   const safeLanguage = language || 'text'
   const safeContent = content || ''
   
+  // Store in our tracking map first so we can reference it later
+  codeBlocksInPreview.value.set(blockId, {
+    blockId,
+    placeholder,
+    content: safeContent,
+    language: safeLanguage,
+    isComplete: false
+  })
+  
   const vNode = h(CodeBlock, {
     language: safeLanguage,
     extension: safeLanguage,
-    title: `Code Block ${codeBlocksInPreview.value.size + 1}`, // Always use sequential numbering
+    title: `Code Block ${codeBlocksInPreview.value.size}`,
     content: safeContent,
     theme: selectedTheme.value,
     class: 'prose-code-block',
     textStream: stream,
     blockId,
+    streamingMode: !!stream,
     onStreamingComplete: (id: string) => {
       markCodeBlockAsComplete(id)
       console.log(`Code block ${id} completed streaming`)
@@ -319,30 +309,33 @@ const createCodeBlock = (placeholder: HTMLElement, blockId: string, language: st
   
   app.mount(container)
   
-  // Track for later updates
-  codeBlocksInPreview.value.set(blockId, {
-    blockId,
-    placeholder: container,
-    content: safeContent,
-    language: safeLanguage,
-    isComplete: false
-  })
+  // Update our reference with the mounted container
+  const existingData = codeBlocksInPreview.value.get(blockId)
+  if (existingData) {
+    existingData.placeholder = container
+    codeBlocksInPreview.value.set(blockId, existingData)
+  }
 
+  // Add observer to detect when content is fully rendered
+  addCodeBlockObserver(blockId, container)
+  
+  return container
+}
+
+const addCodeBlockObserver = (blockId: string, container: HTMLElement) => {
   // Capture the mounted element
-  const mountedElement = codeBlocksInPreview.value.get(blockId)?.placeholder
-  if (mountedElement) {
+  if (container) {
     // Add a MutationObserver to detect when the code block is actually rendered
     const observer = new MutationObserver((mutations) => {
       // Check if the CodeBlock's inner components are loaded
-      const codeComponent = mountedElement.querySelector('.shiki-stream')
+      const codeComponent = container.querySelector('.shiki-stream')
       if (codeComponent) {
         // Element is fully rendered, no need to observe anymore
         observer.disconnect()
         
         // Get the Vue component instance to check state - if possible
-        const vueElement = mountedElement.querySelector('[data-v-component]')
+        const vueElement = container.querySelector('[data-v-component]')
         if (vueElement) {
-          // Using any type to access Vue internal properties safely
           const vueComponent = vueElement as any
           if (vueComponent.__vueParentComponent?.exposed?.isStreamingComplete?.value === true) {
             markCodeBlockAsComplete(blockId)
@@ -351,15 +344,13 @@ const createCodeBlock = (placeholder: HTMLElement, blockId: string, language: st
       }
     })
     
-    // Start observing
-    observer.observe(mountedElement, { 
+    observer.observe(container, { 
       childList: true, 
       subtree: true 
     })
   }
 }
 
-// Read from a ReadableStream and render progressively
 const readFromStream = async (stream: ReadableStream<string>) => {
   if (!md || isStreamingActive.value) return
   
@@ -370,11 +361,10 @@ const readFromStream = async (stream: ReadableStream<string>) => {
   
   try {
     const reader = stream.getReader()
-    let accumulator = '' // Accumulated content for text
-    let codeBlockContents = new Map<string, string>() // Track code block contents separately
+    let accumulator = ''
+    let codeBlockContents = new Map<string, string>()
     let done = false
     
-    // Get fresh reference to container
     await nextTick()
     const container = previewElement.value
     if (!container) {
@@ -419,7 +409,6 @@ const readFromStream = async (stream: ReadableStream<string>) => {
       processingChunk = true
       
       try {
-        // Add new content to the accumulator
         accumulator = value
         
         // Pre-process the entire content to separate text and code blocks
@@ -457,7 +446,6 @@ const readFromStream = async (stream: ReadableStream<string>) => {
           }
         }
         
-        // Now render with stable content
         renderStableStreamContent(
           segments,
           container, 
@@ -558,37 +546,29 @@ const renderStableStreamContent = (
 ) => {
   if (!md) return
   
-  // Track the highest index we've seen
   let codeBlockCount = initialCodeBlockCount
-  
-  // Check existing code blocks for completion first
   renderedCodeBlocks.forEach((blockInfo, blockId) => {
     if (blockInfo.isComplete) {
       completedCodeBlocks.value.add(blockId)
     } else {
-      // Try to check the component state directly
       const element = blockInfo.element
       if (element) {
         const shikiElement = element.querySelector('.shiki-stream')
-        if (shikiElement && !shikiElement.textContent?.includes('...')) {
-          // If content is complete without loading indicators, mark as complete
+        if (shikiElement) {
           markCodeBlockAsComplete(blockId)
         }
       }
     }
   })
   
-  // Process each segment in order
   for (let i = 0; i < segments.length; i++) {
     const segment = segments[i]
     const segmentId = `segment-${i}`
     
     if (segment.type === 'text') {
-      // Handle text segments
       let textContainer = renderedSegments.get(segmentId)
       
       if (!textContainer) {
-        // Create new container for this text segment
         textContainer = document.createElement('div')
         textContainer.dataset.segmentId = segmentId
         textContainer.className = 'md-text-segment'
@@ -596,66 +576,63 @@ const renderStableStreamContent = (
         renderedSegments.set(segmentId, textContainer)
       }
       
-      // Update text content
       const renderedHtml = md.render(segment.content || '')
       textContainer.innerHTML = renderedHtml
     } 
     else if (segment.type === 'code') {
-      // Handle code blocks
       const codeBlockId = `stream-block-${i}`
       
-      // Skip if this code block is already complete
       if (completedCodeBlocks.value.has(codeBlockId)) {
         continue
       }
       
-      // Get the current content for this block
       const currentContent = codeBlockContents.get(codeBlockId) || ''
       
-      // Create code block immediately if it doesn't exist yet
+      // console.log(`Block ${codeBlockId} - Current content length: ${currentContent.length}`)
+      
       if (!renderedCodeBlocks.has(codeBlockId)) {
-        // Create a new placeholder for the code block
         const placeholder = document.createElement('div')
         placeholder.setAttribute('data-code-block-id', codeBlockId)
         placeholder.setAttribute('data-language', segment.language || 'text')
         container.appendChild(placeholder)
         
-        // Create fresh stream for this code block to ensure immediate rendering
         const { readable, writable } = new TransformStream<string, string>()
         codeBlockStreams.set(codeBlockId, { readable, writable })
         
         const contentStream = readable
         
-        // Create the code block component even with empty content to make it visible
-        createCodeBlock(
+        codeBlockContents.set(codeBlockId, currentContent)
+        const elementContainer = createCodeBlock(
           placeholder,
           codeBlockId,
           segment.language,
-          '', // Start with empty content
+          currentContent,
           contentStream 
         )
         
-        // Store for future reference with index and last content
         renderedCodeBlocks.set(codeBlockId, {
-          element: codeBlocksInPreview.value.get(codeBlockId)?.placeholder as HTMLElement,
+          element: elementContainer,
           language: segment.language || 'text',
           index: codeBlockCount + 1,
           contentStream,
-          lastContent: '',
+          lastContent: currentContent,
           isComplete: false
         })
         
         codeBlockCount++
         
-        // Immediately send initial content to make it visible
+        // Send initial content through the stream
         if (currentContent) {
-          const writer = writable.getWriter()
-          writer.write(currentContent)
-          writer.releaseLock()
+          try {
+            const writer = writable.getWriter()
+            writer.write(currentContent)
+            writer.releaseLock()
+          } catch (error) {
+            console.warn(`Failed to write initial content for block ${codeBlockId}:`, error)
+          }
         }
       } 
       else {
-        // Block exists, check if it was completed during this update cycle
         if (completedBlocksSnapshot && completedBlocksSnapshot.has(codeBlockId)) {
           continue
         }
@@ -663,39 +640,59 @@ const renderStableStreamContent = (
         // Only update existing blocks if they're not complete and content changed
         const blockInfo = renderedCodeBlocks.get(codeBlockId)!
         
-        // Apply a more thorough check before updating content
         if (!blockInfo.isComplete && 
             !completedCodeBlocks.value.has(codeBlockId) && 
             currentContent !== blockInfo.lastContent && 
             currentContent.trim().length > 0) {
           
-          // Avoid sending content that's a subset of what we've already sent
+          // Skip if there's no actual new content
           if (blockInfo.lastContent && currentContent.startsWith(blockInfo.lastContent)) {
-            // Check if there's actual new content beyond what we've sent
             const newContentPart = currentContent.substring(blockInfo.lastContent.length)
             if (!newContentPart.trim()) {
-              continue // Skip if there's no actual new content
+              continue
             }
           }
           
           try {
-            // Add a guard in case the writer is in a bad state
+            // Update our tracking map
+            const existingBlockData = codeBlocksInPreview.value.get(codeBlockId)
+            if (existingBlockData) {
+              existingBlockData.content = currentContent
+              codeBlocksInPreview.value.set(codeBlockId, existingBlockData)
+            }
+            
+            // Then update the stream
             const streamPair = codeBlockStreams.get(codeBlockId)
             if (streamPair) {
               const writer = streamPair.writable.getWriter()
               writer.write(currentContent).catch(err => {
                 console.warn(`Error writing to stream for block ${codeBlockId}:`, err)
-                // If we encounter an error, mark the block as complete to avoid further attempts
                 markCodeBlockAsComplete(codeBlockId)
               })
               writer.releaseLock()
               
               // Update the tracked last content
               blockInfo.lastContent = currentContent
+              
+              // Find any component instances and update them directly too
+              const codeBlockElement = blockInfo.element
+              if (codeBlockElement) {
+                // Try to access Exposed API
+                const vueInstance = (codeBlockElement as any).__vue_app__?.component?.exposed
+                if (vueInstance && typeof vueInstance.appendContent === 'function') {
+                  vueInstance.appendContent(currentContent)
+                }
+                
+                // Fallback method to update the rendered content through our map
+                const codeBlockData = codeBlocksInPreview.value.get(codeBlockId)
+                if (codeBlockData) {
+                  codeBlockData.content = currentContent
+                  codeBlocksInPreview.value.set(codeBlockId, codeBlockData)
+                }
+              }
             }
           } catch (error) {
             console.warn(`Failed to update code block ${codeBlockId}:`, error)
-            // If we encounter an error, mark the block as complete
             markCodeBlockAsComplete(codeBlockId)
           }
         }
@@ -704,94 +701,20 @@ const renderStableStreamContent = (
   }
 }
 
-// Simulate streaming with animation
 const streamMarkdownAnimation = async (mdContent: string) => {
   if (!md || isStreamingActive.value || !mdContent) return
   
-  isStreamingActive.value = true
-  renderedContent.value = ''
-  codeBlocksInPreview.value.clear()
-  
   try {
-    await nextTick()
-    const container = previewElement.value
-    if (!container) {
-      console.error('Preview container not found')
-      isStreamingActive.value = false
-      return
-    }
-    
-    container.innerHTML = ''
-    
-    // Break markdown into segments
-    const segments = segmentMarkdown(mdContent)
-    const createdContainers = new Map<string, HTMLElement>()
-    let codeBlockIndex = 0
-    
-    // First create all containers to avoid flicker
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i]
-      const segmentId = `segment-${i}`
-      
-      if (segment.type === 'text') {
-        // Create empty containers for text
-        const element = document.createElement('div')
-        element.id = segmentId
-        container.appendChild(element)
-        createdContainers.set(segmentId, element)
-      } else if (segment.type === 'code') {
-        // Create placeholder for code block
-        const blockId = `animation-block-${codeBlockIndex}`
-        const placeholder = document.createElement('div')
-        placeholder.setAttribute('data-code-block-id', blockId)
-        placeholder.setAttribute('data-language', segment.language || 'text')
-        container.appendChild(placeholder)
-        
-        // Create code block with FULL content immediately
-        // This fixes the issue with only first line showing
-        createCodeBlock(
-          placeholder, 
-          blockId, 
-          segment.language, 
-          segment.content // Use full content right away
-        )
-        
-        const codeSegmentId = `code-${blockId}-${i}`
-        createdContainers.set(codeSegmentId, placeholder)
-        codeBlockIndex++
+    const textStream = new ReadableStream<string>({
+      start(controller) {
+        controller.enqueue(mdContent)
+        controller.close()
       }
-    }
+    })
     
-    // Then animate filling in the text content only
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i]
-      const segmentId = `segment-${i}`
-      
-      if (segment.type === 'text') {
-        const container = createdContainers.get(segmentId)!
-        if (!container) continue
-        
-        // Get rendered HTML
-        const renderedText = md.render(segment.content || '')
-        const tempElement = document.createElement('div')
-        tempElement.innerHTML = renderedText
-        
-        // Get text content to animate
-        const elements = Array.from(tempElement.children)
-        
-        // Append all elements
-        for (const element of elements) {
-          container.appendChild(element)
-          await new Promise(resolve => setTimeout(resolve, 30))
-        }
-      }
-      // Skip code animation since we're showing full content immediately
-    }
-    
-    emit('ready')
+    readFromStream(textStream)
   } catch (error) {
-    console.error('Error animating markdown:', error)
-  } finally {
+    console.error('Error creating streaming animation:', error)
     isStreamingActive.value = false
   }
 }

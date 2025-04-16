@@ -364,7 +364,7 @@ const cycleTheme = () => {
 }
 
 const langColor = computed(() => {
-  const langKey = props.language.toLowerCase() as keyof typeof languageColors
+  const langKey = props.extension.toLowerCase() as keyof typeof languageColors
   return languageColors[langKey] || '#ccc'
 })
 </script>
@@ -437,8 +437,8 @@ const langColor = computed(() => {
         </div>
       </div>
 
-      <ShadcnScrollArea>
-        <ShikiStreamRenderer :stream="tokensStream" class="p-4 font-mono text-sm" :class="[
+      <ShadcnScrollArea class="p-4">
+        <ShikiStreamRenderer :stream="tokensStream" class="font-mono text-sm" :class="[
           isWrapped ? 'whitespace-pre-wrap' : 'whitespace-pre',
           isExpanded ? 'max-h-fit' : 'max-h-[25vh]'
         ]" />

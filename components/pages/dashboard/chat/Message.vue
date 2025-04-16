@@ -72,7 +72,9 @@ const handleMarkdownReady = () => {
   @apply bg-primary/10;
   margin: 0.25rem 0;
 }
+</style>
 
+<!-- 
 :deep(div :is(*:last-child)) {
   margin-bottom: 0;
   padding-bottom: 0;
@@ -82,4 +84,4 @@ const handleMarkdownReady = () => {
   margin-top: 0;
   padding-top: 0;
 }
-</style>
+-->
