@@ -344,7 +344,7 @@ export default defineNuxtConfig({
       },
     },
     optimizeDeps: {
-      exclude: ['@shikijs/markdown-it', 'shiki', 'markdown-it'],
+      exclude: ['markdown-it', '@shikijs/markdown-it', 'shiki', 'shiki-stream', 'shiki-stream/vue'],
     },
     assetsInclude: ['**/*.wasm'],
     worker: {
