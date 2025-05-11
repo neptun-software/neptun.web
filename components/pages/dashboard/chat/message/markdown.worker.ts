@@ -1,10 +1,10 @@
-import MarkdownIt from 'markdown-it'
 import Shiki from '@shikijs/markdown-it'
+import MarkdownIt from 'markdown-it'
 
 const md = new MarkdownIt({
   html: true,
   linkify: true,
-  typographer: true
+  typographer: true,
 })
 
 function customCodeBlockPlugin(md: MarkdownIt) {
@@ -27,25 +27,25 @@ Shiki({
     light: 'github-light',
     dark: 'github-dark',
   },
-}).then(shiki => {
+}).then((shiki) => {
   md.use(shiki)
   self.postMessage({ action: 'ready' })
 })
 
 self.onmessage = (event) => {
   const { markdown, isDarkMode } = event.data
-  
+
   try {
     const html = md.render(markdown || '')
-    
+
     self.postMessage({
       html,
-      success: true
+      success: true,
     })
   } catch (error) {
     self.postMessage({
       error: String(error),
-      success: false
+      success: false,
     })
   }
 }

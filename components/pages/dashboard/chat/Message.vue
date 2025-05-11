@@ -19,7 +19,7 @@ function handleMarkdownReady() {
 watch(() => props.message.isStreaming, (isStreaming) => {
   if (isStreaming) {
     let content = props.message.content || ''
-    
+
     textStream.value = new ReadableStream<string>({
       start(controller: ReadableStreamDefaultController<string>) {
         if (content) {
@@ -33,11 +33,11 @@ watch(() => props.message.isStreaming, (isStreaming) => {
           content = newContent
           controller.enqueue(diff)
         }
-        
+
         if (!props.message.isStreaming) {
           controller.close()
         }
-      }
+      },
     })
   } else {
     textStream.value = undefined

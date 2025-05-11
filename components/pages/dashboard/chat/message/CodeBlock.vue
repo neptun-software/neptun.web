@@ -72,12 +72,16 @@ const isStreaming = ref(false)
 const contentBuffer = ref('')
 
 async function applyThemeInstantly() {
-  if (isThemeChanging.value) return
-  
+  if (isThemeChanging.value) {
+    return
+  }
+
   try {
     const content = storedContent.value
-    if (!content) return
-    
+    if (!content) {
+      return
+    }
+
     tokensStream.value = createTokenStream(content)
   } catch (error) {
     console.error('Error applying theme instantly:', error)
@@ -85,28 +89,34 @@ async function applyThemeInstantly() {
 }
 
 function appendContent(newContent: string) {
-  if (!props.streamingMode) return
-  
+  if (!props.streamingMode) {
+    return
+  }
+
   contentBuffer.value = newContent
   storedContent.value = newContent
-  
+
   if (highlighter.value && !isStreaming.value) {
     refreshStream()
   }
 }
 
 function refreshStream() {
-  if (!highlighter.value || isStreamingComplete.value) return
-  
+  if (!highlighter.value || isStreamingComplete.value) {
+    return
+  }
+
   const contentToUse = props.streamingMode ? contentBuffer.value : props.content
-  if (!contentToUse.trim()) return
-  
+  if (!contentToUse.trim()) {
+    return
+  }
+
   resetStream()
   isStreaming.value = true
-  
+
   try {
     const textStream = createContentStream(contentToUse)
-    
+
     tokensStream.value = textStream.pipeThrough(
       new CodeToTokenTransformStream({
         highlighter: highlighter.value,
@@ -124,17 +134,17 @@ function refreshStream() {
 onMounted(async () => {
   try {
     highlighter.value = await getHighlighter()
-    
+
     if (props.textStream) {
       startStreamingFromInput(props.textStream)
     } else {
       const initialContent = props.streamingMode ? contentBuffer.value : props.content
       storedContent.value = initialContent
-      
+
       if (props.streamingMode) {
         contentBuffer.value = props.content
       }
-      
+
       if (initialContent) {
         startStreaming()
       }
@@ -145,8 +155,10 @@ onMounted(async () => {
 })
 
 watch(() => props.content, (newContent) => {
-  if (props.streamingMode) return
-  
+  if (props.streamingMode) {
+    return
+  }
+
   storedContent.value = newContent
   if (tokensStream.value) {
     resetStream()
@@ -178,16 +190,18 @@ watch(isStreaming, (newValue) => {
 })
 
 async function startStreamingFromInput(stream: ReadableStream<string>) {
-  if (!highlighter.value || isStreamingComplete.value) return
-  
+  if (!highlighter.value || isStreamingComplete.value) {
+    return
+  }
+
   isStreaming.value = true
   isStreamingComplete.value = false
   finalRenderStarted.value = false
-  
+
   try {
     const transformStream = new TransformStream<string, string>()
     const writer = transformStream.writable.getWriter()
-    
+
     tokensStream.value = transformStream.readable.pipeThrough(
       new CodeToTokenTransformStream({
         highlighter: highlighter.value,
@@ -196,24 +210,26 @@ async function startStreamingFromInput(stream: ReadableStream<string>) {
         allowRecalls: true,
       }),
     )
-    
+
     const reader = stream.getReader()
     let lastContentLength = 0
     let shortUpdateCount = 0
     let shortUpdateTimer: ReturnType<typeof setTimeout> | null = null
-    
+
     const finalizeStream = async () => {
-      if (finalRenderStarted.value) return
-      
+      if (finalRenderStarted.value) {
+        return
+      }
+
       finalRenderStarted.value = true
-      
+
       try {
         const finalContent = storedContent.value.trim()
         if (finalContent) {
           writer.write(finalContent)
           renderedContent.value = finalContent
         }
-        
+
         await writer.close()
       } catch (err) {
         console.error('Error finalizing stream:', err)
@@ -226,56 +242,60 @@ async function startStreamingFromInput(stream: ReadableStream<string>) {
         isStreamingComplete.value = true
         isStreamLocked.value = true
         isStreaming.value = false
-        
+
         if (props.blockId) {
           emit('streaming-complete', props.blockId)
           emit('update:isComplete', true)
         }
       }
     }
-    
+
     const writeToStream = (content: string) => {
-      if (finalRenderStarted.value) return
-      
+      if (finalRenderStarted.value) {
+        return
+      }
+
       try {
         writer.write(content)
         renderedContent.value = content
         storedContent.value = content
-        
+
         shortUpdateCount = 0
       } catch (err) {
         console.error('Error writing to token stream:', err)
         finalizeStream()
       }
     }
-    
+
     while (true) {
       const { value, done } = await reader.read()
-      
+
       if (done) {
         if (shortUpdateTimer) {
           clearTimeout(shortUpdateTimer)
           shortUpdateTimer = null
         }
-        
+
         await finalizeStream()
         break
       }
-      
-      if (!value || isStreamLocked.value || finalRenderStarted.value) continue
-      
+
+      if (!value || isStreamLocked.value || finalRenderStarted.value) {
+        continue
+      }
+
       storedContent.value = value
-      
+
       const contentSizeDiff = value.length - lastContentLength
       const hasSignificantNewContent = contentSizeDiff > 10 || lastContentLength === 0
       const isSmallContent = value.length < 100
-      
+
       if (hasSignificantNewContent || isSmallContent) {
         writeToStream(value)
         lastContentLength = value.length
       } else if (contentSizeDiff > 0) {
         shortUpdateCount++
-        
+
         if (shortUpdateCount >= 3) {
           writeToStream(value)
           lastContentLength = value.length
@@ -290,7 +310,7 @@ async function startStreamingFromInput(stream: ReadableStream<string>) {
         }
       }
     }
-    
+
     reader.releaseLock()
   } catch (error) {
     console.error('Error in streaming:', error)
@@ -308,17 +328,17 @@ function createContentStream(content: string): ReadableStream<string> {
       },
     })
   }
-  
+
   return new ReadableStream({
     start(controller) {
       controller.enqueue(content)
       controller.close()
-      
+
       storedContent.value = content
       isStreamLocked.value = true
       isStreamingComplete.value = true
       isStreaming.value = false
-      
+
       if (props.streamingMode && props.blockId) {
         emit('streaming-complete', props.blockId)
         emit('update:isComplete', true)
@@ -328,7 +348,9 @@ function createContentStream(content: string): ReadableStream<string> {
 }
 
 function startStreaming() {
-  if (!highlighter.value) return
+  if (!highlighter.value) {
+    return
+  }
   isStreamingComplete.value = false
   refreshStream()
 }
@@ -341,12 +363,14 @@ function resetStream() {
 }
 
 function cycleTheme() {
-  if (isThemeChanging.value) return
-  
+  if (isThemeChanging.value) {
+    return
+  }
+
   const currentIndex = themeOptions.findIndex(option => option.value === theme.value?.value)
   const nextIndex = (currentIndex + 1) % themeOptions.length
   theme.value = themeOptions[nextIndex]
-  
+
   shouldUpdateTheme.value = true
   applyThemeInstantly()
 }

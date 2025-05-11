@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useTheme } from '@/composables/useTheme'
-import { createApp, h } from 'vue'
+import { createApp, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+
 import CodeBlock from './CodeBlock.vue'
 
 const props = defineProps<{
@@ -22,7 +22,7 @@ const { isDarkMode, selectedTheme } = useTheme()
 
 function initWorker() {
   markdownWorker = new Worker(new URL('./markdown.worker.ts', import.meta.url), { type: 'module' })
-  
+
   markdownWorker.onmessage = (event) => {
     if (event.data.action === 'ready') {
       workerReady = true
@@ -34,15 +34,15 @@ function initWorker() {
     }
 
     const { html, success, error } = event.data
-    
+
     if (!success) {
       console.error('Worker error:', error)
       emit('ready')
       return
     }
-    
+
     renderedContent.value = html
-    
+
     // process code blocks after HTML is rendered
     nextTick(() => {
       replaceCodeBlockPlaceholders()
@@ -51,22 +51,26 @@ function initWorker() {
 }
 
 function renderMarkdown(markdown: string | undefined) {
-  if (!markdown) return
-  
+  if (!markdown) {
+    return
+  }
+
   rawContent.value = markdown
-  if (!markdownWorker || !workerReady) return
-  
+  if (!markdownWorker || !workerReady) {
+    return
+  }
+
   // for streaming, don't debounce initial content
   const delay = props.textStream ? (renderedContent.value ? 50 : 0) : 100
-  
+
   if (renderTimeout) {
     clearTimeout(renderTimeout)
   }
-  
+
   renderTimeout = window.setTimeout(() => {
-    markdownWorker?.postMessage({ 
+    markdownWorker?.postMessage({
       markdown,
-      isDarkMode: isDarkMode.value
+      isDarkMode: isDarkMode.value,
     })
   }, delay)
 }
@@ -76,25 +80,25 @@ function replaceCodeBlockPlaceholders() {
     emit('ready')
     return
   }
-  
+
   const placeholders = previewElement.value.querySelectorAll('.code-block-placeholder')
-  
+
   if (placeholders.length === 0) {
     emit('ready')
     return
   }
-  
+
   placeholders.forEach((placeholder) => {
     const language = placeholder.getAttribute('data-language') || 'text'
-    const content = placeholder.getAttribute('data-content') 
+    const content = placeholder.getAttribute('data-content')
       ? decodeURIComponent(placeholder.getAttribute('data-content') || '')
       : ''
-    
+
     const blockId = `code-block-${codeBlockCounter++}`
-    
+
     const container = document.createElement('div')
     placeholder.replaceWith(container)
-    
+
     const app = createApp({
       render: () => h(CodeBlock, {
         language,
@@ -105,22 +109,24 @@ function replaceCodeBlockPlaceholders() {
         blockId,
       }),
     })
-    
+
     app.mount(container)
   })
-  
+
   emit('ready')
 }
 
 async function handleStream(stream: ReadableStream<string>) {
   const reader = stream.getReader()
   let buffer = ''
-  
+
   try {
     while (true) {
       const { value, done } = await reader.read()
-      if (done) break
-      
+      if (done) {
+        break
+      }
+
       buffer += value
       renderMarkdown(buffer)
     }
@@ -134,19 +140,19 @@ async function handleStream(stream: ReadableStream<string>) {
 
 onMounted(() => {
   initWorker()
-  
+
   if (props.textStream) {
     handleStream(props.textStream)
   } else if (props.markdown) {
     renderMarkdown(props.markdown)
   }
-  
+
   watch(() => props.markdown, (newContent) => {
     if (newContent && !props.textStream) {
       renderMarkdown(newContent)
     }
   })
-  
+
   watch(() => props.textStream, (newStream) => {
     if (newStream) {
       renderedContent.value = ''
@@ -154,7 +160,7 @@ onMounted(() => {
       handleStream(newStream)
     }
   })
-  
+
   watch(() => isDarkMode.value, () => {
     const content = renderedContent.value || rawContent.value
     if (content) {
@@ -167,7 +173,7 @@ onBeforeUnmount(() => {
   if (markdownWorker) {
     markdownWorker.terminate()
   }
-  
+
   if (renderTimeout) {
     clearTimeout(renderTimeout)
   }
@@ -181,7 +187,7 @@ onBeforeUnmount(() => {
       {{ rawContent }}
     </div>
     <!-- Show rendered content once available -->
-    <div v-else v-html="renderedContent"></div>
+    <div v-else v-html="renderedContent" />
   </div>
 </template>
 
