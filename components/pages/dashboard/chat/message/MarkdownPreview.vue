@@ -21,42 +21,64 @@ let workerReady = false
 const { isDarkMode, selectedTheme } = useTheme()
 
 function initWorker() {
-  markdownWorker = new Worker(new URL('./markdown.worker.ts', import.meta.url), { type: 'module' })
-
-  markdownWorker.onmessage = (event) => {
-    if (event.data.action === 'ready') {
-      workerReady = true
-      // re-render any content we received while waiting
-      if (rawContent.value) {
-        renderMarkdown(rawContent.value)
-      }
-      return
-    }
-
-    const { html, success, error } = event.data
-
-    if (!success) {
+  console.log('Initializing markdown worker...')
+  try {
+    markdownWorker = new Worker(new URL('./markdown.worker.ts', import.meta.url), { type: 'module' })
+    
+    markdownWorker.onerror = (error) => {
       console.error('Worker error:', error)
-      emit('ready')
-      return
     }
 
-    renderedContent.value = html
+    markdownWorker.onmessage = (event) => {
+      console.log('Received message from worker:', event.data)
+      if (event.data.action === 'ready') {
+        console.log('Worker is ready')
+        workerReady = true
+        // re-render any content we received while waiting
+        if (rawContent.value) {
+          console.log('Rendering markdown that was waiting')
+          renderMarkdown(rawContent.value)
+        }
+        return
+      }
 
-    // process code blocks after HTML is rendered
-    nextTick(() => {
-      replaceCodeBlockPlaceholders()
-    })
+      const { html, success, error } = event.data
+
+      if (!success) {
+        console.error('Worker error:', error)
+        emit('ready')
+        return
+      }
+
+      console.log('Setting rendered content')
+      renderedContent.value = html
+
+      // process code blocks after HTML is rendered
+      nextTick(() => {
+        replaceCodeBlockPlaceholders()
+      })
+    }
+  } catch (err) {
+    console.error('Error initializing worker:', err)
   }
 }
 
 function renderMarkdown(markdown: string | undefined) {
   if (!markdown) {
+    console.log('No markdown to render')
     return
   }
 
+  console.log('Setting raw content', markdown.substring(0, 50) + '...')
   rawContent.value = markdown
-  if (!markdownWorker || !workerReady) {
+  
+  if (!markdownWorker) {
+    console.log('Worker not initialized')
+    return
+  }
+  
+  if (!workerReady) {
+    console.log('Worker not ready yet')
     return
   }
 
@@ -67,7 +89,9 @@ function renderMarkdown(markdown: string | undefined) {
     clearTimeout(renderTimeout)
   }
 
+  console.log('Scheduling markdown render with delay:', delay)
   renderTimeout = window.setTimeout(() => {
+    console.log('Sending markdown to worker')
     markdownWorker?.postMessage({
       markdown,
       isDarkMode: isDarkMode.value,
