@@ -330,6 +330,7 @@ export default defineNuxtConfig({
       NODE_ENV !== 'development'
         ? [
           wasm(),
+          topLevelAwait(),
           removeConsole(),
         ]
         : [
