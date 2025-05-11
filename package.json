@@ -86,6 +86,7 @@
     "nuxt-posthog": "^1.6.1",
     "nuxt-security": "^2.1.5",
     "nuxt-time": "^1.0.3",
+    "nuxt-workers": "0.1.0",
     "octokit": "^4.1.1",
     "ollama-ai-provider": "^1.2.0",
     "open-graph-scraper": "^6.5.0",

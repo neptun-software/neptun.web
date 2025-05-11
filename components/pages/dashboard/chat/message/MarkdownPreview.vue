@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useTheme } from '@/composables/useTheme'
+import { checkReady, renderMarkdown } from '#imports'
 import { createApp, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import CodeBlock from './CodeBlock.vue'
@@ -13,74 +14,49 @@ const emit = defineEmits(['ready'])
 const renderedContent = ref('')
 const rawContent = ref('') // show raw content while worker initializes
 const previewElement = ref<HTMLElement | null>(null)
-let markdownWorker: Worker | null = null
 let renderTimeout: number | null = null
 let codeBlockCounter = 0 // counter for unique code block IDs
-let workerReady = false
+const workerReady = ref(false)
+const pendingContent = ref('')
 
 const { isDarkMode, selectedTheme } = useTheme()
 
-function initWorker() {
+initWorker()
+
+async function initWorker() {
   console.log('Initializing markdown worker...')
   try {
-    markdownWorker = import.meta.env.DEV
-      ? new Worker(new URL('./markdown.worker.ts', import.meta.url), { type: 'module' })
-      : new Worker(new URL('./markdown.worker.ts', import.meta.url), { type: 'classic' })
-
-    markdownWorker.onerror = (error) => {
-      console.error('Worker error:', error)
-    }
-
-    markdownWorker.onmessage = (event) => {
-      console.log('Received message from worker:', event.data)
-      if (event.data.action === 'ready') {
-        console.log('Worker is ready')
-        workerReady = true
-        // re-render any content we received while waiting
-        if (rawContent.value) {
-          console.log('Rendering markdown that was waiting')
-          renderMarkdown(rawContent.value)
-        }
-        return
-      }
-
-      const { html, success, error } = event.data
-
-      if (!success) {
-        console.error('Worker error:', error)
-        emit('ready')
-        return
-      }
-
-      console.log('Setting rendered content')
-      renderedContent.value = html
-
-      // process code blocks after HTML is rendered
-      nextTick(() => {
-        replaceCodeBlockPlaceholders()
-      })
+    const response = await checkReady()
+    console.log('Worker initialized successfully:', response)
+    workerReady.value = true
+      
+    if (pendingContent.value) {
+      console.log('Processing pending content after worker initialization')
+      processMarkdown(pendingContent.value)
+      pendingContent.value = ''
     }
   } catch (err) {
     console.error('Error initializing worker:', err)
+    if (pendingContent.value) {
+      rawContent.value = pendingContent.value
+      emit('ready')
+    }
   }
 }
 
-function renderMarkdown(markdown: string | undefined) {
+async function processMarkdown(markdown: string | undefined) {
   if (!markdown) {
     console.log('No markdown to render')
     return
   }
 
-  console.log('Setting raw content', `${markdown.substring(0, 50)}...`)
-  rawContent.value = markdown
-
-  if (!markdownWorker) {
-    console.log('Worker not initialized')
-    return
-  }
-
-  if (!workerReady) {
-    console.log('Worker not ready yet')
+  console.log('Processing markdown content:', `${markdown.substring(0, 50)}...`)
+    
+  pendingContent.value = markdown
+    
+  if (!workerReady.value) {
+    console.log('Worker not ready yet - content will be processed when worker is ready')
+    rawContent.value = markdown
     return
   }
 
@@ -92,12 +68,33 @@ function renderMarkdown(markdown: string | undefined) {
   }
 
   console.log('Scheduling markdown render with delay:', delay)
-  renderTimeout = window.setTimeout(() => {
-    console.log('Sending markdown to worker')
-    markdownWorker?.postMessage({
-      markdown,
-      isDarkMode: isDarkMode.value,
-    })
+  renderTimeout = window.setTimeout(async () => {
+    console.log('Rendering markdown with worker')
+    try {
+      // Note: nuxt-workers makes functions return promises even if they're synchronous in the worker
+      const result = await renderMarkdown(markdown, isDarkMode.value)
+      console.log('Worker result:', result)
+      
+      if (!result.success) {
+        console.error('Worker error:', result.error)
+        rawContent.value = markdown
+        emit('ready')
+        return
+      }
+
+      console.log('Setting rendered content')
+      renderedContent.value = result.html
+      rawContent.value = ''
+  
+      // process code blocks after HTML is rendered
+      nextTick(() => {
+        replaceCodeBlockPlaceholders()
+      })
+    } catch (error) {
+      console.error('Error rendering markdown:', error)
+      rawContent.value = markdown
+      emit('ready')
+    }
   }, delay)
 }
 
@@ -154,7 +151,7 @@ async function handleStream(stream: ReadableStream<string>) {
       }
 
       buffer += value
-      renderMarkdown(buffer)
+      processMarkdown(buffer)
     }
   } catch (error) {
     console.error('Error reading stream:', error)
@@ -165,17 +162,15 @@ async function handleStream(stream: ReadableStream<string>) {
 }
 
 onMounted(() => {
-  initWorker()
-
   if (props.textStream) {
     handleStream(props.textStream)
   } else if (props.markdown) {
-    renderMarkdown(props.markdown)
+    processMarkdown(props.markdown)
   }
 
   watch(() => props.markdown, (newContent) => {
     if (newContent && !props.textStream) {
-      renderMarkdown(newContent)
+      processMarkdown(newContent)
     }
   })
 
@@ -188,18 +183,14 @@ onMounted(() => {
   })
 
   watch(() => isDarkMode.value, () => {
-    const content = renderedContent.value || rawContent.value
+    const content = pendingContent.value || renderedContent.value || rawContent.value
     if (content) {
-      renderMarkdown(content)
+      processMarkdown(content)
     }
   })
 })
 
 onBeforeUnmount(() => {
-  if (markdownWorker) {
-    markdownWorker.terminate()
-  }
-
   if (renderTimeout) {
     clearTimeout(renderTimeout)
   }

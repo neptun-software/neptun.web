@@ -53,6 +53,7 @@ export default defineNuxtConfig({
     '@nuxtjs/device',
     '@uploadthing/nuxt',
     'vue-sonner/nuxt',
+    'nuxt-workers',
   ],
 
   components: [
@@ -329,8 +330,6 @@ export default defineNuxtConfig({
     plugins:
       NODE_ENV !== 'development'
         ? [
-          wasm(),
-          topLevelAwait(),
           removeConsole(),
         ]
         : [
@@ -344,7 +343,7 @@ export default defineNuxtConfig({
         },
       },
     },
-    /* optimizeDeps: {
+    optimizeDeps: {
       exclude: [
         '@shikijs/markdown-it',
         'shiki',
@@ -354,10 +353,10 @@ export default defineNuxtConfig({
         '@shikijs/core',
         '@shikijs/transformers',
       ],
-    }, */
-    // assetsInclude: ['**/*.wasm'],
+    },
+    assetsInclude: ['**/*.wasm'],
     worker: {
-      format: 'es'
+      format: 'es',
     },
   },
 
