@@ -329,7 +329,9 @@ export default defineNuxtConfig({
     plugins:
       NODE_ENV !== 'development'
         ? [
-          /* removeConsole(), */
+          wasm(),
+          topLevelAwait(),
+          removeConsole(),
         ]
         : [
           wasm(),
@@ -342,7 +344,7 @@ export default defineNuxtConfig({
         },
       },
     },
-    optimizeDeps: {
+    /* optimizeDeps: {
       exclude: [
         '@shikijs/markdown-it',
         'shiki',
@@ -352,8 +354,8 @@ export default defineNuxtConfig({
         '@shikijs/core',
         '@shikijs/transformers',
       ],
-    },
-    assetsInclude: ['**/*.wasm'],
+    }, */
+    // assetsInclude: ['**/*.wasm'],
     worker: {
       format: 'es'
     },
