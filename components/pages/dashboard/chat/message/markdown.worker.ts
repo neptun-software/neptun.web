@@ -31,23 +31,29 @@ const timeoutId = setTimeout(() => {
   self.postMessage({ action: 'ready' })
 }, 3000)
 
-Shiki({
-  themes: {
-    light: 'github-light',
-    dark: 'github-dark',
-  },
-}).then((shiki) => {
-  clearTimeout(timeoutId)
-  console.log('Shiki loaded, initializing...')
-  md.use(shiki)
-  console.log('Sending ready message...')
-  self.postMessage({ action: 'ready' })
-}).catch(error => {
-  clearTimeout(timeoutId)
-  console.error('Error loading Shiki:', error)
-  // send ready anyway so we can at least render without syntax highlighting
-  self.postMessage({ action: 'ready' })
-})
+// use immediately invoked async function instead of top-level await
+;(async () => {
+  try {
+    console.log('Loading Shiki...')
+    const shiki = await Shiki({
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark',
+      },
+    })
+
+    clearTimeout(timeoutId)
+    console.log('Shiki loaded, initializing...')
+    md.use(shiki)
+    console.log('Sending ready message...')
+    self.postMessage({ action: 'ready' })
+  } catch (error) {
+    clearTimeout(timeoutId)
+    console.error('Error loading Shiki:', error)
+    // send ready anyway so we can at least render without syntax highlighting
+    self.postMessage({ action: 'ready' })
+  }
+})()
 
 self.onmessage = (event) => {
   console.log('Worker received message:', event.data)

@@ -23,8 +23,10 @@ const { isDarkMode, selectedTheme } = useTheme()
 function initWorker() {
   console.log('Initializing markdown worker...')
   try {
-    markdownWorker = new Worker(new URL('./markdown.worker.ts', import.meta.url), { type: 'module' })
-    
+    markdownWorker = import.meta.env.DEV
+      ? new Worker(new URL('./markdown.worker.ts', import.meta.url), { type: 'module' })
+      : new Worker(new URL('./markdown.worker.ts', import.meta.url), { type: 'classic' })
+
     markdownWorker.onerror = (error) => {
       console.error('Worker error:', error)
     }
@@ -69,14 +71,14 @@ function renderMarkdown(markdown: string | undefined) {
     return
   }
 
-  console.log('Setting raw content', markdown.substring(0, 50) + '...')
+  console.log('Setting raw content', `${markdown.substring(0, 50)}...`)
   rawContent.value = markdown
-  
+
   if (!markdownWorker) {
     console.log('Worker not initialized')
     return
   }
-  
+
   if (!workerReady) {
     console.log('Worker not ready yet')
     return
