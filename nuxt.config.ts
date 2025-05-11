@@ -343,21 +343,6 @@ export default defineNuxtConfig({
         },
       },
     },
-    optimizeDeps: {
-      exclude: [
-        '@shikijs/markdown-it',
-        'shiki',
-        'markdown-it',
-        'shiki-stream',
-        'shiki-stream/vue',
-        '@shikijs/core',
-        '@shikijs/transformers',
-      ],
-    },
-    assetsInclude: ['**/*.wasm'],
-    worker: {
-      format: 'es',
-    },
   },
 
   typescript: {
