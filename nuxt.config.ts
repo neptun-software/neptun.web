@@ -346,6 +346,9 @@ export default defineNuxtConfig({
       exclude: ['@shikijs/markdown-it', 'shiki', 'markdown-it'],
     },
     assetsInclude: ['**/*.wasm'],
+    worker: {
+      format: 'es'
+    },
   },
 
   typescript: {
