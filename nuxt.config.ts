@@ -355,7 +355,7 @@ export default defineNuxtConfig({
     },
     assetsInclude: ['**/*.wasm'],
     worker: {
-      format: process.env.NODE_ENV === 'development' ? 'es' : 'iife',
+      format: 'es',
       plugins: process.env.NODE_ENV === 'development' ? () => [topLevelAwait()] : () => [],
     },
   },

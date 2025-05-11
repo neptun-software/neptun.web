@@ -23,9 +23,7 @@ const { isDarkMode, selectedTheme } = useTheme()
 function initWorker() {
   console.log('Initializing markdown worker...')
   try {
-    markdownWorker = import.meta.env.DEV
-      ? new Worker(new URL('./markdown.worker.ts', import.meta.url), { type: 'module' })
-      : new Worker(new URL('./markdown.worker.ts', import.meta.url), { type: 'classic' })
+    markdownWorker = new Worker(new URL('./markdown.worker.ts', import.meta.url), { type: 'module' })
 
     markdownWorker.onerror = (error) => {
       console.error('Worker error:', error)
