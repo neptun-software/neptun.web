@@ -329,6 +329,8 @@ export default defineNuxtConfig({
     plugins:
       NODE_ENV !== 'development'
         ? [
+          wasm(),
+          topLevelAwait(),
           removeConsole(),
         ]
         : [
