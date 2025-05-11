@@ -6,6 +6,7 @@ const props = defineProps<{
 }>()
 
 const isMarkdownReady = ref(false)
+const textStream = ref<ReadableStream<string> | undefined>(undefined)
 
 watch(() => props.message.content, () => {
   isMarkdownReady.value = false
@@ -14,6 +15,34 @@ watch(() => props.message.content, () => {
 function handleMarkdownReady() {
   isMarkdownReady.value = true
 }
+
+watch(() => props.message.isStreaming, (isStreaming) => {
+  if (isStreaming) {
+    let content = props.message.content || ''
+    
+    textStream.value = new ReadableStream<string>({
+      start(controller: ReadableStreamDefaultController<string>) {
+        if (content) {
+          controller.enqueue(content)
+        }
+      },
+      pull(controller: ReadableStreamDefaultController<string>) {
+        const newContent = props.message.content || ''
+        if (newContent !== content) {
+          const diff = newContent.slice(content.length)
+          content = newContent
+          controller.enqueue(diff)
+        }
+        
+        if (!props.message.isStreaming) {
+          controller.close()
+        }
+      }
+    })
+  } else {
+    textStream.value = undefined
+  }
+})
 </script>
 
 <template>
@@ -30,21 +59,18 @@ function handleMarkdownReady() {
       class="px-4 py-3 border rounded-lg bg-background border-slate-200 max-w-[80%] relative dark:border-border"
       :data-message-created-at="message.createdAt"
     >
-      <!-- Show raw text while markdown is rendering -->
+      <!-- Show raw text while markdown is rendering and not streaming -->
       <div v-if="!isMarkdownReady && !message.isStreaming" class="mb-2 whitespace-pre-wrap">
         {{ message.content }}
       </div>
 
-      <!-- Hide the preview until it's ready or streaming -->
-      <div :class="{ hidden: !isMarkdownReady && !message.isStreaming }">
-        <!-- Always use the same component instance -->
-        <DashboardChatMessageMarkdownPreview
-          :key="`preview-${message.id}`"
-          :markdown="message.content"
-          :is-streaming="message.isStreaming"
-          @ready="handleMarkdownReady"
-        />
-      </div>
+      <!-- Show preview when streaming or when ready -->
+      <DashboardChatMessageMarkdownPreview
+        :key="`preview-${message.id}`"
+        :markdown="message.content"
+        :text-stream="textStream"
+        @ready="handleMarkdownReady"
+      />
 
       <!-- Only show controls when not streaming -->
       <template v-if="!message.isStreaming">

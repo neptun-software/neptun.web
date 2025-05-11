@@ -28,12 +28,13 @@ const { selectedTheme, themeOptions, currentTheme, isDarkMode } = useTheme()
 const { getHighlighter, isLoading: isThemeChanging } = useShikiHighlighter()
 const isStreamingComplete = ref(false)
 const isStreamLocked = ref(false)
-const completeContent = ref('')
 
+// store the final content separately from the stream to allow theme updates
+const storedContent = ref(props.content)
 const renderedContent = ref('')
 const finalRenderStarted = ref(false)
 
-// Prevent immediate re-renders on theme changes
+// prevent immediate re-renders on theme changes
 const shouldUpdateTheme = ref(false)
 
 defineExpose({
@@ -68,48 +69,44 @@ function createTokenStream(content: string): ReadableStream {
 
 const tokensStream = ref<ReadableStream>()
 const isStreaming = ref(false)
-const fullContent = ref('')
 const contentBuffer = ref('')
 
 async function applyThemeInstantly() {
-  if (isThemeChanging.value) {
-    return
-  }
-
+  if (isThemeChanging.value) return
+  
   try {
-    tokensStream.value = createTokenStream(fullContent.value)
+    const content = storedContent.value
+    if (!content) return
+    
+    tokensStream.value = createTokenStream(content)
   } catch (error) {
     console.error('Error applying theme instantly:', error)
   }
 }
 
 function appendContent(newContent: string) {
-  if (!props.streamingMode) {
-    return
-  }
-
+  if (!props.streamingMode) return
+  
   contentBuffer.value = newContent
+  storedContent.value = newContent
+  
   if (highlighter.value && !isStreaming.value) {
     refreshStream()
   }
 }
 
 function refreshStream() {
-  if (!highlighter.value || isStreamingComplete.value) {
-    return
-  }
-
+  if (!highlighter.value || isStreamingComplete.value) return
+  
   const contentToUse = props.streamingMode ? contentBuffer.value : props.content
-  if (!contentToUse.trim()) {
-    return
-  }
-
+  if (!contentToUse.trim()) return
+  
   resetStream()
   isStreaming.value = true
-
+  
   try {
     const textStream = createContentStream(contentToUse)
-
+    
     tokensStream.value = textStream.pipeThrough(
       new CodeToTokenTransformStream({
         highlighter: highlighter.value,
@@ -127,17 +124,18 @@ function refreshStream() {
 onMounted(async () => {
   try {
     highlighter.value = await getHighlighter()
-
+    
     if (props.textStream) {
       startStreamingFromInput(props.textStream)
     } else {
       const initialContent = props.streamingMode ? contentBuffer.value : props.content
+      storedContent.value = initialContent
+      
       if (props.streamingMode) {
         contentBuffer.value = props.content
       }
-
+      
       if (initialContent) {
-        fullContent.value = initialContent
         startStreaming()
       }
     }
@@ -147,28 +145,23 @@ onMounted(async () => {
 })
 
 watch(() => props.content, (newContent) => {
-  if (props.streamingMode) {
-    return
-  }
-
+  if (props.streamingMode) return
+  
+  storedContent.value = newContent
   if (tokensStream.value) {
     resetStream()
   }
-  fullContent.value = newContent
   startStreaming()
 })
 
 watch([isDarkMode, () => theme.value], () => {
-  // Don't update theme on initial mount
   if (!shouldUpdateTheme.value) {
-    // Only set the flag to true after component is fully mounted
     nextTick(() => {
       shouldUpdateTheme.value = true
     })
     return
   }
 
-  // Apply theme change - for both dark mode switch and manual theme cycling
   applyThemeInstantly()
 }, { immediate: true })
 
@@ -179,27 +172,22 @@ watch(() => props.textStream, (newStream) => {
 })
 
 watch(isStreaming, (newValue) => {
-  if (newValue === false && fullContent.value) {
+  if (newValue === false && storedContent.value) {
     isStreamingComplete.value = true
   }
 })
 
 async function startStreamingFromInput(stream: ReadableStream<string>) {
-  if (!highlighter.value || isStreamingComplete.value) {
-    return
-  }
-
+  if (!highlighter.value || isStreamingComplete.value) return
+  
   isStreaming.value = true
   isStreamingComplete.value = false
   finalRenderStarted.value = false
-
-  let fullContentBuffer = ''
-
+  
   try {
-    // Create the token stream ONCE at the beginning
     const transformStream = new TransformStream<string, string>()
     const writer = transformStream.writable.getWriter()
-
+    
     tokensStream.value = transformStream.readable.pipeThrough(
       new CodeToTokenTransformStream({
         highlighter: highlighter.value,
@@ -208,27 +196,24 @@ async function startStreamingFromInput(stream: ReadableStream<string>) {
         allowRecalls: true,
       }),
     )
-
+    
     const reader = stream.getReader()
     let lastContentLength = 0
     let shortUpdateCount = 0
     let shortUpdateTimer: ReturnType<typeof setTimeout> | null = null
-
+    
     const finalizeStream = async () => {
-      if (finalRenderStarted.value) {
-        return
-      }
-
+      if (finalRenderStarted.value) return
+      
       finalRenderStarted.value = true
-
+      
       try {
-        const finalContent = fullContentBuffer.trim()
+        const finalContent = storedContent.value.trim()
         if (finalContent) {
           writer.write(finalContent)
           renderedContent.value = finalContent
-          fullContent.value = finalContent
         }
-
+        
         await writer.close()
       } catch (err) {
         console.error('Error finalizing stream:', err)
@@ -241,83 +226,71 @@ async function startStreamingFromInput(stream: ReadableStream<string>) {
         isStreamingComplete.value = true
         isStreamLocked.value = true
         isStreaming.value = false
-
+        
         if (props.blockId) {
           emit('streaming-complete', props.blockId)
           emit('update:isComplete', true)
         }
       }
     }
-
+    
     const writeToStream = (content: string) => {
-      if (finalRenderStarted.value) {
-        return
-      }
-
+      if (finalRenderStarted.value) return
+      
       try {
         writer.write(content)
         renderedContent.value = content
-        fullContent.value = content
-
+        storedContent.value = content
+        
         shortUpdateCount = 0
       } catch (err) {
         console.error('Error writing to token stream:', err)
         finalizeStream()
       }
     }
-
+    
     while (true) {
       const { value, done } = await reader.read()
-
+      
       if (done) {
-        // Stream is complete
         if (shortUpdateTimer) {
           clearTimeout(shortUpdateTimer)
           shortUpdateTimer = null
         }
-
+        
         await finalizeStream()
         break
       }
-
-      if (!value || isStreamLocked.value || finalRenderStarted.value) {
-        continue
-      }
-
-      fullContentBuffer = value
-
-      // Update immediately for significant content changes or first content
-      const contentSizeDiff = fullContentBuffer.length - lastContentLength
+      
+      if (!value || isStreamLocked.value || finalRenderStarted.value) continue
+      
+      storedContent.value = value
+      
+      const contentSizeDiff = value.length - lastContentLength
       const hasSignificantNewContent = contentSizeDiff > 10 || lastContentLength === 0
-      const isSmallContent = fullContentBuffer.length < 100
-
-      // For small content or significant updates, update immediately without batching
+      const isSmallContent = value.length < 100
+      
       if (hasSignificantNewContent || isSmallContent) {
-        writeToStream(fullContentBuffer)
-        lastContentLength = fullContentBuffer.length
-      }
-      // For small incremental updates, we'll count them and update after a few
-      else if (contentSizeDiff > 0) {
+        writeToStream(value)
+        lastContentLength = value.length
+      } else if (contentSizeDiff > 0) {
         shortUpdateCount++
-
-        // If we've collected a few small updates or it's been a while, update
+        
         if (shortUpdateCount >= 3) {
-          writeToStream(fullContentBuffer)
-          lastContentLength = fullContentBuffer.length
-        }
-        // Otherwise set a timer to ensure updates happen occasionally even for slow content
-        else if (!shortUpdateTimer) {
+          writeToStream(value)
+          lastContentLength = value.length
+        } else if (!shortUpdateTimer) {
           shortUpdateTimer = setTimeout(() => {
             if (contentSizeDiff > 0) {
-              writeToStream(fullContentBuffer)
-              lastContentLength = fullContentBuffer.length
+              writeToStream(value)
+              lastContentLength = value.length
             }
             shortUpdateTimer = null
           }, 25)
         }
       }
     }
-
+    
     reader.releaseLock()
   } catch (error) {
     console.error('Error in streaming:', error)
@@ -335,16 +308,17 @@ function createContentStream(content: string): ReadableStream<string> {
       },
     })
   }
-
+  
   return new ReadableStream({
     start(controller) {
       controller.enqueue(content)
       controller.close()
-
+      
+      storedContent.value = content
       isStreamLocked.value = true
       isStreamingComplete.value = true
       isStreaming.value = false
-
+      
       if (props.streamingMode && props.blockId) {
         emit('streaming-complete', props.blockId)
         emit('update:isComplete', true)
@@ -354,11 +328,8 @@ function createContentStream(content: string): ReadableStream<string> {
 }
 
 function startStreaming() {
-  if (!highlighter.value) {
-    return
-  }
+  if (!highlighter.value) return
   isStreamingComplete.value = false
-
   refreshStream()
 }
 
@@ -367,18 +338,15 @@ function resetStream() {
   isStreaming.value = false
   isStreamingComplete.value = false
   isStreamLocked.value = false
-  completeContent.value = ''
 }
 
 function cycleTheme() {
-  if (isThemeChanging.value) {
-    return
-  }
-
+  if (isThemeChanging.value) return
+  
   const currentIndex = themeOptions.findIndex(option => option.value === theme.value?.value)
   const nextIndex = (currentIndex + 1) % themeOptions.length
   theme.value = themeOptions[nextIndex]
-
+  
   shouldUpdateTheme.value = true
   applyThemeInstantly()
 }
@@ -471,3 +439,15 @@ const langColor = computed(() => {
     <br>
   </div>
 </template>
+
+<style lang="postcss" scoped>
+:deep(.shiki) {
+  background: transparent !important;
+}
+
+:deep(pre) {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+</style>
