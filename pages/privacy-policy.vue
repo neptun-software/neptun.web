@@ -11,7 +11,7 @@ definePageMeta({
       <h1>Datenschutz&shy;erkl&auml;rung</h1>
 
       <blockquote>
-        Last updated: 20.3.2025
+        Last updated: 07.06.2025
       </blockquote>
 
       <h2>1. Datenschutz auf einen Blick</h2>
@@ -122,19 +122,18 @@ definePageMeta({
       <p>Die verantwortliche Stelle f&uuml;r die Datenverarbeitung auf dieser Website ist:</p>
       <p>
         Jonas Fr&ouml;ller<br>
-        Limesstra&szlig;e 12/14<br>
-        4060 Leonding, Austria
+        Nu&szlig;b&ouml;ckstra&szlig;e 92<br>
+        4060 Leonding, &Ouml;sterreich
       </p>
 
       <p>
-        Telefon: (0732) 67 33 68 - 0<br>
-        E-Mail: neptunai.contact@gmail.com
+        Telefon: +43 6643279885<br>
+        E-Mail: jonas@merginit.com
       </p>
       <p>
         Verantwortliche Stelle ist die nat&uuml;rliche oder juristische Person, die allein oder gemeinsam mit anderen
         &uuml;ber die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten (z.&nbsp;B. Namen, E-Mail-Adressen
-        o.
-        &Auml;.) entscheidet.
+        o. &Auml;.) entscheidet.
       </p>
 
       <h3>Speicherdauer</h3>
