@@ -30,6 +30,12 @@ const noRestrictionsSecurityConfig = {
   },
 } as const
 
+const completelyUnrestrictedSecurityConfig = {
+  security: {
+    enabled: false,
+  },
+} as const
+
 const NODE_ENV = process.env.NODE_ENV
 console.info(`NODE_ENV: ${NODE_ENV}`)
 
@@ -249,6 +255,10 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    '/': completelyUnrestrictedSecurityConfig,
+    '/dashboard': completelyUnrestrictedSecurityConfig,
+    '/chat': completelyUnrestrictedSecurityConfig,
+    '/ai': completelyUnrestrictedSecurityConfig,
     '/api/**': {
       security: {
         corsHandler,
