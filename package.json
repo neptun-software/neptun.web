@@ -67,7 +67,7 @@
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue-email/components": "^0.0.21",
     "@vue-email/render": "^0.0.9",
-    "ai": "^4.1.34",
+    "ai": "^5.0.52",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "composerize-ts": "^0.6.2",
