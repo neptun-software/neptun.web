@@ -59,7 +59,7 @@
     "@openrouter/ai-sdk-provider": "^0.2.2",
     "@radix-icons/vue": "^1.0.0",
     "@simplewebauthn/browser": "11",
-    "@simplewebauthn/server": "11",
+    "@simplewebauthn/server": "13",
     "@tanstack/vue-table": "^8.20.5",
     "@uploadthing/nuxt": "^7.1.5",
     "@upstash/redis": "^1.34.5",
