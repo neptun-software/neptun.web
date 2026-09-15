@@ -53,7 +53,7 @@
     "@neondatabase/serverless": "^0.10.4",
     "@nuxt/image": "^1.9.0",
     "@nuxtjs/device": "^3.2.4",
-    "@nuxtjs/mdc": "0.13.3",
+    "@nuxtjs/mdc": "0.17.2",
     "@nuxtjs/robots": "^5.2.2",
     "@octokit/graphql-schema": "^15.26.0",
     "@openrouter/ai-sdk-provider": "^0.2.2",
