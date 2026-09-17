@@ -1,10 +1,7 @@
-import type { BundledLanguage, LanguageRegistration } from 'shiki'
+import type { BundledLanguage } from 'shiki'
 import { bundledLanguagesInfo } from 'shiki'
 
-export const supportedShikiLanguages: (
-  | BundledLanguage
-  | LanguageRegistration
-)[] = [
+export const supportedShikiLanguages: BundledLanguage[] = [
   'js',
   'jsx',
   'json',

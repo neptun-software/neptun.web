@@ -54,7 +54,7 @@ export default defineWebAuthnRegisterEventHandler({
       public_key: credential.publicKey,
       counter: credential.counter,
       backed_up: credential.backedUp,
-      transports: (credential.transports || []).join(','),
+      transports: credential.transports ?? [],
     })
 
     await setUserSession(event, {

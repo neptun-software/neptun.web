@@ -1,5 +1,4 @@
 import type { VerifiedAuthenticationResponse } from '@simplewebauthn/server'
-import type { AuthenticatorTransportFuture } from '@simplewebauthn/types'
 import type { H3Event } from 'h3'
 import type { WebAuthnCredential } from '~/server/types/webauthn'
 import { eq } from 'drizzle-orm'
@@ -33,7 +32,7 @@ export default defineWebAuthnAuthenticateEventHandler({
     const credentials = await getWebAuthnCredentialsByUserId(user.id)
     return credentials.map(cred => ({
       id: cred.id,
-      transports: cred.transports.split(',') as AuthenticatorTransportFuture[],
+      transports: cred.transports ?? [],
     }))
   },
 
@@ -47,7 +46,7 @@ export default defineWebAuthnAuthenticateEventHandler({
       publicKey: credential.public_key,
       counter: credential.counter,
       backedUp: credential.backed_up,
-      transports: credential.transports.split(',') as AuthenticatorTransportFuture[],
+      transports: credential.transports ?? [],
     }
   },
 

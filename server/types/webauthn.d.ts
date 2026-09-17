@@ -6,6 +6,7 @@ export interface WebAuthnCredential {
   counter: number
   backedUp: boolean
   transports?: AuthenticatorTransportFuture[]
+  [key: string]: unknown
 }
 
 export interface WebAuthnUser {

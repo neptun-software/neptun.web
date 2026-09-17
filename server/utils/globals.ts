@@ -1,9 +1,9 @@
 export const IS_DEV = import.meta.dev ?? false
-export const IS_SERVERLESS = Boolean(JSON.parse(`${Boolean(process.env.IS_SERVERLESS)}` ?? 'false')) // process.env.DATABASE_CONNECTION_STRING?.includes("neon.tech") && !IS_DEV (serverless doesn't work in a serverless environment and times out :|)
+export const IS_SERVERLESS = process.env.IS_SERVERLESS === 'true' // process.env.DATABASE_CONNECTION_STRING?.includes("neon.tech") && !IS_DEV (serverless doesn't work in a serverless environment and times out :|)
 // export const IS_TEST = import.meta.test;
 
-export const LOG_SQL_QUERIES = Boolean(JSON.parse(`${Boolean(process.env.LOG_SQL_QUERIES)}` ?? 'false'))
-export const LOG_BACKEND = Boolean(JSON.parse(`${Boolean(process.env.LOG_BACKEND)}` ?? 'false'))
+export const LOG_SQL_QUERIES = process.env.LOG_SQL_QUERIES === 'true'
+export const LOG_BACKEND = process.env.LOG_BACKEND === 'true'
 
 export const ENCRYPTION_SECRET = process.env.CRYPTO_SECRET ?? 'secret'
 

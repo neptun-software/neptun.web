@@ -1,8 +1,7 @@
 // https://github.com/rehypejs/rehype-external-links/blob/main/readme.md
+import type { Element, ElementContent, Properties } from 'hast'
 
 declare module '@nuxtjs/mdc' {
-  import type { Element, ElementContent, Properties } from 'hast'
-
   type Target = '_blank' | '_parent' | '_self' | '_top'
   type Test = import('hast-util-is-element').Test
 
@@ -33,6 +32,6 @@ declare module '@nuxtjs/mdc' {
   }
 
   interface UnistPlugin {
-    'rehype-external-links': Options
+    'rehype-external-links'?: Options
   }
 }

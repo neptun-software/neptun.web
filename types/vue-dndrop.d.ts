@@ -1,54 +1,51 @@
-import type { Element } from '@nuxtjs/mdc'
-import type { DefineComponent } from 'vue'
-
 declare module 'vue-dndrop' {
-  interface DropResult {
-    removedIndex: number
-    addedIndex: number
-    payload: Payload
-    element: Element
+  export interface DropResult<T = any> {
+    removedIndex: number | null
+    addedIndex: number | null
+    payload: T
+    element: HTMLElement
   }
 
-  interface DragEvent {
-    payload: Payload
+  export interface DragEvent<T = any> {
+    payload: T
     isSource: boolean
     willAcceptDrop: boolean
   }
 
-  type Payload = any
+  export type Payload = any
 
-  interface NodeDescription {
+  export interface NodeDescription {
     value: string
-    props: Record<string, any>
+    props: Record<string, unknown>
   }
 
-  interface DraggableProps {
+  export interface DraggableProps {
     dragNotAllowed?: boolean
     tag?: string | NodeDescription
   }
 
-  interface ContainerProps {
+  export interface ContainerProps {
     dragStart?: (dragEvent: DragEvent) => void
     dragEnd?: (dragEvent: DragEvent) => void
     dragEnter?: () => void
     dragLeave?: () => void
     dragReady?: (dropResult: DropResult) => void
     drop?: (dropResult: DropResult) => void
-    dropNotAllowed?: (dropResult: { payload: any, container: any }) => void
+    dropNotAllowed?: (dropResult: { payload: unknown, container: unknown }) => void
 
-    getChildPayload?: (index: number) => Payload
+    getChildPayload?: (index: number) => unknown
     shouldAnimateDrop?: (
       sourceContainerOptions: ContainerProps,
-      payload: Payload
+      payload: unknown
     ) => boolean
     shouldAcceptDrop?: (
       sourceContainerOptions: ContainerProps,
-      payload: Payload
+      payload: unknown
     ) => boolean
-    getGhostParent?: () => Element
+    getGhostParent?: () => HTMLElement
 
-    orientation: 'horizontal' | 'vertical'
-    behavior: 'move' | 'copy' | 'drop-zone' | 'contain'
+    orientation?: 'horizontal' | 'vertical'
+    behavior?: 'move' | 'copy' | 'drop-zone' | 'contain'
     tag?: string | NodeDescription
     groupName?: string
     lockAxis?: 'x' | 'y'
@@ -70,10 +67,6 @@ declare module 'vue-dndrop' {
     fireRelatedEventsOnly?: boolean
   }
 
-  const Draggable: DefineComponent<DraggableProps>
-  const Container: DefineComponent<ContainerProps>
-
-  export { Container, DragEvent, Draggable, DropResult }
+  export const Draggable: import('vue').DefineComponent<DraggableProps>
+  export const Container: import('vue').DefineComponent<ContainerProps>
 }
-
-export {}
