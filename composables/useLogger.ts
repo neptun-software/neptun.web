@@ -1,4 +1,4 @@
-import consola from 'consola'
+import { consola } from 'consola'
 
 export function useLogger() {
   // const { $config } = useNuxtApp(); // not available in composables (same as useRuntimeConfig())
