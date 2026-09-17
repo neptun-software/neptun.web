@@ -145,7 +145,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@nuxt/devtools": "^2.6.4",
+      "@nuxt/devtools": "^3.0.0",
       "axios": "^1.18.0",
       "basic-ftp": "^5.2.0",
       "cross-spawn": "^7.0.6",
