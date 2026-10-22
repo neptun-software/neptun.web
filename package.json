@@ -78,7 +78,7 @@
     "gsap": "^3.12.7",
     "jszip": "^3.10.1",
     "lucide-vue-next": "^0.475.0",
-    "markdown-it": "^14.2.0",
+    "markdown-it": "^14.3.3",
     "nodemailer": "^9.1.1",
     "nuxt": "^3.21.11",
     "nuxt-auth-utils": "^0.5.16",
